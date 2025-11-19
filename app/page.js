@@ -1,4 +1,4 @@
-import ProductCard from "./ProductCard";
+<h1>Welcome to OodlesNet </h1>import ProductCard from "./ProductCard";
 
 export default function Home() {
   const sampleProducts = [
