@@ -1,45 +1,57 @@
 import { products } from "../../../data/products";
 
 export default function ProductPage({ params }) {
-  const productId = parseInt(params.id);
-  const product = products.find((p) => p.id === productId);
+  const product = products.find(p => p.id === Number(params.id));
 
   if (!product) {
-    return <h2 style={{ padding: 30 }}>Product not found</h2>;
+    return <h1 style={{ padding: "30px", fontFamily: "Arial" }}>Product Not Found</h1>;
   }
 
   return (
-    <div style={{ padding: "40px", fontFamily: "Arial" }}>
+    <div style={{ padding: "30px", fontFamily: "Arial", maxWidth: "600px", margin: "auto" }}>
       <h1>{product.name}</h1>
 
       <img
         src={product.image}
         alt={product.name}
-        style={{
-          width: "350px",
-          borderRadius: "10px",
-          margin: "20px 0",
-        }}
+        style={{ width: "100%", borderRadius: "10px", marginBottom: "20px" }}
       />
 
-      <p>{product.description}</p>
+      <p style={{ color: "#555" }}>{product.description}</p>
 
-      <h3>Price Comparison</h3>
+      <h2 style={{ marginTop: "30px" }}>Available Prices</h2>
 
-      {product.stores.map((s, index) => (
-        <div
-          key={index}
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            padding: "8px 0",
-            borderBottom: "1px solid #eee",
-          }}
-        >
-          <span>{s.name}</span>
-          <strong>₹{s.price}</strong>
-        </div>
-      ))}
+      <div style={{ marginTop: "15px" }}>
+        {product.stores.map((store, index) => (
+          <div
+            key={index}
+            style={{
+              background: "#f3f3f3",
+              padding: "15px",
+              borderRadius: "10px",
+              marginBottom: "12px"
+            }}
+          >
+            <strong>{store.name}</strong> — ₹{store.price}
+            <br />
+            <a
+              href={store.link}
+              target="_blank"
+              style={{
+                display: "inline-block",
+                marginTop: "8px",
+                padding: "8px 14px",
+                background: "#0070f3",
+                color: "#fff",
+                borderRadius: "6px",
+              }}
+            >
+              View on {store.name}
+            </a>
+          </div>
+        ))}
+      </div>
     </div>
   );
-}
+      }
+  
