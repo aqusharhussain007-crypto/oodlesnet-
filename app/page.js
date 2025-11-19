@@ -1,65 +1,91 @@
-<h1>Welcome to OodlesNet </h1>import ProductCard from "./ProductCard";
+"use client";
+
+import { useState } from "react";
+import { products } from "../data/products";
 
 export default function Home() {
-  const sampleProducts = [
-    {
-      store: "Amazon",
-      name: "Wireless Earbuds",
-      price: 1299,
-      link: "https://www.amazon.in/",
-    },
-    {
-      store: "Flipkart",
-      name: "Smartwatch",
-      price: 2199,
-      link: "https://www.flipkart.com/",
-    },
-    {
-      store: "Meesho",
-      name: "Backpack",
-      price: 899,
-      link: "https://www.meesho.com/",
-    },
-  ];
+  const [query, setQuery] = useState("");
+
+  // Filter products by search text
+  const filteredProducts = products.filter((p) =>
+    p.name.toLowerCase().includes(query.toLowerCase())
+  );
 
   return (
     <div style={{ padding: "40px", fontFamily: "Arial" }}>
-      <h1>Welcome to OodlesNet</h1>
-      <p>Your one-stop search for Amazon, Flipkart, Meesho & more.</p>
+      <h1 style={{ textAlign: "center", marginBottom: "20px" }}>
+        OodlesNet 🚀
+      </h1>
 
-      <div style={{ marginTop: "20px" }}>
+      {/* SEARCH BAR */}
+      <div style={{ textAlign: "center", marginBottom: "30px" }}>
         <input
           type="text"
-          placeholder="Search any product..."
+          placeholder="Search for any product..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
           style={{
-            padding: "10px",
-            width: "100%",
-            maxWidth: "400px",
-            borderRadius: "6px",
+            width: "60%",
+            padding: "12px 15px",
+            fontSize: "16px",
+            borderRadius: "8px",
             border: "1px solid #ccc",
           }}
         />
       </div>
 
-      <h2 style={{ marginTop: "30px" }}>Sample Products</h2>
+      {/* PRODUCT LIST */}
       <div
         style={{
-          display: "flex",
-          flexWrap: "wrap",
-          marginTop: "15px",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+          gap: "20px",
         }}
       >
-        {sampleProducts.map((product, index) => (
-          <ProductCard
-            key={index}
-            store={product.store}
-            name={product.name}
-            price={product.price}
-            link={product.link}
-          />
+        {filteredProducts.map((p) => (
+          <div
+            key={p.id}
+            style={{
+              border: "1px solid #ddd",
+              borderRadius: "10px",
+              padding: "15px",
+              background: "#fff",
+              boxShadow: "0px 3px 8px rgba(0,0,0,0.08)",
+            }}
+          >
+            <img
+              src={p.image}
+              alt={p.name}
+              style={{
+                width: "100%",
+                borderRadius: "10px",
+                marginBottom: "10px",
+              }}
+            />
+
+            <h3>{p.name}</h3>
+
+            {/* STORE PRICE COMPARISON */}
+            <div style={{ marginTop: "10px" }}>
+              {p.stores.map((s, index) => (
+                <div
+                  key={index}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "6px 0",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  <span>{s.name}</span>
+                  <strong>₹{s.price}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
         ))}
       </div>
     </div>
   );
-            }
+                }
   
