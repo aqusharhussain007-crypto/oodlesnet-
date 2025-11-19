@@ -42,15 +42,67 @@ export default function Home() {
           gap: "20px",
         }}
       >
-        {filteredProducts.map((p) => (
-          <div
-            key={p.id}
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: "10px",
-              padding: "15px",
+import Link from "next/link";
+import { products } from "../data/products";
+
+export default function Home() {
+  return (
+    <div style={{ padding: "30px", fontFamily: "Arial" }}>
+      <h1>OodlesNet 🚀</h1>
+
+      <input
+        type="text"
+        placeholder="Search for products..."
+        style={{
+          width: "100%",
+          padding: "12px",
+          margin: "20px 0",
+          borderRadius: "8px",
+          border: "1px solid #ccc",
+        }}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+        gap: "20px",
+      }}>
+        {filteredProducts.map(product => (
+          <Link
+            key={product.id}
+            href={`/product/${product.id}`}
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <div style={{
               background: "#fff",
-              boxShadow: "0px 3px 8px rgba(0,0,0,0.08)",
+              padding: "20px",
+              borderRadius: "12px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              cursor: "pointer",
+              transition: "0.2s",
+            }}>
+              <img
+                src={product.image}
+                alt={product.name}
+                style={{ width: "100%", borderRadius: "10px" }}
+              />
+
+              <h3>{product.name}</h3>
+
+              {product.stores.map((store, index) => (
+                <p key={index}>
+                  <strong>{store.name}:</strong> ₹{store.price}
+                </p>
+              ))}
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+                                  }
+                                  
             }}
           >
             <img
