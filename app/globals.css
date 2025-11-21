@@ -1,1 +1,77 @@
+/* globals.css */
+
+/* General body styling */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7fa; /* Soft light background for eye comfort */
+  color: #111;
+  margin: 0;
+  padding: 0;
+}
+
+/* Neon-blue glow effect for headers */
+h1, h2, h3, h4, h5, h6 {
+  color: #16d2ff;
+  text-shadow: 0 0 5px #16d2ff, 0 0 10px #16d2ff, 0 0 20px #16d2ff;
+}
+
+/* Glowing buttons */
+button, .btn {
+  background-color: #16d2ff;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #16d2ff, 0 0 20px #16d2ff;
+  transition: 0.3s;
+}
+
+button:hover, .btn:hover {
+  box-shadow: 0 0 20px #16d2ff, 0 0 30px #16d2ff;
+  transform: scale(1.05);
+}
+
+/* Product card glow effect */
+.product-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 15px;
+  margin: 15px;
+  box-shadow: 0 0 5px #16d2ff, 0 0 10px #16d2ff;
+  transition: 0.3s;
+}
+
+.product-card:hover {
+  box-shadow: 0 0 15px #16d2ff, 0 0 30px #16d2ff;
+  transform: translateY(-3px);
+}
+
+/* Input/search bar styling */
+input[type="text"], .search-bar {
+  width: 100%;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 2px solid #16d2ff;
+  box-shadow: 0 0 5px #16d2ff;
+  outline: none;
+  transition: 0.3s;
+}
+
+input[type="text"]:focus, .search-bar:focus {
+  box-shadow: 0 0 10px #16d2ff, 0 0 20px #16d2ff;
+  border-color: #16d2ff;
+}
+
+/* Links glow effect */
+a {
+  color: #16d2ff;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+a:hover {
+  text-shadow: 0 0 5px #16d2ff, 0 0 10px #16d2ff;
+  }
 
