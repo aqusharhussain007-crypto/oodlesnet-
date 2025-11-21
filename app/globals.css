@@ -3,14 +3,13 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-/* BODY */
+}/* Body Styling */
 body {
-  font-family: 'Inter', Arial, sans-serif;
-  background-color: #f5f7fa;
-  color: #1a1a1a;
-  line-height: 1.6;
+    font-family: 'Inter', Arial, sans-serif;
+    background-color: #e9ecf1; /* light soft grey → neon glow will pop */
+    color: #1a1a1a;
+    line-height: 1.6;
+}
   padding: 2rem;
 }
 
