@@ -1,5 +1,4 @@
 import { products } from "../../../data/products";
-
 export default function ProductPage({ params }) {
   const product = products.find(p => p.id === Number(params.id));
 
