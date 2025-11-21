@@ -1,6 +1,4 @@
-
 import './globals.css';
-
 export const metadata = {
   title: 'OodlesNet 🚀',
   description: 'Compare prices across multiple stores easily!',
