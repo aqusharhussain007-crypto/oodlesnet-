@@ -1,9 +1,9 @@
 // app/layout.js
-import './globals.css';
+import "./globals.css";
 
 export const metadata = {
-  title: 'OodlesNet 🚀',
-  description: 'Compare prices across multiple stores easily!',
+  title: "OodlesNet 🚀",
+  description: "Compare prices across multiple stores easily!",
 };
 
 export default function RootLayout({ children }) {
