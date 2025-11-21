@@ -13,11 +13,14 @@ body {
   padding: 2rem;
 }
 
-/* GLOW HEADINGS */
-h1, h2, h3 {
-  color: #16d2ff;
-  text-shadow: 0 0 6px rgba(22,210,255,0.8);
+/* Glow Headings */
+h1, h2, h3, h4, h5, h6 {
+    color: #16d2ff;
+    text-shadow:
+        0 0 6px rgba(22, 210, 255, 0.8),
+        0 0 12px rgba(22, 210, 255, 0.5);
 }
+
 
 /* BUTTONS */
 button {
