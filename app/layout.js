@@ -1,10 +1,9 @@
-// app/layout.js
 import "./globals.css";
 import Navbar from "../components/Navbar";
 
 export const metadata = {
   title: "OodlesNet 🚀",
-  description: "Modern product experience",
+  description: "Compare prices across multiple stores easily!",
 };
 
 export default function RootLayout({ children }) {
@@ -17,3 +16,4 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+  
