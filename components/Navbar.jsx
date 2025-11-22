@@ -1,26 +1,29 @@
 "use client";
 
-import Link from "next/link";
-import { useState } from "react";
-
 export default function Navbar() {
-  const [dark, setDark] = useState(false);
-
   return (
-    <nav className={dark ? "navbar dark" : "navbar"}>
-      <div className="logo">
-        <Link href="/">OodlesNet</Link>
+    <nav
+      style={{
+        width: "100%",
+        padding: "1rem 2rem",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        background: "#f2f2f2",
+        borderBottom: "1px solid #ddd",
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+      }}
+    >
+      <h2 style={{ margin: 0 }}>OodlesNet</h2>
+
+      <div style={{ display: "flex", gap: "1.5rem" }}>
+        <a href="/" style={{ textDecoration: "none" }}>Home</a>
+        <a href="/products" style={{ textDecoration: "none" }}>Products</a>
+        <a href="/contact" style={{ textDecoration: "none" }}>Contact</a>
       </div>
-
-      <ul className="nav-links">
-        <li><Link href="/">Home</Link></li>
-        <li><Link href="/products">Products</Link></li>
-      </ul>
-
-      <button className="mode-toggle" onClick={() => setDark(!dark)}>
-        {dark ? "Light Mode" : "Dark Mode"}
-      </button>
     </nav>
   );
-      }
+          }
       
