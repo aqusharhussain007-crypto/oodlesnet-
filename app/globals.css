@@ -89,4 +89,38 @@ button:hover {
   display: flex;
   align-items: center;
     }
-    
+    /* NAVBAR */
+.navbar {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #ddd;
+}
+
+.navbar.dark {
+  background: #0d0d0d;
+  color: white;
+  border-bottom: 1px solid #333;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: inherit;
+  font-weight: 500;
+}
+
+.mode-toggle {
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+    }
+  
