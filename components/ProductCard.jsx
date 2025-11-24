@@ -1,32 +1,15 @@
-export default function ProductCard({ store, name, price, link }) {
+export default function ProductCard({ product }) {
   return (
-    <div
-      style={{
-        border: "1px solid #ccc",
-        borderRadius: "8px",
-        padding: "15px",
-        margin: "10px",
-        width: "250px",
-        boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-      }}
-    >
-      <h3 style={{ margin: "0 0 10px 0" }}>{name}</h3>
-      <p style={{ margin: "0 0 5px 0", fontWeight: "bold" }}>{store}</p>
-      <p style={{ margin: "0 0 10px 0" }}>₹ {price}</p>
-      <a
-        href={link}
-        target="_blank"
-        style={{
-          display: "inline-block",
-          padding: "8px 12px",
-          backgroundColor: "#1e40af",
-          color: "#fff",
-          borderRadius: "4px",
-          textDecoration: "none",
-        }}
-      >
-        Buy Now
-      </a>
+    <div className="border rounded-lg p-4 shadow">
+      <img
+        src={product.image}
+        alt={product.name}
+        className="w-full h-48 object-cover rounded"
+      />
+
+      <h2 className="text-xl font-semibold mt-2">{product.name}</h2>
+      <p className="text-gray-600">{product.description}</p>
+      <p classname="font-bold mt-2">₹{product.price}</p>
     </div>
   );
 }
