@@ -1,31 +1,36 @@
-// app/page.js
+"use client";
+
+import { useEffect, useState } from "react";
+import ProductCard from "@/components/ProductCard";
+import { db } from "@/lib/firebase";
+import { collection, getDocs } from "firebase/firestore";
+
 export default function Home() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    async function loadProducts() {
+      const querySnapshot = await getDocs(collection(db, "products"));
+      const items = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setProducts(items);
+    }
+
+    loadProducts();
+  }, []);
+
   return (
-    <>
-      <h1>OodlesNet 🚀</h1>
+    <main className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Products</h1>
 
-      {/* Search Bar */}
-      <div className="search-wrapper">
-        <input
-          type="text"
-          placeholder="Search products..."
-          className="search-bar"
-        />
-        <button style={{ marginLeft: "1rem" }}>Search</button>
-      </div>
-
-      {/* Cards Grid */}
-      <div className="product-grid">
-        {[1, 2, 3].map((item) => (
-          <div key={item} className="card">
-            <img src="https://via.placeholder.com/250x150" alt="Product" />
-            <h2>Product {item}</h2>
-            <p>$9{item}.99</p>
-            <button>Buy Now</button>
-          </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {products.map(product => (
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
-    </>
+    </main>
   );
-            }
-            
+}
