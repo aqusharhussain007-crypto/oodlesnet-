@@ -1,10 +1,26 @@
-import ProductCard from "@/components/ProductCard";
-export default function ProductPage({ params }) {
-  const product = products.find(p => p.id === Number(params.id));
+"use client";
 
-  if (!product) {
-    return <h1 style={{ padding: "30px", fontFamily: "Arial" }}>Product Not Found</h1>;
-  }
+import { useEffect, useState } from "react";
+import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
+
+export default function ProductPage({ params }) {
+  const [product, setProduct] = useState(null);
+
+  useEffect(() => {
+    async function loadProduct() {
+      const ref = doc(db, "products", params.id);
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        setProduct({ id: snap.id, ...snap.data() });
+      }
+    }
+
+    loadProduct();
+  }, [params.id]);
+
+  if (!product) return <h1>Loading...</h1>;
 
   return (
     <div style={{ padding: "30px", fontFamily: "Arial", maxWidth: "600px", margin: "auto" }}>
@@ -18,39 +34,9 @@ export default function ProductPage({ params }) {
 
       <p style={{ color: "#555" }}>{product.description}</p>
 
-      <h2 style={{ marginTop: "30px" }}>Available Prices</h2>
-
-      <div style={{ marginTop: "15px" }}>
-        {product.stores.map((store, index) => (
-          <div
-            key={index}
-            style={{
-              background: "#f3f3f3",
-              padding: "15px",
-              borderRadius: "10px",
-              marginBottom: "12px"
-            }}
-          >
-            <strong>{store.name}</strong> — ₹{store.price}
-            <br />
-            <a
-              href={store.link}
-              target="_blank"
-              style={{
-                display: "inline-block",
-                marginTop: "8px",
-                padding: "8px 14px",
-                background: "#0070f3",
-                color: "#fff",
-                borderRadius: "6px",
-              }}
-            >
-              View on {store.name}
-            </a>
-          </div>
-        ))}
-      </div>
+      <h2 style={{ marginTop: "30px" }}>Price</h2>
+      <p>₹{product.price}</p>
     </div>
   );
-      }
-  
+        }
+        
