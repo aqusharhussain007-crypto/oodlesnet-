@@ -11,32 +11,26 @@ export default function ProductPage({ params }) {
     async function loadProduct() {
       const ref = doc(db, "products", params.id);
       const snap = await getDoc(ref);
-
       if (snap.exists()) {
         setProduct({ id: snap.id, ...snap.data() });
       }
     }
-
     loadProduct();
   }, [params.id]);
 
   if (!product) return <h1>Loading...</h1>;
 
   return (
-    <div style={{ padding: "30px", fontFamily: "Arial", maxWidth: "600px", margin: "auto" }}>
+    <div style={{ padding: "30px", maxWidth: "600px", margin: "auto" }}>
       <h1>{product.name}</h1>
-
       <img
         src={product.image}
         alt={product.name}
         style={{ width: "100%", borderRadius: "10px", marginBottom: "20px" }}
       />
-
-      <p style={{ color: "#555" }}>{product.description}</p>
-
-      <h2 style={{ marginTop: "30px" }}>Price</h2>
+      <p>{product.description}</p>
+      <h2 style={{ marginTop: "20px" }}>Price</h2>
       <p>₹{product.price}</p>
     </div>
   );
-        }
-        
+}
