@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ProductCard from "@/component/ProductCard";   // your folder name is 'component'
+import ProductCard from "@/components/ProductCard";
 import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 
