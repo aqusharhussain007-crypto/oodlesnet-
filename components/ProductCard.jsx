@@ -9,7 +9,7 @@ export default function ProductCard({ product }) {
 
       <h2 className="text-xl font-semibold mt-2">{product.name}</h2>
       <p className="text-gray-600">{product.description}</p>
-      <p classname="font-bold mt-2">₹{product.price}</p>
+      <p className="font-bold mt-2">₹{product.price}</p>
     </div>
   );
 }
