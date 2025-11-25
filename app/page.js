@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ProductCard from "@/components/ProductCard";
+import ProductCard from "@/component/ProductCard";   // your folder name is 'component'
 import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 
@@ -33,4 +33,5 @@ export default function Home() {
       </div>
     </main>
   );
-}
+  }
+  
