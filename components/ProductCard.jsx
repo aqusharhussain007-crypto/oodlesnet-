@@ -1,6 +1,6 @@
 export default function ProductCard({ product }) {
   return (
-    <div className="border rounded-lg p-4 shadow">
+    <div className="border rounded p-4 shadow">
       <img
         src={product.image}
         alt={product.name}
