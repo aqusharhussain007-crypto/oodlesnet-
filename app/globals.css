@@ -11,28 +11,42 @@ body {
   background-color: #e9ecf1;
   color: #1a1a1a;
   line-height: 1.6;
-  padding: 2rem 1rem;
+  padding: 1rem; /* mobile-friendly */
 }
 
-/* HEADINGS — SHARP + STRONGER NEON BLUE */
+/* PAGE CONTAINER */
+.page-container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 1rem;
+}
+
+/* MOBILE FIX — prevent wide overflow */
+@media (max-width: 600px) {
+  .page-container {
+    padding: 0.5rem;
+  }
+}
+
+/* SHARP OUTLINE NEON HEADINGS */
 h1, h2, h3, h4, h5, h6 {
-  color: #0bbcff; /* deeper neon blue */
+  color: #0bbcff;
   text-shadow:
-    0 0 4px rgba(11,188,255,0.7),
-    0 0 10px rgba(11,188,255,0.5);
+    0 0 2px #0bbcff,
+    0 0 4px #0bbcff;
 }
 
-/* BRAND LOGO GLOW — STRONGER BLUE */
+/* BRAND LOGO — SHARP NEON OUTLINE */
 .brand-title {
   color: #0bbcff;
   text-shadow:
-    0 0 6px rgba(11,188,255,0.8),
-    0 0 14px rgba(11,188,255,0.6),
-    0 0 20px rgba(11,188,255,0.4);
+    0 0 2px #0bbcff,
+    0 0 6px #0bbcff;
   font-weight: 900;
   letter-spacing: 0.6px;
 }
 
+/* BUTTONS */
 button, .btn-glow {
   background-color: #0bbcff;
   color: #fff;
@@ -41,67 +55,72 @@ button, .btn-glow {
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  box-shadow: 0 0 8px rgba(11,188,255,0.5);
+  box-shadow: 0 0 8px rgba(11,188,255,0.4);
   transition: all 0.3s ease;
 }
 
 button:hover, .btn-glow:hover {
   box-shadow:
-    0 0 12px rgba(11,188,255,0.8),
-    0 0 16px rgba(11,188,255,0.5);
+    0 0 10px rgba(11,188,255,0.7),
+    0 0 14px rgba(11,188,255,0.5);
   transform: translateY(-2px);
 }
 
-
 /* SEARCH BAR */
 .search-bar {
-  width: 300px;
+  width: 100%;
+  max-width: 350px;
   padding: 0.6rem 1rem;
-  border: 2px solid #16d2ff;
+  border: 2px solid #0bbcff;
   border-radius: 6px;
   outline: none;
   transition: box-shadow 0.3s ease;
 }
 
 .search-bar:focus {
-  box-shadow: 0 0 10px rgba(22,210,255,0.7);
+  box-shadow: 0 0 8px rgba(11,188,255,0.6);
 }
 
 /* CARD STYLE */
 .card {
-  width: 250px;
+  width: 100%;
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   padding: 1rem;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  opacity: 0;
+  animation: fadeIn 0.6s ease forwards;
 }
 
-/* CARD HOVER EFFECT (subtle lift) */
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 25px rgba(22,210,255,0.25);
-}
-
-/* CARD IMAGE */
+/* PRODUCT IMAGE */
 .card img {
   width: 100%;
   border-radius: 8px;
   margin-bottom: 0.8rem;
+  object-fit: cover;
 }
 
-/* PRODUCT GRID */
-.product-grid {
-  display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
+/* CARD NEON OUTLINE ON HOVER */
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 0 8px rgba(11,188,255,0.4),
+    0 0 16px rgba(11,188,255,0.3),
+    0 0 24px rgba(11,188,255,0.2);
+  border: 1px solid rgba(11,188,255,0.4);
 }
 
-/* SEARCH WRAPPER */
-.search-wrapper {
-  margin: 1.5rem 0;
-  display: flex;
-  align-items: center;
+/* FADE-IN ANIMATION */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* FOOTER LINK GLOW */
+footer a:hover {
+  color: #0bbcff;
+  text-shadow: 0 0 6px rgba(11,188,255,0.6);
 }
 
 /* NAVBAR */
@@ -118,12 +137,6 @@ button:hover, .btn-glow:hover {
   z-index: 100;
 }
 
-.navbar.dark {
-  background: #0d0d0d;
-  color: white;
-  border-bottom: 1px solid #333;
-}
-
 .nav-links {
   display: flex;
   gap: 1.5rem;
@@ -133,43 +146,5 @@ button:hover, .btn-glow:hover {
   text-decoration: none;
   color: inherit;
   font-weight: 500;
-}
-
-/* MODE TOGGLE BTN (future feature) */
-.mode-toggle {
-  padding: 0.4rem 0.8rem;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-    }
- /* CARD NEON GLOW ON HOVER */
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow:
-    0 0 8px rgba(22,210,255,0.4),
-    0 0 16px rgba(22,210,255,0.3),
-    0 0 24px rgba(22,210,255,0.2);
-  border: 1px solid rgba(22,210,255,0.4);
-    }
- /* FOOTER LINK HOVER (NEON GLOW) */
-footer a:hover {
-  color: #0bbcff;
-  text-shadow: 0 0 6px rgba(11,188,255,0.6);
-/* PAGE CONTAINER (Applies to all pages) */
-.page-container {
-  max-width: 1100px;
-  margin: auto;
-  padding: 1rem;
-  }
-  
-/* Smooth fade-in animation */
-.card {
-  opacity: 0;
-  animation: fadeIn 0.6s ease forwards;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
   }
   
