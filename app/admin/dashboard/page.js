@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
-import { app, db } from "@/lib/firebase";
+import { auth } from "@/lib/firebase";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 
 export default function AdminDashboard() {
-  const auth = getAuth(app);
 
   const [admin, setAdmin] = useState(null);
   const [products, setProducts] = useState([]);
