@@ -43,7 +43,7 @@ export default function Home() {
   );
 
   return (
-    <main className="p-4">
+    <main className="page-container">
 
       <h1 className="text-2xl font-bold mb-4">Products</h1>
 
