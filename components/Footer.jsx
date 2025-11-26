@@ -2,49 +2,52 @@ export default function Footer() {
   return (
     <footer
       style={{
-        marginTop: "40px",
+        marginTop: "60px",
         padding: "2rem",
         background: "#ffffff",
         borderTop: "1px solid #ddd",
         textAlign: "center",
-        boxShadow: "0 -4px 12px rgba(11,188,255,0.15)"
+        fontSize: "14px"
       }}
     >
-      <h2 className="brand-title" style={{ marginBottom: "15px" }}>
-        OodlesNet
-      </h2>
+      <p style={{ marginBottom: "8px" }}>
+        © {new Date().getFullYear()} OodlesNet — All Rights Reserved
+      </p>
 
-      <div style={{ marginBottom: "15px" }}>
-        <a href="/" style={{ margin: "0 10px", textDecoration: "none" }}>
-          Home
+      <div style={{ marginTop: "10px" }}>
+        <a
+          href="/privacy"
+          style={{
+            marginRight: "15px",
+            textDecoration: "none",
+            color: "#555"
+          }}
+        >
+          Privacy Policy
         </a>
-        <a href="/products" style={{ margin: "0 10px", textDecoration: "none" }}>
-          Products
+
+        <a
+          href="/terms"
+          style={{
+            marginRight: "15px",
+            textDecoration: "none",
+            color: "#555"
+          }}
+        >
+          Terms & Conditions
         </a>
-        <a href="/about" style={{ margin: "0 10px", textDecoration: "none" }}>
-          About
-        </a>
-        <a href="/contact" style={{ margin: "0 10px", textDecoration: "none" }}>
-          Contact
+
+        <a
+          href="/contact"
+          style={{
+            textDecoration: "none",
+            color: "#555"
+          }}
+        >
+          Contact Us
         </a>
       </div>
-
-      <p style={{ fontSize: "0.9rem", color: "#555" }}>
-        support@oodlesnet.com
-      </p>
-
-      <p style={{ marginTop: "10px", fontSize: "0.8rem", color: "#888" }}>
-        © {new Date().getFullYear()} OodlesNet — All Rights Reserved.
-      </p>
     </footer>
   );
-}
-
-style={{
-  marginTop: "60px",   // more space above footer
-  padding: "2rem",
-  background: "#ffffff",
-  borderTop: "1px solid #ddd",
-  textAlign: "center",
-  boxShadow: "0 -4px 12px rgba(11,188,255,0.15)"
-}}
+        }
+      
