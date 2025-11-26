@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "postinstall": "next telemetry disable",
+    "vercel-build": "next build"
   },
   "dependencies": {
     "next": "14.1.0",
