@@ -39,3 +39,12 @@ export default function Footer() {
     </footer>
   );
 }
+
+style={{
+  marginTop: "60px",   // more space above footer
+  padding: "2rem",
+  background: "#ffffff",
+  borderTop: "1px solid #ddd",
+  textAlign: "center",
+  boxShadow: "0 -4px 12px rgba(11,188,255,0.15)"
+}}
