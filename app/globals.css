@@ -137,4 +137,13 @@ button:hover, .btn-glow:hover {
   border: none;
   cursor: pointer;
     }
-  
+ /* CARD NEON GLOW ON HOVER */
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 0 8px rgba(22,210,255,0.4),
+    0 0 16px rgba(22,210,255,0.3),
+    0 0 24px rgba(22,210,255,0.2);
+  border: 1px solid rgba(22,210,255,0.4);
+    }
+
