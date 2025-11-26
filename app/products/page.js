@@ -37,7 +37,7 @@ export default function ProductsPage() {
   }, []);
 
   return (
-    <main className="p-4">
+    <main className="page-container">
       <h1 className="text-2xl font-bold mb-4">All Products</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
