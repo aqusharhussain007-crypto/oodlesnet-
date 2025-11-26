@@ -1,6 +1,6 @@
 export default function ContactPage() {
   return (
-    <main style={{ padding: "30px" }}>
+    <main className="page-container">
       <h1>Contact Us</h1>
 
       <p style={{ marginTop: "15px", fontSize: "1.1rem" }}>
