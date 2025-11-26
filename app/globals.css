@@ -151,4 +151,7 @@ button:hover, .btn-glow:hover {
     0 0 24px rgba(22,210,255,0.2);
   border: 1px solid rgba(22,210,255,0.4);
     }
-
+ /* FOOTER LINK HOVER (NEON GLOW) */
+footer a:hover {
+  color: #0bbcff;
+  text-shadow: 0 0 6px rgba(11,188,255,0.6);
