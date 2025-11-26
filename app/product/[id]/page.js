@@ -41,7 +41,7 @@ export default function ProductPage({ params }) {
 
 
   return (
-    <div style={{ padding: "30px", maxWidth: "700px", margin: "auto" }}>
+    <div className="page-container" style={{ maxWidth: "700px" }}>
 
       <h1 style={{ marginBottom: "20px" }}>{product.name}</h1>
 
