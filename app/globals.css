@@ -5,28 +5,136 @@
   box-sizing: border-box;
 }
 
+/* BODY */
 body {
   font-family: 'Inter', Arial, sans-serif;
   background-color: #e9ecf1;
   color: #1a1a1a;
   line-height: 1.6;
+  padding: 2rem 1rem;
 }
 
-/* HEADINGS GLOW */
-h1, h2, h3 {
+/* HEADINGS (NO GLOW — SHARP TEXT) */
+h1, h2, h3, h4, h5, h6 {
+  color: #16d2ff;
+  text-shadow: none;
+}
+
+/* BRAND LOGO GLOW ONLY */
+.brand-title {
   color: #16d2ff;
   text-shadow:
-    0 0 6px rgba(22, 210, 255, 0.8),
-    0 0 12px rgba(22, 210, 255, 0.5);
+    0 0 6px rgba(22,210,255,0.8),
+    0 0 12px rgba(22,210,255,0.5);
+  font-weight: 900;
+  letter-spacing: 0.5px;
 }
 
-/* CARD */
-.border {
-  border: 1px solid #ddd;
-}
-.rounded {
+/* BUTTONS WITH GLOW */
+button, .btn-glow {
+  background-color: #16d2ff;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.4rem;
   border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 0 8px rgba(22,210,255,0.5);
+  transition: all 0.3s ease;
 }
-.shadow {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                              }
+
+button:hover, .btn-glow:hover {
+  box-shadow: 0 0 16px rgba(22,210,255,0.9);
+  transform: translateY(-2px);
+}
+
+/* SEARCH BAR */
+.search-bar {
+  width: 300px;
+  padding: 0.6rem 1rem;
+  border: 2px solid #16d2ff;
+  border-radius: 6px;
+  outline: none;
+  transition: box-shadow 0.3s ease;
+}
+
+.search-bar:focus {
+  box-shadow: 0 0 10px rgba(22,210,255,0.7);
+}
+
+/* CARD STYLE */
+.card {
+  width: 250px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  padding: 1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* CARD HOVER EFFECT (subtle lift) */
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(22,210,255,0.25);
+}
+
+/* CARD IMAGE */
+.card img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 0.8rem;
+}
+
+/* PRODUCT GRID */
+.product-grid {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* SEARCH WRAPPER */
+.search-wrapper {
+  margin: 1.5rem 0;
+  display: flex;
+  align-items: center;
+}
+
+/* NAVBAR */
+.navbar {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar.dark {
+  background: #0d0d0d;
+  color: white;
+  border-bottom: 1px solid #333;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: inherit;
+  font-weight: 500;
+}
+
+/* MODE TOGGLE BTN (future feature) */
+.mode-toggle {
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+    }
+  
