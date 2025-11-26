@@ -14,39 +14,44 @@ body {
   padding: 2rem 1rem;
 }
 
-/* HEADINGS (NO GLOW — SHARP TEXT) */
+/* HEADINGS — SHARP + STRONGER NEON BLUE */
 h1, h2, h3, h4, h5, h6 {
-  color: #16d2ff;
-  text-shadow: none;
-}
-
-/* BRAND LOGO GLOW ONLY */
-.brand-title {
-  color: #16d2ff;
+  color: #0bbcff; /* deeper neon blue */
   text-shadow:
-    0 0 6px rgba(22,210,255,0.8),
-    0 0 12px rgba(22,210,255,0.5);
-  font-weight: 900;
-  letter-spacing: 0.5px;
+    0 0 4px rgba(11,188,255,0.7),
+    0 0 10px rgba(11,188,255,0.5);
 }
 
-/* BUTTONS WITH GLOW */
+/* BRAND LOGO GLOW — STRONGER BLUE */
+.brand-title {
+  color: #0bbcff;
+  text-shadow:
+    0 0 6px rgba(11,188,255,0.8),
+    0 0 14px rgba(11,188,255,0.6),
+    0 0 20px rgba(11,188,255,0.4);
+  font-weight: 900;
+  letter-spacing: 0.6px;
+}
+
 button, .btn-glow {
-  background-color: #16d2ff;
+  background-color: #0bbcff;
   color: #fff;
   border: none;
   padding: 0.7rem 1.4rem;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  box-shadow: 0 0 8px rgba(22,210,255,0.5);
+  box-shadow: 0 0 8px rgba(11,188,255,0.5);
   transition: all 0.3s ease;
 }
 
 button:hover, .btn-glow:hover {
-  box-shadow: 0 0 16px rgba(22,210,255,0.9);
+  box-shadow:
+    0 0 12px rgba(11,188,255,0.8),
+    0 0 16px rgba(11,188,255,0.5);
   transform: translateY(-2px);
 }
+
 
 /* SEARCH BAR */
 .search-bar {
