@@ -9,16 +9,22 @@ export default function Navbar() {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        background: "#fff",
+        background: "#ffffff",
         borderBottom: "1px solid #ddd",
         position: "sticky",
         top: 0,
         zIndex: 100,
       }}
     >
-      <h2>OodlesNet</h2>
+      <h2 className="brand-title" style={{ margin: 0 }}>
+        OodlesNet
+      </h2>
+
       <div style={{ display: "flex", gap: "1.5rem" }}>
-        <a href="/">Home</a>
+        <a href="/" style={{ textDecoration: "none" }}>Home</a>
+        <a href="/products" style={{ textDecoration: "none" }}>Products</a>
+        <a href="/about" style={{ textDecoration: "none" }}>About</a>
+        <a href="/contact" style={{ textDecoration: "none" }}>Contact</a>
       </div>
     </nav>
   );
