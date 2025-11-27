@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase-app";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 
 export default function ProductPage({ params }) {
