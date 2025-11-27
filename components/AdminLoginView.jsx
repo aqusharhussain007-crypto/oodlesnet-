@@ -56,5 +56,4 @@ export default function AdminLoginView() {
       </form>
     </main>
   );
-          }
-        
+                                       }
