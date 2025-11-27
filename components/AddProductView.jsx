@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import useAuth from "@/lib/useAuth";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase-app";
 import { collection, addDoc } from "firebase/firestore";
 
 export default function AddProductView() {
@@ -25,6 +25,7 @@ export default function AddProductView() {
       image,
       description: desc,
       price: Number(price),
+      createdAt: new Date()
     });
 
     alert("Product added!");
@@ -76,4 +77,4 @@ export default function AddProductView() {
       </form>
     </main>
   );
-          }
+    }
