@@ -148,3 +148,39 @@ footer a:hover {
   font-weight: 500;
   }
   
+/* SEARCH BAR GLOW ON FOCUS */
+.search-bar {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border: 2px solid #0bbcff;
+  border-radius: 8px;
+  outline: none;
+  background: #fff;
+  transition: 0.3s ease;
+}
+
+.search-bar:focus {
+  box-shadow: 0 0 10px rgba(11,188,255,0.6);
+  border-color: #0bbcff;
+}
+
+/* AUTOCOMPLETE DROPDOWN */
+.autocomplete-box {
+  background: white;
+  margin-top: 6px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.08);
+  position: absolute;
+  width: 100%;
+  z-index: 50;
+}
+
+.autocomplete-item {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.autocomplete-item:hover {
+  background: #f5faff;
+}
