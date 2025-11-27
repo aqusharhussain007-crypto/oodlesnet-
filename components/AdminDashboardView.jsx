@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import useAuth from "@/lib/useAuth";
-import { auth, db } from "@/lib/firebase";
+import { auth } from "@/lib/firebase-auth";
+import { db } from "@/lib/firebase-app";
 import { signOut } from "firebase/auth";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 
@@ -78,4 +79,3 @@ export default function AdminDashboardView() {
     </main>
   );
 }
-  
