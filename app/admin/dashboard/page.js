@@ -1,80 +1,71 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 
 export default function AdminDashboard() {
-  const [admin, setAdmin] = useState(null);
   const [products, setProducts] = useState([]);
+  const [admin, setAdmin] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Protect page
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, (user) => {
       if (!user) {
         window.location.href = "/admin/login";
-      } else {
-        setAdmin(user);
-        loadProducts();
+        return;
       }
+      setAdmin(user);
+      loadProducts();
     });
-
-    return () => unsub();
   }, []);
 
   async function loadProducts() {
     const snap = await getDocs(collection(db, "products"));
-    const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    setProducts(list);
+    const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    setProducts(items);
     setLoading(false);
   }
 
-  async function removeProduct(id) {
-    if (!confirm("Delete this product?")) return;
-
+  async function deleteProduct(id) {
     await deleteDoc(doc(db, "products", id));
     loadProducts();
   }
 
-  if (!admin) return <p style={{ padding: "20px" }}>Loading...</p>;
+  if (!admin) return <p>Loading...</p>;
 
   return (
-    <main className="page-container">
+    <main style={{ padding: "20px" }}>
       <h1>Admin Dashboard</h1>
 
       <button
-        className="btn-glow"
         onClick={() => signOut(auth)}
-        style={{ margin: "15px 0" }}
+        className="btn-glow"
+        style={{ marginBottom: "20px" }}
       >
         Logout
       </button>
 
-      <a
-        href="/admin/add-product"
-        className="btn-glow"
-        style={{ display: "inline-block", marginBottom: "20px" }}
-      >
-        ➕ Add Product
-      </a>
+      <a href="/admin/add-product" className="btn-glow">Add Product</a>
 
-      {loading ? <p>Loading...</p> : (
-        <div>
-          {products.map((p) => (
+      <div style={{ marginTop: "25px" }}>
+        {loading ? (
+          <p>Loading products...</p>
+        ) : (
+          products.map((p) => (
             <div
               key={p.id}
               style={{
                 borderBottom: "1px solid #ddd",
                 padding: "15px 0",
-                marginBottom: "10px"
+                marginBottom: "5px",
               }}
             >
               <strong>{p.name}</strong>
 
-              <div style={{ marginTop: "8px" }}>
+              <div style={{ marginTop: "10px" }}>
                 <a
                   href={`/product/${p.id}`}
                   target="_blank"
@@ -85,17 +76,16 @@ export default function AdminDashboard() {
 
                 <button
                   className="btn-glow"
-                  onClick={() => removeProduct(p.id)}
-                  style={{ padding: "5px 10px" }}
+                  onClick={() => deleteProduct(p.id)}
                 >
                   Delete
                 </button>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </main>
   );
-                                          }
-      
+          }
+          
