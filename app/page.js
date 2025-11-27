@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import ProductCard from "@/components/ProductCard";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
 
 export default function Home() {
