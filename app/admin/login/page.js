@@ -17,8 +17,6 @@ export default function AdminLogin() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-
-      // Redirect after login
       window.location.href = "/admin/dashboard";
     } catch (err) {
       setError("Invalid email or password.");
@@ -29,49 +27,38 @@ export default function AdminLogin() {
 
   return (
     <main className="page-container" style={{ maxWidth: "400px" }}>
-      <h1 style={{ marginBottom: "15px" }}>Admin Login</h1>
+      <h1>Admin Login</h1>
 
-      {error && (
-        <p style={{ color: "red", marginBottom: "10px" }}>
-          {error}
-        </p>
-      )}
+      {error && <p style={{ color: "red", marginBottom: "10px" }}>{error}</p>}
 
       <form onSubmit={handleLogin}>
-        <div style={{ marginBottom: "15px" }}>
-          <label>Email</label>
-          <input
-            type="email"
-            className="search-bar"
-            style={{ width: "100%" }}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
+        <input
+          type="email"
+          className="search-bar"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={{ width: "100%", marginBottom: "15px" }}
+        />
 
-        <div style={{ marginBottom: "15px" }}>
-          <label>Password</label>
-          <input
-            type="password"
-            className="search-bar"
-            style={{ width: "100%" }}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
+        <input
+          type="password"
+          className="search-bar"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={{ width: "100%", marginBottom: "15px" }}
+        />
 
         <button
           type="submit"
           className="btn-glow"
-          style={{ width: "100%", padding: "0.8rem" }}
-          disabled={loading}
+          style={{ width: "100%" }}
         >
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>
     </main>
   );
-    }
+        }
         
