@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { auth } from "@/lib/firebase";
+import { auth } from "@/lib/firebase-auth";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
 export default function AdminLoginView() {
@@ -56,5 +56,5 @@ export default function AdminLoginView() {
       </form>
     </main>
   );
-      }
-          
+  }
+      
