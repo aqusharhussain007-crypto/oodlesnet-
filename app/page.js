@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import ProductCard from "@/components/ProductCard";
 import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
@@ -8,62 +8,148 @@ import { collection, getDocs } from "firebase/firestore";
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [filtered, setFiltered] = useState([]);
 
+  // Load products from Firestore
   useEffect(() => {
     async function loadProducts() {
-      const productSnap = await getDocs(collection(db, "products"));
+      const snap = await getDocs(collection(db, "products"));
+      const items = snap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-      const loaded = [];
-
-      for (let docSnap of productSnap.docs) {
-        const product = { id: docSnap.id, ...docSnap.data() };
-
-        // Load prices subcollection
-        const priceSnap = await getDocs(
-          collection(db, "products", docSnap.id, "prices")
-        );
-
-        let prices = priceSnap.docs.map(p => p.data().price);
-        let lowestPrice = prices.length > 0 ? Math.min(...prices) : null;
-
-        product.lowestPrice = lowestPrice;
-
-        loaded.push(product);
-      }
-
-      setProducts(loaded);
+      setProducts(items);
+      setFiltered(items);
     }
-
     loadProducts();
   }, []);
 
-  // Search filter
-  const filtered = products.filter(p =>
-    p.name.toLowerCase().includes(search.toLowerCase())
-  );
+  // Autocomplete + Filter
+  useEffect(() => {
+    if (!search) {
+      setSuggestions([]);
+      setFiltered(products);
+      return;
+    }
+
+    const match = products.filter(p =>
+      p.name.toLowerCase().includes(search.toLowerCase())
+    );
+
+    setSuggestions(match.slice(0, 5));
+    setFiltered(match);
+  }, [search, products]);
+
+  // Voice Search 🎤
+  function startVoiceSearch() {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Your browser does not support voice search.");
+      return;
+    }
+
+    const recog = new SpeechRecognition();
+    recog.lang = "en-IN";
+
+    recog.onresult = (event) => {
+      const text = event.results[0][0].transcript;
+      setSearch(text);
+    };
+
+    recog.start();
+  }
 
   return (
     <main className="page-container">
 
-      <h1 className="text-2xl font-bold mb-4">Products</h1>
+      {/* Sticky Search Bar */}
+      <div
+        style={{
+          position: "sticky",
+          top: "72px",
+          background: "#e9ecf1",
+          zIndex: 50,
+          paddingBottom: "10px",
+          paddingTop: "10px"
+        }}
+      >
+        <div style={{ position: "relative", display: "flex", gap: "10px" }}>
 
-      {/* SEARCH BAR */}
-      <input
-        className="search-bar"
-        placeholder="Search products..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={{ marginBottom: "20px" }}
-      />
+          {/* Search Input */}
+          <input
+            type="text"
+            className="search-bar"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ flex: 1 }}
+          />
 
-      {/* PRODUCT GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {filtered.map(product => (
+          {/* Search Button */}
+          <button
+            className="btn-glow"
+            style={{
+              fontSize: "18px",
+              padding: "0 14px",
+              borderRadius: "8px"
+            }}
+          >
+            🔍
+          </button>
+
+          {/* Voice Search */}
+          <button
+            onClick={startVoiceSearch}
+            className="btn-glow"
+            style={{
+              fontSize: "18px",
+              padding: "0 14px",
+              borderRadius: "8px"
+            }}
+          >
+            🎤
+          </button>
+
+          {/* AUTOCOMPLETE DROPDOWN */}
+          {suggestions.length > 0 && (
+            <div className="autocomplete-box">
+              {suggestions.map((item) => (
+                <div
+                  key={item.id}
+                  className="autocomplete-item"
+                  onClick={() => {
+                    setSearch(item.name);
+                    setSuggestions([]);
+                  }}
+                >
+                  {item.name}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Title */}
+      <h1 style={{ marginTop: "20px" }}>Products</h1>
+
+      {/* Product Grid */}
+      <div
+        style={{
+          display: "grid",
+          gap: "1rem",
+          gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+          marginTop: "20px",
+        }}
+      >
+        {filtered.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
-
     </main>
   );
-            }
-    
+}
