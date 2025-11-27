@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import useAuth from "@/lib/useAuth";
 import { auth } from "@/lib/firebase-auth";
 import { db } from "@/lib/firebase-app";
+
 import { signOut } from "firebase/auth";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 
@@ -18,7 +19,7 @@ export default function AdminDashboardView() {
 
   async function loadProducts() {
     const snap = await getDocs(collection(db, "products"));
-    const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     setProducts(list);
   }
 
@@ -46,7 +47,7 @@ export default function AdminDashboardView() {
       </a>
 
       <div style={{ marginTop: "20px" }}>
-        {products.map((p) => (
+        {products.map(p => (
           <div
             key={p.id}
             style={{
@@ -66,10 +67,7 @@ export default function AdminDashboardView() {
                 View
               </a>
 
-              <button
-                className="btn-glow"
-                onClick={() => removeProduct(p.id)}
-              >
+              <button className="btn-glow" onClick={() => removeProduct(p.id)}>
                 Delete
               </button>
             </div>
@@ -78,4 +76,4 @@ export default function AdminDashboardView() {
       </div>
     </main>
   );
-}
+                }
