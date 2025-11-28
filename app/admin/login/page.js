@@ -1,12 +1,10 @@
 "use client";
-
 import dynamic from "next/dynamic";
 
-const AdminLoginView = dynamic(
-  () => import("@/components/AdminLoginView"),
-  { ssr: false }
-);
+const Login = dynamic(() => import("@/components/AdminLoginView"), {
+  ssr: false,
+});
 
 export default function Page() {
-  return <AdminLoginView />;
+  return <Login />;
     }
