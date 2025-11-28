@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import useAuth from "@/lib/useAuth";
-import { auth } from "@/lib/firebase-auth";
-import { db } from "@/lib/firebase-app";
 
-import { signOut } from "firebase/auth";
-import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
+import {
+  loadAllProducts,
+  deleteProduct,
+  logoutAdmin,
+} from "@/lib/dashboard-actions";
 
 export default function AdminDashboardView() {
   const user = useAuth();
@@ -14,18 +15,17 @@ export default function AdminDashboardView() {
 
   useEffect(() => {
     if (user === null) window.location.href = "/admin/login";
-    if (user) loadProducts();
+    if (user) fetchProducts();
   }, [user]);
 
-  async function loadProducts() {
-    const snap = await getDocs(collection(db, "products"));
-    const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  async function fetchProducts() {
+    const list = await loadAllProducts();
     setProducts(list);
   }
 
-  async function removeProduct(id) {
-    await deleteDoc(doc(db, "products", id));
-    loadProducts();
+  async function handleDelete(id) {
+    await deleteProduct(id);
+    fetchProducts();
   }
 
   if (user === undefined) return <p>Loading...</p>;
@@ -34,20 +34,16 @@ export default function AdminDashboardView() {
     <main className="page-container">
       <h1>Admin Dashboard</h1>
 
-      <button className="btn-glow" onClick={() => signOut(auth)}>
+      <button className="btn-glow" onClick={logoutAdmin}>
         Logout
       </button>
 
-      <a
-        href="/admin/add-product"
-        className="btn-glow"
-        style={{ marginLeft: "10px" }}
-      >
+      <a href="/admin/add-product" className="btn-glow" style={{ marginLeft: "10px" }}>
         Add Product
       </a>
 
       <div style={{ marginTop: "20px" }}>
-        {products.map(p => (
+        {products.map((p) => (
           <div
             key={p.id}
             style={{
@@ -57,7 +53,6 @@ export default function AdminDashboardView() {
             }}
           >
             <strong>{p.name}</strong>
-
             <div style={{ marginTop: "10px" }}>
               <a
                 href={`/product/${p.id}`}
@@ -67,7 +62,7 @@ export default function AdminDashboardView() {
                 View
               </a>
 
-              <button className="btn-glow" onClick={() => removeProduct(p.id)}>
+              <button className="btn-glow" onClick={() => handleDelete(p.id)}>
                 Delete
               </button>
             </div>
@@ -76,4 +71,4 @@ export default function AdminDashboardView() {
       </div>
     </main>
   );
-                }
+}
