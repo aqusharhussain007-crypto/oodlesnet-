@@ -29,9 +29,7 @@ export default function AdminLoginView() {
     <main className="page-container" style={{ maxWidth: "400px" }}>
       <h1>Admin Login</h1>
 
-      {error && (
-        <p style={{ color: "red", marginBottom: "10px" }}>{error}</p>
-      )}
+      {error && <p style={{ color: "red", marginBottom: "10px" }}>{error}</p>}
 
       <form onSubmit={handleLogin}>
         <input
