@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { auth } from "@/lib/firebase-auth";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { loginAdmin } from "@/lib/login-actions";
 
 export default function AdminLoginView() {
   const [email, setEmail] = useState("");
@@ -12,14 +11,15 @@ export default function AdminLoginView() {
 
   async function handleLogin(e) {
     e.preventDefault();
-    setError("");
     setLoading(true);
+    setError("");
 
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
+    const result = await loginAdmin(email, password);
+
+    if (result.success) {
       window.location.href = "/admin/dashboard";
-    } catch (err) {
-      setError("Invalid email or password");
+    } else {
+      setError(result.error);
     }
 
     setLoading(false);
@@ -29,7 +29,7 @@ export default function AdminLoginView() {
     <main className="page-container" style={{ maxWidth: "400px" }}>
       <h1>Admin Login</h1>
 
-      {error && <p style={{ color: "red", marginBottom: "10px" }}>{error}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
       <form onSubmit={handleLogin}>
         <input
@@ -56,5 +56,5 @@ export default function AdminLoginView() {
       </form>
     </main>
   );
-          }
-        
+}
+  
