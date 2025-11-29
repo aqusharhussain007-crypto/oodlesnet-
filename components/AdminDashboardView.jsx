@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import useAuth from "@/lib/useAuth";
 import { logoutAdmin } from "@/lib/login-actions";
+
 import { db } from "@/lib/firebase-app";
 import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
 
@@ -10,41 +11,32 @@ export default function AdminDashboardView() {
   const user = useAuth();
   const [products, setProducts] = useState([]);
 
-  // Redirect if not logged in
   useEffect(() => {
     if (user === null) window.location.href = "/admin/login";
     if (user) loadProducts();
   }, [user]);
 
-  // Load products
   async function loadProducts() {
     const snap = await getDocs(collection(db, "products"));
-    const list = snap.docs.map((d) => ({
-      id: d.id,
-      ...d.data()
-    }));
+    const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
     setProducts(list);
   }
 
-  // Delete product
   async function removeProduct(id) {
     await deleteDoc(doc(db, "products", id));
     loadProducts();
   }
 
-  // Until auth loads
   if (user === undefined) return <p>Loading...</p>;
 
   return (
     <main className="page-container">
       <h1>Admin Dashboard</h1>
 
-      {/* Logout */}
-      <button className="btn-glow" onClick={() => signOut(auth)}>
+      <button className="btn-glow" onClick={logoutAdmin}>
         Logout
       </button>
 
-      {/* Add Product */}
       <a
         href="/admin/add-product"
         className="btn-glow"
@@ -53,7 +45,6 @@ export default function AdminDashboardView() {
         Add Product
       </a>
 
-      {/* Product List */}
       <div style={{ marginTop: "20px" }}>
         {products.map((p) => (
           <div
@@ -84,5 +75,4 @@ export default function AdminDashboardView() {
       </div>
     </main>
   );
-      }
-      
+}
