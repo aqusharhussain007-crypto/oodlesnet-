@@ -14,13 +14,13 @@ export default function AdminLoginView() {
     setLoading(true);
 
     try {
-      // dynamic import firebase only on client
+      // Import everything ONLY on the client
       const { auth } = await import("@/lib/firebase-auth");
       const { signInWithEmailAndPassword } = await import("firebase/auth");
 
       await signInWithEmailAndPassword(auth, email, password);
-      window.location.href = "/admin/dashboard";
 
+      window.location.href = "/admin/dashboard";
     } catch (err) {
       setError("Invalid email or password");
     }
@@ -32,7 +32,7 @@ export default function AdminLoginView() {
     <main className="page-container" style={{ maxWidth: "400px" }}>
       <h1>Admin Login</h1>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p style={{ color: "red", marginBottom: "10px" }}>{error}</p>}
 
       <form onSubmit={handleLogin}>
         <input
@@ -59,4 +59,5 @@ export default function AdminLoginView() {
       </form>
     </main>
   );
-}
+        }
+    
