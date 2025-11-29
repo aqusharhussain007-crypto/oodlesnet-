@@ -10,20 +10,24 @@ export default function AdminLoginView() {
   const [loading, setLoading] = useState(false);
 
   async function handleLogin(e) {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  e.preventDefault();
+  setError("");
+  setLoading(true);
 
-    const result = await loginAdmin(email, password);
+  try {
+    // dynamic import firebase only on client
+    const { auth } = await import("@/lib/firebase-auth");
+    const { signInWithEmailAndPassword } = await import("firebase/auth");
 
-    if (result.success) {
-      window.location.href = "/admin/dashboard";
-    } else {
-      setError(result.error);
-    }
+    await signInWithEmailAndPassword(auth, email, password);
 
-    setLoading(false);
+    window.location.href = "/admin/dashboard";
+  } catch (err) {
+    setError("Invalid email or password");
   }
+
+  setLoading(false);
+}
 
   return (
     <main className="page-container" style={{ maxWidth: "400px" }}>
