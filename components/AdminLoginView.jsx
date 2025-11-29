@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { loginAdmin } from "@/lib/login-actions";
 
 export default function AdminLoginView() {
   const [email, setEmail] = useState("");
@@ -10,24 +9,24 @@ export default function AdminLoginView() {
   const [loading, setLoading] = useState(false);
 
   async function handleLogin(e) {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-  try {
-    // dynamic import firebase only on client
-    const { auth } = await import("@/lib/firebase-auth");
-    const { signInWithEmailAndPassword } = await import("firebase/auth");
+    try {
+      // dynamic import firebase only on client
+      const { auth } = await import("@/lib/firebase-auth");
+      const { signInWithEmailAndPassword } = await import("firebase/auth");
 
-    await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = "/admin/dashboard";
 
-    window.location.href = "/admin/dashboard";
-  } catch (err) {
-    setError("Invalid email or password");
+    } catch (err) {
+      setError("Invalid email or password");
+    }
+
+    setLoading(false);
   }
-
-  setLoading(false);
-}
 
   return (
     <main className="page-container" style={{ maxWidth: "400px" }}>
@@ -61,4 +60,3 @@ export default function AdminLoginView() {
     </main>
   );
 }
-  
