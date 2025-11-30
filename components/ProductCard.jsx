@@ -3,7 +3,7 @@
 export default function ProductCard({ product }) {
   return (
     <div
-      className="product-card"
+      className="product-card pulse-on-hover"
       style={{
         background: "#0b111d",
         border: "2px solid rgba(0, 183, 255, 0.5)",
