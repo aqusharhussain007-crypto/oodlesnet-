@@ -184,3 +184,28 @@ footer a:hover {
 .autocomplete-item:hover {
   background: #f5faff;
 }
+/* CLEAN NEON BORDER MENU ITEMS */
+.nav-item-neon {
+  position: relative;
+}
+
+.nav-item-neon:hover {
+  color: #fff !important;
+  background: #0bbcff !important;
+  box-shadow: 0 0 10px #0bbcff, 0 0 20px #0bbcff;
+  border-color: #0bbcff;
+}
+
+/* REMOVE fuzzy blurry glow from the whole site */
+* {
+  text-shadow: none !important;
+}
+
+h1, h2, h3, h4 {
+  text-shadow: 0 0 6px rgba(11,188,255,0.4);
+    }
+.btn-glow:hover {
+  box-shadow: 0 0 6px #0bbcff, 0 0 12px #0bbcff;
+  transform: translateY(-2px);
+  transition: 0.2s ease;
+  }
