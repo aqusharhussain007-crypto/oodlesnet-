@@ -95,3 +95,24 @@ function MenuItem({ href, children }) {
     </Link>
   );
 }
+<nav
+  style={{
+    position: "fixed",
+    top: 0,
+    width: "100%",
+    background: "black",
+    padding: "10px 0",
+    display: "flex",
+    justifyContent: "center",
+    zIndex: 100,
+    borderBottom: "2px solid #0bbcff",
+  }}
+>
+  <div style={{ display: "flex", gap: "20px" }}>
+    <a href="/" className="nav-link">Home</a>
+    <a href="/products" className="nav-link">Products</a>
+    <a href="/about" className="nav-link">About</a>
+    <a href="/contact" className="nav-link">Contact</a>
+  </div>
+</nav>
+          
