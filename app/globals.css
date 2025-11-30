@@ -236,3 +236,29 @@ html, body {
   }
   }
     
+/* Fade-in animation for card load */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Green neon pulse */
+@keyframes greenPulse {
+  0% {
+    box-shadow: 0 0 10px rgba(0, 255, 120, 0.0);
+    border-color: rgba(0, 255, 120, 0.0);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(0, 255, 120, 0.35);
+    border-color: rgba(0, 255, 120, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(0, 255, 120, 0.0);
+    border-color: rgba(0, 255, 120, 0.0);
+  }
+}
+
+/* Apply pulse ONLY on hover */
+.pulse-on-hover:hover {
+  animation: greenPulse 1.6s infinite ease-out;
+}
