@@ -1,53 +1,35 @@
+"use client";
+
 export default function Footer() {
   return (
     <footer
       style={{
-        marginTop: "60px",
-        padding: "2rem",
-        background: "#ffffff",
-        borderTop: "1px solid #ddd",
+        marginTop: "40px",
+        width: "100%",
+        padding: "18px 0",
         textAlign: "center",
-        fontSize: "14px"
+        background: "#0a0f1a",
+        borderTop: "2px solid #00b7ff",
+        boxShadow: "0 -0px 20px rgba(0, 183, 255, 0.25)",
+        color: "#cfeeff",
+        position: "relative",
       }}
     >
-      <p style={{ marginBottom: "8px" }}>
-        © {new Date().getFullYear()} OodlesNet — All Rights Reserved
-      </p>
-
-      <div style={{ marginTop: "10px" }}>
-        <a
-          href="/privacy"
-          style={{
-            marginRight: "15px",
-            textDecoration: "none",
-            color: "#555"
-          }}
-        >
-          Privacy Policy
-        </a>
-
-        <a
-          href="/terms"
-          style={{
-            marginRight: "15px",
-            textDecoration: "none",
-            color: "#555"
-          }}
-        >
-          Terms & Conditions
-        </a>
-
-        <a
-          href="/contact"
-          style={{
-            textDecoration: "none",
-            color: "#555"
-          }}
-        >
-          Contact Us
-        </a>
+      <div style={{ fontSize: "1rem", fontWeight: 500, opacity: 0.9 }}>
+        © {new Date().getFullYear()} <span style={{ color: "#00c9ff" }}>OodlesNet</span>.  
+        All Rights Reserved.
       </div>
+
+      {/* Glow line */}
+      <div
+        style={{
+          width: "60%",
+          height: "3px",
+          background: "linear-gradient(90deg, transparent, #00b7ff, transparent)",
+          margin: "10px auto 0 auto",
+          opacity: 0.7,
+        }}
+      ></div>
     </footer>
   );
-        }
-      
+}
