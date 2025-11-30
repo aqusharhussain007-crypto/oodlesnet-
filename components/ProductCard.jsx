@@ -1,28 +1,70 @@
+"use client";
+
 export default function ProductCard({ product }) {
   return (
-    <a
-      href={`/product/${product.id}`}
-      style={{ textDecoration: "none", color: "inherit" }}
+    <div
+      className="product-card"
+      style={{
+        background: "#0b111d",
+        border: "2px solid rgba(0, 183, 255, 0.5)",
+        borderRadius: "14px",
+        padding: "12px",
+        boxShadow: "0 0 12px rgba(0, 183, 255, 0.25)",
+        transition: "all 0.3s ease",
+        cursor: "pointer",
+        animation: "fadeIn 0.6s ease",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-6px)";
+        e.currentTarget.style.boxShadow =
+          "0 0 18px rgba(0, 183, 255, 0.45)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0px)";
+        e.currentTarget.style.boxShadow =
+          "0 0 12px rgba(0, 183, 255, 0.25)";
+      }}
+      onClick={() => (window.location.href = `/product/${product.id}`)}
     >
-      <div className="card">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-48 object-cover rounded"
-        />
+      {/* Product Image */}
+      <img
+        src={product.image}
+        alt={product.name}
+        style={{
+          width: "100%",
+          height: "170px",
+          objectFit: "cover",
+          borderRadius: "10px",
+          marginBottom: "10px",
+          boxShadow: "0 0 12px rgba(0, 183, 255, 0.35)",
+        }}
+      />
 
-        <h2 className="text-xl font-semibold mt-2">{product.name}</h2>
+      {/* Title */}
+      <h3
+        style={{
+          color: "white",
+          fontSize: "1.05rem",
+          fontWeight: "600",
+          marginBottom: "6px",
+          textShadow: "0 0 6px rgba(0, 183, 255, 0.6)",
+        }}
+      >
+        {product.name}
+      </h3>
 
-        {product.lowestPrice ? (
-          <p style={{ marginTop: "8px", color: "#0bbcff", fontWeight: "bold" }}>
-            Starting from ₹{product.lowestPrice}
-          </p>
-        ) : (
-          <p style={{ marginTop: "8px", color: "#555" }}>
-            Price not available
-          </p>
-        )}
-      </div>
-    </a>
+      {/* Lowest Price */}
+      {product.lowestPrice && (
+        <p
+          style={{
+            color: "#00eaff",
+            fontSize: "1rem",
+            fontWeight: "bold",
+          }}
+        >
+          ₹{product.lowestPrice}
+        </p>
+      )}
+    </div>
   );
 }
