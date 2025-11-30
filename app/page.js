@@ -11,9 +11,21 @@ export default function Home() {
   const [suggestions, setSuggestions] = useState([]);
   const [filtered, setFiltered] = useState([]);
 
-  // -----------------------------------------
-  // Voice Search 🎤
-  // -----------------------------------------
+  // Load products from Firestore
+  useEffect(() => {
+    async function loadProducts() {
+      const snap = await getDocs(collection(db, "products"));
+      const items = snap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setProducts(items);
+      setFiltered(items);
+    }
+    loadProducts();
+  }, []);
+
+  // Voice Search
   function startVoiceSearch() {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -34,26 +46,7 @@ export default function Home() {
     recog.start();
   }
 
-  // -----------------------------------------
-  // Load Products from Firestore
-  // -----------------------------------------
-  useEffect(() => {
-    async function loadProducts() {
-      const snap = await getDocs(collection(db, "products"));
-      const items = snap.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setProducts(items);
-      setFiltered(items);
-    }
-    loadProducts();
-  }, []);
-
-  // -----------------------------------------
-  // Autocomplete + Search Filtering
-  // -----------------------------------------
+  // Autocomplete + Filtering
   useEffect(() => {
     if (!search) {
       setSuggestions([]);
@@ -72,85 +65,38 @@ export default function Home() {
   return (
     <main className="page-container">
 
-      {/* -----------------------------------------
-          🔍 Search Bar Section (Updated Version)
-      ------------------------------------------- */}
-<div
-  style={{
-    marginTop: "8px",
-    padding: "10px 0",
-    background: "#e9ecf1",
-    position: "sticky",
-    top: "70px",
-    zIndex: 50,
-  }}
->
-  <div
-    style={{
-      display: "flex",
-      gap: "6px",
-      alignItems: "center",
-      padding: "0 8px",
-    }}
-  >
-    <input
-      type="text"
-      placeholder="Search products..."
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-      className="search-bar"
-      style={{
-        flex: 1,
-        height: "44px",
-        fontSize: "1rem",
-        borderRadius: "10px",
-        border: "2px solid #00b7ff",
-        paddingLeft: "12px",
-        background: "white",
-      }}
-    />
-
-    <button
-      className="btn-glow"
-      style={{
-        width: "44px",
-        height: "44px",
-        fontSize: "1.2rem",
-        borderRadius: "10px",
-      }}
-    >
-      🔍
-    </button>
-
-    <button
-      onClick={startVoiceSearch}
-      className="btn-glow"
-      style={{
-        width: "44px",
-        height: "44px",
-        fontSize: "1.2rem",
-        borderRadius: "10px",
-      }}
-    >
-      🎤
-    </button>
-  </div>
-</div>
-
-          {/* Input Box */}
+      {/* 🔍 SEARCH BAR SECTION */}
+      <div
+        style={{
+          marginTop: "8px",
+          padding: "10px 0",
+          background: "#e9ecf1",
+          position: "sticky",
+          top: "70px",
+          zIndex: 50,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            gap: "6px",
+            alignItems: "center",
+            padding: "0 8px",
+          }}
+        >
           <input
             type="text"
-            className="search-bar"
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            className="search-bar"
             style={{
               flex: 1,
-              height: "48px",
-              fontSize: "1.05rem",
-              borderRadius: "12px",
+              height: "44px",
+              fontSize: "1rem",
+              borderRadius: "10px",
               border: "2px solid #00b7ff",
-              paddingLeft: "14px",
+              paddingLeft: "12px",
               background: "white",
             }}
           />
@@ -159,47 +105,62 @@ export default function Home() {
           <button
             className="btn-glow"
             style={{
-              width: "50px",
-              height: "48px",
-              fontSize: "1.4rem",
-              borderRadius: "12px",
-              padding: 0,
+              width: "44px",
+              height: "44px",
+              fontSize: "1.2rem",
+              borderRadius: "10px",
             }}
           >
             🔍
           </button>
 
-          {/* Voice Search */}
+          {/* Voice Button */}
           <button
             onClick={startVoiceSearch}
             className="btn-glow"
             style={{
-              width: "50px",
-              height: "48px",
-              fontSize: "1.4rem",
-              borderRadius: "12px",
-              padding: 0,
+              width: "44px",
+              height: "44px",
+              fontSize: "1.2rem",
+              borderRadius: "10px",
             }}
           >
             🎤
           </button>
         </div>
+
+        {/* AUTOCOMPLETE DROPDOWN */}
+        {suggestions.length > 0 && (
+          <div className="autocomplete-box">
+            {suggestions.map((item) => (
+              <div
+                key={item.id}
+                className="autocomplete-item"
+                onClick={() => {
+                  setSearch(item.name);
+                  setSuggestions([]);
+                }}
+              >
+                {item.name}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* -----------------------------------------
-          Page Title
-      ------------------------------------------- */}
-      <h1 style={{ marginTop: "20px", color: "#00b7ff" }}>Products</h1>
+      {/* TITLE */}
+      <h1 style={{ marginTop: "16px", marginBottom: "10px", color: "#00b7ff" }}>
+        Products
+      </h1>
 
-      {/* -----------------------------------------
-          Product Grid
-      ------------------------------------------- */}
+      {/* PRODUCT GRID */}
       <div
         style={{
           display: "grid",
-          gap: "1rem",
+          gap: "0.8rem",
           gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-          marginTop: "20px",
+          marginTop: "10px",
+          marginBottom: "20px",
         }}
       >
         {filtered.map((product) => (
@@ -208,5 +169,5 @@ export default function Home() {
       </div>
     </main>
   );
-         }
-      
+          }
+          
