@@ -1,91 +1,88 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
-    <header
+    <nav
       style={{
-        padding: "12px 20px",
-        background: "#0a0f1f",
-        boxShadow: "0 0 18px rgba(0, 200, 255, 0.25)",
+        width: "100%",
+        padding: "16px",
         position: "sticky",
         top: 0,
         zIndex: 100,
+        background: "#071424",
+        boxShadow: "0 0 18px rgba(0, 200, 255, 0.35)",
       }}
     >
-      <nav
+      {/* Top Section */}
+      <div
         style={{
-          maxWidth: "1100px",
-          margin: "0 auto",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
         }}
       >
-        {/* BRAND */}
-        <Link href="/" className="font-bold text-xl neon-text">
+        {/* Logo */}
+        <Link href="/" style={{ color: "#00c8ff", fontSize: "24px", fontWeight: "bold" }}>
           OodlesNet
         </Link>
 
-        {/* Hamburger (Mobile) */}
+        {/* Menu Toggle Button */}
         <button
-          className="md:hidden text-white text-2xl"
-          onClick={() => setMenuOpen(!menuOpen)}
-          style={{ background: "transparent", border: "none" }}
+          onClick={() => setOpen(!open)}
+          style={{
+            background: "#0bbcff",
+            border: "none",
+            padding: "10px 16px",
+            borderRadius: "10px",
+            boxShadow: "0 0 12px rgba(11,188,255,0.5)",
+            cursor: "pointer",
+          }}
         >
           ☰
         </button>
+      </div>
 
-        {/* NAV LINKS */}
-        <ul
-          className={`${
-            menuOpen ? "flex" : "hidden"
-          } md:flex flex-col md:flex-row gap-3 md:gap-4 text-white text-sm md:text-base mt-3 md:mt-0`}
+      {/* Dropdown Menu */}
+      {open && (
+        <div
           style={{
-            alignItems: "center",
+            marginTop: "12px",
+            background: "#0d2237",
+            padding: "20px",
+            borderRadius: "12px",
+            boxShadow: "0 0 16px rgba(11,188,255,0.4)",
           }}
         >
-          {[
-            { name: "Home", link: "/" },
-            { name: "Products", link: "/products" },
-            { name: "About", link: "/about" },
-            { name: "Contact", link: "/contact" },
-          ].map((item) => (
-            <li key={item.link}>
-              <Link
-                href={item.link}
-                className="menu-link"
-                style={{
-                  padding: "6px 12px",
-                  borderRadius: "6px",
-                  transition: "0.2s",
-                }}
-              >
-                {item.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      {/* Neon Effect Styles */}
-      <style jsx>{`
-        .neon-text {
-          color: #0bbcff;
-          text-shadow: 0 0 8px rgba(11, 188, 255, 0.6);
-        }
-
-        .menu-link:hover {
-          background: rgba(11, 188, 255, 0.12);
-          box-shadow: 0 0 10px rgba(11, 188, 255, 0.4);
-          color: #0bbcff;
-        }
-      `}</style>
-    </header>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "14px",
+            }}
+          >
+            <Link href="/" style={menuItemStyle}>Home</Link>
+            <Link href="/products" style={menuItemStyle}>Products</Link>
+            <Link href="/about" style={menuItemStyle}>About</Link>
+            <Link href="/contact" style={menuItemStyle}>Contact</Link>
+          </div>
+        </div>
+      )}
+    </nav>
   );
-              }
+}
+
+const menuItemStyle = {
+  color: "white",
+  fontSize: "18px",
+  textDecoration: "none",
+  padding: "10px 12px",
+  borderRadius: "8px",
+  background: "rgba(255,255,255,0.08)",
+  boxShadow: "0 0 8px rgba(0, 180, 255, 0.25)",
+};
               
