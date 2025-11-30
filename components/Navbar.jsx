@@ -1,31 +1,66 @@
 "use client";
 
+import Link from "next/link";
+
 export default function Navbar() {
   return (
-    <nav
+    <header
       style={{
         width: "100%",
-        padding: "1rem 2rem",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
         background: "#ffffff",
-        borderBottom: "1px solid #ddd",
+        padding: "14px 0",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
         position: "sticky",
         top: 0,
-        zIndex: 100,
+        zIndex: 50,
       }}
     >
-      <h2 className="brand-title" style={{ margin: 0 }}>
+      {/* LOGO */}
+      <h1
+        style={{
+          textAlign: "center",
+          fontSize: "28px",
+          fontWeight: "700",
+          color: "#0bbcff",
+          marginBottom: "10px",
+          textShadow: "0 0 8px rgba(11,188,255,0.5)",
+        }}
+      >
         OodlesNet
-      </h2>
+      </h1>
 
-      <div style={{ display: "flex", gap: "1.5rem" }}>
-        <a href="/" style={{ textDecoration: "none" }}>Home</a>
-        <a href="/products" style={{ textDecoration: "none" }}>Products</a>
-        <a href="/about" style={{ textDecoration: "none" }}>About</a>
-        <a href="/contact" style={{ textDecoration: "none" }}>Contact</a>
-      </div>
-    </nav>
+      {/* MENU ROW */}
+      <nav
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "12px",
+        }}
+      >
+        {[
+          { name: "Home", link: "/" },
+          { name: "Products", link: "/products" },
+          { name: "About", link: "/about" },
+          { name: "Contact", link: "/contact" },
+        ].map((item) => (
+          <Link
+            key={item.name}
+            href={item.link}
+            style={{
+              padding: "8px 14px",
+              borderRadius: "6px",
+              border: "2px solid #0bbcff",
+              fontWeight: "600",
+              textDecoration: "none",
+              color: "#0bbcff",
+              transition: "0.2s ease",
+            }}
+            className="nav-item-neon"
+          >
+            {item.name}
+          </Link>
+        ))}
+      </nav>
+    </header>
   );
 }
