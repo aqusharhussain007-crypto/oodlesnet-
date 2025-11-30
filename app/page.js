@@ -75,24 +75,68 @@ export default function Home() {
       {/* -----------------------------------------
           🔍 Search Bar Section (Updated Version)
       ------------------------------------------- */}
-      <div
-        style={{
-          marginTop: "10px",
-          padding: "12px 0",
-          background: "#e9ecf1",
-          position: "sticky",
-          top: "70px",
-          zIndex: 50,
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            gap: "8px",
-            alignItems: "center",
-            padding: "0 10px",
-          }}
-        >
+<div
+  style={{
+    marginTop: "8px",
+    padding: "10px 0",
+    background: "#e9ecf1",
+    position: "sticky",
+    top: "70px",
+    zIndex: 50,
+  }}
+>
+  <div
+    style={{
+      display: "flex",
+      gap: "6px",
+      alignItems: "center",
+      padding: "0 8px",
+    }}
+  >
+    <input
+      type="text"
+      placeholder="Search products..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      className="search-bar"
+      style={{
+        flex: 1,
+        height: "44px",
+        fontSize: "1rem",
+        borderRadius: "10px",
+        border: "2px solid #00b7ff",
+        paddingLeft: "12px",
+        background: "white",
+      }}
+    />
+
+    <button
+      className="btn-glow"
+      style={{
+        width: "44px",
+        height: "44px",
+        fontSize: "1.2rem",
+        borderRadius: "10px",
+      }}
+    >
+      🔍
+    </button>
+
+    <button
+      onClick={startVoiceSearch}
+      className="btn-glow"
+      style={{
+        width: "44px",
+        height: "44px",
+        fontSize: "1.2rem",
+        borderRadius: "10px",
+      }}
+    >
+      🎤
+    </button>
+  </div>
+</div>
+
           {/* Input Box */}
           <input
             type="text"
