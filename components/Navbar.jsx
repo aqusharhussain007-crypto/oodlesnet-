@@ -11,7 +11,7 @@ export default function Navbar() {
       style={{
         width: "100%",
         background: "#071018",
-        padding: "12px 18px",
+        padding: "14px 18px",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
@@ -25,17 +25,18 @@ export default function Navbar() {
       <Link href="/" style={{ display: "flex", alignItems: "center" }}>
         <img
           src="/logo.png"
-          alt="OodlesNet Logo"
+          alt="logo"
           style={{
-            height: "38px",
+            height: "40px",
             width: "auto",
             objectFit: "contain",
             cursor: "pointer",
+            display: "block",
           }}
         />
       </Link>
 
-      {/* MENU BUTTON (MOBILE) */}
+      {/* MENU BUTTON */}
       <button
         onClick={() => setOpen(!open)}
         style={{
@@ -47,7 +48,7 @@ export default function Navbar() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          fontSize: "24px",
+          fontSize: "26px",
           color: "#fff",
           boxShadow: "0 0 15px rgba(0,183,255,0.7)",
         }}
@@ -61,28 +62,20 @@ export default function Navbar() {
           style={{
             position: "absolute",
             right: "18px",
-            top: "72px",
+            top: "75px",
             background: "#0a1824",
             borderRadius: "10px",
-            padding: "12px 18px",
+            padding: "14px 18px",
             display: "flex",
             flexDirection: "column",
             gap: "12px",
             boxShadow: "0 0 20px rgba(0,183,255,0.4)",
           }}
         >
-          <Link href="/" className="nav-link">
-            Home
-          </Link>
-          <Link href="/products" className="nav-link">
-            Products
-          </Link>
-          <Link href="/about" className="nav-link">
-            About
-          </Link>
-          <Link href="/contact" className="nav-link">
-            Contact
-          </Link>
+          <Link href="/" className="nav-link">Home</Link>
+          <Link href="/products" className="nav-link">Products</Link>
+          <Link href="/about" className="nav-link">About</Link>
+          <Link href="/contact" className="nav-link">Contact</Link>
         </div>
       )}
     </nav>
