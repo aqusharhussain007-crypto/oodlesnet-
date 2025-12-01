@@ -10,109 +10,81 @@ export default function Navbar() {
     <nav
       style={{
         width: "100%",
-        background: "#07111f",
-        padding: "18px 20px",
+        background: "#071018",
+        padding: "12px 18px",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        boxShadow: "0 0 20px rgba(0, 180, 255, 0.15)",
         position: "sticky",
         top: 0,
         zIndex: 100,
+        boxShadow: "0 2px 12px rgba(0,0,0,0.35)",
       }}
     >
-      {/* Brand Name */}
-      <Link
-        href="/"
-        style={{
-          fontSize: "1.8rem",
-          fontWeight: "700",
-          color: "#00b7ff",
-          textDecoration: "none",
-          letterSpacing: "1px",
-        }}
-      >
-        OodlesNet
+      {/* LOGO */}
+      <Link href="/" style={{ display: "flex", alignItems: "center" }}>
+        <img
+          src="/logo.png"
+          alt="OodlesNet Logo"
+          style={{
+            height: "38px",
+            width: "auto",
+            objectFit: "contain",
+            cursor: "pointer",
+          }}
+        />
       </Link>
 
-      {/* Mobile Menu Button */}
+      {/* MENU BUTTON (MOBILE) */}
       <button
         onClick={() => setOpen(!open)}
         style={{
           background: "#00b7ff",
-          border: "none",
-          padding: "12px 16px",
           borderRadius: "12px",
-          color: "white",
-          fontSize: "1.3rem",
-          boxShadow: "0 0 15px rgba(0, 183, 255, 0.6)",
+          width: "48px",
+          height: "48px",
+          border: "none",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontSize: "24px",
+          color: "#fff",
+          boxShadow: "0 0 15px rgba(0,183,255,0.7)",
         }}
       >
         ☰
       </button>
 
-      {/* Dropdown Menu */}
+      {/* DROPDOWN MENU */}
       {open && (
         <div
           style={{
             position: "absolute",
-            top: "70px",
-            right: "20px",
-            width: "180px",
-            background: "#ffffff",
-            borderRadius: "12px",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-            padding: "10px 0",
-            animation: "fadeIn 0.2s",
+            right: "18px",
+            top: "72px",
+            background: "#0a1824",
+            borderRadius: "10px",
+            padding: "12px 18px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+            boxShadow: "0 0 20px rgba(0,183,255,0.4)",
           }}
         >
-          {/* MENU ITEMS */}
-          <MenuItem href="/">Home</MenuItem>
-          <MenuItem href="/products">Products</MenuItem>
-          <MenuItem href="/about">About</MenuItem>
-          <MenuItem href="/contact">Contact</MenuItem>
+          <Link href="/" className="nav-link">
+            Home
+          </Link>
+          <Link href="/products" className="nav-link">
+            Products
+          </Link>
+          <Link href="/about" className="nav-link">
+            About
+          </Link>
+          <Link href="/contact" className="nav-link">
+            Contact
+          </Link>
         </div>
       )}
     </nav>
   );
 }
-
-/* Reusable Menu Link Component */
-function MenuItem({ href, children }) {
-  return (
-    <Link
-      href={href}
-      style={{
-        display: "block",
-        padding: "12px 20px",
-        color: "#0b1220",
-        fontSize: "1.05rem",
-        textDecoration: "none",
-        borderBottom: "1px solid #eee",
-      }}
-    >
-      {children}
-    </Link>
-  );
-}
-<nav
-  style={{
-    position: "fixed",
-    top: 0,
-    width: "100%",
-    background: "black",
-    padding: "10px 0",
-    display: "flex",
-    justifyContent: "center",
-    zIndex: 100,
-    borderBottom: "2px solid #0bbcff",
-  }}
->
-  <div style={{ display: "flex", gap: "20px" }}>
-    <a href="/" className="nav-link">Home</a>
-    <a href="/products" className="nav-link">Products</a>
-    <a href="/about" className="nav-link">About</a>
-    <a href="/contact" className="nav-link">Contact</a>
-  </div>
-</nav>
-          
