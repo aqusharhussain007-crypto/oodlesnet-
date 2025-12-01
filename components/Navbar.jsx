@@ -27,8 +27,8 @@ export default function Navbar() {
           src="/logo.png"
           alt="logo"
           style={{
-            height: "90px",
-            width: "auto",
+            height: "80px",
+            width: "220",
             objectFit: "contain",
             cursor: "pointer",
             display: "block",
