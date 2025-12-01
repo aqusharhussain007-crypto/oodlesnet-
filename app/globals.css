@@ -262,3 +262,15 @@ html, body {
 .pulse-on-hover:hover {
   animation: greenPulse 1.6s infinite ease-out;
 }
+.nav-link {
+  color: #00c3ff;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: 0.25s;
+}
+
+.nav-link:hover {
+  color: #00ff95;
+  text-shadow: 0 0 6px rgba(0,255,149,0.6);
+  }
+  
