@@ -11,7 +11,7 @@ export default function Navbar() {
       style={{
         width: "100%",
         background: "#071018",
-        padding: "14px 18px",
+        padding: "6px 14px",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
