@@ -4,12 +4,15 @@ import { useState, useEffect } from "react";
 import ProductCard from "@/components/ProductCard";
 import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
+import BannerAd from "@/components/ads/BannerAd";
+import { getAds } from "@/lib/getAds";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [filtered, setFiltered] = useState([]);
+  const [ads, setAds] = useState([]);
 
   // Load products from Firestore
   useEffect(() => {
@@ -23,6 +26,15 @@ export default function Home() {
       setFiltered(items);
     }
     loadProducts();
+  }, []);
+
+  // Load Ads (NEW)
+  useEffect(() => {
+    async function loadAds() {
+      const data = await getAds();
+      setAds(data);
+    }
+    loadAds();
   }, []);
 
   // Voice Search
@@ -64,6 +76,11 @@ export default function Home() {
 
   return (
     <main className="page-container">
+
+      {/* 🔥 Banner Ads Section */}
+      <div className="mb-4 px-3">
+        <BannerAd ads={ads} />
+      </div>
 
       {/* Search Bar Section */}
       <div
@@ -216,8 +233,6 @@ export default function Home() {
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
-
     </main>
   );
     }
-    
