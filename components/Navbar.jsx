@@ -7,20 +7,17 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav
-      style={{
-        width: "100%",
-        background: "#071018",
-        padding: "4px 12px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-        boxShadow: "0 2px 12px rgba(0,0,0,0.35)",
-      }}
-    >
+    <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "4px 12px",
+    height: "54px",
+    backgroundColor: "#000D1A",
+  }}
+>
+      
       {/* LOGO */}
       <Link href="/" style={{ display: "flex", alignItems: "center" }}>
         <img
