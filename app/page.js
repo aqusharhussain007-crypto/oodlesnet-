@@ -52,14 +52,16 @@ export default function Home() {
 
     const recog = new SpeechRecognition();
     recog.lang = "en-IN";
+
     recog.onresult = (event) => {
       const text = event.results[0][0].transcript;
       setSearch(text);
     };
+
     recog.start();
   }
 
-  // Filtering
+  // Filter products
   useEffect(() => {
     if (!search) {
       setSuggestions([]);
@@ -119,7 +121,7 @@ export default function Home() {
             }}
           />
 
-          {/* Search Button */}
+          {/* 🔍 Search Button (SVG) */}
           <button
             style={{
               width: "38px",
@@ -131,14 +133,24 @@ export default function Home() {
               alignItems: "center",
               justifyContent: "center",
               boxShadow: "0 0 12px rgba(0,200,255,0.5)",
-              color: "white",
-              fontSize: "17px",
             }}
           >
-            🔍
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="#003344"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="16.65" y1="16.65" x2="21" y2="21"></line>
+            </svg>
           </button>
 
-          {/* Microphone Button (REPLACED WITH SVG ICON) */}
+          {/* 🎤 Microphone Button (Upgraded SVG) */}
           <button
             onClick={startVoiceSearch}
             style={{
@@ -151,15 +163,15 @@ export default function Home() {
               alignItems: "center",
               justifyContent: "center",
               boxShadow: "0 0 12px rgba(0,200,255,0.5)",
-              color: "white",
             }}
           >
-            {/* Mic Icon SVG */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              fill="white"
+              width="22"
+              height="22"
+              fill="#003344"
+              stroke="white"
+              strokeWidth="1"
               viewBox="0 0 24 24"
             >
               <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 14 0h-2zm-5 8a7 7 0 0 0 7-7h-2a5 5 0 0 1-10 0H5a7 7 0 0 0 7 7zm-1 2h2v3h-2v-3z" />
@@ -167,7 +179,7 @@ export default function Home() {
           </button>
         </div>
 
-        {/* AUTOCOMPLETE RESULTS */}
+        {/* AUTOCOMPLETE */}
         {suggestions.length > 0 && (
           <div
             style={{
@@ -200,7 +212,7 @@ export default function Home() {
         )}
       </div>
 
-      {/* PREMIUM BANNER WITH PROPER SPACING */}
+      {/* BANNER */}
       <div style={{ marginTop: "10px" }} className="px-3">
         <BannerAd ads={ads} />
       </div>
@@ -233,5 +245,4 @@ export default function Home() {
       </div>
     </main>
   );
-      }
-        
+}
