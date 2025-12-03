@@ -11,7 +11,7 @@ export default function Navbar() {
       style={{
         backgroundColor: "#000D1A",
         padding: "4px 12px",
-        height: "54px",
+        height: "50px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -25,24 +25,26 @@ export default function Navbar() {
         <img
           src="/logo.png"
           alt="OodlesNet"
-          style={{ height: "40px", cursor: "pointer" }}
+          style={{ height: "34px", cursor: "pointer" }}
         />
       </Link>
 
-      {/* Hamburger */}
+      {/* Hamburger Button */}
       <button
         onClick={() => setOpen(!open)}
         style={{
           width: "40px",
           height: "40px",
-          borderRadius: "8px",
+          borderRadius: "10px",
           background: "#00c3ff",
           border: "none",
-          boxShadow: "0 0 10px #00c3ff",
+          boxShadow: "0 0 12px #00c3ff",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           cursor: "pointer",
+          fontSize: "22px",
+          color: "white",
         }}
       >
         ☰
@@ -53,15 +55,15 @@ export default function Navbar() {
         <div
           style={{
             position: "absolute",
-            top: "54px",
+            top: "50px",
             right: "12px",
             background: "#00172A",
-            borderRadius: "8px",
-            padding: "10px",
+            borderRadius: "10px",
+            padding: "12px",
             boxShadow: "0 0 12px rgba(0,255,255,0.3)",
             display: "flex",
             flexDirection: "column",
-            gap: "10px",
+            gap: "12px",
             zIndex: 200,
           }}
         >
@@ -72,5 +74,4 @@ export default function Navbar() {
       )}
     </nav>
   );
-      }
-      
+            }
