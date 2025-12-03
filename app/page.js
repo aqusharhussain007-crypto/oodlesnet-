@@ -59,7 +59,7 @@ export default function Home() {
     recog.start();
   }
 
-  // Filter
+  // Filtering & suggestions
   useEffect(() => {
     if (!search) {
       setSuggestions([]);
@@ -78,48 +78,61 @@ export default function Home() {
   return (
     <main className="page-container">
 
-      {/* SEARCH BAR */}
+      {/* 🌟 PREMIUM GLASS SEARCH BAR */}
       <div
         style={{
           marginTop: "0px",
           padding: "6px 0",
-          background: "rgba(255,255,255,0.4)",
-          backdropFilter: "blur(10px)",
+          background: "rgba(0,0,0,0.10)",
+          backdropFilter: "blur(15px)",
           position: "sticky",
           top: "50px",
           zIndex: 50,
+          borderBottom: "1px solid rgba(255,255,255,0.1)",
         }}
       >
         <div
           style={{
             display: "flex",
-            gap: "4px",
+            gap: "6px",
             alignItems: "center",
-            padding: "0 8px",
+            padding: "0 10px",
           }}
         >
+          {/* Search Box */}
           <input
             type="text"
-            className="search-bar"
-            placeholder="Search products..."
+            placeholder="Search products…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
               flex: 1,
-              height: "40px",
-              borderRadius: "12px",
-              border: "1.6px solid #00c3ff",
+              height: "42px",
+              borderRadius: "14px",
               paddingLeft: "12px",
+              background: "rgba(255,255,255,0.25)",
+              backdropFilter: "blur(12px)",
+              border: "1.4px solid rgba(0,200,255,0.6)",
+              color: "#003244",
+              fontSize: "0.95rem",
+              boxShadow: "0 0 10px rgba(0,200,255,0.35)",
             }}
           />
 
+          {/* Small Neon Buttons */}
           <button
-            className="btn-glow"
             style={{
-              width: "36px",
-              height: "40px",
-              borderRadius: "10px",
-              background: "#00c3ff",
+              width: "38px",
+              height: "42px",
+              borderRadius: "12px",
+              background: "rgba(0,200,255,0.9)",
+              border: "none",
+              fontSize: "18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 0 12px rgba(0,200,255,0.7)",
+              color: "white",
             }}
           >
             🔍
@@ -128,22 +141,44 @@ export default function Home() {
           <button
             onClick={startVoiceSearch}
             style={{
-              width: "36px",
-              height: "40px",
-              borderRadius: "10px",
-              background: "#00c3ff",
+              width: "38px",
+              height: "42px",
+              borderRadius: "12px",
+              background: "rgba(0,200,255,0.9)",
+              border: "none",
+              fontSize: "18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 0 12px rgba(0,200,255,0.7)",
+              color: "white",
             }}
           >
             🎤
           </button>
         </div>
 
+        {/* Suggestions Dropdown */}
         {suggestions.length > 0 && (
-          <div className="autocomplete-box">
+          <div
+            style={{
+              marginTop: "6px",
+              background: "rgba(255,255,255,0.85)",
+              borderRadius: "10px",
+              padding: "8px",
+              marginLeft: "10px",
+              marginRight: "10px",
+              boxShadow: "0 0 8px rgba(0,0,0,0.2)",
+            }}
+          >
             {suggestions.map((item) => (
               <div
                 key={item.id}
-                className="autocomplete-item"
+                style={{
+                  padding: "6px 8px",
+                  cursor: "pointer",
+                  borderRadius: "6px",
+                }}
                 onClick={() => {
                   setSearch(item.name);
                   setSuggestions([]);
@@ -156,24 +191,31 @@ export default function Home() {
         )}
       </div>
 
-      {/* BANNER AD */}
-      <div className="mb-4 px-3">
+      {/* 🌟 PREMIUM BANNER AD */}
+      <div style={{ marginTop: "8px" }} className="px-3">
         <BannerAd ads={ads} />
       </div>
 
       {/* TITLE */}
-      <h1 style={{ marginTop: "10px", marginBottom: "8px", color: "#00b7ff" }}>
+      <h1
+        style={{
+          marginTop: "14px",
+          marginBottom: "10px",
+          color: "#00b7ff",
+          fontSize: "1.9rem",
+        }}
+      >
         Products
       </h1>
 
-      {/* PRODUCTS GRID */}
+      {/* PRODUCT GRID */}
       <div
         style={{
           display: "grid",
-          gap: "0.8rem",
+          gap: "1rem",
           gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
           marginTop: "10px",
-          marginBottom: "20px",
+          marginBottom: "40px",
         }}
       >
         {filtered.map((product) => (
@@ -182,5 +224,5 @@ export default function Home() {
       </div>
     </main>
   );
-      }
+    }
       
