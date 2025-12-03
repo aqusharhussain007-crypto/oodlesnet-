@@ -2,20 +2,45 @@
 import { useState, useEffect } from "react";
 
 export default function BannerAd({ ads }) {
+  // TEMPORARY DEBUG: Show ads length
+  if (!ads) {
+    return (
+      <div style={{
+        background: "red",
+        color: "white",
+        padding: "10px",
+        textAlign: "center",
+        borderRadius: "8px"
+      }}>
+        ❌ ads is undefined
+      </div>
+    );
+  }
+
+  if (ads.length === 0) {
+    return (
+      <div style={{
+        background: "orange",
+        color: "black",
+        padding: "10px",
+        textAlign: "center",
+        borderRadius: "8px"
+      }}>
+        ⚠️ No ads found (ads.length = 0)
+      </div>
+    );
+  }
+
+  // If ads exist, show rotating banner
   const [current, setCurrent] = useState(0);
 
-  // Auto-rotate ads every 5 seconds
   useEffect(() => {
-    if (!ads || ads.length === 0) return;
-
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % ads.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [ads]);
-
-  if (!ads || ads.length === 0) return null;
+  }, [ads.length]);
 
   const ad = ads[current];
 
@@ -31,4 +56,4 @@ export default function BannerAd({ ads }) {
       }}
     ></a>
   );
-      }
+}
