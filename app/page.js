@@ -78,89 +78,89 @@ export default function Home() {
   return (
     <main className="page-container">
 
-      {/* Banner Ads */}
-      <div className="mb-4 px-3">
-        <BannerAd ads={ads} />
-      </div>
-
-      {/* Search Section */}
-      <div
+  {/* Search Bar Section */}
+  <div
+    style={{
+      marginTop: "8px",
+      padding: "8px 0",
+      background: "rgba(255,255,255,0.4)",
+      backdropFilter: "blur(10px)",
+      position: "sticky",
+      top: "70px",
+      zIndex: 50,
+    }}
+  >
+    <div
+      style={{
+        display: "flex",
+        gap: "4px",
+        alignItems: "center",
+        padding: "0 8px",
+      }}
+    >
+      <input
+        type="text"
+        className="search-bar"
+        placeholder="Search products..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
         style={{
-          marginTop: "8px",
-          padding: "8px 0",
-          background: "rgba(255,255,255,0.4)",
-          backdropFilter: "blur(10px)",
-          position: "sticky",
-          top: "70px",
-          zIndex: 50,
+          flex: 1,
+          height: "40px",
+          borderRadius: "12px",
+          border: "2px solid #00c3ff",
+          paddingLeft: "12px",
+        }}
+      />
+
+      <button
+        className="btn-glow"
+        style={{
+          width: "36px",
+          height: "40px",
+          borderRadius: "10px",
+          background: "#00c3ff",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            gap: "4px",
-            alignItems: "center",
-            padding: "0 8px",
-          }}
-        >
-          <input
-            type="text"
-            className="search-bar"
-            placeholder="Search products..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              flex: 1,
-              height: "40px",
-              borderRadius: "12px",
-              border: "2px solid #00c3ff",
-              paddingLeft: "12px",
-            }}
-          />
+        🔍
+      </button>
 
-          <button
-            className="btn-glow"
-            style={{
-              width: "36px",
-              height: "40px",
-              borderRadius: "10px",
-              background: "#00c3ff",
+      <button
+        onClick={startVoiceSearch}
+        style={{
+          width: "36px",
+          height: "40px",
+          borderRadius: "10px",
+          background: "#00c3ff",
+        }}
+      >
+        🎤
+      </button>
+    </div>
+
+    {suggestions.length > 0 && (
+      <div className="autocomplete-box">
+        {suggestions.map((item) => (
+          <div
+            key={item.id}
+            className="autocomplete-item"
+            onClick={() => {
+              setSearch(item.name);
+              setSuggestions([]);
             }}
           >
-            🔍
-          </button>
-
-          <button
-            onClick={startVoiceSearch}
-            style={{
-              width: "36px",
-              height: "40px",
-              borderRadius: "10px",
-              background: "#00c3ff",
-            }}
-          >
-            🎤
-          </button>
-        </div>
-
-        {suggestions.length > 0 && (
-          <div className="autocomplete-box">
-            {suggestions.map((item) => (
-              <div
-                key={item.id}
-                className="autocomplete-item"
-                onClick={() => {
-                  setSearch(item.name);
-                  setSuggestions([]);
-                }}
-              >
-                {item.name}
-              </div>
-            ))}
+            {item.name}
           </div>
-        )}
+        ))}
       </div>
+    )}
+  </div>
 
+  {/* 🔥 Banner Ads Section (Now Moved Below Search Bar) */}
+  <div className="mb-4 px-3">
+    <BannerAd ads={ads} />
+  </div>
+        
       {/* TITLE */}
       <h1 style={{ marginTop: "16px", color: "#00b7ff" }}>Products</h1>
 
