@@ -51,4 +51,5 @@ export default function BannerAd({ ads }) {
       }}
     ></a>
   );
-}
+            }
+  
