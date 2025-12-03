@@ -59,7 +59,7 @@ export default function Home() {
     recog.start();
   }
 
-  // Filtering & suggestions
+  // Filtering
   useEffect(() => {
     if (!search) {
       setSuggestions([]);
@@ -110,8 +110,8 @@ export default function Home() {
               height: "42px",
               borderRadius: "14px",
               paddingLeft: "12px",
-              background: "rgba(255,255,255,0.25)",
-              backdropFilter: "blur(12px)",
+              background: "rgba(255,255,255,0.35)",
+              backdropFilter: "blur(15px)",
               border: "1.4px solid rgba(0,200,255,0.6)",
               color: "#003244",
               fontSize: "0.95rem",
@@ -119,46 +119,55 @@ export default function Home() {
             }}
           />
 
-          {/* Small Neon Buttons */}
+          {/* Search Button */}
           <button
             style={{
               width: "38px",
               height: "42px",
               borderRadius: "12px",
-              background: "rgba(0,200,255,0.9)",
+              background: "rgba(0,200,255,0.75)",
               border: "none",
-              fontSize: "18px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 0 12px rgba(0,200,255,0.7)",
+              boxShadow: "0 0 12px rgba(0,200,255,0.5)",
               color: "white",
+              fontSize: "17px",
             }}
           >
             🔍
           </button>
 
+          {/* Microphone Button (REPLACED WITH SVG ICON) */}
           <button
             onClick={startVoiceSearch}
             style={{
               width: "38px",
               height: "42px",
               borderRadius: "12px",
-              background: "rgba(0,200,255,0.9)",
+              background: "rgba(0,200,255,0.75)",
               border: "none",
-              fontSize: "18px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 0 12px rgba(0,200,255,0.7)",
+              boxShadow: "0 0 12px rgba(0,200,255,0.5)",
               color: "white",
             }}
           >
-            🎤
+            {/* Mic Icon SVG */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              fill="white"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 14 0h-2zm-5 8a7 7 0 0 0 7-7h-2a5 5 0 0 1-10 0H5a7 7 0 0 0 7 7zm-1 2h2v3h-2v-3z" />
+            </svg>
           </button>
         </div>
 
-        {/* Suggestions Dropdown */}
+        {/* AUTOCOMPLETE RESULTS */}
         {suggestions.length > 0 && (
           <div
             style={{
@@ -191,8 +200,8 @@ export default function Home() {
         )}
       </div>
 
-      {/* 🌟 PREMIUM BANNER AD */}
-      <div style={{ marginTop: "8px" }} className="px-3">
+      {/* PREMIUM BANNER WITH PROPER SPACING */}
+      <div style={{ marginTop: "10px" }} className="px-3">
         <BannerAd ads={ads} />
       </div>
 
@@ -224,5 +233,5 @@ export default function Home() {
       </div>
     </main>
   );
-    }
-      
+      }
+        
