@@ -5,7 +5,6 @@ import ProductCard from "@/components/ProductCard";
 import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
 import BannerAd from "@/components/ads/BannerAd";
-import { getAds } from "@/lib/getAds";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -27,15 +26,22 @@ export default function Home() {
     }
     loadProducts();
   }, []);
-
-  // Load Ads (NEW)
-  useEffect(() => {
-    async function loadAds() {
-      const data = await getAds();
-      setAds(data);
+// Load Ads (Client-side Firestore)
+useEffect(() => {
+  async function loadAds() {
+    try {
+      const snap = await getDocs(collection(db, "ads"));
+      const items = snap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setAds(items);
+    } catch (error) {
+      console.log("ADS ERROR:", error);
     }
-    loadAds();
-  }, []);
+  }
+  loadAds();
+}, []);
 
   // Voice Search
   function startVoiceSearch() {
