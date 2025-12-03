@@ -52,14 +52,16 @@ export default function Home() {
 
     const recog = new SpeechRecognition();
     recog.lang = "en-IN";
+
     recog.onresult = (event) => {
       const text = event.results[0][0].transcript;
       setSearch(text);
     };
+
     recog.start();
   }
 
-  // Filtering
+  // Filtering + Suggestions
   useEffect(() => {
     if (!search) {
       setSuggestions([]);
@@ -78,93 +80,93 @@ export default function Home() {
   return (
     <main className="page-container">
 
-  {/* Search Bar Section */}
-<div
-  style={{
-    marginTop: "2px",
-    padding: "6px 0",
-    background: "rgba(255,255,255,0.4)",
-    backdropFilter: "blur(10px)",
-    position: "sticky",
-    top: "54px",
-    zIndex: 50,
-  }}
->
-      
-  >
-    <div
-      style={{
-        display: "flex",
-        gap: "4px",
-        alignItems: "center",
-        padding: "0 8px",
-      }}
-    >
-      <input
-        type="text"
-        className="search-bar"
-        placeholder="Search products..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
+      {/* 🌐 Search Bar Section */}
+      <div
         style={{
-          flex: 1,
-          height: "40px",
-          borderRadius: "12px",
-          border: "2px solid #00c3ff",
-          paddingLeft: "12px",
-        }}
-      />
-
-      <button
-        className="btn-glow"
-        style={{
-          width: "36px",
-          height: "40px",
-          borderRadius: "10px",
-          background: "#00c3ff",
+          marginTop: "2px",
+          padding: "6px 0",
+          background: "rgba(255,255,255,0.4)",
+          backdropFilter: "blur(10px)",
+          position: "sticky",
+          top: "54px",
+          zIndex: 50,
         }}
       >
-        🔍
-      </button>
+        <div
+          style={{
+            display: "flex",
+            gap: "4px",
+            alignItems: "center",
+            padding: "0 8px",
+          }}
+        >
+          <input
+            type="text"
+            className="search-bar"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{
+              flex: 1,
+              height: "40px",
+              borderRadius: "12px",
+              border: "2px solid #00c3ff",
+              paddingLeft: "12px",
+            }}
+          />
 
-      <button
-        onClick={startVoiceSearch}
-        style={{
-          width: "36px",
-          height: "40px",
-          borderRadius: "10px",
-          background: "#00c3ff",
-        }}
-      >
-        🎤
-      </button>
-    </div>
-
-    {suggestions.length > 0 && (
-      <div className="autocomplete-box">
-        {suggestions.map((item) => (
-          <div
-            key={item.id}
-            className="autocomplete-item"
-            onClick={() => {
-              setSearch(item.name);
-              setSuggestions([]);
+          <button
+            className="btn-glow"
+            style={{
+              width: "36px",
+              height: "40px",
+              borderRadius: "10px",
+              background: "#00c3ff",
             }}
           >
-            {item.name}
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
+            🔍
+          </button>
 
-  {/* 🔥 Banner Ads Section (Now Moved Below Search Bar) */}
-  <div className="mb-4 px-3">
-    <BannerAd ads={ads} />
-  </div>
-        
+          <button
+            onClick={startVoiceSearch}
+            style={{
+              width: "36px",
+              height: "40px",
+              borderRadius: "10px",
+              background: "#00c3ff",
+            }}
+          >
+            🎤
+          </button>
+        </div>
+
+        {suggestions.length > 0 && (
+          <div className="autocomplete-box">
+            {suggestions.map((item) => (
+              <div
+                key={item.id}
+                className="autocomplete-item"
+                onClick={() => {
+                  setSearch(item.name);
+                  setSuggestions([]);
+                }}
+              >
+                {item.name}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 🔥 Banner Ads Section */}
+      <div className="mb-4 px-3">
+        <BannerAd ads={ads} />
+      </div>
+
       {/* TITLE */}
-      <h1 style={{ marginTop: "16px", color: "#00b7ff" }}>Products</h1>
+      <h1 style={{ marginTop: "16px", marginBottom: "10px", color: "#00b7ff" }}>
+        Products
+      </h1>
 
       {/* PRODUCT GRID */}
       <div
@@ -173,14 +175,13 @@ export default function Home() {
           gap: "0.8rem",
           gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
           marginTop: "10px",
+          marginBottom: "20px",
         }}
       >
         {filtered.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
-
     </main>
   );
-        }
-        
+}
