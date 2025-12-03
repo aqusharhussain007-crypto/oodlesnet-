@@ -79,16 +79,18 @@ export default function Home() {
     <main className="page-container">
 
   {/* Search Bar Section */}
-  <div
-    style={{
-      marginTop: "8px",
-      padding: "8px 0",
-      background: "rgba(255,255,255,0.4)",
-      backdropFilter: "blur(10px)",
-      position: "sticky",
-      top: "70px",
-      zIndex: 50,
-    }}
+<div
+  style={{
+    marginTop: "2px",
+    padding: "6px 0",
+    background: "rgba(255,255,255,0.4)",
+    backdropFilter: "blur(10px)",
+    position: "sticky",
+    top: "54px",
+    zIndex: 50,
+  }}
+>
+      
   >
     <div
       style={{
