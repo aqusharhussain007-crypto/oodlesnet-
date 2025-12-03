@@ -96,7 +96,8 @@ export default function Home() {
       {/* 🔍 Search Section */}
       <div
         style={{
-          marginTop: "4px",
+          marginTop: "14px",   // ⭐ Updated spacing
+          marginBottom: "10px",
           padding: "4px 10px",
           background: "rgba(255,255,255,0.3)",
           backdropFilter: "blur(10px)",
@@ -176,8 +177,8 @@ export default function Home() {
         )}
       </div>
 
-      {/* 🟩 Banner (reduced spacing) */}
-      <div className="px-3 mt-2">
+      {/* 🟩 Banner */}
+      <div className="px-3 mt-0">
         <BannerAd ads={ads} />
       </div>
 
@@ -202,4 +203,3 @@ export default function Home() {
     </main>
   );
 }
-  
