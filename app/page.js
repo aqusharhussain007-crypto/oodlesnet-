@@ -76,42 +76,39 @@ export default function Home() {
     setFiltered(matched);
   }, [search, products]);
 
-  // ----------------------------
-  // SVG BUTTON STYLE (FIX)
-  // ----------------------------
+  // White Icon Button Style
   const iconButtonStyle = {
-    width: "48px",
-    height: "48px",
+    width: "42px",
+    height: "42px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "8px", // FIX
-    overflow: "visible", // FIX
-    borderRadius: "14px",
-    background: "rgba(0,200,255,0.7)",
-    backdropFilter: "blur(8px)",
+    padding: "6px",
+    borderRadius: "12px",
+    overflow: "visible",
+    background: "rgba(0, 200, 255, 0.75)",
     boxShadow: "0 0 10px rgba(0,200,255,0.7)",
   };
 
   return (
     <main className="page-container">
 
-      {/* 🔍 Search Bar Section */}
+      {/* 🔍 Search Section */}
       <div
         style={{
-          marginTop: "6px",
-          padding: "6px 10px",
+          marginTop: "4px",
+          padding: "4px 10px",
           background: "rgba(255,255,255,0.3)",
           backdropFilter: "blur(10px)",
           position: "sticky",
-          top: "70px",
+          top: "68px",
           zIndex: 50,
         }}
       >
         <div
           style={{
             display: "flex",
-            gap: "8px",
+            gap: "6px",
             alignItems: "center",
           }}
         >
@@ -121,10 +118,9 @@ export default function Home() {
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="search-bar"
             style={{
               flex: 1,
-              height: "48px",
+              height: "46px",
               borderRadius: "12px",
               fontSize: "1rem",
               paddingLeft: "14px",
@@ -134,26 +130,26 @@ export default function Home() {
             }}
           />
 
-          {/* Search Button (SVG) */}
+          {/* Search Button */}
           <button style={iconButtonStyle}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="22"
               height="22"
-              fill="black"
+              fill="white"
               viewBox="0 0 24 24"
             >
               <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
             </svg>
           </button>
 
-          {/* Mic Button (SVG) */}
+          {/* Mic Button */}
           <button onClick={startVoiceSearch} style={iconButtonStyle}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="22"
               height="22"
-              fill="black"
+              fill="white"
               viewBox="0 0 24 24"
             >
               <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7zm-1 2h2v3h-2v-3z" />
@@ -180,13 +176,13 @@ export default function Home() {
         )}
       </div>
 
-      {/* 🟩 Banner Ad Section */}
-      <div className="px-3 mt-3">
+      {/* 🟩 Banner (reduced spacing) */}
+      <div className="px-3 mt-2">
         <BannerAd ads={ads} />
       </div>
 
       {/* Title */}
-      <h1 style={{ marginTop: "18px", marginBottom: "12px", color: "#00b7ff" }}>
+      <h1 style={{ marginTop: "14px", marginBottom: "10px", color: "#00b7ff" }}>
         Products
       </h1>
 
@@ -205,5 +201,5 @@ export default function Home() {
       </div>
     </main>
   );
-      }
+}
   
