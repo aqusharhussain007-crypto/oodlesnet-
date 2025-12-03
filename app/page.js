@@ -13,7 +13,7 @@ export default function Home() {
   const [filtered, setFiltered] = useState([]);
   const [ads, setAds] = useState([]);
 
-  // Load products
+  // Load Products
   useEffect(() => {
     async function loadProducts() {
       const snap = await getDocs(collection(db, "products"));
@@ -27,7 +27,7 @@ export default function Home() {
     loadProducts();
   }, []);
 
-  // Load ads
+  // Load Ads
   useEffect(() => {
     async function loadAds() {
       try {
@@ -38,23 +38,18 @@ export default function Home() {
         }));
         setAds(items);
       } catch (err) {
-        console.log("Ads Error:", err);
+        console.log("ADS ERROR:", err);
       }
     }
     loadAds();
   }, []);
 
-  // Voice search
+  // Voice Search
   function startVoiceSearch() {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return alert("Voice search not supported.");
 
-    if (!SpeechRecognition) {
-      alert("Voice search not supported");
-      return;
-    }
-
-    const recog = new SpeechRecognition();
+    const recog = new SR();
     recog.lang = "en-IN";
 
     recog.onresult = (event) => {
@@ -65,7 +60,7 @@ export default function Home() {
     recog.start();
   }
 
-  // Autocomplete
+  // Filtering + Autocomplete
   useEffect(() => {
     if (!search) {
       setSuggestions([]);
@@ -73,135 +68,127 @@ export default function Home() {
       return;
     }
 
-    const match = products.filter((p) =>
+    const matched = products.filter((p) =>
       p.name.toLowerCase().includes(search.toLowerCase())
     );
 
-    setSuggestions(match.slice(0, 5));
-    setFiltered(match);
+    setSuggestions(matched.slice(0, 5));
+    setFiltered(matched);
   }, [search, products]);
 
-  return (
-    <main className="page-container" style={{ paddingBottom: "40px" }}>
+  // ----------------------------
+  // SVG BUTTON STYLE (FIX)
+  // ----------------------------
+  const iconButtonStyle = {
+    width: "48px",
+    height: "48px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "8px", // FIX
+    overflow: "visible", // FIX
+    borderRadius: "14px",
+    background: "rgba(0,200,255,0.7)",
+    backdropFilter: "blur(8px)",
+    boxShadow: "0 0 10px rgba(0,200,255,0.7)",
+  };
 
-      {/* 🔎 Floating Search Bar */}
+  return (
+    <main className="page-container">
+
+      {/* 🔍 Search Bar Section */}
       <div
         style={{
-          marginTop: "10px",
-          padding: "0 10px",
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
+          marginTop: "6px",
+          padding: "6px 10px",
+          background: "rgba(255,255,255,0.3)",
+          backdropFilter: "blur(10px)",
           position: "sticky",
-          top: "66px",
-          zIndex: 200,
-          background: "transparent",
+          top: "70px",
+          zIndex: 50,
         }}
       >
-        {/* Input */}
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+        <div
           style={{
-            flex: 1,
-            height: "42px",
-            borderRadius: "12px",
-            border: "2px solid #00c3ff",
-            paddingLeft: "12px",
-            background: "rgba(255,255,255,0.65)",
-            fontSize: "1rem",
-            color: "#003344",
-            boxShadow: "0 0 10px rgba(0,200,255,0.35)",
-          }}
-        />
-
-        {/* Search button */}
-        <button
-          style={{
-            width: "42px",
-            height: "42px",
-            borderRadius: "12px",
-            background: "rgba(0,200,255,0.90)",
             display: "flex",
+            gap: "8px",
             alignItems: "center",
-            justifyContent: "center",
-            border: "none",
-            boxShadow: "0 0 12px rgba(0,200,255,0.6)",
           }}
         >
-          {/* BLACK SEARCH ICON */}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="black"
-          >
-            <path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 10-.7.7l.3.3v.8l5 5 1.5-1.5-5-5zm-6 0A4.5 4.5 0 1114 9.5 4.5 4.5 0 019.5 14z" />
-          </svg>
-        </button>
+          {/* Input Box */}
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="search-bar"
+            style={{
+              flex: 1,
+              height: "48px",
+              borderRadius: "12px",
+              fontSize: "1rem",
+              paddingLeft: "14px",
+              border: "2px solid #00c3ff",
+              background: "rgba(255,255,255,0.8)",
+              boxShadow: "0 0 8px rgba(0,195,255,0.4)",
+            }}
+          />
 
-        {/* Mic button */}
-        <button
-          onClick={startVoiceSearch}
-          style={{
-            width: "42px",
-            height: "42px",
-            borderRadius: "12px",
-            background: "rgba(0,200,255,0.90)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            border: "none",
-            boxShadow: "0 0 12px rgba(0,200,255,0.6)",
-          }}
-        >
-          {/* BLACK MIC ICON */}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="black"
-          >
-            <path d="M12 14a3 3 0 003-3V5a3 3 0 10-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7zm-1 2h2v3h-2v-3z" />
-          </svg>
-        </button>
+          {/* Search Button (SVG) */}
+          <button style={iconButtonStyle}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              fill="black"
+              viewBox="0 0 24 24"
+            >
+              <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
+            </svg>
+          </button>
+
+          {/* Mic Button (SVG) */}
+          <button onClick={startVoiceSearch} style={iconButtonStyle}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              fill="black"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7zm-1 2h2v3h-2v-3z" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Autocomplete */}
+        {suggestions.length > 0 && (
+          <div className="autocomplete-box">
+            {suggestions.map((item) => (
+              <div
+                key={item.id}
+                className="autocomplete-item"
+                onClick={() => {
+                  setSearch(item.name);
+                  setSuggestions([]);
+                }}
+              >
+                {item.name}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Autocomplete dropdown */}
-      {suggestions.length > 0 && (
-        <div style={{ marginTop: "4px", paddingLeft: "10px", paddingRight: "10px" }}>
-          {suggestions.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => {
-                setSearch(item.name);
-                setSuggestions([]);
-              }}
-              style={{
-                padding: "10px",
-                background: "white",
-                borderBottom: "1px solid #ddd",
-                borderRadius: "6px",
-                marginBottom: "4px",
-              }}
-            >
-              {item.name}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Banner */}
-      <div className="mt-3 px-3">
+      {/* 🟩 Banner Ad Section */}
+      <div className="px-3 mt-3">
         <BannerAd ads={ads} />
       </div>
 
       {/* Title */}
-      <h1 style={{ marginTop: "16px", color: "#00b7ff" }}>Products</h1>
+      <h1 style={{ marginTop: "18px", marginBottom: "12px", color: "#00b7ff" }}>
+        Products
+      </h1>
 
       {/* Product Grid */}
       <div
@@ -209,8 +196,7 @@ export default function Home() {
           display: "grid",
           gap: "0.8rem",
           gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-          marginTop: "10px",
-          marginBottom: "20px",
+          marginBottom: "30px",
         }}
       >
         {filtered.map((product) => (
@@ -219,5 +205,5 @@ export default function Home() {
       </div>
     </main>
   );
-                                            }
-    
+      }
+  
