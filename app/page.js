@@ -122,61 +122,43 @@ export default function Home() {
           />
 
           {/* 🔍 Search Button (SVG) */}
-          <button
-            style={{
-              width: "38px",
-              height: "42px",
-              borderRadius: "12px",
-              background: "rgba(0,200,255,0.75)",
-              border: "none",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 0 12px rgba(0,200,255,0.5)",
-            }}
-          >
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-              fill="#003344"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="11" cy="11" r="7"></circle>
-              <line x1="16.65" y1="16.65" x2="21" y2="21"></line>
-            </svg>
-          </button>
+<button
+  style={{
+    width: "38px",
+    height: "42px",
+    borderRadius: "12px",
+    background: "rgba(0,200,255,0.75)",
+    border: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 0 12px rgba(0,200,255,0.5)",
+  }}
+>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+    <path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 10-.7.7l.3.3v.8l5 5 1.5-1.5-5-5zm-6 0A4.5 4.5 0 1114 9.5 4.5 4.5 0 019.5 14z"/>
+  </svg>
+</button>
 
           {/* 🎤 Microphone Button (Upgraded SVG) */}
           <button
-            onClick={startVoiceSearch}
-            style={{
-              width: "38px",
-              height: "42px",
-              borderRadius: "12px",
-              background: "rgba(0,200,255,0.75)",
-              border: "none",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 0 12px rgba(0,200,255,0.5)",
-            }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="22"
-              height="22"
-              fill="#003344"
-              stroke="white"
-              strokeWidth="1"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 14 0h-2zm-5 8a7 7 0 0 0 7-7h-2a5 5 0 0 1-10 0H5a7 7 0 0 0 7 7zm-1 2h2v3h-2v-3z" />
-            </svg>
-          </button>
+  onClick={startVoiceSearch}
+  style={{
+    width: "38px",
+    height: "42px",
+    borderRadius: "12px",
+    background: "rgba(0,200,255,0.75)",
+    border: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 0 12px rgba(0,200,255,0.5)",
+  }}
+>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+    <path d="M12 14a3 3 0 003-3V5a3 3 0 10-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7zm-1 2h2v3h-2v-3z"/>
+  </svg>
+</button>
         </div>
 
         {/* AUTOCOMPLETE */}
