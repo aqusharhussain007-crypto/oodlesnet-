@@ -52,16 +52,14 @@ export default function Home() {
 
     const recog = new SpeechRecognition();
     recog.lang = "en-IN";
-
     recog.onresult = (event) => {
       const text = event.results[0][0].transcript;
       setSearch(text);
     };
-
     recog.start();
   }
 
-  // Filtering + Suggestions
+  // Filter
   useEffect(() => {
     if (!search) {
       setSuggestions([]);
@@ -80,15 +78,15 @@ export default function Home() {
   return (
     <main className="page-container">
 
-      {/* 🌐 Search Bar Section */}
+      {/* SEARCH BAR */}
       <div
         style={{
-          marginTop: "2px",
+          marginTop: "0px",
           padding: "6px 0",
           background: "rgba(255,255,255,0.4)",
           backdropFilter: "blur(10px)",
           position: "sticky",
-          top: "54px",
+          top: "50px",
           zIndex: 50,
         }}
       >
@@ -110,7 +108,7 @@ export default function Home() {
               flex: 1,
               height: "40px",
               borderRadius: "12px",
-              border: "2px solid #00c3ff",
+              border: "1.6px solid #00c3ff",
               paddingLeft: "12px",
             }}
           />
@@ -158,17 +156,17 @@ export default function Home() {
         )}
       </div>
 
-      {/* 🔥 Banner Ads Section */}
+      {/* BANNER AD */}
       <div className="mb-4 px-3">
         <BannerAd ads={ads} />
       </div>
 
       {/* TITLE */}
-      <h1 style={{ marginTop: "16px", marginBottom: "10px", color: "#00b7ff" }}>
+      <h1 style={{ marginTop: "10px", marginBottom: "8px", color: "#00b7ff" }}>
         Products
       </h1>
 
-      {/* PRODUCT GRID */}
+      {/* PRODUCTS GRID */}
       <div
         style={{
           display: "grid",
@@ -184,4 +182,5 @@ export default function Home() {
       </div>
     </main>
   );
-}
+      }
+      
