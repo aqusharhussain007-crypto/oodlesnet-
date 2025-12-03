@@ -13,7 +13,7 @@ export default function Home() {
   const [filtered, setFiltered] = useState([]);
   const [ads, setAds] = useState([]);
 
-  // Load products from Firestore
+  // Load products
   useEffect(() => {
     async function loadProducts() {
       const snap = await getDocs(collection(db, "products"));
@@ -27,7 +27,7 @@ export default function Home() {
     loadProducts();
   }, []);
 
-  // Load Ads
+  // Load ads
   useEffect(() => {
     async function loadAds() {
       try {
@@ -44,13 +44,13 @@ export default function Home() {
     loadAds();
   }, []);
 
-  // Voice Search
+  // Voice search
   function startVoiceSearch() {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      alert("Your browser does not support voice search.");
+      alert("Voice search not supported");
       return;
     }
 
@@ -65,7 +65,7 @@ export default function Home() {
     recog.start();
   }
 
-  // Autocomplete + Filtering
+  // Autocomplete
   useEffect(() => {
     if (!search) {
       setSuggestions([]);
@@ -84,7 +84,7 @@ export default function Home() {
   return (
     <main className="page-container" style={{ paddingBottom: "40px" }}>
 
-      {/* 🔎 CLEAN FLOATING SEARCH BAR */}
+      {/* 🔎 Floating Search Bar */}
       <div
         style={{
           marginTop: "10px",
@@ -98,7 +98,7 @@ export default function Home() {
           background: "transparent",
         }}
       >
-        {/* SEARCH INPUT */}
+        {/* Input */}
         <input
           type="text"
           placeholder="Search products..."
@@ -110,14 +110,14 @@ export default function Home() {
             borderRadius: "12px",
             border: "2px solid #00c3ff",
             paddingLeft: "12px",
-            background: "rgba(255,255,255,0.60)",
+            background: "rgba(255,255,255,0.65)",
             fontSize: "1rem",
             color: "#003344",
             boxShadow: "0 0 10px rgba(0,200,255,0.35)",
           }}
         />
 
-        {/* SEARCH BUTTON */}
+        {/* Search button */}
         <button
           style={{
             width: "42px",
@@ -131,18 +131,19 @@ export default function Home() {
             boxShadow: "0 0 12px rgba(0,200,255,0.6)",
           }}
         >
+          {/* BLACK SEARCH ICON */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
+            width="22"
+            height="22"
             viewBox="0 0 24 24"
-            fill="white"
+            fill="black"
           >
             <path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 10-.7.7l.3.3v.8l5 5 1.5-1.5-5-5zm-6 0A4.5 4.5 0 1114 9.5 4.5 4.5 0 019.5 14z" />
           </svg>
         </button>
 
-        {/* MIC BUTTON */}
+        {/* Mic button */}
         <button
           onClick={startVoiceSearch}
           style={{
@@ -157,31 +158,35 @@ export default function Home() {
             boxShadow: "0 0 12px rgba(0,200,255,0.6)",
           }}
         >
+          {/* BLACK MIC ICON */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
+            width="22"
+            height="22"
             viewBox="0 0 24 24"
-            fill="white"
+            fill="black"
           >
             <path d="M12 14a3 3 0 003-3V5a3 3 0 10-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7zm-1 2h2v3h-2v-3z" />
           </svg>
         </button>
       </div>
 
-      {/* AUTOCOMPLETE RESULTS */}
+      {/* Autocomplete dropdown */}
       {suggestions.length > 0 && (
-        <div
-          className="autocomplete-box"
-          style={{ marginTop: "4px", paddingLeft: "10px", paddingRight: "10px" }}
-        >
+        <div style={{ marginTop: "4px", paddingLeft: "10px", paddingRight: "10px" }}>
           {suggestions.map((item) => (
             <div
               key={item.id}
-              className="autocomplete-item"
               onClick={() => {
                 setSearch(item.name);
                 setSuggestions([]);
+              }}
+              style={{
+                padding: "10px",
+                background: "white",
+                borderBottom: "1px solid #ddd",
+                borderRadius: "6px",
+                marginBottom: "4px",
               }}
             >
               {item.name}
@@ -190,17 +195,15 @@ export default function Home() {
         </div>
       )}
 
-      {/* 🔥 BANNER ADS */}
+      {/* Banner */}
       <div className="mt-3 px-3">
         <BannerAd ads={ads} />
       </div>
 
-      {/* TITLE */}
-      <h1 style={{ marginTop: "16px", marginBottom: "10px", color: "#00b7ff" }}>
-        Products
-      </h1>
+      {/* Title */}
+      <h1 style={{ marginTop: "16px", color: "#00b7ff" }}>Products</h1>
 
-      {/* PRODUCT GRID */}
+      {/* Product Grid */}
       <div
         style={{
           display: "grid",
@@ -216,5 +219,5 @@ export default function Home() {
       </div>
     </main>
   );
-      }
-      
+                                            }
+    
