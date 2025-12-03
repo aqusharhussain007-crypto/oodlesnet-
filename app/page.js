@@ -121,78 +121,91 @@ export default function Home() {
             }}
           />
 
-          {/* 🔍 Search Button (SVG) */}
-<button
+          {/* 🔎 CLEAN FLOATING SEARCH BAR */}
+<div
   style={{
-    width: "38px",
-    height: "42px",
-    borderRadius: "12px",
-    background: "rgba(0,200,255,0.75)",
-    border: "none",
+    marginTop: "10px",
+    padding: "0 8px",
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "0 0 12px rgba(0,200,255,0.5)",
+    gap: "8px",
+    position: "sticky",
+    top: "66px",
+    zIndex: 100,
+    background: "transparent",
   }}
 >
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-    <path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 10-.7.7l.3.3v.8l5 5 1.5-1.5-5-5zm-6 0A4.5 4.5 0 1114 9.5 4.5 4.5 0 019.5 14z"/>
-  </svg>
-</button>
+  {/* SEARCH INPUT */}
+  <input
+    type="text"
+    placeholder="Search products..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    style={{
+      flex: 1,
+      height: "42px",
+      borderRadius: "12px",
+      border: "2px solid #00c3ff",
+      paddingLeft: "12px",
+      background: "rgba(255,255,255,0.60)",
+      fontSize: "1rem",
+      color: "#003344",
+      boxShadow: "0 0 10px rgba(0,200,255,0.35)",
+    }}
+  />
 
-          {/* 🎤 Microphone Button (Upgraded SVG) */}
-          <button
-  onClick={startVoiceSearch}
-  style={{
-    width: "38px",
-    height: "42px",
-    borderRadius: "12px",
-    background: "rgba(0,200,255,0.75)",
-    border: "none",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "0 0 12px rgba(0,200,255,0.5)",
-  }}
->
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-    <path d="M12 14a3 3 0 003-3V5a3 3 0 10-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7zm-1 2h2v3h-2v-3z"/>
-  </svg>
-</button>
-        </div>
+  {/* SEARCH BUTTON */}
+  <button
+    style={{
+      width: "42px",
+      height: "42px",
+      borderRadius: "12px",
+      background: "rgba(0,200,255,0.90)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      border: "none",
+      boxShadow: "0 0 12px rgba(0,200,255,0.6)",
+    }}
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="white"
+    >
+      <path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 10-.7.7l.3.3v.8l5 5 1.5-1.5-5-5zm-6 0A4.5 4.5 0 1114 9.5 4.5 4.5 0 019.5 14z"/>
+    </svg>
+  </button>
 
-        {/* AUTOCOMPLETE */}
-        {suggestions.length > 0 && (
-          <div
-            style={{
-              marginTop: "6px",
-              background: "rgba(255,255,255,0.85)",
-              borderRadius: "10px",
-              padding: "8px",
-              marginLeft: "10px",
-              marginRight: "10px",
-              boxShadow: "0 0 8px rgba(0,0,0,0.2)",
-            }}
-          >
-            {suggestions.map((item) => (
-              <div
-                key={item.id}
-                style={{
-                  padding: "6px 8px",
-                  cursor: "pointer",
-                  borderRadius: "6px",
-                }}
-                onClick={() => {
-                  setSearch(item.name);
-                  setSuggestions([]);
-                }}
-              >
-                {item.name}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+  {/* MIC BUTTON */}
+  <button
+    onClick={startVoiceSearch}
+    style={{
+      width: "42px",
+      height: "42px",
+      borderRadius: "12px",
+      background: "rgba(0,200,255,0.90)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      border: "none",
+      boxShadow: "0 0 12px rgba(0,200,255,0.6)",
+    }}
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="white"
+    >
+      <path d="M12 14a3 3 0 003-3V5a3 3 0 10-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7zm-1 2h2v3h-2v-3z"/>
+    </svg>
+  </button>
+</div>
+
 
       {/* BANNER */}
       <div style={{ marginTop: "10px" }} className="px-3">
