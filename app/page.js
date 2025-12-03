@@ -26,219 +26,69 @@ export default function Home() {
     }
     loadProducts();
   }, []);
-// Load Ads (Client-side Firestore)
-useEffect(() => {
-  async function loadAds() {
-    try {
-      const snap = await getDocs(collection(db, "ads"));
-      const items = snap.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setAds(items);
-    } catch (error) {
-      console.log("ADS ERROR:", error);
-    }
-  }
-  loadAds();
-}, []);
 
-  // Voice Search
-  function startVoiceSearch() {
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      alert("Your browser does not support voice search.");
-      return;
-    }
-
-    const recog = new SpeechRecognition();
-    recog.lang = "en-IN";
-
-    recog.onresult = (event) => {
-      const text = event.results[0][0].transcript;
-      setSearch(text);
-    };
-
-    recog.start();
-  }
-
-  // Autocomplete + Filtering
+  // Load Ads (Client-side Firestore)
   useEffect(() => {
-    if (!search) {
-      setSuggestions([]);
-      setFiltered(products);
-      return;
+    async function loadAds() {
+      try {
+        const snap = await getDocs(collection(db, "ads"));
+        const items = snap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setAds(items);
+      } catch (error) {
+        console.log("ADS ERROR:", error);
+      }
     }
+    loadAds();
+  }, []);
 
-    const match = products.filter((p) =>
-      p.name.toLowerCase().includes(search.toLowerCase())
-    );
-
-    setSuggestions(match.slice(0, 5));
-    setFiltered(match);
-  }, [search, products]);
-
+  // ===== DEBUG MODE RETURN =====
   return (
-    <main className="page-container">
+    <div style={{ padding: "20px", color: "black" }}>
+      <h2>🔥 DEBUG MODE (Temporary)</h2>
 
-      {/* 🔥 Banner Ads Section */}
-      <div className="mb-4 px-3">
-        <BannerAd ads={ads} />
-      </div>
-
-      {/* Search Bar Section */}
-      <div
+      <h3>Products Loaded:</h3>
+      <pre
         style={{
-          marginTop: "8px",
-          padding: "8px 0",
-          background: "rgba(255,255,255,0.4)",
-          backdropFilter: "blur(10px)",
-          position: "sticky",
-          top: "70px",
-          zIndex: 50,
+          background: "#eee",
+          padding: "8px",
+          borderRadius: "8px",
+          whiteSpace: "pre-wrap",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            gap: "4px",
-            alignItems: "center",
-            padding: "0 8px",
-          }}
-        >
-          {/* Input Box */}
-          <input
-            type="text"
-            className="search-bar"
-            placeholder="Search products..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              flex: 1,
-              height: "40px",
-              fontSize: "0.95rem",
-              borderRadius: "12px",
-              border: "2px solid #00c3ff",
-              outline: "none",
-              paddingLeft: "12px",
-              background: "rgba(255,255,255,0.75)",
-              boxShadow: "0 0 8px rgba(0,195,255,0.4)",
-              transition: "0.25s",
-            }}
-          />
+        {JSON.stringify(products, null, 2)}
+      </pre>
 
-          {/* Search Button */}
-          <button
-            className="btn-glow"
-            style={{
-              width: "36px",
-              height: "40px",
-              borderRadius: "10px",
-              padding: 0,
-              fontSize: "1.05rem",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#00c3ff",
-              boxShadow: "0 0 6px rgba(0,195,255,0.6)",
-            }}
-          >
-            🔍
-          </button>
-
-          {/* Voice Search Button */}
-          <button
-            onClick={startVoiceSearch}
-            style={{
-              width: "36px",
-              height: "40px",
-              borderRadius: "10px",
-              padding: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#00c3ff",
-              boxShadow: "0 0 6px rgba(0,195,255,0.7)",
-              position: "relative",
-              overflow: "hidden",
-            }}
-          >
-            {/* Mic Icon */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="white"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 14 0h-2zm-5 8a7 7 0 0 0 7-7h-2a5 5 0 0 1-10 0H5a7 7 0 0 0 7 7zm-1 2h2v3h-2v-3z" />
-            </svg>
-
-            {/* Ripple Animation */}
-            <span
-              style={{
-                position: "absolute",
-                width: "100%",
-                height: "100%",
-                background: "rgba(255, 255, 255, 0.25)",
-                borderRadius: "50%",
-                animation: "pulse 1.8s infinite",
-                zIndex: -1,
-              }}
-            ></span>
-          </button>
-        </div>
-
-        {/* AUTOCOMPLETE */}
-        {suggestions.length > 0 && (
-          <div className="autocomplete-box">
-            {suggestions.map((item) => (
-              <div
-                key={item.id}
-                className="autocomplete-item"
-                onClick={() => {
-                  setSearch(item.name);
-                  setSuggestions([]);
-                }}
-              >
-                {item.name}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <style>
-        {`
-          @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.7; }
-            70% { transform: scale(1.8); opacity: 0; }
-            100% { opacity: 0; }
-          }
-        `}
-      </style>
-
-      {/* TITLE */}
-      <h1 style={{ marginTop: "16px", marginBottom: "10px", color: "#00b7ff" }}>
-        Products
-      </h1>
-
-      {/* PRODUCT GRID */}
-      <div
+      <h3>Ads Loaded:</h3>
+      <pre
         style={{
-          display: "grid",
-          gap: "0.8rem",
-          gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-          marginTop: "10px",
-          marginBottom: "20px",
+          background: "#ffe7c2",
+          padding: "8px",
+          borderRadius: "8px",
+          whiteSpace: "pre-wrap",
         }}
       >
-        {filtered.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+        {JSON.stringify(ads, null, 2)}
+      </pre>
+
+      <h3>Ads Count:</h3>
+      <div
+        style={{
+          background: ads.length === 0 ? "red" : "green",
+          color: "white",
+          padding: "10px",
+          borderRadius: "8px",
+        }}
+      >
+        ads.length = {ads.length}
       </div>
-    </main>
+
+      <p style={{ marginTop: "20px", fontSize: "0.9rem" }}>
+        👉 If ads = [], Firestore is returning EMPTY.  
+        👉 Tell me the entire content shown in "Ads Loaded".
+      </p>
+    </div>
   );
-    }
+}
