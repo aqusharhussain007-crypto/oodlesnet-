@@ -5,6 +5,7 @@ import ProductCard from "@/components/ProductCard";
 import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
 import BannerAd from "@/components/ads/BannerAd";
+import CategoryList from "@/components/CategoryList"; // ⭐ NEW IMPORT
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -17,10 +18,7 @@ export default function Home() {
   useEffect(() => {
     async function loadProducts() {
       const snap = await getDocs(collection(db, "products"));
-      const items = snap.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const items = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setProducts(items);
       setFiltered(items);
     }
@@ -76,7 +74,7 @@ export default function Home() {
     setFiltered(matched);
   }, [search, products]);
 
-  // White Icon Button Style
+  // Button styling
   const iconButtonStyle = {
     width: "42px",
     height: "42px",
@@ -96,8 +94,7 @@ export default function Home() {
       {/* 🔍 Search Section */}
       <div
         style={{
-          marginTop: "14px",   // ⭐ Updated spacing
-          marginBottom: "10px",
+          marginTop: "14px",
           padding: "4px 10px",
           background: "rgba(255,255,255,0.3)",
           backdropFilter: "blur(10px)",
@@ -177,8 +174,11 @@ export default function Home() {
         )}
       </div>
 
+      {/* ⭐ CATEGORY LIST */}
+      <CategoryList />
+
       {/* 🟩 Banner */}
-      <div className="px-3 mt-0">
+      <div className="px-3 mt-1">
         <BannerAd ads={ads} />
       </div>
 
@@ -202,4 +202,5 @@ export default function Home() {
       </div>
     </main>
   );
-}
+          }
+  
