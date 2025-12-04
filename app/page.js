@@ -5,20 +5,24 @@ import ProductCard from "@/components/ProductCard";
 import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
 import BannerAd from "@/components/ads/BannerAd";
-import CategoryList from "@/components/CategoryList"; // ⭐ NEW IMPORT
 
 export default function Home() {
   const [products, setProducts] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
   const [suggestions, setSuggestions] = useState([]);
-  const [filtered, setFiltered] = useState([]);
   const [ads, setAds] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCat, setSelectedCat] = useState("all");
 
   // Load Products
   useEffect(() => {
     async function loadProducts() {
       const snap = await getDocs(collection(db, "products"));
-      const items = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const items = snap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
       setProducts(items);
       setFiltered(items);
     }
@@ -30,7 +34,7 @@ export default function Home() {
     async function loadAds() {
       try {
         const snap = await getDocs(collection(db, "ads"));
-        const items = snap.docs.map((doc) => ({
+        const items = snap.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
         }));
@@ -42,6 +46,32 @@ export default function Home() {
     loadAds();
   }, []);
 
+  // Load Categories
+  useEffect(() => {
+    async function loadCategories() {
+      const snap = await getDocs(collection(db, "categories"));
+      const items = snap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setCategories(items);
+    }
+    loadCategories();
+  }, []);
+
+  // Category Filter Handler
+  function filterByCategory(slug) {
+    setSelectedCat(slug);
+
+    if (slug === "all") {
+      setFiltered(products);
+      return;
+    }
+
+    const filteredItems = products.filter(p => p.categorySlug === slug);
+    setFiltered(filteredItems);
+  }
+
   // Voice Search
   function startVoiceSearch() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -49,32 +79,30 @@ export default function Home() {
 
     const recog = new SR();
     recog.lang = "en-IN";
-
     recog.onresult = (event) => {
       const text = event.results[0][0].transcript;
       setSearch(text);
     };
-
     recog.start();
   }
 
-  // Filtering + Autocomplete
+  // Search & Suggestions
   useEffect(() => {
     if (!search) {
-      setSuggestions([]);
       setFiltered(products);
+      setSuggestions([]);
       return;
     }
 
-    const matched = products.filter((p) =>
+    const match = products.filter((p) =>
       p.name.toLowerCase().includes(search.toLowerCase())
     );
 
-    setSuggestions(matched.slice(0, 5));
-    setFiltered(matched);
+    setFiltered(match);
+    setSuggestions(match.slice(0, 5));
   }, [search, products]);
 
-  // Button styling
+  // Button Style
   const iconButtonStyle = {
     width: "42px",
     height: "42px",
@@ -83,7 +111,6 @@ export default function Home() {
     justifyContent: "center",
     padding: "6px",
     borderRadius: "12px",
-    overflow: "visible",
     background: "rgba(0, 200, 255, 0.75)",
     boxShadow: "0 0 10px rgba(0,200,255,0.7)",
   };
@@ -91,11 +118,11 @@ export default function Home() {
   return (
     <main className="page-container">
 
-      {/* 🔍 Search Section */}
+      {/* Search Bar */}
       <div
         style={{
           marginTop: "14px",
-          padding: "4px 10px",
+          padding: "6px 10px",
           background: "rgba(255,255,255,0.3)",
           backdropFilter: "blur(10px)",
           position: "sticky",
@@ -103,14 +130,7 @@ export default function Home() {
           zIndex: 50,
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            gap: "6px",
-            alignItems: "center",
-          }}
-        >
-          {/* Input Box */}
+        <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
           <input
             type="text"
             placeholder="Search products..."
@@ -124,70 +144,91 @@ export default function Home() {
               paddingLeft: "14px",
               border: "2px solid #00c3ff",
               background: "rgba(255,255,255,0.8)",
-              boxShadow: "0 0 8px rgba(0,195,255,0.4)",
             }}
           />
 
-          {/* Search Button */}
+          {/* Search Btn */}
           <button style={iconButtonStyle}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="22"
-              height="22"
-              fill="white"
-              viewBox="0 0 24 24"
-            >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
               <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
             </svg>
           </button>
 
-          {/* Mic Button */}
+          {/* Mic Btn */}
           <button onClick={startVoiceSearch} style={iconButtonStyle}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="22"
-              height="22"
-              fill="white"
-              viewBox="0 0 24 24"
-            >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
               <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7zm-1 2h2v3h-2v-3z" />
             </svg>
           </button>
         </div>
-
-        {/* Autocomplete */}
-        {suggestions.length > 0 && (
-          <div className="autocomplete-box">
-            {suggestions.map((item) => (
-              <div
-                key={item.id}
-                className="autocomplete-item"
-                onClick={() => {
-                  setSearch(item.name);
-                  setSuggestions([]);
-                }}
-              >
-                {item.name}
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* ⭐ CATEGORY LIST */}
-      <CategoryList />
+      {/* Category Row */}
+      <div
+        style={{
+          display: "flex",
+          overflowX: "auto",
+          padding: "10px 6px",
+          gap: "10px",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {/* ALL CATEGORY BUTTON */}
+        <div
+          onClick={() => filterByCategory("all")}
+          style={{
+            minWidth: "110px",
+            padding: "12px",
+            borderRadius: "14px",
+            border: selectedCat === "all" ? "3px solid #00c3ff" : "2px solid #ccc",
+            textAlign: "center",
+            background: selectedCat === "all" ? "rgba(0,195,255,0.2)" : "white",
+            cursor: "pointer",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+          }}
+        >
+          <strong>All</strong>
+        </div>
 
-      {/* 🟩 Banner */}
-      <div className="px-3 mt-1">
+        {/* Dynamic Categories */}
+        {categories.map((cat) => (
+          <div
+            key={cat.id}
+            onClick={() => filterByCategory(cat.slug)}
+            style={{
+              minWidth: "120px",
+              padding: "12px",
+              borderRadius: "14px",
+              border:
+                selectedCat === cat.slug
+                  ? "3px solid #00c3ff"
+                  : "2px solid #ccc",
+              background:
+                selectedCat === cat.slug
+                  ? "rgba(0,195,255,0.2)"
+                  : "white",
+              textAlign: "center",
+              cursor: "pointer",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+            }}
+          >
+            <div style={{ fontSize: "26px" }}>{cat.icon}</div>
+            <div style={{ marginTop: "4px", color: "#0088cc", fontWeight: 600 }}>
+              {cat.name}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Banner */}
+      <div className="px-3 mt-0">
         <BannerAd ads={ads} />
       </div>
 
-      {/* Title */}
-      <h1 style={{ marginTop: "14px", marginBottom: "10px", color: "#00b7ff" }}>
-        Products
-      </h1>
+      {/* PRODUCTS TITLE */}
+      <h1 style={{ marginTop: "16px", color: "#00b7ff" }}>Products</h1>
 
-      {/* Product Grid */}
+      {/* PRODUCTS GRID */}
       <div
         style={{
           display: "grid",
@@ -202,5 +243,4 @@ export default function Home() {
       </div>
     </main>
   );
-          }
-  
+}
