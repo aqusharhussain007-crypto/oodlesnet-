@@ -1,136 +1,97 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import { db } from "@/lib/firebase-app";
-import { doc, getDoc, collection, getDocs } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 
-export default function ProductPage({ params }) {
+export default function ProductPage() {
+  const { id } = useParams();
   const [product, setProduct] = useState(null);
-  const [prices, setPrices] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadProductData() {
-      // Load MAIN product info
-      const productRef = doc(db, "products", params.id);
-      const productSnap = await getDoc(productRef);
+    async function loadProduct() {
+      const ref = doc(db, "products", id);
+      const snap = await getDoc(ref);
 
-      if (productSnap.exists()) {
-        setProduct({ id: productSnap.id, ...productSnap.data() });
-      }
-
-      // Load SUBCOLLECTION "prices"
-      const pricesRef = collection(db, "products", params.id, "prices");
-      const priceSnap = await getDocs(pricesRef);
-
-      const priceList = priceSnap.docs.map(doc => ({
-        store: doc.id,
-        ...doc.data(),
-      }));
-
-      // Sort from lowest price → highest
-      priceList.sort((a, b) => a.price - b.price);
-
-      setPrices(priceList);
+      if (snap.exists()) setProduct({ id: snap.id, ...snap.data() });
+      setLoading(false);
     }
+    loadProduct();
+  }, [id]);
 
-    loadProductData();
-  }, [params.id]);
-
-
-  if (!product) return <h1>Loading...</h1>;
-
+  if (loading) return <p style={{ padding: 20 }}>Loading...</p>;
+  if (!product) return <p style={{ padding: 20 }}>Product not found.</p>;
 
   return (
-    <div className="page-container" style={{ maxWidth: "700px" }}>
-
-      <h1 style={{ marginBottom: "20px" }}>{product.name}</h1>
-
+    <main style={{ padding: "20px" }}>
+      {/* Product Image */}
       <img
-        src={product.image}
+        src={product.imageUrl}
         alt={product.name}
         style={{
           width: "100%",
-          borderRadius: "10px",
-          marginBottom: "20px",
-          boxShadow: "0 0 12px rgba(11,188,255,0.4)"
+          borderRadius: "12px",
+          boxShadow: "0 0 20px rgba(0,195,255,0.4)",
+          marginBottom: "18px",
         }}
       />
 
-      <p style={{ marginBottom: "25px", fontSize: "1.1rem" }}>
+      {/* Product Name */}
+      <h1 style={{ fontSize: "1.6rem", marginBottom: "10px", color: "#00b7ff" }}>
+        {product.name}
+      </h1>
+
+      {/* Description */}
+      <p style={{ opacity: 0.9, marginBottom: "20px" }}>
         {product.description}
       </p>
 
-
-      {/* PRICE TABLE */}
-      <h2 style={{ marginTop: "30px", marginBottom: "10px" }}>
-        Price Comparison
-      </h2>
-
-      <table
+      {/* Price Section */}
+      <div
         style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          background: "#fff",
+          padding: "15px",
           borderRadius: "12px",
-          overflow: "hidden",
-          boxShadow: "0 0 12px rgba(11,188,255,0.25)"
+          background: "rgba(0,195,255,0.1)",
+          border: "2px solid #00c3ff",
+          marginBottom: "20px",
         }}
       >
-        <thead style={{ background: "#0bbcff", color: "white" }}>
-          <tr>
-            <th style={{ padding: "12px" }}>Store</th>
-            <th style={{ padding: "12px" }}>Price</th>
-            <th style={{ padding: "12px" }}>Link</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {prices.map((p, index) => (
-            <tr
-              key={index}
-              style={{
-                textAlign: "center",
-                background: index === 0 ? "rgba(11,188,255,0.10)" : "white",
-                fontWeight: index === 0 ? "bold" : "normal",
-              }}
-            >
-              <td style={{ padding: "12px", textTransform: "capitalize" }}>
-                {p.store}
-              </td>
-
-              <td style={{ padding: "12px" }}>
-                ₹{p.price}
-              </td>
-
-              <td style={{ padding: "12px" }}>
-                <a
-                  href={p.link}
-                  target="_blank"
-                  className="btn-glow"
-                  style={{
-                    padding: "6px 12px",
-                    borderRadius: "6px",
-                    display: "inline-block",
-                    textDecoration: "none"
-                  }}
-                >
-                  Buy
-                </a>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-
-      {/* Cheapest price highlight */}
-      {prices.length > 0 && (
-        <p style={{ marginTop: "15px", fontWeight: "bold" }}>
-          💰 Lowest Price: ₹{prices[0].price} on {prices[0].store}
+        <h2 style={{ marginBottom: "5px" }}>Base Price</h2>
+        <p style={{ fontSize: "1.3rem", fontWeight: "bold" }}>
+          ₹ {product.price}
         </p>
-      )}
+      </div>
 
-    </div>
+      {/* Comparison Section Placeholder */}
+      <div
+        style={{
+          padding: "15px",
+          borderRadius: "12px",
+          background: "rgba(255,255,255,0.15)",
+          boxShadow: "0 0 12px rgba(0,0,0,0.2)",
+        }}
+      >
+        <h2 style={{ marginBottom: "10px" }}>Compare Prices</h2>
+
+        <div style={{ marginBottom: "12px" }}>
+          <b>Amazon:</b> Coming soon…
+        </div>
+        <div style={{ marginBottom: "12px" }}>
+          <b>Flipkart:</b> Coming soon…
+        </div>
+        <div style={{ marginBottom: "12px" }}>
+          <b>Meesho:</b> Coming soon…
+        </div>
+        <div style={{ marginBottom: "12px" }}>
+          <b>AJIO:</b> Coming soon…
+        </div>
+
+        <p style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: "10px" }}>
+          (Automatic price comparison will be added in Phase 2)
+        </p>
+      </div>
+    </main>
   );
-                                      }
-    
+            }
