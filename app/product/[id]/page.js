@@ -15,9 +15,12 @@ export default function ProductPage() {
       const ref = doc(db, "products", id);
       const snap = await getDoc(ref);
 
-      if (snap.exists()) setProduct({ id: snap.id, ...snap.data() });
+      if (snap.exists()) {
+        setProduct({ id: snap.id, ...snap.data() });
+      }
       setLoading(false);
     }
+
     loadProduct();
   }, [id]);
 
@@ -26,7 +29,8 @@ export default function ProductPage() {
 
   return (
     <main style={{ padding: "20px" }}>
-      {/* Product Image */}
+      
+      {/* PRODUCT IMAGE */}
       <img
         src={product.imageUrl}
         alt={product.name}
@@ -38,17 +42,23 @@ export default function ProductPage() {
         }}
       />
 
-      {/* Product Name */}
-      <h1 style={{ fontSize: "1.6rem", marginBottom: "10px", color: "#00b7ff" }}>
+      {/* PRODUCT NAME */}
+      <h1
+        style={{
+          fontSize: "1.6rem",
+          marginBottom: "10px",
+          color: "#00b7ff",
+        }}
+      >
         {product.name}
       </h1>
 
-      {/* Description */}
+      {/* PRODUCT DESCRIPTION */}
       <p style={{ opacity: 0.9, marginBottom: "20px" }}>
         {product.description}
       </p>
 
-      {/* Price Section */}
+      {/* BASE PRICE */}
       <div
         style={{
           padding: "15px",
@@ -64,96 +74,105 @@ export default function ProductPage() {
         </p>
       </div>
 
-      {/* Comparison Section */}
-<div
-  style={{
-    padding: "15px",
-    borderRadius: "12px",
-    background: "rgba(255,255,255,0.15)",
-    boxShadow: "0 0 12px rgba(0,0,0,0.2)",
-    marginTop: "20px",
-  }}
->
-  <h2 style={{ marginBottom: "10px" }}>Compare Prices</h2>
+      {/* ⭐ BUY NOW BUTTONS & PRICE COMPARISON SECTION ⭐ */}
+      <div
+        style={{
+          padding: "15px",
+          borderRadius: "12px",
+          background: "rgba(255,255,255,0.15)",
+          boxShadow: "0 0 12px rgba(0,0,0,0.2)",
+          marginTop: "20px",
+        }}
+      >
+        <h2 style={{ marginBottom: "10px" }}>Compare Prices</h2>
 
-  {/* AMAZON */}
-  <a
-    href="#"
-    style={{
-      display: "block",
-      background: "#FF9900",
-      padding: "12px",
-      borderRadius: "10px",
-      color: "black",
-      fontWeight: "bold",
-      textAlign: "center",
-      marginBottom: "12px",
-      textDecoration: "none",
-      boxShadow: "0 0 10px rgba(255,153,0,0.5)",
-    }}
-  >
-    Buy on Amazon
-  </a>
+        {/* AMAZON */}
+        <a
+          href="#"
+          style={{
+            display: "block",
+            background: "#FF9900",
+            padding: "12px",
+            borderRadius: "10px",
+            color: "black",
+            fontWeight: "bold",
+            textAlign: "center",
+            marginBottom: "12px",
+            textDecoration: "none",
+            boxShadow: "0 0 10px rgba(255,153,0,0.5)",
+          }}
+        >
+          Buy on Amazon
+        </a>
 
-  {/* FLIPKART */}
-  <a
-    href="#"
-    style={{
-      display: "block",
-      background: "#007BFF",
-      padding: "12px",
-      borderRadius: "10px",
-      color: "white",
-      fontWeight: "bold",
-      textAlign: "center",
-      marginBottom: "12px",
-      textDecoration: "none",
-      boxShadow: "0 0 10px rgba(0,123,255,0.5)",
-    }}
-  >
-    Buy on Flipkart
-  </a>
+        {/* FLIPKART */}
+        <a
+          href="#"
+          style={{
+            display: "block",
+            background: "#007BFF",
+            padding: "12px",
+            borderRadius: "10px",
+            color: "white",
+            fontWeight: "bold",
+            textAlign: "center",
+            marginBottom: "12px",
+            textDecoration: "none",
+            boxShadow: "0 0 10px rgba(0,123,255,0.5)",
+          }}
+        >
+          Buy on Flipkart
+        </a>
 
-  {/* MEESHO */}
-  <a
-    href="#"
-    style={{
-      display: "block",
-      background: "#FF3B9D",
-      padding: "12px",
-      borderRadius: "10px",
-      color: "white",
-      fontWeight: "bold",
-      textAlign: "center",
-      marginBottom: "12px",
-      textDecoration: "none",
-      boxShadow: "0 0 10px rgba(255,59,157,0.5)",
-    }}
-  >
-    Buy on Meesho
-  </a>
+        {/* MEESHO */}
+        <a
+          href="#"
+          style={{
+            display: "block",
+            background: "#FF3B9D",
+            padding: "12px",
+            borderRadius: "10px",
+            color: "white",
+            fontWeight: "bold",
+            textAlign: "center",
+            marginBottom: "12px",
+            textDecoration: "none",
+            boxShadow: "0 0 10px rgba(255,59,157,0.5)",
+          }}
+        >
+          Buy on Meesho
+        </a>
 
-  {/* AJIO */}
-  <a
-    href="#"
-    style={{
-      display: "block",
-      background: "#2C2C2C",
-      padding: "12px",
-      borderRadius: "10px",
-      color: "white",
-      fontWeight: "bold",
-      textAlign: "center",
-      marginBottom: "12px",
-      textDecoration: "none",
-      boxShadow: "0 0 10px rgba(0,0,0,0.4)",
-    }}
-  >
-    Buy on AJIO
-  </a>
+        {/* AJIO */}
+        <a
+          href="#"
+          style={{
+            display: "block",
+            background: "#2C2C2C",
+            padding: "12px",
+            borderRadius: "10px",
+            color: "white",
+            fontWeight: "bold",
+            textAlign: "center",
+            marginBottom: "12px",
+            textDecoration: "none",
+            boxShadow: "0 0 10px rgba(0,0,0,0.4)",
+          }}
+        >
+          Buy on AJIO
+        </a>
 
-  <p style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: "5px" }}>
-    (Affiliate links will be added here in Phase 2)
-  </p>
-</div>
-
+        <p
+          style={{
+            fontSize: "0.8rem",
+            opacity: 0.7,
+            marginTop: "5px",
+            textAlign: "center",
+          }}
+        >
+          (Affiliate links will be added in Phase 2)
+        </p>
+      </div>
+    </main>
+  );
+        }
