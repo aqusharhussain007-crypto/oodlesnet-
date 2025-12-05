@@ -1,70 +1,35 @@
-"use client";
+import Link from "next/link";
 
 export default function ProductCard({ product }) {
   return (
-    <div
-      className="product-card pulse-on-hover"
-      style={{
-        background: "#0b111d",
-        border: "2px solid rgba(0, 183, 255, 0.5)",
-        borderRadius: "14px",
-        padding: "12px",
-        boxShadow: "0 0 12px rgba(0, 183, 255, 0.25)",
-        transition: "all 0.3s ease",
-        cursor: "pointer",
-        animation: "fadeIn 0.6s ease",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-6px)";
-        e.currentTarget.style.boxShadow =
-          "0 0 18px rgba(0, 183, 255, 0.45)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0px)";
-        e.currentTarget.style.boxShadow =
-          "0 0 12px rgba(0, 183, 255, 0.25)";
-      }}
-      onClick={() => (window.location.href = `/product/${product.id}`)}
-    >
-      {/* Product Image */}
-      <img
-        src={product.image}
-        alt={product.name}
+    <Link href={`/product/${product.id}`}>
+      <div
         style={{
-          width: "100%",
-          height: "170px",
-          objectFit: "cover",
-          borderRadius: "10px",
-          marginBottom: "10px",
-          boxShadow: "0 0 12px rgba(0, 183, 255, 0.35)",
-        }}
-      />
-
-      {/* Title */}
-      <h3
-        style={{
+          padding: "12px",
+          borderRadius: "14px",
+          background: "rgba(0,0,0,0.7)",
           color: "white",
-          fontSize: "1.05rem",
-          fontWeight: "600",
-          marginBottom: "6px",
-          textShadow: "0 0 6px rgba(0, 183, 255, 0.6)",
+          boxShadow: "0 0 12px rgba(0,195,255,0.4)",
+          cursor: "pointer",
         }}
       >
-        {product.name}
-      </h3>
-
-      {/* Lowest Price */}
-      {product.lowestPrice && (
-        <p
+        <img
+          src={product.imageUrl}
+          alt={product.name}
           style={{
-            color: "#00eaff",
-            fontSize: "1rem",
-            fontWeight: "bold",
+            width: "100%",
+            height: "150px",
+            objectFit: "cover",
+            borderRadius: "10px",
+            marginBottom: "10px",
           }}
-        >
-          ₹{product.lowestPrice}
+        />
+
+        <h3 style={{ margin: 0, fontSize: "1rem" }}>{product.name}</h3>
+        <p style={{ marginTop: "6px", fontWeight: "bold", color: "#00c3ff" }}>
+          ₹ {product.price}
         </p>
-      )}
-    </div>
+      </div>
+    </Link>
   );
 }
