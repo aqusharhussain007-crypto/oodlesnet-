@@ -64,34 +64,96 @@ export default function ProductPage() {
         </p>
       </div>
 
-      {/* Comparison Section Placeholder */}
-      <div
-        style={{
-          padding: "15px",
-          borderRadius: "12px",
-          background: "rgba(255,255,255,0.15)",
-          boxShadow: "0 0 12px rgba(0,0,0,0.2)",
-        }}
-      >
-        <h2 style={{ marginBottom: "10px" }}>Compare Prices</h2>
+      {/* Comparison Section */}
+<div
+  style={{
+    padding: "15px",
+    borderRadius: "12px",
+    background: "rgba(255,255,255,0.15)",
+    boxShadow: "0 0 12px rgba(0,0,0,0.2)",
+    marginTop: "20px",
+  }}
+>
+  <h2 style={{ marginBottom: "10px" }}>Compare Prices</h2>
 
-        <div style={{ marginBottom: "12px" }}>
-          <b>Amazon:</b> Coming soon…
-        </div>
-        <div style={{ marginBottom: "12px" }}>
-          <b>Flipkart:</b> Coming soon…
-        </div>
-        <div style={{ marginBottom: "12px" }}>
-          <b>Meesho:</b> Coming soon…
-        </div>
-        <div style={{ marginBottom: "12px" }}>
-          <b>AJIO:</b> Coming soon…
-        </div>
+  {/* AMAZON */}
+  <a
+    href="#"
+    style={{
+      display: "block",
+      background: "#FF9900",
+      padding: "12px",
+      borderRadius: "10px",
+      color: "black",
+      fontWeight: "bold",
+      textAlign: "center",
+      marginBottom: "12px",
+      textDecoration: "none",
+      boxShadow: "0 0 10px rgba(255,153,0,0.5)",
+    }}
+  >
+    Buy on Amazon
+  </a>
 
-        <p style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: "10px" }}>
-          (Automatic price comparison will be added in Phase 2)
-        </p>
-      </div>
-    </main>
-  );
-            }
+  {/* FLIPKART */}
+  <a
+    href="#"
+    style={{
+      display: "block",
+      background: "#007BFF",
+      padding: "12px",
+      borderRadius: "10px",
+      color: "white",
+      fontWeight: "bold",
+      textAlign: "center",
+      marginBottom: "12px",
+      textDecoration: "none",
+      boxShadow: "0 0 10px rgba(0,123,255,0.5)",
+    }}
+  >
+    Buy on Flipkart
+  </a>
+
+  {/* MEESHO */}
+  <a
+    href="#"
+    style={{
+      display: "block",
+      background: "#FF3B9D",
+      padding: "12px",
+      borderRadius: "10px",
+      color: "white",
+      fontWeight: "bold",
+      textAlign: "center",
+      marginBottom: "12px",
+      textDecoration: "none",
+      boxShadow: "0 0 10px rgba(255,59,157,0.5)",
+    }}
+  >
+    Buy on Meesho
+  </a>
+
+  {/* AJIO */}
+  <a
+    href="#"
+    style={{
+      display: "block",
+      background: "#2C2C2C",
+      padding: "12px",
+      borderRadius: "10px",
+      color: "white",
+      fontWeight: "bold",
+      textAlign: "center",
+      marginBottom: "12px",
+      textDecoration: "none",
+      boxShadow: "0 0 10px rgba(0,0,0,0.4)",
+    }}
+  >
+    Buy on AJIO
+  </a>
+
+  <p style={{ fontSize: "0.8rem", opacity: 0.7, marginTop: "5px" }}>
+    (Affiliate links will be added here in Phase 2)
+  </p>
+</div>
+
