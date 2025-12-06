@@ -5,127 +5,204 @@ import { db } from "@/lib/firebase-app";
 import { doc, getDoc } from "firebase/firestore";
 import Image from "next/image";
 
-// Store logos
-const storeData = [
-  { key: "amazon", name: "Amazon", logo: "/stores/amazon.png" },
-  { key: "meesho", name: "Meesho", logo: "/stores/meesho.png" },
-  { key: "ajio", name: "Ajio", logo: "/stores/ajio.png" },
-];
-
-export default function ProductPage({ params }) {
+export default function ProductDetail({ params }) {
   const { id } = params;
   const [product, setProduct] = useState(null);
-  const [angle, setAngle] = useState(0);
 
-  // Rotate logos
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setAngle((prev) => prev + 0.02); // slow smooth spin
-    }, 16);
-    return () => clearInterval(interval);
-  }, []);
+  // Store logos (in loop)
+  const storeLogos = [
+    { name: "Amazon", logo: "/amazon.png" },
+    { name: "Meesho", logo: "/meesho.png" },
+    { name: "Ajio", logo: "/ajio.png" },
+  ];
 
   useEffect(() => {
-    async function load() {
-      const snap = await getDoc(doc(db, "products", id));
-      if (snap.exists()) setProduct(snap.data());
+    async function loadProduct() {
+      const ref = doc(db, "products", id);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        setProduct(snap.data());
+      }
     }
-    load();
+    loadProduct();
   }, [id]);
 
   if (!product) return <p>Loading...</p>;
 
-  return (
-    <main className="px-4 py-6">
-      {/* Product Name */}
-      <h1 className="text-2xl font-bold text-sky-500">{product.name}</h1>
-      <p className="text-gray-600 mt-1">{product.description}</p>
+  // Price card data
+  const priceData = [
+    {
+      name: "Amazon",
+      price: product.amazonPrice,
+      offer: product.amazonOffer,
+      url: product.amazonUrl,
+      logo: "/amazon.png",
+    },
+    {
+      name: "Meesho",
+      price: product.meeshoPrice,
+      offer: product.meeshoOffer,
+      url: product.meeshoUrl,
+      logo: "/meesho.png",
+    },
+    {
+      name: "Ajio",
+      price: product.ajioPrice,
+      offer: product.ajioOffer,
+      url: product.ajioUrl,
+      logo: "/ajio.png",
+    },
+  ];
 
-      {/* IMAGE */}
-      <div className="w-full mt-4 rounded-xl overflow-hidden shadow-lg">
-        <Image
-          src={product.imageUrl}
-          width={800}
-          height={600}
-          alt={product.name}
-          className="w-full h-auto object-cover"
-        />
+  return (
+    <main style={{ padding: "16px" }}>
+      {/* TITLE */}
+      <h1 style={{ fontSize: "2rem", fontWeight: "700", color: "#00b7ff" }}>
+        {product.name}
+      </h1>
+
+      <p style={{ marginTop: "-5px" }}>{product.description}</p>
+
+      {/* PRODUCT IMAGE */}
+      <img
+        src={product.imageUrl}
+        alt={product.name}
+        style={{
+          width: "100%",
+          borderRadius: "16px",
+          marginTop: "12px",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
+        }}
+      />
+
+      {/* SPINNING LOGO LOOP */}
+      <div
+        style={{
+          marginTop: "20px",
+          display: "flex",
+          justifyContent: "center",
+          gap: "14px",
+          overflow: "hidden",
+        }}
+        className="logo-slider"
+      >
+        {storeLogos.map((s, i) => (
+          <div key={i} className="logo-bubble">
+            <img
+              src={s.logo}
+              alt={s.name}
+              style={{ width: "40px", height: "40px" }}
+            />
+          </div>
+        ))}
       </div>
 
-      {/* ★ Revolving Store Logos */}
-      <div className="relative mx-auto mt-6 w-40 h-40 flex items-center justify-center">
-        {storeData.map((store, index) => {
-          const radius = 70;
-          const a = angle + index * 2.1; // spread evenly
-          const x = radius * Math.cos(a);
-          const y = radius * Math.sin(a);
+      {/* TITLE */}
+      <h2
+        style={{
+          marginTop: "25px",
+          marginBottom: "10px",
+          fontSize: "1.8rem",
+          fontWeight: "700",
+          color: "#00b7ff",
+        }}
+      >
+        Compare Prices
+      </h2>
 
-          return (
-            <div
-              key={store.key}
-              className="absolute w-14 h-14 rounded-full bg-white shadow-xl border border-sky-200 flex items-center justify-center"
+      {/* SWIPEABLE 2.5-CARD ROW */}
+      <div
+        style={{
+          display: "flex",
+          gap: "14px",
+          overflowX: "auto",
+          paddingBottom: "15px",
+        }}
+      >
+        {priceData.map((store, index) => (
+          <div
+            key={index}
+            style={{
+              minWidth: "65%",
+              background: "white",
+              borderRadius: "16px",
+              padding: "14px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
+              border: "3px solid #c7eeff",
+            }}
+          >
+            <h3 style={{ fontSize: "1.2rem", fontWeight: "700" }}>
+              {store.name}
+            </h3>
+
+            <p
               style={{
-                transform: `translate(${x}px, ${y}px)`,
+                fontSize: "1.3rem",
+                fontWeight: "700",
+                color: "#00c3ff",
+                marginTop: "-5px",
               }}
             >
-              <Image
-                src={store.logo}
-                width={40}
-                height={40}
-                alt={store.name}
-              />
-            </div>
-          );
-        })}
-      </div>
+              ₹{store.price}
+            </p>
 
-      {/* Compare Prices Title */}
-      <h2 className="text-2xl font-bold text-sky-500 mt-8">Compare Prices</h2>
-
-      {/* ★ 2.5 Card Scrolling Row */}
-      <div className="mt-4 flex gap-4 overflow-x-auto pb-4">
-        {storeData.map((store) => {
-          const price = product[`${store.key}Price`] || null;
-          const offer = product[`${store.key}Offer`] || "No offers";
-          const url = product[`${store.key}Url`] || "#";
-
-          return (
-            <div
-              key={store.key}
-              className="min-w-[68%] max-w-[68%] bg-white rounded-2xl shadow-md p-4 border border-sky-100 relative"
+            <p
+              style={{
+                color: "#555",
+                marginBottom: "10px",
+                fontSize: "0.9rem",
+              }}
             >
-              {/* Store Name + Price */}
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-bold">{store.name}</h3>
-                <span className="text-sky-500 font-bold text-xl">
-                  ₹{price || "--"}
-                </span>
-              </div>
+              {store.offer}
+            </p>
 
-              {/* Offer */}
-              <p className="text-gray-500 text-sm mt-1">{offer}</p>
-
-              {/* Buy Button */}
-              <a
-                href={url}
-                target="_blank"
-                className="block w-full mt-3 text-center text-black font-semibold py-3 rounded-xl"
-                style={{
-                  background:
-                    "linear-gradient(to right, #00c6ff, #00ff84)",
-                  boxShadow: "0 0 12px rgba(0,200,255,0.5)",
-                }}
-              >
-                Buy Now →
-              </a>
-            </div>
-          );
-        })}
-
-        {/* Extra half-space to show 2.5 layout */}
-        <div className="min-w-[30%]"></div>
+            {/* SMALL BUY BUTTON */}
+            <a
+              href={store.url}
+              target="_blank"
+              style={{
+                display: "inline-block",
+                padding: "8px 20px",
+                borderRadius: "20px",
+                background:
+                  "linear-gradient(90deg, #00c3ff, #00e78f 60%, #00c3ff)",
+                boxShadow: "0 0 10px rgba(0,220,255,0.6)",
+                color: "black",
+                fontWeight: "600",
+              }}
+            >
+              Buy →
+            </a>
+          </div>
+        ))}
       </div>
+
+      {/* KEYFRAME ANIMATION */}
+      <style>
+        {`
+          .logo-bubble {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            box-shadow: 0 0 18px rgba(0,200,255,0.6);
+            animation: spinLoop 6s linear infinite;
+          }
+
+          @keyframes spinLoop {
+            0%   { transform: translateX(-80px) scale(0.6); opacity:0; }
+            25%  { transform: translateX(0px) scale(1); opacity:1; }
+            50%  { transform: translateX(80px) scale(0.8); opacity:1; }
+            75%  { transform: translateX(140px) scale(0.6); opacity:0.6; }
+            100% { transform: translateX(-80px) scale(0.6); opacity:0; }
+          }
+
+        `}
+      </style>
     </main>
   );
-        }
-              
+                   }
+      
