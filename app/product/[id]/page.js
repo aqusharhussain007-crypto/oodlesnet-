@@ -1,6 +1,7 @@
 "use client";
+
 import { useEffect, useState, useRef } from "react";
-import { db } from "@/firebase";
+import { db } from "@/lib/firebase-app";  // ✅ FIXED IMPORT
 import { doc, getDoc } from "firebase/firestore";
 import Image from "next/image";
 
@@ -8,20 +9,21 @@ export default function ProductDetail({ params }) {
   const { id } = params;
   const [product, setProduct] = useState(null);
 
-  // AUTO-SLIDE LOGOS
+  // Refs for logo animation
   const scrollRef = useRef(null);
   const isDragging = useRef(false);
   const pauseTimeout = useRef(null);
 
+  // Load product from Firestore
   useEffect(() => {
-    const fetchProduct = async () => {
+    async function fetchProduct() {
       const snap = await getDoc(doc(db, "products", id));
       if (snap.exists()) setProduct(snap.data());
-    };
+    }
     fetchProduct();
   }, [id]);
 
-  // AUTO SLIDE EFFECT
+  // Auto-slide effect (Option B)
   useEffect(() => {
     if (!scrollRef.current) return;
 
@@ -29,36 +31,37 @@ export default function ProductDetail({ params }) {
       if (!isDragging.current) {
         scrollRef.current.scrollBy({ left: 120, behavior: "smooth" });
       }
-    }, 1600); // every 1.6 sec, ONE LOGO moves
+    }, 1600);
 
     const el = scrollRef.current;
 
-    // If reaches end → jump back
-    const onScroll = () => {
+    const handleScroll = () => {
       if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 5) {
         el.scrollTo({ left: 0, behavior: "smooth" });
       }
     };
-    el.addEventListener("scroll", onScroll);
+
+    el.addEventListener("scroll", handleScroll);
 
     return () => {
       clearInterval(interval);
-      el.removeEventListener("scroll", onScroll);
+      el.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
-  // PAUSE & RESUME AFTER 1 SEC ON USER DRAG
+  // Pause auto-scroll when user interacts
   const handleUserInteraction = () => {
     isDragging.current = true;
+
     clearTimeout(pauseTimeout.current);
     pauseTimeout.current = setTimeout(() => {
       isDragging.current = false;
-    }, 1000);
+    }, 1000); // Resume after 1 sec
   };
 
-  if (!product) return <p className="text-white p-4">Loading...</p>;
+  if (!product) return <p className="p-4">Loading...</p>;
 
-  // STORE LOGO LIST
+  // Store Logos
   const stores = [
     { name: "Amazon", logo: "/logos/amazon.png" },
     { name: "Meesho", logo: "/logos/meesho.png" },
@@ -67,14 +70,15 @@ export default function ProductDetail({ params }) {
 
   return (
     <div className="p-4 pb-20">
-      {/* Title */}
+
+      {/* TITLE */}
       <h1 className="text-4xl font-bold text-blue-400 leading-tight">
         {product.name}
       </h1>
 
       <p className="text-gray-700 mt-1">{product.description}</p>
 
-      {/* Product Image */}
+      {/* PRODUCT IMAGE */}
       <div className="mt-4 w-full">
         <Image
           src={product.imageUrl}
@@ -85,7 +89,7 @@ export default function ProductDetail({ params }) {
         />
       </div>
 
-      {/* ⭐ AUTO-SLIDING LOGO CAROUSEL (1 + half logo visible) */}
+      {/* AUTO-SLIDING LOGO CAROUSEL */}
       <div
         ref={scrollRef}
         onTouchStart={handleUserInteraction}
@@ -108,6 +112,7 @@ export default function ProductDetail({ params }) {
                 className="object-contain"
               />
             </div>
+
             <p className="text-center text-gray-700 font-medium mt-1">
               {s.name.slice(0, 4)}
             </p>
@@ -115,12 +120,12 @@ export default function ProductDetail({ params }) {
         ))}
       </div>
 
-      {/* Compare Prices Title */}
+      {/* SECTION TITLE */}
       <h2 className="text-3xl font-bold text-blue-400 mt-8">
         Compare Prices
       </h2>
 
-      {/* ⭐ 2.5 PRICE CARDS IN ONE ROW */}
+      {/* 2.5 PRICE CARDS ROW */}
       <div className="mt-4 flex overflow-x-scroll gap-4 no-scrollbar pb-4">
         {[
           {
@@ -154,7 +159,7 @@ export default function ProductDetail({ params }) {
 
             <p className="text-gray-600 mt-1">{store.offer}</p>
 
-            {/* BUY BUTTON */}
+            {/* BUY BUTTON (Small) */}
             <a
               href={store.url}
               target="_blank"
@@ -171,6 +176,7 @@ export default function ProductDetail({ params }) {
           </div>
         ))}
       </div>
+
     </div>
   );
     }
