@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
-import { db } from "@/lib/firebase-app"; 
+import { useEffect, useState } from "react";
+import { db } from "@/lib/firebase-app";
 import { doc, getDoc } from "firebase/firestore";
 import Image from "next/image";
 
@@ -8,166 +8,115 @@ export default function ProductDetail({ params }) {
   const { id } = params;
   const [product, setProduct] = useState(null);
 
-  // LOGO CAROUSEL
-  const scrollRef = useRef(null);
-  const isPaused = useRef(false);
-  const pauseTimer = useRef(null);
-
   useEffect(() => {
-    const loadProduct = async () => {
+    const load = async () => {
       const snap = await getDoc(doc(db, "products", id));
       if (snap.exists()) setProduct(snap.data());
     };
-    loadProduct();
+    load();
   }, [id]);
 
-  // LOGO AUTO-SCROLL LOOP
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
+  if (!product) return <p className="text-white p-4">Loading...</p>;
 
-    const slide = () => {
-      if (!isPaused.current) {
-        el.scrollBy({ left: 2, behavior: "smooth" });
-      }
-      if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 2) {
-        el.scrollTo({ left: 0 });
-      }
-    };
-
-    const interval = setInterval(slide, 20); // smooth & slow
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const pauseScroll = () => {
-    isPaused.current = true;
-    clearTimeout(pauseTimer.current);
-    pauseTimer.current = setTimeout(() => {
-      isPaused.current = false;
-    }, 1000);
-  };
-
-  if (!product)
-    return <p className="text-white p-5 text-lg">Loading product...</p>;
-
-  // STORES FOR AVAILABLE ON
+  // Store Logos (Option 2 → Infinite Loop Animation)
   const stores = [
-    { name: "Meesho", logo: "/logos/meesho.png" },
-    { name: "AJIO", logo: "/logos/ajio.png" },
     { name: "Amazon", logo: "/logos/amazon.png" },
+    { name: "Meesho", logo: "/logos/meesho.png" },
+    { name: "Ajio", logo: "/logos/ajio.png" },
   ];
 
-  // PRICE CARDS
-  const priceData = [
-    {
-      name: "Amazon",
-      price: product.amazonPrice,
-      offer: product.amazonOffer,
-      url: product.amazonUrl,
-      logo: "/logos/amazon.png",
-    },
-    {
-      name: "Meesho",
-      price: product.meeshoPrice,
-      offer: product.meeshoOffer,
-      url: product.meeshoUrl,
-      logo: "/logos/meesho.png",
-    },
-    {
-      name: "Ajio",
-      price: product.ajioPrice,
-      offer: product.ajioOffer,
-      url: product.ajioUrl,
-      logo: "/logos/ajio.png",
-    },
-  ];
+  // Duplicate list for infinite loop
+  const loopLogos = [...stores, ...stores, ...stores];
 
   return (
-    <div className="p-4 pb-24">
-
-      {/* Title */}
+    <div className="p-4 pb-20">
+      {/* PRODUCT NAME */}
       <h1 className="text-4xl font-bold text-blue-400 leading-tight">
         {product.name}
       </h1>
+      <p className="text-gray-700 mt-1">{product.description}</p>
 
-      <p className="text-gray-600 mt-2">{product.description}</p>
-
-      {/* Main Image */}
+      {/* PRODUCT IMAGE */}
       <div className="mt-4">
         <Image
           src={product.imageUrl}
+          width={800}
+          height={500}
           alt={product.name}
-          width={700}
-          height={400}
-          className="rounded-3xl border border-blue-200 shadow-lg"
+          className="rounded-2xl shadow-lg border border-blue-200"
         />
       </div>
 
-      {/* AVAILABLE ON */}
+      {/* ⭐ AVAILABLE ON */}
       <h2 className="text-3xl font-bold text-blue-400 mt-6">Available On</h2>
 
-      <div
-        ref={scrollRef}
-        onTouchStart={pauseScroll}
-        onTouchMove={pauseScroll}
-        onWheel={pauseScroll}
-        className="flex gap-6 overflow-x-scroll no-scrollbar mt-4 py-2 px-1"
-      >
-        {stores.concat(stores).map((s, i) => (
-          <div key={i} className="min-w-[110px] text-center">
-            <div className="w-[95px] h-[95px] rounded-full bg-white shadow-xl border border-blue-200 flex items-center justify-center overflow-hidden">
-              <Image
-                src={s.logo}
-                alt={s.name}
-                width={60}
-                height={60}
-                className="object-contain"
-              />
-            </div>
-            <p className="mt-1 text-gray-700 text-lg font-semibold">{s.name}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Compare Prices */}
-      <h2 className="text-3xl font-bold text-blue-400 mt-8">Compare Prices</h2>
-
-      {/* TALL 2.5 PRICE CARDS */}
-      <div className="flex overflow-x-scroll gap-5 mt-4 pb-6 no-scrollbar">
-        {priceData.map((store, index) => (
-          <div
-            key={index}
-            className="min-w-[64%] bg-white rounded-3xl p-4 border border-blue-200 shadow-xl"
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+      {/* ⭐ INFINITE SLIDING LOGO STRIP */}
+      <div className="relative overflow-hidden mt-4">
+        <div
+          className="flex gap-6 animate-slideSlow"
+          style={{ width: "max-content" }}
+        >
+          {loopLogos.map((s, i) => (
+            <div key={i} className="flex flex-col items-center">
+              <div className="w-[90px] h-[90px] rounded-full bg-white shadow-lg border border-blue-100 flex items-center justify-center">
                 <Image
-                  src={store.logo}
-                  width={32}
-                  height={32}
-                  alt={store.name}
-                  className="rounded-md"
+                  src={s.logo}
+                  width={60}
+                  height={60}
+                  alt={s.name}
+                  className="object-contain"
                 />
-                <h3 className="text-xl font-bold text-blue-500">
-                  {store.name}
-                </h3>
               </div>
-
-              <p className="text-2xl font-bold text-blue-500">
-                ₹{store.price}
+              <p className="mt-1 font-semibold text-gray-700">
+                {s.name}
               </p>
             </div>
+          ))}
+        </div>
+      </div>
 
-            {/* Offer */}
-            <p className="text-gray-600 mt-2">{store.offer}</p>
+      {/* COMPARE PRICES */}
+      <h2 className="text-3xl font-bold text-blue-400 mt-8">
+        Compare Prices
+      </h2>
+
+      {/* ⭐ 2.5 PRICE CARDS (TALL RECTANGLE) */}
+      <div className="mt-4 flex gap-4 overflow-x-scroll no-scrollbar pb-6">
+        {[
+          {
+            name: "Amazon",
+            price: product.amazonPrice,
+            offer: product.amazonOffer,
+            url: product.amazonUrl,
+          },
+          {
+            name: "Meesho",
+            price: product.meeshoPrice,
+            offer: product.meeshoOffer,
+            url: product.meeshoUrl,
+          },
+          {
+            name: "Ajio",
+            price: product.ajioPrice,
+            offer: product.ajioOffer,
+            url: product.ajioUrl,
+          },
+        ].map((s, i) => (
+          <div
+            key={i}
+            className="min-w-[63%] bg-white rounded-3xl p-4 border border-blue-200 shadow-xl"
+          >
+            <h3 className="text-2xl font-bold text-blue-500">{s.name}</h3>
+            <p className="text-3xl font-bold text-blue-600 mt-1">
+              ₹{s.price}
+            </p>
+            <p className="text-gray-600 mt-1">{s.offer}</p>
 
             {/* BUY BUTTON */}
             <a
-              href={store.url}
+              href={s.url}
               target="_blank"
-              className="mt-4 inline-block w-[95px] text-center px-3 py-2 rounded-full shadow-md font-semibold text-black text-lg"
+              className="mt-4 inline-block px-6 py-2 rounded-full shadow-md font-semibold text-black text-lg"
               style={{
                 background: "linear-gradient(to right, #00c6ff, #00ff99)",
               }}
@@ -180,3 +129,16 @@ export default function ProductDetail({ params }) {
     </div>
   );
 }
+
+/* Tailwind animation (add to globals.css)
+-------------------------------------------------- 
+@keyframes slideSlow {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-slideSlow {
+  animation: slideSlow 12s linear infinite;
+}
+-------------------------------------------------- 
+*/
+            
