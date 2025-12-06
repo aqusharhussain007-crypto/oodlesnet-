@@ -1,7 +1,6 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import { db } from "@/lib/firebase-app";
+import { useEffect, useState, useRef } from "react";
+import { db } from "@/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import Image from "next/image";
 
@@ -9,200 +8,170 @@ export default function ProductDetail({ params }) {
   const { id } = params;
   const [product, setProduct] = useState(null);
 
-  // Store logos (in loop)
-  const storeLogos = [
-    { name: "Amazon", logo: "/amazon.png" },
-    { name: "Meesho", logo: "/meesho.png" },
-    { name: "Ajio", logo: "/ajio.png" },
-  ];
+  // AUTO-SLIDE LOGOS
+  const scrollRef = useRef(null);
+  const isDragging = useRef(false);
+  const pauseTimeout = useRef(null);
 
   useEffect(() => {
-    async function loadProduct() {
-      const ref = doc(db, "products", id);
-      const snap = await getDoc(ref);
-      if (snap.exists()) {
-        setProduct(snap.data());
-      }
-    }
-    loadProduct();
+    const fetchProduct = async () => {
+      const snap = await getDoc(doc(db, "products", id));
+      if (snap.exists()) setProduct(snap.data());
+    };
+    fetchProduct();
   }, [id]);
 
-  if (!product) return <p>Loading...</p>;
+  // AUTO SLIDE EFFECT
+  useEffect(() => {
+    if (!scrollRef.current) return;
 
-  // Price card data
-  const priceData = [
-    {
-      name: "Amazon",
-      price: product.amazonPrice,
-      offer: product.amazonOffer,
-      url: product.amazonUrl,
-      logo: "/amazon.png",
-    },
-    {
-      name: "Meesho",
-      price: product.meeshoPrice,
-      offer: product.meeshoOffer,
-      url: product.meeshoUrl,
-      logo: "/meesho.png",
-    },
-    {
-      name: "Ajio",
-      price: product.ajioPrice,
-      offer: product.ajioOffer,
-      url: product.ajioUrl,
-      logo: "/ajio.png",
-    },
+    let interval = setInterval(() => {
+      if (!isDragging.current) {
+        scrollRef.current.scrollBy({ left: 120, behavior: "smooth" });
+      }
+    }, 1600); // every 1.6 sec, ONE LOGO moves
+
+    const el = scrollRef.current;
+
+    // If reaches end → jump back
+    const onScroll = () => {
+      if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 5) {
+        el.scrollTo({ left: 0, behavior: "smooth" });
+      }
+    };
+    el.addEventListener("scroll", onScroll);
+
+    return () => {
+      clearInterval(interval);
+      el.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
+  // PAUSE & RESUME AFTER 1 SEC ON USER DRAG
+  const handleUserInteraction = () => {
+    isDragging.current = true;
+    clearTimeout(pauseTimeout.current);
+    pauseTimeout.current = setTimeout(() => {
+      isDragging.current = false;
+    }, 1000);
+  };
+
+  if (!product) return <p className="text-white p-4">Loading...</p>;
+
+  // STORE LOGO LIST
+  const stores = [
+    { name: "Amazon", logo: "/logos/amazon.png" },
+    { name: "Meesho", logo: "/logos/meesho.png" },
+    { name: "Ajio", logo: "/logos/ajio.png" },
   ];
 
   return (
-    <main style={{ padding: "16px" }}>
-      {/* TITLE */}
-      <h1 style={{ fontSize: "2rem", fontWeight: "700", color: "#00b7ff" }}>
+    <div className="p-4 pb-20">
+      {/* Title */}
+      <h1 className="text-4xl font-bold text-blue-400 leading-tight">
         {product.name}
       </h1>
 
-      <p style={{ marginTop: "-5px" }}>{product.description}</p>
+      <p className="text-gray-700 mt-1">{product.description}</p>
 
-      {/* PRODUCT IMAGE */}
-      <img
-        src={product.imageUrl}
-        alt={product.name}
-        style={{
-          width: "100%",
-          borderRadius: "16px",
-          marginTop: "12px",
-          boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
-        }}
-      />
+      {/* Product Image */}
+      <div className="mt-4 w-full">
+        <Image
+          src={product.imageUrl}
+          width={800}
+          height={500}
+          alt={product.name}
+          className="rounded-2xl border border-blue-200 shadow-lg"
+        />
+      </div>
 
-      {/* SPINNING LOGO LOOP */}
+      {/* ⭐ AUTO-SLIDING LOGO CAROUSEL (1 + half logo visible) */}
       <div
-        style={{
-          marginTop: "20px",
-          display: "flex",
-          justifyContent: "center",
-          gap: "14px",
-          overflow: "hidden",
-        }}
-        className="logo-slider"
+        ref={scrollRef}
+        onTouchStart={handleUserInteraction}
+        onTouchMove={handleUserInteraction}
+        onWheel={handleUserInteraction}
+        className="mt-6 flex overflow-x-scroll no-scrollbar gap-4 px-1"
+        style={{ scrollSnapType: "x mandatory" }}
       >
-        {storeLogos.map((s, i) => (
-          <div key={i} className="logo-bubble">
-            <img
-              src={s.logo}
-              alt={s.name}
-              style={{ width: "40px", height: "40px" }}
-            />
+        {stores.map((s, i) => (
+          <div
+            key={i}
+            className="min-w-[110px] scroll-snap-align-start flex flex-col items-center"
+          >
+            <div className="w-[85px] h-[85px] rounded-full bg-white shadow-lg border border-blue-100 flex items-center justify-center overflow-hidden">
+              <Image
+                src={s.logo}
+                alt={s.name}
+                width={60}
+                height={60}
+                className="object-contain"
+              />
+            </div>
+            <p className="text-center text-gray-700 font-medium mt-1">
+              {s.name.slice(0, 4)}
+            </p>
           </div>
         ))}
       </div>
 
-      {/* TITLE */}
-      <h2
-        style={{
-          marginTop: "25px",
-          marginBottom: "10px",
-          fontSize: "1.8rem",
-          fontWeight: "700",
-          color: "#00b7ff",
-        }}
-      >
+      {/* Compare Prices Title */}
+      <h2 className="text-3xl font-bold text-blue-400 mt-8">
         Compare Prices
       </h2>
 
-      {/* SWIPEABLE 2.5-CARD ROW */}
-      <div
-        style={{
-          display: "flex",
-          gap: "14px",
-          overflowX: "auto",
-          paddingBottom: "15px",
-        }}
-      >
-        {priceData.map((store, index) => (
+      {/* ⭐ 2.5 PRICE CARDS IN ONE ROW */}
+      <div className="mt-4 flex overflow-x-scroll gap-4 no-scrollbar pb-4">
+        {[
+          {
+            name: "Amazon",
+            price: product.amazonPrice,
+            offer: product.amazonOffer,
+            url: product.amazonUrl,
+          },
+          {
+            name: "Meesho",
+            price: product.meeshoPrice,
+            offer: product.meeshoOffer,
+            url: product.meeshoUrl,
+          },
+          {
+            name: "Ajio",
+            price: product.ajioPrice,
+            offer: product.ajioOffer,
+            url: product.ajioUrl,
+          },
+        ].map((store, index) => (
           <div
             key={index}
-            style={{
-              minWidth: "65%",
-              background: "white",
-              borderRadius: "16px",
-              padding: "14px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.12)",
-              border: "3px solid #c7eeff",
-            }}
+            className="min-w-[62%] bg-white rounded-2xl p-4 border border-blue-200 shadow-md"
           >
-            <h3 style={{ fontSize: "1.2rem", fontWeight: "700" }}>
-              {store.name}
-            </h3>
+            <h3 className="text-xl font-bold text-blue-400">{store.name}</h3>
 
-            <p
-              style={{
-                fontSize: "1.3rem",
-                fontWeight: "700",
-                color: "#00c3ff",
-                marginTop: "-5px",
-              }}
-            >
+            <p className="text-2xl font-bold text-blue-500 mt-1">
               ₹{store.price}
             </p>
 
-            <p
-              style={{
-                color: "#555",
-                marginBottom: "10px",
-                fontSize: "0.9rem",
-              }}
-            >
-              {store.offer}
-            </p>
+            <p className="text-gray-600 mt-1">{store.offer}</p>
 
-            {/* SMALL BUY BUTTON */}
+            {/* BUY BUTTON */}
             <a
               href={store.url}
               target="_blank"
+              className="mt-3 inline-block px-6 py-2 rounded-full shadow-md"
               style={{
-                display: "inline-block",
-                padding: "8px 20px",
-                borderRadius: "20px",
                 background:
-                  "linear-gradient(90deg, #00c3ff, #00e78f 60%, #00c3ff)",
-                boxShadow: "0 0 10px rgba(0,220,255,0.6)",
-                color: "black",
-                fontWeight: "600",
+                  "linear-gradient(to right, #00c6ff, #00ff99)",
               }}
             >
-              Buy →
+              <span className="font-semibold text-black text-lg">
+                Buy →
+              </span>
             </a>
           </div>
         ))}
       </div>
-
-      {/* KEYFRAME ANIMATION */}
-      <style>
-        {`
-          .logo-bubble {
-            width: 60px;
-            height: 60px;
-            background: white;
-            border-radius: 50%;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            box-shadow: 0 0 18px rgba(0,200,255,0.6);
-            animation: spinLoop 6s linear infinite;
-          }
-
-          @keyframes spinLoop {
-            0%   { transform: translateX(-80px) scale(0.6); opacity:0; }
-            25%  { transform: translateX(0px) scale(1); opacity:1; }
-            50%  { transform: translateX(80px) scale(0.8); opacity:1; }
-            75%  { transform: translateX(140px) scale(0.6); opacity:0.6; }
-            100% { transform: translateX(-80px) scale(0.6); opacity:0; }
-          }
-
-        `}
-      </style>
-    </main>
+    </div>
   );
-                   }
-      
+    }
+    
