@@ -8,35 +8,54 @@ export default function ProductDetail({ params }) {
   const { id } = params;
   const [product, setProduct] = useState(null);
 
+  // LOAD PRODUCT
   useEffect(() => {
-    const load = async () => {
+    const loadProduct = async () => {
       const snap = await getDoc(doc(db, "products", id));
       if (snap.exists()) setProduct(snap.data());
     };
-    load();
+    loadProduct();
   }, [id]);
 
-  if (!product) return <p className="text-white p-4">Loading...</p>;
+  if (!product) return <p className="p-4 text-gray-500">Loading...</p>;
 
-  // Store Logos (Option 2 → Infinite Loop Animation)
   const stores = [
     { name: "Amazon", logo: "/logos/amazon.png" },
     { name: "Meesho", logo: "/logos/meesho.png" },
     { name: "Ajio", logo: "/logos/ajio.png" },
   ];
 
-  // Duplicate list for infinite loop
-  const loopLogos = [...stores, ...stores, ...stores];
+  const priceCards = [
+    {
+      name: "Amazon",
+      logo: "/logos/amazon.png",
+      price: product.amazonPrice,
+      offer: product.amazonOffer,
+      url: product.amazonUrl,
+    },
+    {
+      name: "Meesho",
+      logo: "/logos/meesho.png",
+      price: product.meeshoPrice,
+      offer: product.meeshoOffer,
+      url: product.meeshoUrl,
+    },
+    {
+      name: "Ajio",
+      logo: "/logos/ajio.png",
+      price: product.ajioPrice,
+      offer: product.ajioOffer,
+      url: product.ajioUrl,
+    },
+  ];
 
   return (
     <div className="p-4 pb-20">
-      {/* PRODUCT NAME */}
-      <h1 className="text-4xl font-bold text-blue-400 leading-tight">
-        {product.name}
-      </h1>
+      {/* Title */}
+      <h1 className="text-4xl font-bold text-blue-400">{product.name}</h1>
       <p className="text-gray-700 mt-1">{product.description}</p>
 
-      {/* PRODUCT IMAGE */}
+      {/* Product Image */}
       <div className="mt-4">
         <Image
           src={product.imageUrl}
@@ -47,134 +66,58 @@ export default function ProductDetail({ params }) {
         />
       </div>
 
-      {/* ⭐ AVAILABLE ON */}
+      {/* AVAILABLE ON */}
       <h2 className="text-3xl font-bold text-blue-400 mt-6">Available On</h2>
 
-      {/* ⭐ INFINITE SLIDING LOGO STRIP */}
-      <div className="relative overflow-hidden mt-4">
-        <div
-          className="flex gap-6 animate-slideSlow"
-          style={{ width: "max-content" }}
-        >
-          {loopLogos.map((s, i) => (
-            <div key={i} className="flex flex-col items-center">
-              <div className="w-[90px] h-[90px] rounded-full bg-white shadow-lg border border-blue-100 flex items-center justify-center">
-                <Image
-                  src={s.logo}
-                  width={60}
-                  height={60}
-                  alt={s.name}
-                  className="object-contain"
-                />
-              </div>
-              <p className="mt-1 font-semibold text-gray-700">
-                {s.name}
-              </p>
+      {/* Store Logos EXACTLY like your screenshot */}
+      <div className="mt-5 flex justify-center gap-6">
+        {stores.map((s, i) => (
+          <div key={i} className="flex flex-col items-center">
+            <div className="w-[95px] h-[95px] rounded-full bg-white shadow-xl border border-blue-100 flex items-center justify-center overflow-hidden">
+              <Image
+                src={s.logo}
+                width={60}
+                height={60}
+                alt={s.name}
+                className="object-contain"
+              />
             </div>
-          ))}
-        </div>
+            <p className="mt-1 font-semibold text-gray-700">
+              {s.name.slice(0, 5)}
+            </p>
+          </div>
+        ))}
       </div>
 
       {/* COMPARE PRICES */}
-      <h2 className="text-3xl font-bold text-blue-400 mt-8">
-        Compare Prices
-      </h2>
+      <h2 className="text-3xl font-bold text-blue-400 mt-8">Compare Prices</h2>
 
-      const priceCards = [
-  {
-    name: "Amazon",
-    price: product.amazonPrice,
-    offer: product.amazonOffer,
-    url: product.amazonUrl,
-    logo: "/logos/amazon.png"
-  },
-  {
-    name: "Meesho",
-    price: product.meeshoPrice,
-    offer: product.meeshoOffer,
-    url: product.meeshoUrl,
-    logo: "/logos/meesho.png"
-  },
-  {
-    name: "Ajio",
-    price: product.ajioPrice,
-    offer: product.ajioOffer,
-    url: product.ajioUrl,
-    logo: "/logos/ajio.png"
-  },
-];
+      {/* 2.5 TALL RECTANGLE CARDS */}
+      <div className="mt-4 flex gap-4 overflow-x-scroll no-scrollbar pb-4">
+        {priceCards.map((s, i) => (
+          <div
+            key={i}
+            className="min-w-[65%] bg-white rounded-3xl p-5 border border-blue-200 shadow-lg"
+          >
+            <div className="flex items-center gap-3">
+              <Image
+                src={s.logo}
+                width={40}
+                height={40}
+                alt={s.name}
+                className="rounded-full border border-gray-200"
+              />
+              <h3 className="text-2xl font-bold text-blue-500">{s.name}</h3>
+            </div>
 
-{/* ⭐ FIXED — PERFECT VERTICAL RECTANGLE PRICE CARDS */}
-<div className="mt-6 flex gap-4 overflow-x-scroll no-scrollbar pb-2">
+            <p className="text-3xl font-bold text-blue-600 mt-2">₹{s.price}</p>
+            <p className="text-gray-600 mt-1">{s.offer}</p>
 
-  {priceCards.map((s, i) => (
-    <div
-      key={i}
-      className="
-        min-w-[65%] 
-        bg-white 
-        rounded-3xl 
-        p-5 
-        border border-blue-200 
-        shadow-[0_4px_18px_rgba(0,0,0,0.12)]
-        flex flex-col
-      "
-    >
-
-      {/* TOP: Logo + Name + Price */}
-      <div className="flex items-center justify-between">
-        
-        <div className="flex items-center gap-3">
-          <Image 
-            src={s.logo} 
-            width={40} 
-            height={40} 
-            alt={s.name}
-            className="rounded-full border border-gray-200"
-          />
-          <h3 className="text-xl font-bold text-blue-500">
-            {s.name}
-          </h3>
-        </div>
-
-        <p className="text-2xl font-bold text-blue-500">
-          ₹{s.price}
-        </p>
-
-      </div>
-
-      <p className="text-gray-600 text-lg mt-2">{s.offer}</p>
-
-      <a
-        href={s.url}
-        target="_blank"
-        className="
-          mt-4 
-          py-2 px-6 
-          rounded-full 
-          font-semibold 
-          text-black 
-          text-lg 
-          shadow-md 
-          inline-block
-        "
-        style={{
-          background: "linear-gradient(to right, #00c6ff, #00ff99)"
-        }}
-      >
-        Buy →
-      </a>
-
-    </div>
-  ))}
-
-</div>
-              
             {/* BUY BUTTON */}
             <a
               href={s.url}
               target="_blank"
-              className="mt-4 inline-block px-6 py-2 rounded-full shadow-md font-semibold text-black text-lg"
+              className="mt-4 inline-block px-6 py-2 rounded-full font-semibold text-black text-lg shadow-md"
               style={{
                 background: "linear-gradient(to right, #00c6ff, #00ff99)",
               }}
@@ -187,16 +130,3 @@ export default function ProductDetail({ params }) {
     </div>
   );
 }
-
-/* Tailwind animation (add to globals.css)
--------------------------------------------------- 
-@keyframes slideSlow {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-.animate-slideSlow {
-  animation: slideSlow 12s linear infinite;
-}
--------------------------------------------------- 
-*/
-            
