@@ -1,6 +1,5 @@
 "use client";
-
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase-app";
 import { doc, getDoc } from "firebase/firestore";
 import Image from "next/image";
@@ -9,7 +8,6 @@ export default function ProductDetail({ params }) {
   const { id } = params;
   const [product, setProduct] = useState(null);
 
-  /* LOAD PRODUCT */
   useEffect(() => {
     const load = async () => {
       const snap = await getDoc(doc(db, "products", id));
@@ -18,77 +16,62 @@ export default function ProductDetail({ params }) {
     load();
   }, [id]);
 
-  if (!product) return <p className="p-4 text-gray-700">Loading...</p>;
+  if (!product) return <p className="text-center p-4">Loading...</p>;
 
-  /* STORE LOGOS */
+  // Store logos
   const stores = [
     { name: "Amazon", logo: "/logos/amazon.png" },
     { name: "Meesho", logo: "/logos/meesho.png" },
     { name: "Ajio", logo: "/logos/ajio.png" },
   ];
 
-  /* Duplicate list for smooth infinite animation */
-  const loopLogos = [...stores, ...stores];
-
   return (
-    <div className="p-4 pb-20">
-      {/* PRODUCT NAME */}
-      <h1 className="text-4xl font-bold leading-tight text-blue-400">
+    <div className="w-full max-w-[600px] mx-auto px-4 pb-24">
+
+      {/* TITLE */}
+      <h1 className="text-4xl font-bold text-blue-400 mt-4">
         {product.name}
       </h1>
+      <p className="text-gray-700">{product.description}</p>
 
-      <p className="mt-1 text-gray-600">{product.description}</p>
-
-      {/* PRODUCT IMAGE */}
+      {/* IMAGE */}
       <div className="mt-4">
         <Image
           src={product.imageUrl}
-          width={900}
-          height={600}
+          width={800}
+          height={500}
           alt={product.name}
-          className="rounded-3xl border border-blue-200 shadow-lg"
+          className="rounded-2xl shadow-lg border border-blue-200 w-full"
         />
       </div>
 
       {/* AVAILABLE ON */}
-      <h2 className="mt-8 text-3xl font-bold text-blue-400">Available On</h2>
+      <h2 className="text-3xl font-bold text-blue-400 mt-8">Available On</h2>
 
-      {/* LOGO TRACK (infinite sliding) */}
-      <div className="relative mt-4 overflow-hidden">
-        <div
-          className="flex gap-6 animate-slideSlow"
-          style={{ width: "max-content" }}
-        >
-          {loopLogos.map((store, i) => (
-            <div
-              key={i}
-              className="flex flex-col items-center justify-center"
-            >
-              <div className="flex h-[90px] w-[90px] items-center justify-center rounded-full border border-blue-100 bg-white shadow-lg overflow-hidden">
-                <Image
-                  src={store.logo}
-                  alt={store.name}
-                  width={55}
-                  height={55}
-                  className="object-contain"
-                />
-              </div>
-
-              <p className="mt-1 text-sm font-semibold text-gray-700">
-                {store.name}
-              </p>
+      {/* LOGO ROW (STATIC FOR NOW) */}
+      <div className="flex flex-row justify-between mt-4 px-2">
+        {stores.map((s, i) => (
+          <div key={i} className="flex flex-col items-center">
+            <div className="w-[90px] h-[90px] rounded-full bg-white shadow-lg border border-blue-200 flex items-center justify-center">
+              <Image
+                src={s.logo}
+                width={55}
+                height={55}
+                alt={s.name}
+                className="object-contain"
+              />
             </div>
-          ))}
-        </div>
+            <p className="mt-1 text-gray-700 font-medium">{s.name}</p>
+          </div>
+        ))}
       </div>
 
       {/* COMPARE PRICES */}
-      <h2 className="mt-10 text-3xl font-bold text-blue-400">
-        Compare Prices
-      </h2>
+      <h2 className="text-3xl font-bold text-blue-400 mt-10">Compare Prices</h2>
 
-      {/* PRICE CARDS — Tall 2.5 visible */}
-      <div className="mt-4 flex gap-4 overflow-x-scroll no-scrollbar pb-6">
+      {/* 2.5 VERTICAL CARDS */}
+      <div className="flex gap-4 overflow-x-auto no-scrollbar mt-4 pb-6">
+        
         {[
           {
             name: "Amazon",
@@ -108,28 +91,26 @@ export default function ProductDetail({ params }) {
             offer: product.ajioOffer,
             url: product.ajioUrl,
           },
-        ].map((store, index) => (
+        ].map((s, i) => (
           <div
-            key={index}
-            className="min-w-[62%] rounded-3xl border border-blue-200 bg-white p-5 shadow-xl"
+            key={i}
+            className="min-w-[65%] bg-white rounded-3xl p-4 border border-blue-200 shadow-lg"
           >
-            <h3 className="text-2xl font-bold text-blue-500">
-              {store.name}
-            </h3>
+            <h3 className="text-2xl font-bold text-blue-500">{s.name}</h3>
 
-            <p className="mt-1 text-3xl font-bold text-blue-600">
-              ₹{store.price}
+            <p className="text-3xl font-bold text-blue-600 mt-1">
+              ₹{s.price}
             </p>
 
-            <p className="mt-1 text-gray-600">{store.offer}</p>
+            <p className="text-gray-600 mt-1">{s.offer}</p>
 
             {/* BUY BUTTON */}
             <a
-              href={store.url}
+              href={s.url}
               target="_blank"
-              className="mt-4 inline-flex items-center justify-center rounded-full px-6 py-2 text-lg font-semibold text-black shadow-md"
+              className="mt-4 inline-block px-6 py-2 rounded-full shadow-md text-black font-semibold text-lg"
               style={{
-                background: "linear-gradient(to right, #00c6ff, #00ff99)",
+                background: "linear-gradient(to right,#00c6ff,#00ff99)",
               }}
             >
               Buy →
@@ -139,5 +120,5 @@ export default function ProductDetail({ params }) {
       </div>
     </div>
   );
-        }
-    
+    }
+            
