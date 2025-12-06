@@ -274,3 +274,11 @@ html, body {
   text-shadow: 0 0 6px rgba(0,255,149,0.6);
   }
   
+@keyframes slideSlow {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-slideSlow {
+  animation: slideSlow 12s linear infinite;
+                       }
+  
