@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+
+import { useEffect, useState, useRef } from "react";
 import { db } from "@/lib/firebase-app";
 import { doc, getDoc } from "firebase/firestore";
 import Image from "next/image";
@@ -8,117 +9,122 @@ export default function ProductDetail({ params }) {
   const { id } = params;
   const [product, setProduct] = useState(null);
 
+  // small ref just to ensure we can pause/resume if user interacts
+  const logoContainerRef = useRef(null);
+
   useEffect(() => {
-    const load = async () => {
-      const snap = await getDoc(doc(db, "products", id));
-      if (snap.exists()) setProduct(snap.data());
-    };
+    async function load() {
+      try {
+        const snap = await getDoc(doc(db, "products", id));
+        if (snap.exists()) setProduct(snap.data());
+      } catch (e) {
+        console.error("Product load error:", e);
+      }
+    }
     load();
   }, [id]);
 
-  if (!product) return <p className="text-center p-4">Loading...</p>;
+  if (!product) return <p className="loading">Loading...</p>;
 
-  // Store logos
+  // store list (keep small; animation duplicates below)
   const stores = [
     { name: "Amazon", logo: "/logos/amazon.png" },
     { name: "Meesho", logo: "/logos/meesho.png" },
     { name: "Ajio", logo: "/logos/ajio.png" },
   ];
 
+  // duplicate once to allow continuous loop (CSS translate uses -50%)
+  const logosForLoop = [...stores, ...stores];
+
   return (
-    <div className="w-full max-w-[600px] mx-auto px-4 pb-24">
+    <main className="page-container">
+      <h1 className="product-title">{product.name}</h1>
+      <p className="product-desc">{product.description}</p>
 
-      {/* TITLE */}
-      <h1 className="text-4xl font-bold text-blue-400 mt-4">
-        {product.name}
-      </h1>
-      <p className="text-gray-700">{product.description}</p>
-
-      {/* IMAGE */}
-      <div className="mt-4">
+      <div className="product-image-wrap">
         <Image
           src={product.imageUrl}
-          width={800}
-          height={500}
           alt={product.name}
-          className="rounded-2xl shadow-lg border border-blue-200 w-full"
+          width={1200}
+          height={700}
+          className="product-image"
         />
       </div>
 
-      {/* AVAILABLE ON */}
-      <h2 className="text-3xl font-bold text-blue-400 mt-8">Available On</h2>
-
-      {/* LOGO ROW (STATIC FOR NOW) */}
-      <div className="flex flex-row justify-between mt-4 px-2">
-        {stores.map((s, i) => (
-          <div key={i} className="flex flex-col items-center">
-            <div className="w-[90px] h-[90px] rounded-full bg-white shadow-lg border border-blue-200 flex items-center justify-center">
-              <Image
-                src={s.logo}
-                width={55}
-                height={55}
-                alt={s.name}
-                className="object-contain"
-              />
+      {/* AVAILABLE ON - logo strip (CSS handles continuous horizontal loop) */}
+      <h2 className="section-title">Available On</h2>
+      <div
+        className="logo-strip-outer"
+        ref={logoContainerRef}
+        onMouseEnter={() => logoContainerRef.current?.classList.add("paused")}
+        onMouseLeave={() => logoContainerRef.current?.classList.remove("paused")}
+      >
+        <div className="logo-strip">
+          {logosForLoop.map((s, i) => (
+            <div key={i} className="logo-item">
+              <div className="logo-circle">
+                <Image src={s.logo} alt={s.name} width={58} height={58} className="logo-img" />
+              </div>
+              <div className="logo-name">{s.name}</div>
             </div>
-            <p className="mt-1 text-gray-700 font-medium">{s.name}</p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      {/* COMPARE PRICES */}
-      <h2 className="text-3xl font-bold text-blue-400 mt-10">Compare Prices</h2>
+      {/* COMPARE PRICES - horizontal scroller with 2.5 visible tall rectangular cards */}
+      <h2 className="section-title">Compare Prices</h2>
 
-      {/* 2.5 VERTICAL CARDS */}
-      <div className="flex gap-4 overflow-x-auto no-scrollbar mt-4 pb-6">
-        
+      <div className="price-strip" role="list">
         {[
           {
             name: "Amazon",
-            price: product.amazonPrice,
-            offer: product.amazonOffer,
-            url: product.amazonUrl,
+            price: product.amazonPrice ?? "",
+            offer: product.amazonOffer ?? "No offers",
+            url: product.amazonUrl ?? "#",
           },
           {
             name: "Meesho",
-            price: product.meeshoPrice,
-            offer: product.meeshoOffer,
-            url: product.meeshoUrl,
+            price: product.meeshoPrice ?? "",
+            offer: product.meeshoOffer ?? "No offers",
+            url: product.meeshoUrl ?? "#",
           },
           {
             name: "Ajio",
-            price: product.ajioPrice,
-            offer: product.ajioOffer,
-            url: product.ajioUrl,
+            price: product.ajioPrice ?? "",
+            offer: product.ajioOffer ?? "No offers",
+            url: product.ajioUrl ?? "#",
           },
-        ].map((s, i) => (
-          <div
-            key={i}
-            className="min-w-[65%] bg-white rounded-3xl p-4 border border-blue-200 shadow-lg"
-          >
-            <h3 className="text-2xl font-bold text-blue-500">{s.name}</h3>
+        ].map((s, idx) => (
+          <article className="price-card" key={idx} role="listitem">
+            <div className="price-card-top">
+              <div className="price-card-title-wrap">
+                <div className="price-card-logo-placeholder">
+                  {/* small logo inside card (optional) */}
+                  <Image src={`/logos/${s.name.toLowerCase()}.png`} alt={s.name} width={28} height={28} />
+                </div>
+                <h3 className="price-card-title">{s.name}</h3>
+              </div>
 
-            <p className="text-3xl font-bold text-blue-600 mt-1">
-              ₹{s.price}
-            </p>
+              <div className="price-amount">₹{s.price || ""}</div>
+            </div>
 
-            <p className="text-gray-600 mt-1">{s.offer}</p>
+            <p className="price-offer">{s.offer}</p>
 
-            {/* BUY BUTTON */}
-            <a
-              href={s.url}
-              target="_blank"
-              className="mt-4 inline-block px-6 py-2 rounded-full shadow-md text-black font-semibold text-lg"
-              style={{
-                background: "linear-gradient(to right,#00c6ff,#00ff99)",
-              }}
-            >
-              Buy →
-            </a>
-          </div>
+            <div className="price-card-bottom">
+              {/* small round gradient buy button sized around text */}
+              <a className="buy-btn" href={s.url} target="_blank" rel="noreferrer">Buy →</a>
+
+              {/* mini icons/benefits under button */}
+              <div className="benefits">
+                <span className="benefit-dot" /> <span className="benefit-text">Fast delivery</span>
+                <span className="benefit-dot" /> <span className="benefit-text">Prime deals</span>
+                <span className="benefit-dot" /> <span className="benefit-text">7-day return</span>
+              </div>
+            </div>
+          </article>
         ))}
       </div>
-    </div>
+    </main>
   );
-    }
-            
+          }
+          
