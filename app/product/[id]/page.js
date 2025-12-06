@@ -1,7 +1,6 @@
 "use client";
-
 import { useEffect, useState, useRef } from "react";
-import { db } from "@/lib/firebase-app";
+import { db } from "@/lib/firebase-app"; 
 import { doc, getDoc } from "firebase/firestore";
 import Image from "next/image";
 
@@ -9,241 +8,168 @@ export default function ProductDetail({ params }) {
   const { id } = params;
   const [product, setProduct] = useState(null);
 
-  // LOGO CAROUSEL (smooth 1-by-1 slide)
-  const [index, setIndex] = useState(0);
-  const running = useRef(true);
-  const resumeTimer = useRef(null);
+  // LOGO CAROUSEL
+  const scrollRef = useRef(null);
+  const isPaused = useRef(false);
+  const pauseTimer = useRef(null);
 
-  const logos = [
-    { name: "Amazon", src: "/logos/amazon.png" },
-    { name: "Meesho", src: "/logos/meesho.png" },
-    { name: "AJIO", src: "/logos/ajio.png" },
-  ];
-
-  // Fetch product
   useEffect(() => {
-    async function load() {
+    const loadProduct = async () => {
       const snap = await getDoc(doc(db, "products", id));
       if (snap.exists()) setProduct(snap.data());
-    }
-    load();
+    };
+    loadProduct();
   }, [id]);
 
-  // AUTO SLIDE (one by one)
+  // LOGO AUTO-SCROLL LOOP
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (running.current) {
-        setIndex((prev) => (prev + 1) % logos.length);
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const slide = () => {
+      if (!isPaused.current) {
+        el.scrollBy({ left: 2, behavior: "smooth" });
       }
-    }, 1700);
+      if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 2) {
+        el.scrollTo({ left: 0 });
+      }
+    };
+
+    const interval = setInterval(slide, 20); // smooth & slow
 
     return () => clearInterval(interval);
   }, []);
 
-  // Pause on user touch + resume after 1 sec
-  const userPause = () => {
-    running.current = false;
-    clearTimeout(resumeTimer.current);
-    resumeTimer.current = setTimeout(() => {
-      running.current = true;
+  const pauseScroll = () => {
+    isPaused.current = true;
+    clearTimeout(pauseTimer.current);
+    pauseTimer.current = setTimeout(() => {
+      isPaused.current = false;
     }, 1000);
   };
 
-  if (!product) return <p style={{ padding: 16 }}>Loading...</p>;
+  if (!product)
+    return <p className="text-white p-5 text-lg">Loading product...</p>;
 
-  // Compact card width for 2.5 layout
-  const CARD_WIDTH = "58%";
+  // STORES FOR AVAILABLE ON
+  const stores = [
+    { name: "Meesho", logo: "/logos/meesho.png" },
+    { name: "AJIO", logo: "/logos/ajio.png" },
+    { name: "Amazon", logo: "/logos/amazon.png" },
+  ];
+
+  // PRICE CARDS
+  const priceData = [
+    {
+      name: "Amazon",
+      price: product.amazonPrice,
+      offer: product.amazonOffer,
+      url: product.amazonUrl,
+      logo: "/logos/amazon.png",
+    },
+    {
+      name: "Meesho",
+      price: product.meeshoPrice,
+      offer: product.meeshoOffer,
+      url: product.meeshoUrl,
+      logo: "/logos/meesho.png",
+    },
+    {
+      name: "Ajio",
+      price: product.ajioPrice,
+      offer: product.ajioOffer,
+      url: product.ajioUrl,
+      logo: "/logos/ajio.png",
+    },
+  ];
 
   return (
-    <div style={{ padding: 16, paddingBottom: 80 }}>
+    <div className="p-4 pb-24">
+
       {/* Title */}
-      <h1 style={{ fontSize: 32, fontWeight: 800, color: "#00b7ff", lineHeight: 1.1 }}>
+      <h1 className="text-4xl font-bold text-blue-400 leading-tight">
         {product.name}
       </h1>
 
-      <p style={{ color: "#666", marginTop: 6 }}>{product.description}</p>
+      <p className="text-gray-600 mt-2">{product.description}</p>
 
-      {/* Product Image */}
-      <div style={{ marginTop: 12 }}>
+      {/* Main Image */}
+      <div className="mt-4">
         <Image
           src={product.imageUrl}
-          width={700}
-          height={500}
           alt={product.name}
-          style={{
-            width: "100%",
-            borderRadius: 16,
-            boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-          }}
+          width={700}
+          height={400}
+          className="rounded-3xl border border-blue-200 shadow-lg"
         />
       </div>
 
-      {/* LOGO SLIDER (One-by-one, smooth, NO blinking) */}
-      <h3
-        style={{
-          marginTop: 20,
-          color: "#00b7ff",
-          fontSize: 22,
-          fontWeight: 700,
-        }}
-      >
-        Available On
-      </h3>
+      {/* AVAILABLE ON */}
+      <h2 className="text-3xl font-bold text-blue-400 mt-6">Available On</h2>
 
       <div
-        onTouchStart={userPause}
-        onTouchMove={userPause}
-        onWheel={userPause}
-        style={{
-          position: "relative",
-          height: 120,
-          overflow: "hidden",
-          marginTop: 10,
-        }}
+        ref={scrollRef}
+        onTouchStart={pauseScroll}
+        onTouchMove={pauseScroll}
+        onWheel={pauseScroll}
+        className="flex gap-6 overflow-x-scroll no-scrollbar mt-4 py-2 px-1"
       >
-        {logos.map((store, i) => {
-          const isActive = i === index;
-
-          return (
-            <div
-              key={i}
-              style={{
-                position: "absolute",
-                top: isActive ? 0 : 10,
-                left: isActive ? "50%" : "120%",
-                transform: "translateX(-50%)",
-                transition: "0.8s ease",
-                opacity: isActive ? 1 : 0,
-                textAlign: "center",
-              }}
-            >
-              <div
-                style={{
-                  width: 90,
-                  height: 90,
-                  borderRadius: "50%",
-                  background: "white",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  boxShadow: "0 10px 25px rgba(0,195,255,0.25)",
-                }}
-              >
-                <Image
-                  src={store.src}
-                  width={60}
-                  height={60}
-                  alt={store.name}
-                  style={{ objectFit: "contain" }}
-                />
-              </div>
-
-              <p style={{ marginTop: 6, fontWeight: 600 }}>{store.name}</p>
+        {stores.concat(stores).map((s, i) => (
+          <div key={i} className="min-w-[110px] text-center">
+            <div className="w-[95px] h-[95px] rounded-full bg-white shadow-xl border border-blue-200 flex items-center justify-center overflow-hidden">
+              <Image
+                src={s.logo}
+                alt={s.name}
+                width={60}
+                height={60}
+                className="object-contain"
+              />
             </div>
-          );
-        })}
+            <p className="mt-1 text-gray-700 text-lg font-semibold">{s.name}</p>
+          </div>
+        ))}
       </div>
 
       {/* Compare Prices */}
-      <h2
-        style={{
-          marginTop: 20,
-          fontSize: 26,
-          fontWeight: 800,
-          color: "#00b7ff",
-        }}
-      >
-        Compare Prices
-      </h2>
+      <h2 className="text-3xl font-bold text-blue-400 mt-8">Compare Prices</h2>
 
-      {/* PRICE CARDS — Compact — 2.5 Visible */}
-      <div
-        style={{
-          display: "flex",
-          gap: 12,
-          overflowX: "auto",
-          marginTop: 12,
-          paddingBottom: 16,
-        }}
-      >
-        {[
-          {
-            name: "Amazon",
-            price: product.amazonPrice,
-            offer: product.amazonOffer,
-            url: product.amazonUrl,
-            key: "amazon",
-          },
-          {
-            name: "Meesho",
-            price: product.meeshoPrice,
-            offer: product.meeshoOffer,
-            url: product.meeshoUrl,
-            key: "meesho",
-          },
-          {
-            name: "AJIO",
-            price: product.ajioPrice,
-            offer: product.ajioOffer,
-            url: product.ajioUrl,
-            key: "ajio",
-          },
-        ].map((store, i) => (
+      {/* TALL 2.5 PRICE CARDS */}
+      <div className="flex overflow-x-scroll gap-5 mt-4 pb-6 no-scrollbar">
+        {priceData.map((store, index) => (
           <div
-            key={i}
-            style={{
-              minWidth: CARD_WIDTH,
-              background: "white",
-              borderRadius: 14,
-              padding: 12,
-              boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
-            }}
+            key={index}
+            className="min-w-[64%] bg-white rounded-3xl p-4 border border-blue-200 shadow-xl"
           >
             {/* Header */}
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
                 <Image
-                  src={`/logos/${store.key}.png`}
-                  width={28}
-                  height={28}
+                  src={store.logo}
+                  width={32}
+                  height={32}
                   alt={store.name}
-                  style={{
-                    background: "#fff",
-                    borderRadius: 8,
-                    padding: 4,
-                  }}
+                  className="rounded-md"
                 />
-                <strong style={{ fontSize: 18 }}>{store.name}</strong>
+                <h3 className="text-xl font-bold text-blue-500">
+                  {store.name}
+                </h3>
               </div>
 
-              <div style={{ fontWeight: 800, color: "#00b7ff", fontSize: 20 }}>
+              <p className="text-2xl font-bold text-blue-500">
                 ₹{store.price}
-              </div>
+              </p>
             </div>
 
             {/* Offer */}
-            <p style={{ marginTop: 6, color: "#666" }}>{store.offer}</p>
+            <p className="text-gray-600 mt-2">{store.offer}</p>
 
             {/* BUY BUTTON */}
             <a
               href={store.url}
               target="_blank"
+              className="mt-4 inline-block w-[95px] text-center px-3 py-2 rounded-full shadow-md font-semibold text-black text-lg"
               style={{
-                display: "inline-block",
-                marginTop: 8,
-                padding: "6px 18px",
-                background: "linear-gradient(90deg,#00c6ff,#00ff99)",
-                borderRadius: 30,
-                fontWeight: 700,
-                color: "black",
-                boxShadow: "0 8px 25px rgba(0,200,255,0.3)",
-                textDecoration: "none",
+                background: "linear-gradient(to right, #00c6ff, #00ff99)",
               }}
             >
               Buy →
@@ -253,5 +179,4 @@ export default function ProductDetail({ params }) {
       </div>
     </div>
   );
-        }
-                    
+}
