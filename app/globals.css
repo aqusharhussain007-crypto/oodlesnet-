@@ -102,3 +102,166 @@ html, body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ---------- LOGO STRIP (infinite) ---------- */
+.logo-strip-outer {
+  width: 100%;
+  overflow: hidden;
+  padding: 18px 0 6px;
+  box-sizing: border-box;
+}
+
+.logo-strip {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  /* width: max-content ensures the duplication works */
+  width: max-content;
+  animation: slideLogos 12s linear infinite;
+}
+
+.logo-strip-outer.paused .logo-strip {
+  animation-play-state: paused;
+}
+
+.logo-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 92px;
+}
+
+.logo-circle {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(11,188,255,0.12);
+  box-shadow: 0 6px 20px rgba(11,188,255,0.14);
+}
+
+.logo-img { object-fit: contain; }
+
+.logo-name {
+  margin-top: 8px;
+  font-weight: 600;
+  color: #2b2b2b;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* the animation moves entire strip to left by 50% (we duplicated content) */
+@keyframes slideLogos {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); } 
+}
+
+/* ---------- PRICE STRIP (2.5 tall cards) ---------- */
+.price-strip {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding: 16px 6px 28px;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+
+.price-strip::-webkit-scrollbar { height: 8px; }
+.price-strip::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 6px; }
+
+/* tall rectangle card, narrow enough to show 2 + half on phone */
+.price-card {
+  min-width: 62%;
+  max-width: 62%;
+  background: #fff;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 8px 26px rgba(11,188,255,0.06);
+  border: 3px solid rgba(11,188,255,0.09);
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+/* Top row inside card */
+.price-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.price-card-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.price-card-logo-placeholder {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Title & price */
+.price-card-title { color: #0bbcff; font-size: 20px; margin: 0; }
+.price-amount { color: #08caff; font-size: 20px; font-weight: 800; }
+
+/* Offer text */
+.price-offer { margin-top: 12px; color: #666; font-size: 15px; }
+
+/* bottom area with buy button and benefits */
+.price-card-bottom {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+/* small rounded gradient button sized around text */
+.buy-btn {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 800;
+  text-decoration: none;
+  background: linear-gradient(90deg, #00c6ff 0%, #00ff99 100%);
+  color: #001011;
+  box-shadow: 0 8px 20px rgba(0,198,255,0.18);
+  white-space: nowrap;
+}
+
+/* benefits mini list to right of button (compact) */
+.benefits {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.benefit-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #0bbcff;
+  box-shadow: 0 4px 14px rgba(11,188,255,0.12);
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.benefit-text {
+  color: #444;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* RESPONSIVE TWEAKS */
+@media (min-width: 900px) {
+  .price-card { min-width: 33%; max-width: 33%; } /* show more on desktop */
+  }
+           
