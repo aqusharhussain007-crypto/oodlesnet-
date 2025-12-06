@@ -1,183 +1,300 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { db } from "@/lib/firebase-app";  // ✅ FIXED IMPORT
+import { db } from "@/lib/firebase-app"; // correct path
 import { doc, getDoc } from "firebase/firestore";
 import Image from "next/image";
 
-export default function ProductDetail({ params }) {
+export default function ProductPage({ params }) {
   const { id } = params;
   const [product, setProduct] = useState(null);
 
-  // Refs for logo animation
-  const scrollRef = useRef(null);
-  const isDragging = useRef(false);
-  const pauseTimeout = useRef(null);
-
-  // Load product from Firestore
-  useEffect(() => {
-    async function fetchProduct() {
-      const snap = await getDoc(doc(db, "products", id));
-      if (snap.exists()) setProduct(snap.data());
-    }
-    fetchProduct();
-  }, [id]);
-
-  // Auto-slide effect (Option B)
-  useEffect(() => {
-    if (!scrollRef.current) return;
-
-    let interval = setInterval(() => {
-      if (!isDragging.current) {
-        scrollRef.current.scrollBy({ left: 120, behavior: "smooth" });
-      }
-    }, 1600);
-
-    const el = scrollRef.current;
-
-    const handleScroll = () => {
-      if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 5) {
-        el.scrollTo({ left: 0, behavior: "smooth" });
-      }
-    };
-
-    el.addEventListener("scroll", handleScroll);
-
-    return () => {
-      clearInterval(interval);
-      el.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  // Pause auto-scroll when user interacts
-  const handleUserInteraction = () => {
-    isDragging.current = true;
-
-    clearTimeout(pauseTimeout.current);
-    pauseTimeout.current = setTimeout(() => {
-      isDragging.current = false;
-    }, 1000); // Resume after 1 sec
-  };
-
-  if (!product) return <p className="p-4">Loading...</p>;
-
-  // Store Logos
-  const stores = [
-    { name: "Amazon", logo: "/logos/amazon.png" },
-    { name: "Meesho", logo: "/logos/meesho.png" },
-    { name: "Ajio", logo: "/logos/ajio.png" },
+  // logo carousel state
+  const [index, setIndex] = useState(0); // which logo is centered
+  const [running, setRunning] = useState(true); // auto-run flag
+  const containerRef = useRef(null);
+  const timerRef = useRef(null);
+  const resumeTimeoutRef = useRef(null);
+  const logos = [
+    { key: "amazon", name: "Amazon", src: "/logos/amazon.png" },
+    { key: "meesho", name: "Meesho", src: "/logos/meesho.png" },
+    { key: "ajio", name: "AJIO", src: "/logos/ajio.png" },
   ];
 
-  return (
-    <div className="p-4 pb-20">
+  // Fetch product
+  useEffect(() => {
+    async function loadProduct() {
+      try {
+        const snap = await getDoc(doc(db, "products", id));
+        if (snap.exists()) {
+          setProduct(snap.data());
+        } else {
+          setProduct(null);
+        }
+      } catch (e) {
+        console.error("Failed to load product:", e);
+      }
+    }
+    loadProduct();
+  }, [id]);
 
-      {/* TITLE */}
-      <h1 className="text-4xl font-bold text-blue-400 leading-tight">
+  // Controlled auto-advance: move one logo at a time
+  useEffect(() => {
+    if (!running) return;
+    // advance every 1700ms (speed is good per your note)
+    timerRef.current = setInterval(() => {
+      setIndex((i) => (i + 1) % logos.length);
+    }, 1700);
+    return () => clearInterval(timerRef.current);
+  }, [running]);
+
+  // On index change scroll the container to show centered logo + half next
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    // compute sizes dynamically
+    const item = el.querySelector("[data-logo-item]");
+    if (!item) return;
+    const itemWidth = item.getBoundingClientRect().width;
+    // Want center the `index` item and show half of next:
+    // scrollLeft = index * itemWidth - offsetToCenter
+    // We'll place center item at small left padding so it appears centered with half of next visible.
+    // Simpler: scrollLeft = index * (itemWidth * 0.85) to create overlap feel.
+    // But to be precise, set scrollLeft = index * (itemWidth * 0.92)
+    const scrollLeft = index * (itemWidth * 0.95);
+    el.scrollTo({ left: scrollLeft, behavior: "smooth" });
+  }, [index]);
+
+  // Pause on user interaction -> resume after 1s
+  const handleUserInteraction = () => {
+    // stop auto-run
+    setRunning(false);
+    clearTimeout(resumeTimeoutRef.current);
+    // resume after 1 second
+    resumeTimeoutRef.current = setTimeout(() => {
+      setRunning(true);
+    }, 1000);
+  };
+
+  // compact card size helper
+  const CARD_MIN_WIDTH = "62%"; // 2.5 layout looks good with 62% min width
+
+  // feature arrays per store (Option B) — dynamic from product
+  const getFeatures = (storeKey) => {
+    if (!product) return [];
+    const key = `${storeKey}Features`; // e.g. amazonFeatures
+    const raw = product[key];
+    if (Array.isArray(raw) && raw.length) return raw.slice(0, 4);
+    // fallback defaults per store
+    const defaults = {
+      amazon: ["Fast delivery", "Prime deals", "7-day returns"],
+      meesho: ["COD available", "Daily deals", "Free shipping"],
+      ajio: ["Exclusive offers", "Secure checkout", "Trendy"],
+    };
+    return defaults[storeKey] || [];
+  };
+
+  if (!product) {
+    return <div style={{ padding: 16 }}>Loading product...</div>;
+  }
+
+  // helper to format price
+  const fmt = (p) =>
+    p === undefined || p === null || p === 0 ? "—" : `₹ ${Number(p).toLocaleString("en-IN")}`;
+
+  return (
+    <main style={{ padding: 16 }}>
+      {/* Title */}
+      <h1 style={{ fontSize: 24, fontWeight: 800, color: "#00b7ff", margin: 0 }}>
         {product.name}
       </h1>
+      <p style={{ margin: "6px 0 12px", color: "#666" }}>{product.description}</p>
 
-      <p className="text-gray-700 mt-1">{product.description}</p>
-
-      {/* PRODUCT IMAGE */}
-      <div className="mt-4 w-full">
+      {/* product image */}
+      <div style={{ width: "100%", borderRadius: 12, overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.06)" }}>
         <Image
           src={product.imageUrl}
-          width={800}
-          height={500}
           alt={product.name}
-          className="rounded-2xl border border-blue-200 shadow-lg"
+          width={1200}
+          height={700}
+          style={{ width: "100%", height: "auto", display: "block" }}
         />
       </div>
 
-      {/* AUTO-SLIDING LOGO CAROUSEL */}
-      <div
-        ref={scrollRef}
-        onTouchStart={handleUserInteraction}
-        onTouchMove={handleUserInteraction}
-        onWheel={handleUserInteraction}
-        className="mt-6 flex overflow-x-scroll no-scrollbar gap-4 px-1"
-        style={{ scrollSnapType: "x mandatory" }}
-      >
-        {stores.map((s, i) => (
-          <div
-            key={i}
-            className="min-w-[110px] scroll-snap-align-start flex flex-col items-center"
-          >
-            <div className="w-[85px] h-[85px] rounded-full bg-white shadow-lg border border-blue-100 flex items-center justify-center overflow-hidden">
-              <Image
-                src={s.logo}
-                alt={s.name}
-                width={60}
-                height={60}
-                className="object-contain"
-              />
-            </div>
+      {/* Logo carousel area */}
+      <section style={{ marginTop: 18 }}>
+        <h3 style={{ margin: "6px 0 10px", color: "#00b7ff", fontSize: 18, fontWeight: 700 }}>
+          Available On
+        </h3>
 
-            <p className="text-center text-gray-700 font-medium mt-1">
-              {s.name.slice(0, 4)}
-            </p>
-          </div>
-        ))}
-      </div>
+        <div
+          ref={containerRef}
+          onTouchStart={handleUserInteraction}
+          onTouchMove={handleUserInteraction}
+          onWheel={handleUserInteraction}
+          onMouseDown={handleUserInteraction}
+          style={{
+            display: "flex",
+            gap: 14,
+            alignItems: "center",
+            overflowX: "auto",
+            padding: "6px 8px",
+            scrollSnapType: "x mandatory",
+            // hide default scrollbar visually
+            msOverflowStyle: "none",
+            scrollbarWidth: "none",
+          }}
+        >
+          {logos.concat(logos).map((l, i) => {
+            // duplicate logos to create smooth wrap; map index modulo logos.length
+            const baseIndex = i % logos.length;
+            const visibleIndex = baseIndex === index;
+            // visual sizes: centered one slightly larger
+            const size = visibleIndex ? 86 : 64;
+            const opacity = visibleIndex ? 1 : 0.85;
+            const translateY = visibleIndex ? -2 : 0;
 
-      {/* SECTION TITLE */}
-      <h2 className="text-3xl font-bold text-blue-400 mt-8">
+            return (
+              <div
+                data-logo-item
+                key={`logo-${i}-${l.key}`}
+                style={{
+                  minWidth: 110, // controls how much of next peeks in (1 + half)
+                  flex: "0 0 auto",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  scrollSnapAlign: "center",
+                  transition: "transform 400ms ease, opacity 400ms ease",
+                  transform: `translateY(${translateY}px)`,
+                  opacity,
+                }}
+              >
+                <div
+                  style={{
+                    width: size,
+                    height: size,
+                    borderRadius: 999,
+                    background: "white",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    boxShadow: "0 10px 30px rgba(0,195,255,0.12)",
+                    border: "1px solid rgba(0,195,255,0.12)",
+                  }}
+                >
+                  <Image src={logos[baseIndex].src} alt={logos[baseIndex].name} width={Math.round(size * 0.7)} height={Math.round(size * 0.7)} style={{ objectFit: "contain" }} />
+                </div>
+                <div style={{ height: 8 }} />
+                <div style={{ fontSize: 12, color: "#444", fontWeight: 600 }}>
+                  {logos[baseIndex].name}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Compare Prices Title */}
+      <h3 style={{ marginTop: 20, marginBottom: 8, color: "#00b7ff", fontSize: 20, fontWeight: 800 }}>
         Compare Prices
-      </h2>
+      </h3>
 
-      {/* 2.5 PRICE CARDS ROW */}
-      <div className="mt-4 flex overflow-x-scroll gap-4 no-scrollbar pb-4">
+      {/* 2.5 card horizontal row */}
+      <div style={{ display: "flex", gap: 12, overflowX: "auto", paddingBottom: 16 }}>
         {[
           {
+            key: "amazon",
             name: "Amazon",
             price: product.amazonPrice,
             offer: product.amazonOffer,
             url: product.amazonUrl,
           },
           {
+            key: "meesho",
             name: "Meesho",
             price: product.meeshoPrice,
             offer: product.meeshoOffer,
             url: product.meeshoUrl,
           },
           {
-            name: "Ajio",
+            key: "ajio",
+            name: "AJIO",
             price: product.ajioPrice,
             offer: product.ajioOffer,
             url: product.ajioUrl,
           },
-        ].map((store, index) => (
-          <div
-            key={index}
-            className="min-w-[62%] bg-white rounded-2xl p-4 border border-blue-200 shadow-md"
-          >
-            <h3 className="text-xl font-bold text-blue-400">{store.name}</h3>
-
-            <p className="text-2xl font-bold text-blue-500 mt-1">
-              ₹{store.price}
-            </p>
-
-            <p className="text-gray-600 mt-1">{store.offer}</p>
-
-            {/* BUY BUTTON (Small) */}
-            <a
-              href={store.url}
-              target="_blank"
-              className="mt-3 inline-block px-6 py-2 rounded-full shadow-md"
+        ].map((storeObj, idx) => {
+          const features = getFeatures(storeObj.key);
+          return (
+            <article
+              key={storeObj.key}
               style={{
-                background:
-                  "linear-gradient(to right, #00c6ff, #00ff99)",
+                minWidth: CARD_MIN_WIDTH,
+                maxWidth: CARD_MIN_WIDTH,
+                background: "linear-gradient(180deg, rgba(255,255,255,0.96), #ffffff)",
+                borderRadius: 14,
+                padding: "10px",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
+                border: "1px solid rgba(0,195,255,0.06)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
               }}
             >
-              <span className="font-semibold text-black text-lg">
-                Buy →
-              </span>
-            </a>
-          </div>
-        ))}
-      </div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, overflow: "hidden", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Image src={`/logos/${storeObj.key}.png`} alt={storeObj.name} width={28} height={28} />
+                  </div>
+                  <div style={{ fontWeight: 800 }}>{storeObj.name}</div>
+                </div>
 
-    </div>
+                <div style={{ fontWeight: 800, color: "#00c3ff", fontSize: 18 }}>
+                  {fmt(storeObj.price)}
+                </div>
+              </div>
+
+              <div style={{ color: "#666", fontSize: 13, minHeight: 36 }}>{storeObj.offer}</div>
+
+              <div style={{ display: "flex", justifyContent: "flex-start", gap: 8, alignItems: "center", marginTop: 4 }}>
+                <a
+                  href={storeObj.url || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "6px 12px",
+                    borderRadius: 999,
+                    background: "linear-gradient(90deg,#00c6ff,#00e78f)",
+                    boxShadow: "0 8px 24px rgba(0,200,255,0.18)",
+                    color: "#000",
+                    fontWeight: 700,
+                    textDecoration: "none",
+                    fontSize: 14,
+                  }}
+                >
+                  Buy →
+                </a>
+
+                {/* features (minimal dots style) */}
+                <div style={{ display: "flex", gap: 10, marginLeft: 8 }}>
+                  {features.map((f, i) => (
+                    <div key={i} style={{ display: "flex", gap: 6, alignItems: "center", fontSize: 12, color: "#444" }}>
+                      <span style={{ width: 6, height: 6, borderRadius: 6, background: "#00c6ff", display: "inline-block" }} />
+                      <span>{f}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </main>
   );
-    }
-    
+                              }
+      
