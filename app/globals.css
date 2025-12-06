@@ -1,11 +1,11 @@
-/* RESET — SAFE VERSION (does NOT break flexbox) */
+/* 🌟 GLOBAL RESET — SAFE VERSION (DO NOT BREAK FLEXBOX) */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* BODY */
+/* 🌟 BODY */
 body {
   font-family: 'Inter', Arial, sans-serif;
   background-color: #e9ecf1;
@@ -13,25 +13,25 @@ body {
   line-height: 1.6;
 }
 
-/* HEADINGS GLOW */
+/* 🌟 HEADINGS (Neon Glow) */
 h1, h2, h3, h4, h5, h6 {
   color: #0bbcff;
   text-shadow: 0 0 6px rgba(11,188,255,0.4);
 }
 
-/* REMOVE GLOBAL TEXT-SHADOW RESET (was breaking neon) */
+/* 🌟 ROOT HEIGHT */
 html, body {
   height: 100%;
 }
 
-/* BUTTON GLOW */
+/* 🌟 BUTTON GLOW */
 .btn-glow:hover {
   box-shadow: 0 0 6px #0bbcff, 0 0 12px #0bbcff;
   transform: translateY(-2px);
   transition: 0.2s ease;
 }
 
-/* NAV-LINK STYLING */
+/* 🌟 NAV LINK */
 .nav-link {
   color: #00c3ff;
   font-size: 1.1rem;
@@ -43,7 +43,7 @@ html, body {
   text-shadow: 0 0 6px rgba(0,255,149,0.6);
 }
 
-/* SEARCH BAR */
+/* 🌟 SEARCH BAR INPUT */
 .search-bar {
   width: 100%;
   padding: 0.7rem 1rem;
@@ -58,7 +58,7 @@ html, body {
   border-color: #0bbcff;
 }
 
-/* AUTOCOMPLETE */
+/* 🌟 AUTOCOMPLETE BOX */
 .autocomplete-box {
   background: white;
   margin-top: 6px;
@@ -70,13 +70,13 @@ html, body {
   z-index: 50;
 }
 
-/* 🔥 FIX: Only ONE fadeIn definition */
+/* 🌟 FADE-IN ANIMATION — Only One Version */
 @keyframes fadeIn {
   0% { opacity: 0; transform: translateY(10px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
-/* LOGO SLIDE ANIMATION — your original */
+/* 🌟 LOGO SLIDER (smooth infinite loop) */
 @keyframes slideSlow {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
@@ -85,17 +85,20 @@ html, body {
   animation: slideSlow 12s linear infinite;
 }
 
-/* GREEN PULSE */
+/* 🌟 GREEN PULSE */
 @keyframes greenPulse {
-  0%,100% {
-    box-shadow: 0 0 8px rgba(0,255,120,0);
-  }
-  50% {
-    box-shadow: 0 0 18px rgba(0,255,120,0.4);
-  }
+  0%,100% { box-shadow: 0 0 8px rgba(0,255,120,0); }
+  50% { box-shadow: 0 0 18px rgba(0,255,120,0.4); }
 }
 .pulse-on-hover:hover {
   animation: greenPulse 1.6s infinite ease-out;
 }
 
-/* REMOVE all duplicate/overlapping code */
+/* 🌟 FIX: Prevent unwanted overflow on small screens */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
