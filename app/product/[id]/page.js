@@ -80,38 +80,96 @@ export default function ProductDetail({ params }) {
         Compare Prices
       </h2>
 
-      {/* ⭐ 2.5 PRICE CARDS (TALL RECTANGLE) */}
-      <div className="mt-4 flex gap-4 overflow-x-scroll no-scrollbar pb-6">
-        {[
-          {
-            name: "Amazon",
-            price: product.amazonPrice,
-            offer: product.amazonOffer,
-            url: product.amazonUrl,
-          },
-          {
-            name: "Meesho",
-            price: product.meeshoPrice,
-            offer: product.meeshoOffer,
-            url: product.meeshoUrl,
-          },
-          {
-            name: "Ajio",
-            price: product.ajioPrice,
-            offer: product.ajioOffer,
-            url: product.ajioUrl,
-          },
-        ].map((s, i) => (
-          <div
-            key={i}
-            className="min-w-[63%] bg-white rounded-3xl p-4 border border-blue-200 shadow-xl"
-          >
-            <h3 className="text-2xl font-bold text-blue-500">{s.name}</h3>
-            <p className="text-3xl font-bold text-blue-600 mt-1">
-              ₹{s.price}
-            </p>
-            <p className="text-gray-600 mt-1">{s.offer}</p>
+      const priceCards = [
+  {
+    name: "Amazon",
+    price: product.amazonPrice,
+    offer: product.amazonOffer,
+    url: product.amazonUrl,
+    logo: "/logos/amazon.png"
+  },
+  {
+    name: "Meesho",
+    price: product.meeshoPrice,
+    offer: product.meeshoOffer,
+    url: product.meeshoUrl,
+    logo: "/logos/meesho.png"
+  },
+  {
+    name: "Ajio",
+    price: product.ajioPrice,
+    offer: product.ajioOffer,
+    url: product.ajioUrl,
+    logo: "/logos/ajio.png"
+  },
+];
 
+{/* ⭐ FIXED — PERFECT VERTICAL RECTANGLE PRICE CARDS */}
+<div className="mt-6 flex gap-4 overflow-x-scroll no-scrollbar pb-2">
+
+  {priceCards.map((s, i) => (
+    <div
+      key={i}
+      className="
+        min-w-[65%] 
+        bg-white 
+        rounded-3xl 
+        p-5 
+        border border-blue-200 
+        shadow-[0_4px_18px_rgba(0,0,0,0.12)]
+        flex flex-col
+      "
+    >
+
+      {/* TOP: Logo + Name + Price */}
+      <div className="flex items-center justify-between">
+        
+        <div className="flex items-center gap-3">
+          <Image 
+            src={s.logo} 
+            width={40} 
+            height={40} 
+            alt={s.name}
+            className="rounded-full border border-gray-200"
+          />
+          <h3 className="text-xl font-bold text-blue-500">
+            {s.name}
+          </h3>
+        </div>
+
+        <p className="text-2xl font-bold text-blue-500">
+          ₹{s.price}
+        </p>
+
+      </div>
+
+      <p className="text-gray-600 text-lg mt-2">{s.offer}</p>
+
+      <a
+        href={s.url}
+        target="_blank"
+        className="
+          mt-4 
+          py-2 px-6 
+          rounded-full 
+          font-semibold 
+          text-black 
+          text-lg 
+          shadow-md 
+          inline-block
+        "
+        style={{
+          background: "linear-gradient(to right, #00c6ff, #00ff99)"
+        }}
+      >
+        Buy →
+      </a>
+
+    </div>
+  ))}
+
+</div>
+              
             {/* BUY BUTTON */}
             <a
               href={s.url}
