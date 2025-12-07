@@ -160,14 +160,81 @@ export default function Home() {
       </div>
 
       {/* CATEGORY ROW */}
+<div
+  style={{
+    width: "100%",
+    overflowX: "auto",
+    display: "flex",
+    justifyContent: "center",  // ⭐ centers all cards
+    gap: "14px",
+    padding: "10px 0",
+    whiteSpace: "nowrap",
+  }}
+>
+  {/* ALL CATEGORY BUTTON */}
+  <div
+    onClick={() => filterByCategory("all")}
+    style={{
+      display: "inline-block",
+      minWidth: "95px",
+      padding: "10px",
+      borderRadius: "14px",
+      background: selectedCat === "all" ? "rgba(0,195,255,0.15)" : "rgba(255,255,255,0.6)",
+      border: selectedCat === "all" ? "2px solid #00c3ff" : "2px solid #aacbe3",
+      textAlign: "center",
+      cursor: "pointer",
+      boxShadow: "0 2px 8px rgba(0,195,255,0.25)",
+    }}
+  >
+    <strong style={{ color: "#009fe3" }}>All</strong>
+  </div>
+
+  {/* Dynamic Categories */}
+  {categories.map((cat) => (
+    <div
+      key={cat.id}
+      onClick={() => filterByCategory(cat.slug)}
+      style={{
+        display: "inline-block",
+        minWidth: "95px",
+        padding: "10px",
+        borderRadius: "14px",
+        background:
+          selectedCat === cat.slug
+            ? "rgba(0,195,255,0.15)"
+            : "rgba(255,255,255,0.6)", // ⭐ very light theme
+        border:
+          selectedCat === cat.slug
+            ? "2px solid #00c3ff"
+            : "2px solid #aacbe3",
+        textAlign: "center",
+        cursor: "pointer",
+        boxShadow: "0 2px 8px rgba(0,195,255,0.25)",
+      }}
+    >
+      {/* FIX BROKEN LOGOS — using Image tag */}
+      <div style={{ width: "40px", margin: "auto" }}>
+        <img
+          src={cat.iconUrl}
+          alt={cat.name}
+          style={{ width: "38px", height: "38px", objectFit: "contain" }}
+        />
+      </div>
+
       <div
         style={{
-          display: "flex",
-          overflowX: "auto",
-          gap: "8px",
-          padding: "6px",
+          marginTop: "4px",
+          color: "#0088cc",
+          fontWeight: 600,
+          fontSize: "0.9rem",
         }}
       >
+        {cat.name}
+      </div>
+    </div>
+  ))}
+</div>
+            
         {/* ALL Category */}
         <div
           onClick={() => filterByCategory("all")}
