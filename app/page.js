@@ -119,33 +119,52 @@ export default function Home() {
     <main className="page-container">
 
       {/* Search Bar */}
-      <div
-        style={{
-          marginTop: "14px",
-          padding: "6px 10px",
-          background: "rgba(255,255,255,0.3)",
-          backdropFilter: "blur(10px)",
-          position: "sticky",
-          top: "68px",
-          zIndex: 50,
-        }}
-      >
-        <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              flex: 1,
-              height: "46px",
-              borderRadius: "12px",
-              fontSize: "1rem",
-              paddingLeft: "14px",
-              border: "2px solid #00c3ff",
-              background: "rgba(255,255,255,0.8)",
-            }}
-          />
+<div style={{ position: "relative", width: "100%" }}>
+  <input
+    type="text"
+    placeholder="Search products..."
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    className="search-bar"
+    style={{
+      width: "100%",
+      height: "46px",
+      borderRadius: "12px",
+      fontSize: "1rem",
+      paddingLeft: "14px",
+      paddingRight: "42px",  // 👈 space for icon
+      border: "2px solid #00c3ff",
+      background: "rgba(255,255,255,0.85)",
+      boxShadow: "0 0 8px rgba(0,195,255,0.4)",
+    }}
+  />
+
+  {/* 🔍 Search Icon INSIDE input (right side) */}
+  <div
+    style={{
+      position: "absolute",
+      right: "10px",
+      top: "50%",
+      transform: "translateY(-50%)",
+      width: "24px",
+      height: "24px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      pointerEvents: "none", // icon should NOT block typing
+    }}
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="22"
+      height="22"
+      fill="#00c3ff"
+      viewBox="0 0 24 24"
+    >
+      <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
+    </svg>
+  </div>
+</div>
 
           {/* Search Btn */}
           <button style={iconButtonStyle}>
