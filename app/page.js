@@ -14,100 +14,95 @@ export default function Home() {
   const [categories, setCategories] = useState([]);
   const [selectedCat, setSelectedCat] = useState("all");
 
-  /* LOAD PRODUCTS */
+  // Load Products
   useEffect(() => {
-    async function loadProducts() {
+    async function load() {
       const snap = await getDocs(collection(db, "products"));
-      const items = snap.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const items = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
       setProducts(items);
       setFiltered(items);
     }
-    loadProducts();
+    load();
   }, []);
 
-  /* LOAD ADS */
+  // Load Ads
   useEffect(() => {
-    async function loadAds() {
+    async function load() {
       const snap = await getDocs(collection(db, "ads"));
-      setAds(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const items = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setAds(items);
     }
-    loadAds();
+    load();
   }, []);
 
-  /* LOAD CATEGORIES */
+  // Load Categories
   useEffect(() => {
-    async function loadCategories() {
+    async function load() {
       const snap = await getDocs(collection(db, "categories"));
-      setCategories(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const items = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setCategories(items);
     }
-    loadCategories();
+    load();
   }, []);
 
-  /* FILTER BY CATEGORY */
+  // Filter category
   function filterByCategory(slug) {
     setSelectedCat(slug);
     if (slug === "all") return setFiltered(products);
+
     setFiltered(products.filter(p => p.categorySlug === slug));
   }
 
-  /* SEARCH */
+  // Search system
   useEffect(() => {
     if (!search) return setFiltered(products);
 
-    const match = products.filter((p) =>
-      p.name.toLowerCase().includes(search.toLowerCase())
+    setFiltered(
+      products.filter(p =>
+        p.name.toLowerCase().includes(search.toLowerCase())
+      )
     );
-
-    setFiltered(match);
   }, [search, products]);
 
-  /* MIC BUTTON STYLE */
-  const iconButtonStyle = {
-    width: "42px",
-    height: "42px",
+  // Mic Button Style
+  const iconBtn = {
+    width: "46px",
+    height: "46px",
+    borderRadius: "14px",
+    background: "rgba(0,200,255,0.75)",
+    boxShadow: "0 0 8px rgba(0,200,255,0.6)",
+    border: "none",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "6px",
-    borderRadius: "12px",
-    background: "rgba(0, 200, 255, 0.75)",
-    boxShadow: "0 0 10px rgba(0,200,255,0.7)",
   };
 
   return (
     <main className="page-container">
 
       {/* 🔍 SEARCH BAR */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "6px",
-          marginTop: "10px",
-          marginBottom: "12px",
-        }}
-      >
+      <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
         <div style={{ position: "relative", flex: 1 }}>
           <input
+            type="text"
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="search-bar"
             style={{
               width: "100%",
               height: "46px",
-              borderRadius: "12px",
+              borderRadius: "14px",
               paddingLeft: "14px",
               paddingRight: "40px",
+              fontSize: "1rem",
               border: "2px solid #00c3ff",
-              background: "rgba(255,255,255,0.85)",
+              background: "white",
+              boxShadow: "0 0 8px rgba(0,195,255,0.4)",
             }}
           />
 
-          {/* 🔍 Icon */}
+          {/* Icon inside input */}
           <div
             style={{
               position: "absolute",
@@ -117,125 +112,102 @@ export default function Home() {
               pointerEvents: "none",
             }}
           >
-            <svg width="22" height="22" fill="#00c3ff" viewBox="0 0 24 24">
-              <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
-            </svg>
+            🔍
           </div>
         </div>
 
-        {/* MIC */}
-        <button style={iconButtonStyle}>
-          <svg width="22" height="22" fill="white" viewBox="0 0 24 24">
-            <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7zm-1 2h2v3h-2v-3z" />
-          </svg>
-        </button>
+        {/* MIC BTN */}
+        <button style={iconBtn}>🎤</button>
       </div>
 
-      {/* ⭐ CATEGORY ROW — FIXED & CLEAN */}
+      {/* ⭐ CATEGORY SELECTOR */}
       <div
         style={{
-          width: "100%",
           display: "flex",
           justifyContent: "center",
-          gap: "14px",
+          gap: "12px",
           overflowX: "auto",
-          paddingBottom: "8px",
-          whiteSpace: "nowrap",
+          padding: "12px 0",
+          marginTop: "10px",
         }}
       >
-        {/* DEFAULT ALL CATEGORY */}
+        {/* All */}
         <div
           onClick={() => filterByCategory("all")}
           style={{
-            display: "inline-block",
-            minWidth: "95px",
+            minWidth: "90px",
             padding: "10px",
-            borderRadius: "14px",
+            borderRadius: "16px",
+            textAlign: "center",
             background:
               selectedCat === "all"
-                ? "rgba(0,195,255,0.15)"
-                : "rgba(255,255,255,0.6)",
+                ? "rgba(0,195,255,0.25)"
+                : "rgba(255,255,255,0.7)",
             border:
               selectedCat === "all"
                 ? "2px solid #00c3ff"
-                : "2px solid #aacbe3",
-            textAlign: "center",
+                : "2px solid #b8d8e8",
+            color: "#009de0",
+            fontWeight: 700,
             cursor: "pointer",
-            fontWeight: 600,
-            color: "#0088cc",
+            boxShadow: "0 2px 8px rgba(0,195,255,0.25)",
           }}
         >
           All
         </div>
 
-        {/* CATEGORY CARDS */}
+        {/* Dynamic categories */}
         {categories.map((cat) => (
           <div
             key={cat.id}
             onClick={() => filterByCategory(cat.slug)}
             style={{
-              display: "inline-block",
-              minWidth: "95px",
+              minWidth: "90px",
               padding: "10px",
-              borderRadius: "14px",
+              borderRadius: "16px",
+              textAlign: "center",
               background:
                 selectedCat === cat.slug
-                  ? "rgba(0,195,255,0.15)"
-                  : "rgba(255,255,255,0.6)",
+                  ? "rgba(0,195,255,0.25)"
+                  : "rgba(255,255,255,0.7)",
               border:
                 selectedCat === cat.slug
                   ? "2px solid #00c3ff"
-                  : "2px solid #aacbe3",
-              textAlign: "center",
+                  : "2px solid #b8d8e8",
+              color: "#009de0",
               cursor: "pointer",
+              boxShadow: "0 2px 8px rgba(0,195,255,0.25)",
             }}
           >
-            <img
-              src={cat.iconUrl}
-              alt={cat.name}
-              style={{
-                width: "40px",
-                height: "40px",
-                objectFit: "contain",
-                margin: "auto",
-              }}
-            />
-            <div
-              style={{
-                marginTop: "4px",
-                color: "#0088cc",
-                fontWeight: 600,
-                fontSize: "0.9rem",
-              }}
-            >
+            <div style={{ fontSize: "26px" }}>{cat.icon}</div>
+            <div style={{ fontSize: "0.8rem", fontWeight: 600 }}>
               {cat.name}
             </div>
           </div>
         ))}
       </div>
 
-      {/* BANNER ADS */}
-      <div className="px-3 mt-1">
-        <BannerAd ads={ads} />
-      </div>
+      {/* Banner */}
+      <BannerAd ads={ads} />
 
-      {/* PRODUCTS TITLE */}
-      <h1 style={{ marginTop: "16px", color: "#00b7ff" }}>Products</h1>
+      {/* Products Title */}
+      <h1 style={{ color: "#00b7ff", marginTop: "18px" }}>Products</h1>
 
       {/* PRODUCT GRID */}
       <div
         style={{
           display: "grid",
-          gap: "0.8rem",
+          gap: "12px",
           gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-          marginBottom: "30px",
+          marginTop: "10px",
+          marginBottom: "40px",
         }}
       >
-        {filtered.map((product) => (
-          <ProductCard key={product.id} product={product} />
+        {filtered.map((p) => (
+          <ProductCard key={p.id} product={p} />
         ))}
       </div>
     </main>
   );
-  }
-    
+        }
+        
