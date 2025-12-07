@@ -103,7 +103,6 @@ export default function Home() {
           marginBottom: "12px",
         }}
       >
-        {/* SEARCH INPUT */}
         <div style={{ position: "relative", flex: 1 }}>
           <input
             type="text"
@@ -124,7 +123,7 @@ export default function Home() {
             }}
           />
 
-          {/* SEARCH ICON (A) */}
+          {/* SEARCH ICON */}
           <div
             style={{
               position: "absolute",
@@ -134,33 +133,21 @@ export default function Home() {
               pointerEvents: "none",
             }}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="22"
-              height="22"
-              fill="#00c3ff"
-              viewBox="0 0 24 24"
-            >
+            <svg width="22" height="22" fill="#00c3ff" viewBox="0 0 24 24">
               <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
             </svg>
           </div>
         </div>
 
-        {/* MIC BUTTON (D) */}
+        {/* MIC BUTTON */}
         <button onClick={startVoiceSearch} style={iconButtonStyle}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="22"
-            height="22"
-            fill="white"
-            viewBox="0 0 24 24"
-          >
+          <svg width="22" height="22" fill="white" viewBox="0 0 24 24">
             <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7zm-1 2h2v3h-2v-3z" />
           </svg>
         </button>
       </div>
 
-      {/* ⭐ CATEGORY ROW — FIXED SCROLL + CENTERED + ALL BUTTON VISIBLE */}
+      {/* ⭐ CATEGORY ROW */}
       <div
         style={{
           width: "100%",
@@ -171,7 +158,6 @@ export default function Home() {
           whiteSpace: "nowrap",
         }}
       >
-        {/* ALL BUTTON */}
         <div
           onClick={() => filterByCategory("all")}
           style={{
@@ -194,7 +180,6 @@ export default function Home() {
           <strong style={{ color: "#009fe3" }}>All</strong>
         </div>
 
-        {/* CATEGORY CARDS */}
         {categories.map((cat) => (
           <div
             key={cat.id}
@@ -244,15 +229,18 @@ export default function Home() {
         <BannerAd ads={ads} />
       </div>
 
-      {/* PRODUCTS */}
+      {/* TITLE */}
       <h1 style={{ marginTop: "16px", color: "#00b7ff" }}>Products</h1>
 
+      {/* ⭐ UPDATED PRODUCT GRID — centered + bigger cards */}
       <div
         style={{
           display: "grid",
-          gap: "0.8rem",
-          gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-          marginBottom: "30px",
+          justifyContent: "center",   // center grid
+          gap: "1.2rem",
+          gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+          maxWidth: "900px",
+          margin: "0 auto 40px auto", // center whole block
         }}
       >
         {filtered.map((product) => (
@@ -261,5 +249,5 @@ export default function Home() {
       </div>
     </main>
   );
-              }
-        
+          }
+    
