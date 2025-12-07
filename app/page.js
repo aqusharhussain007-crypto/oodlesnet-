@@ -14,6 +14,7 @@ export default function Home() {
   const [ads, setAds] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCat, setSelectedCat] = useState("all");
+  
 {/* 🔍 Search Bar Row */}
 <div
   style={{
