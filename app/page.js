@@ -99,29 +99,50 @@ export default function Home() {
     <main className="page-container">
 
       {/* ---------------- SEARCH BAR ---------------- */}
-      <div className="flex items-center gap-2 mt-3 mb-2">
-        <div className="relative flex-1">
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="search-bar"
-            style={{ paddingRight: "42px" }}
-          />
+<div className="flex items-center gap-2 mt-3 mb-2">
 
-          {/* SEARCH ICON */}
-          <svg
-            width="22"
-            height="22"
-            fill="#00c3ff"
-            viewBox="0 0 24 24"
-            className="absolute right-3 top-1/2 -translate-y-1/2"
-          >
-            <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
-          </svg>
-        </div>
-      </div>
+  {/* INPUT */}
+  <div className="relative flex-1">
+    <input
+      type="text"
+      placeholder="Search products..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      className="search-bar"
+      style={{ paddingRight: "42px" }}
+    />
+
+    {/* SEARCH ICON */}
+    <svg
+      width="22"
+      height="22"
+      fill="#00c3ff"
+      viewBox="0 0 24 24"
+      className="absolute right-3 top-1/2 -translate-y-1/2"
+    >
+      <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
+    </svg>
+  </div>
+
+  {/* MIC ICON (RESTORED) */}
+  <button
+    onClick={startVoiceSearch}
+    style={{
+      width: "42px",
+      height: "42px",
+      borderRadius: "12px",
+      background: "rgba(0,200,255,0.75)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      boxShadow: "0 0 10px rgba(0,200,255,0.7)"
+    }}
+  >
+    <svg width="22" height="22" fill="white" viewBox="0 0 24 24">
+      <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7zm-1 2h2v3h-2v-3z" />
+    </svg>
+  </button>
+</div>
 
       {/* ---------------- BANNER ---------------- */}
       <div className="mt-2 px-2">
