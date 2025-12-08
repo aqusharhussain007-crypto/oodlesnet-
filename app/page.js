@@ -177,15 +177,51 @@ export default function Home() {
         <BannerAd ads={ads} />
       </div>
 
-      {/* -------------------------------- TRENDING TODAY ------------------------------- */}
-      <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">
-        Trending Today
-      </h2>
+      {/* ---------------- TRENDING TODAY ---------------- */}
+<h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">
+  Trending Today
+</h2>
 
-      <div className="flex overflow-x-auto gap-3 no-scrollbar pb-2">
-        {trending.map((item) => (
+<div className="overflow-hidden relative">
+  <div
+    className="flex gap-3 no-scrollbar animate-[autoSlide_12s_linear_infinite]"
+  >
+    {[...trending, ...trending].map((item, index) => (
+      <div
+        key={index}
+        onClick={() => (window.location = `/product/${item.id}`)}
+        className="min-w-[120px] bg-white rounded-xl p-2 shadow cursor-pointer text-center"
+      >
+        <Image
+          src={item.imageUrl}
+          width={120}
+          height={120}
+          alt={item.name}
+          className="rounded-md object-cover"
+        />
+        <p className="text-[0.85rem] mt-1 font-semibold text-blue-700">
+          {item.name}
+        </p>
+      </div>
+    ))}
+  </div>
+</div>
+          
+
+      {/* ---------------- RECENTLY VIEWED ---------------- */}
+{recent.length > 0 && (
+  <>
+    <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">
+      Recently Viewed
+    </h2>
+
+    <div className="overflow-hidden relative">
+      <div
+        className="flex gap-3 no-scrollbar animate-[autoSlide_12s_linear_infinite]"
+      >
+        {[...recent, ...recent].map((item, index) => (
           <div
-            key={item.id}
+            key={index}
             onClick={() => (window.location = `/product/${item.id}`)}
             className="min-w-[120px] bg-white rounded-xl p-2 shadow cursor-pointer text-center"
           >
@@ -202,36 +238,9 @@ export default function Home() {
           </div>
         ))}
       </div>
-
-      {/* -------------------------------- RECENTLY VIEWED ------------------------------- */}
-      {recent.length > 0 && (
-        <>
-          <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">
-            Recently Viewed
-          </h2>
-
-          <div className="flex overflow-x-auto gap-3 no-scrollbar pb-2">
-            {recent.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => (window.location = `/product/${item.id}`)}
-                className="min-w-[120px] bg-white rounded-xl p-2 shadow cursor-pointer text-center"
-              >
-                <Image
-                  src={item.imageUrl}
-                  width={120}
-                  height={120}
-                  alt={item.name}
-                  className="rounded-md object-cover"
-                />
-                <p className="text-[0.85rem] mt-1 font-semibold text-blue-700">
-                  {item.name}
-                </p>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
+    </div>
+  </>
+)}
 
       {/* -------------------------------- CATEGORIES ------------------------------- */}
       <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">
