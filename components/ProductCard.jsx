@@ -1,21 +1,56 @@
 "use client";
+
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function ProductCard({ product }) {
+  const router = useRouter();
+
+  // ------------------------------
+  // 🔥 Add to Recently Viewed
+  // ------------------------------
+  function saveRecent() {
+    if (typeof window === "undefined") return;
+
+    let recent = JSON.parse(localStorage.getItem("recent") || "[]");
+
+    // remove if exists
+    recent = recent.filter((p) => p.id !== product.id);
+
+    // add to top
+    recent.unshift({
+      id: product.id,
+      name: product.name,
+      imageUrl: product.imageUrl,
+    });
+
+    // limit to 12 items
+    if (recent.length > 12) recent = recent.slice(0, 12);
+
+    localStorage.setItem("recent", JSON.stringify(recent));
+  }
+
+  // ------------------------------
+  // 🔥 Handle Click → Save + Navigate
+  // ------------------------------
+  function openProduct() {
+    saveRecent();
+    router.push(`/product/${product.id}`);
+  }
+
   return (
-    <Link
-      href={`/product/${product.id}`}
+    <div
+      onClick={openProduct}
       style={{
         display: "block",
-        width: "92%",               // ⭐ breathing space left & right
-        maxWidth: "420px",          // ⭐ still centered & neat
-        margin: "0 auto 18px auto", // ⭐ center every card
+        width: "92%",               // ⭐ breathing space
+        maxWidth: "420px",
+        margin: "0 auto 18px auto", // ⭐ center cards
         background: "linear-gradient(135deg, #e6faff, #e4ffee)",
         borderRadius: "22px",
         padding: "16px",
         boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
-        textDecoration: "none",
+        cursor: "pointer",
         transition: "transform 0.2s ease",
       }}
     >
@@ -58,7 +93,6 @@ export default function ProductCard({ product }) {
       >
         ₹ {product.price}
       </p>
-    </Link>
+    </div>
   );
-            }
-            
+}
