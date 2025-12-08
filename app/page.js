@@ -190,99 +190,118 @@ export default function Home() {
         <BannerAd ads={ads} />
       </div>
 
-      {/* ---------------- TRENDING TODAY ---------------- */}
-      <h2 className="text-xl font-bold text-blue-500 mt-5 mb-2">
-        Trending Today
-      </h2>
+/* ---------------- TRENDING TODAY ---------------- */
+<h2 className="text-xl font-bold text-blue-500 mt-5 mb-2">
+  Trending Today
+</h2>
 
-      <div className="flex overflow-x-auto gap-3 no-scrollbar pb-2">
-        {loading
-          ? [...Array(5)].map((_, i) => <SkeletonCard key={i} />)
-          : trending.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => (window.location = `/product/${item.id}`)}
-                style={{
-                  minWidth: "120px",
-                  background: "white",
-                  borderRadius: "14px",
-                  padding: "10px",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                  cursor: "pointer",
-                  textAlign: "center",
-                }}
-              >
-                <Image
-                  src={item.imageUrl}
-                  width={120}
-                  height={120}
-                  alt={item.name}
-                  style={{
-                    borderRadius: "10px",
-                    objectFit: "cover",
-                  }}
-                />
-                <p
-                  style={{
-                    fontSize: "0.85rem",
-                    marginTop: "4px",
-                    fontWeight: 600,
-                    color: "#0077aa",
-                  }}
-                >
-                  {item.name}
-                </p>
-              </div>
-            ))}
+<div
+  className="flex overflow-x-auto gap-3 no-scrollbar pb-2"
+  style={{ paddingBottom: "10px" }}
+>
+  {trending.length === 0 ? (
+    [...Array(5)].map((_, i) => (
+      <div
+        key={i}
+        className="shimmer"
+        style={{
+          minWidth: "120px",
+          height: "150px",
+          borderRadius: "14px",
+          background:
+            "linear-gradient(90deg, #d2f7ff, #b8f1ff, #d2f7ff)",
+        }}
+      />
+    ))
+  ) : (
+    trending.map((item) => (
+      <div
+        key={item.id}
+        onClick={() => (window.location = `/product/${item.id}`)}
+        style={{
+          minWidth: "140px",
+          maxWidth: "140px",
+          background: "white",
+          borderRadius: "14px",
+          padding: "10px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          cursor: "pointer",
+          textAlign: "center",
+        }}
+      >
+        <Image
+          src={item.imageUrl}
+          width={120}
+          height={120}
+          alt={item.name}
+          style={{
+            borderRadius: "10px",
+            objectFit: "cover",
+          }}
+        />
+        <p
+          style={{
+            fontSize: "0.85rem",
+            marginTop: "4px",
+            fontWeight: 600,
+            color: "#0077aa",
+          }}
+        >
+          {item.name}
+        </p>
       </div>
+    ))
+  )}
+</div>
 
-      {/* ---------------- RECENTLY VIEWED ---------------- */}
-      {recent.length > 0 && (
-        <>
-          <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">
-            Recently Viewed
-          </h2>
+{/* ---------------- RECENTLY VIEWED ---------------- */}
+{typeof window !== "undefined" && recent.length > 0 && (
+  <>
+    <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">
+      Recently Viewed
+    </h2>
 
-          <div className="flex overflow-x-auto gap-3 no-scrollbar pb-2">
-            {recent.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => (window.location = `/product/${item.id}`)}
-                style={{
-                  minWidth: "120px",
-                  background: "white",
-                  borderRadius: "14px",
-                  padding: "10px",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                  cursor: "pointer",
-                  textAlign: "center",
-                }}
-              >
-                <Image
-                  src={item.imageUrl}
-                  width={120}
-                  height={120}
-                  alt={item.name}
-                  style={{
-                    borderRadius: "10px",
-                    objectFit: "cover",
-                  }}
-                />
-                <p
-                  style={{
-                    fontSize: "0.85rem",
-                    marginTop: "4px",
-                    fontWeight: 600,
-                    color: "#0077aa",
-                  }}
-                >
-                  {item.name}
-                </p>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
+    <div className="flex overflow-x-auto gap-3 no-scrollbar pb-2">
+      {recent.map((item) => (
+        <div
+          key={item.id}
+          onClick={() => (window.location = `/product/${item.id}`)}
+          style={{
+            minWidth: "140px",
+            maxWidth: "140px",
+            background: "white",
+            borderRadius: "14px",
+            padding: "10px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            cursor: "pointer",
+            textAlign: "center",
+          }}
+        >
+          <Image
+            src={item.imageUrl}
+            width={120}
+            height={120}
+            alt={item.name}
+            style={{
+              borderRadius: "10px",
+              objectFit: "cover",
+            }}
+          />
+          <p
+            style={{
+              fontSize: "0.85rem",
+              marginTop: "4px",
+              fontWeight: 600,
+              color: "#0077aa",
+            }}
+          >
+            {item.name}
+          </p>
+        </div>
+      ))}
+    </div>
+  </>
+)}
 
       {/* ---------------- CATEGORIES ---------------- */}
       <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">
