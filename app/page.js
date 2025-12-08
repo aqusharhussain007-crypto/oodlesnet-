@@ -1,131 +1,139 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import ProductCard from "@/components/ProductCard";
 import { db } from "@/lib/firebase-app";
-import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import BannerAd from "@/components/ads/BannerAd";
+import Image from "next/image";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
   const [ads, setAds] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCat, setSelectedCat] = useState("all");
+  const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
 
-  const sliderRef = useRef(null);
-
-  // 🚀 Infinite slider speed
-  const SLIDE_SPEED = 0.6; // Smaller = faster
-
-  useEffect(() => {
-    const slider = sliderRef.current;
-    if (!slider) return;
-
-    let scrollAmount = 0;
-
-    function autoScroll() {
-      if (!slider) return;
-
-      scrollAmount += SLIDE_SPEED;
-      slider.scrollLeft = scrollAmount;
-
-      if (scrollAmount >= slider.scrollWidth / 2) {
-        scrollAmount = 0;
-        slider.scrollLeft = 0;
-      }
-
-      requestAnimationFrame(autoScroll);
-    }
-
-    autoScroll();
-  }, []);
-
-  // Fetch Products
+  /* ---------------- LOAD PRODUCTS ---------------- */
   useEffect(() => {
     async function loadProducts() {
       const snap = await getDocs(collection(db, "products"));
-      const items = snap.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const items = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
       setProducts(items);
       setFiltered(items);
 
-      // 🔥 Sort trending (high views first)
-      const trendingSorted = [...items]
-        .filter((p) => p.views !== undefined)
-        .sort((a, b) => b.views - a.views);
+      // trending = highest impressions (top 10)
+      const sorted = [...items]
+        .sort((a, b) => (b.impressions || 0) - (a.impressions || 0))
+        .slice(0, 10);
 
-      setTrending(trendingSorted);
+      setTrending(sorted);
     }
     loadProducts();
   }, []);
 
-  // Fetch Ads
+  /* ---------------- LOAD ADS ---------------- */
   useEffect(() => {
     async function loadAds() {
       const snap = await getDocs(collection(db, "ads"));
-      const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const items = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setAds(items);
     }
     loadAds();
   }, []);
 
-  // Fetch Categories
+  /* ---------------- LOAD CATEGORIES ---------------- */
   useEffect(() => {
-    async function loadCategories() {
+    async function loadCats() {
       const snap = await getDocs(collection(db, "categories"));
-      const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const items = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setCategories(items);
     }
-    loadCategories();
+    loadCats();
   }, []);
 
-  // Category Filter
+  /* ---------------- RECENTLY VIEWED ---------------- */
+  useEffect(() => {
+    const data = JSON.parse(localStorage.getItem("recent") || "[]");
+    setRecent(data);
+  }, []);
+
+  /* ---------------- CATEGORY FILTER ---------------- */
   function filterByCategory(slug) {
     setSelectedCat(slug);
 
     if (slug === "all") {
       setFiltered(products);
-    } else {
-      setFiltered(products.filter((p) => p.categorySlug === slug));
+      return;
     }
+    setFiltered(products.filter((p) => p.categorySlug === slug));
   }
 
-  // Search Logic
+  /* ---------------- VOICE SEARCH ---------------- */
+  function startVoiceSearch() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return alert("Voice search not supported.");
+
+    const recog = new SR();
+    recog.lang = "en-IN";
+
+    recog.onresult = (e) => {
+      setSearch(e.results[0][0].transcript);
+    };
+
+    recog.start();
+  }
+
+  /* ---------------- TEXT SEARCH ---------------- */
   useEffect(() => {
     if (!search) {
       setFiltered(products);
+      setSuggestions([]);
       return;
     }
 
-    const results = products.filter((p) =>
+    const match = products.filter((p) =>
       p.name.toLowerCase().includes(search.toLowerCase())
     );
-    setFiltered(results);
+
+    setFiltered(match);
+    setSuggestions(match.slice(0, 5));
   }, [search, products]);
 
-  // Mic Button Style
+  /* ---------------- REUSABLE ICON BUTTON ---------------- */
   const iconButton = {
-    width: "45px",
-    height: "45px",
-    borderRadius: "12px",
-    background: "rgba(0,200,255,0.8)",
+    width: "42px",
+    height: "42px",
     display: "flex",
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
+    borderRadius: "12px",
+    background: "rgba(0,200,255,0.75)",
     boxShadow: "0 0 10px rgba(0,200,255,0.7)",
   };
+
+  /* ===========================================================
+            UI STARTS HERE
+  =========================================================== */
 
   return (
     <main className="page-container">
 
-      {/* 🔍 SEARCH BAR */}
-      <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
+      {/* ---------------- SEARCH BAR ---------------- */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+          marginTop: "12px",
+        }}
+      >
+        {/* SEARCH INPUT */}
         <div style={{ position: "relative", flex: 1 }}>
           <input
             type="text"
@@ -135,17 +143,22 @@ export default function Home() {
             className="search-bar"
             style={{
               width: "100%",
-              height: "50px",
-              borderRadius: "14px",
-              paddingLeft: "14px",
-              paddingRight: "40px",
+              height: "46px",
+              borderRadius: "12px",
               fontSize: "1rem",
+              paddingLeft: "14px",
+              paddingRight: "42px",
               border: "2px solid #00c3ff",
+              background: "rgba(255,255,255,0.9)",
             }}
           />
 
-          {/* Correct Search Icon A */}
-          <div
+          {/* SEARCH ICON */}
+          <svg
+            width="22"
+            height="22"
+            fill="#00c3ff"
+            viewBox="0 0 24 24"
             style={{
               position: "absolute",
               right: "10px",
@@ -154,68 +167,132 @@ export default function Home() {
               pointerEvents: "none",
             }}
           >
-            🔍
-          </div>
+            <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
+          </svg>
         </div>
 
-        {/* Mic Icon D */}
-        <div style={iconButton}>🎤</div>
+        {/* MIC BUTTON */}
+        <button onClick={startVoiceSearch} style={iconButton}>
+          <svg width="22" height="22" fill="white" viewBox="0 0 24 24">
+            <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7zm-1 2h2v3h-2v-3z" />
+          </svg>
+        </button>
       </div>
 
-      {/* 🔥 TRENDING SLIDER (Infinite Loop) */}
-      <h2 style={{ marginTop: "18px", color: "#00b7ff" }}>🔥 Trending Today</h2>
+      {/* ---------------- BANNER ---------------- */}
+      <div className="mt-2 px-2">
+        <BannerAd ads={ads} />
+      </div>
 
-      <div
-        ref={sliderRef}
-        style={{
-          display: "flex",
-          overflow: "hidden",
-          whiteSpace: "nowrap",
-          gap: "12px",
-          padding: "10px 4px",
-        }}
-      >
-        {[...trending, ...trending].map((item, index) => (
+      {/* ---------------- TRENDING TODAY ---------------- */}
+      <h2 className="text-xl font-bold text-blue-500 mt-5 mb-2">
+        Trending Today
+      </h2>
+
+      <div className="flex overflow-x-auto gap-3 no-scrollbar pb-2">
+        {trending.map((item) => (
           <div
-            key={index}
+            key={item.id}
+            onClick={() => (window.location = `/product/${item.id}`)}
             style={{
-              minWidth: "260px",
+              minWidth: "120px",
+              background: "white",
               borderRadius: "14px",
-              padding: "12px",
-              background: "linear-gradient(135deg,#e0fff7,#e6f7ff)",
-              boxShadow: "0 4px 12px rgba(0,195,255,0.3)",
+              padding: "10px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
               cursor: "pointer",
+              textAlign: "center",
             }}
           >
-            <div style={{ fontWeight: 600, fontSize: "1.0rem" }}>
+            <Image
+              src={item.imageUrl}
+              width={120}
+              height={120}
+              alt={item.name}
+              style={{
+                borderRadius: "10px",
+                objectFit: "cover",
+              }}
+            />
+            <p
+              style={{
+                fontSize: "0.85rem",
+                marginTop: "4px",
+                fontWeight: 600,
+                color: "#0077aa",
+              }}
+            >
               {item.name}
-            </div>
-            <div style={{ fontSize: "0.9rem", opacity: 0.7 }}>
-              Views: {item.views}
-            </div>
+            </p>
           </div>
         ))}
       </div>
 
-      {/* CATEGORIES */}
-      <h2 style={{ marginTop: "10px", color: "#00b7ff" }}>Categories</h2>
+      {/* ---------------- RECENTLY VIEWED ---------------- */}
+      {recent.length > 0 && (
+        <>
+          <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">
+            Recently Viewed
+          </h2>
+
+          <div className="flex overflow-x-auto gap-3 no-scrollbar pb-2">
+            {recent.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => (window.location = `/product/${item.id}`)}
+                style={{
+                  minWidth: "120px",
+                  background: "white",
+                  borderRadius: "14px",
+                  padding: "10px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  cursor: "pointer",
+                  textAlign: "center",
+                }}
+              >
+                <Image
+                  src={item.imageUrl}
+                  width={120}
+                  height={120}
+                  alt={item.name}
+                  style={{
+                    borderRadius: "10px",
+                    objectFit: "cover",
+                  }}
+                />
+                <p
+                  style={{
+                    fontSize: "0.85rem",
+                    marginTop: "4px",
+                    fontWeight: 600,
+                    color: "#0077aa",
+                  }}
+                >
+                  {item.name}
+                </p>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* ---------------- CATEGORY ROW ---------------- */}
+      <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">Categories</h2>
 
       <div
         style={{
           display: "flex",
           overflowX: "auto",
           gap: "12px",
-          padding: "8px 0",
+          whiteSpace: "nowrap",
+          paddingBottom: "8px",
         }}
       >
+        {/* ALL category */}
         <div
           onClick={() => filterByCategory("all")}
           style={{
-            minWidth: "110px",
-            borderRadius: "14px",
-            padding: "12px",
-            textAlign: "center",
-            cursor: "pointer",
+            minWidth: "120px",
             background:
               selectedCat === "all"
                 ? "rgba(0,195,255,0.15)"
@@ -223,50 +300,69 @@ export default function Home() {
             border:
               selectedCat === "all"
                 ? "2px solid #00c3ff"
-                : "2px solid #bbddee",
+                : "2px solid #aacbe3",
+            borderRadius: "14px",
+            textAlign: "center",
+            padding: "10px",
+            cursor: "pointer",
           }}
         >
-          All
+          <strong style={{ color: "#0088cc" }}>All</strong>
         </div>
 
-        {categories.map((cat) => (
+        {categories.map((c) => (
           <div
-            key={cat.id}
-            onClick={() => filterByCategory(cat.slug)}
+            key={c.id}
+            onClick={() => filterByCategory(c.slug)}
             style={{
-              minWidth: "110px",
-              borderRadius: "14px",
-              padding: "12px",
-              textAlign: "center",
-              cursor: "pointer",
+              minWidth: "120px",
               background:
-                selectedCat === cat.slug
+                selectedCat === c.slug
                   ? "rgba(0,195,255,0.15)"
                   : "rgba(255,255,255,0.7)",
               border:
-                selectedCat === cat.slug
+                selectedCat === c.slug
                   ? "2px solid #00c3ff"
-                  : "2px solid #bbddee",
+                  : "2px solid #aacbe3",
+              borderRadius: "14px",
+              textAlign: "center",
+              padding: "10px",
+              cursor: "pointer",
             }}
           >
-            <div style={{ fontSize: "22px" }}>{cat.icon}</div>
-            <div style={{ marginTop: "4px" }}>{cat.name}</div>
+            <div style={{ fontSize: "30px" }}>{c.icon}</div>
+            <div style={{ marginTop: "4px", color: "#0088cc", fontWeight: 600 }}>
+              {c.name}
+            </div>
           </div>
         ))}
       </div>
 
-      {/* ADS */}
-      <BannerAd ads={ads} />
+      {/* ---------------- PRODUCT GRID ---------------- */}
+      <h1
+        style={{
+          marginTop: "18px",
+          color: "#00b7ff",
+          fontSize: "1.4rem",
+          fontWeight: "700",
+        }}
+      >
+        Products
+      </h1>
 
-      {/* PRODUCTS */}
-      <h1 style={{ marginTop: "16px", color: "#00b7ff" }}>Products</h1>
-
-      <div style={{ display: "grid", gap: "1rem" }}>
-        {filtered.map((p) => (
-          <ProductCard key={p.id} product={p} />
+      <div
+        style={{
+          display: "grid",
+          gap: "0.9rem",
+          gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))",
+          marginBottom: "40px",
+        }}
+      >
+        {filtered.map((product) => (
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
     </main>
   );
-        }
+}
   
