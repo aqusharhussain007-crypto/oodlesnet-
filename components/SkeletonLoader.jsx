@@ -1,42 +1,22 @@
-export default function SkeletonLoader() {
-  return (
-    <div className="animate-pulse space-y-4">
-
-      {/* Search Bar Skeleton */}
-      <div className="w-full h-12 rounded-xl bg-gradient-to-r from-[#00c3ff33] to-[#00ff9933] shimmer" />
-
-      {/* Trending Skeleton */}
-      <div className="mt-4 h-6 w-40 rounded-md bg-gradient-to-r from-[#00c3ff33] to-[#00ff9933] shimmer" />
-      <div className="flex gap-4 mt-2 overflow-hidden">
-        {[1,2,3].map(i => (
-          <div key={i} className="w-28 h-20 rounded-xl bg-gradient-to-r from-[#00c3ff33] to-[#00ff9933] shimmer" />
-        ))}
-      </div>
-
-      {/* Category Skeleton */}
-      <div className="mt-4 h-6 w-36 rounded-md bg-gradient-to-r from-[#00c3ff33] to-[#00ff9933] shimmer" />
-      <div className="flex gap-4 mt-2 overflow-x-auto pb-2">
-        {[1,2,3,4].map(i => (
+export default function SkeletonLoader({ type }) {
+  if (type === "trending") {
+    return (
+      <div className="flex gap-3 overflow-x-auto no-scrollbar px-1 pb-2">
+        {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="w-20 h-20 rounded-2xl bg-gradient-to-r from-[#00c3ff33] to-[#00ff9933] shimmer"
-          />
+            className="min-w-[120px] h-[150px] bg-gray-200 shimmer rounded-xl"
+          ></div>
         ))}
       </div>
+    );
+  }
 
-      {/* Banner Skeleton */}
-      <div className="w-full h-32 rounded-xl bg-gradient-to-r from-[#00c3ff33] to-[#00ff9933] shimmer" />
+  if (type === "product") {
+    return (
+      <div className="w-full bg-gray-200 shimmer rounded-xl h-[260px] mb-4"></div>
+    );
+  }
 
-      {/* Product Grid Skeleton */}
-      <div className="grid grid-cols-2 gap-3 mt-4">
-        {[1,2,3,4].map(i => (
-          <div
-            key={i}
-            className="h-48 rounded-xl bg-gradient-to-r from-[#00c3ff33] to-[#00ff9933] shimmer"
-          />
-        ))}
-      </div>
-
-    </div>
-  );
-      }
+  return null;
+}
