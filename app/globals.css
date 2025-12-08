@@ -265,3 +265,14 @@ html, body {
   .price-card { min-width: 33%; max-width: 33%; } /* show more on desktop */
   }
            
+/* BLUE → GREEN SHIMMER EFFECT */
+.shimmer {
+  background-size: 200% 100%;
+  animation: shimmerMove 1.6s linear infinite;
+}
+
+@keyframes shimmerMove {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+              }
+               
