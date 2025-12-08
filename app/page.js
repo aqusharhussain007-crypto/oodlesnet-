@@ -7,23 +7,6 @@ import { collection, getDocs } from "firebase/firestore";
 import BannerAd from "@/components/ads/BannerAd";
 import Image from "next/image";
 
-/* -------------------------------------------
-   ⭐ Skeleton Shimmer Component
--------------------------------------------- */
-function SkeletonCard() {
-  return (
-    <div
-      style={{
-        minWidth: "120px",
-        height: "160px",
-        background: "linear-gradient(90deg,#e6f7ff 0%,#f0fbff 50%,#e6f7ff 100%)",
-        borderRadius: "14px",
-        animation: "shimmer 1.4s infinite linear",
-      }}
-    ></div>
-  );
-}
-
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -31,20 +14,26 @@ export default function Home() {
   const [ads, setAds] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCat, setSelectedCat] = useState("all");
+
   const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
+
   const [loading, setLoading] = useState(true);
 
-  /* ---------------- LOAD PRODUCTS ---------------- */
+  /* ------------------------------------
+        LOAD PRODUCTS + TRENDING
+  ------------------------------------ */
   useEffect(() => {
     async function loadProducts() {
+      setLoading(true);
+
       const snap = await getDocs(collection(db, "products"));
       const items = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
       setProducts(items);
       setFiltered(items);
 
-      // Trending = highest impressions
+      // trending = highest impressions
       const sorted = [...items]
         .sort((a, b) => (b.impressions || 0) - (a.impressions || 0))
         .slice(0, 10);
@@ -55,7 +44,9 @@ export default function Home() {
     loadProducts();
   }, []);
 
-  /* ---------------- LOAD ADS ---------------- */
+  /* ------------------------------------
+               LOAD ADS
+  ------------------------------------ */
   useEffect(() => {
     async function loadAds() {
       const snap = await getDocs(collection(db, "ads"));
@@ -65,7 +56,9 @@ export default function Home() {
     loadAds();
   }, []);
 
-  /* ---------------- LOAD CATEGORIES ---------------- */
+  /* ------------------------------------
+           LOAD CATEGORIES
+  ------------------------------------ */
   useEffect(() => {
     async function loadCats() {
       const snap = await getDocs(collection(db, "categories"));
@@ -75,35 +68,46 @@ export default function Home() {
     loadCats();
   }, []);
 
-  /* ---------------- RECENTLY VIEWED ---------------- */
+  /* ------------------------------------
+           LOAD RECENTLY VIEWED
+  ------------------------------------ */
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const data = JSON.parse(localStorage.getItem("recent") || "[]");
     setRecent(data);
   }, []);
 
-  /* ---------------- CATEGORY FILTER ---------------- */
+  /* ------------------------------------
+          CATEGORY FILTER
+  ------------------------------------ */
   function filterByCategory(slug) {
     setSelectedCat(slug);
 
-    if (slug === "all") {
-      setFiltered(products);
-      return;
-    }
+    if (slug === "all") return setFiltered(products);
     setFiltered(products.filter((p) => p.categorySlug === slug));
   }
 
-  /* ---------------- VOICE SEARCH ---------------- */
+  /* ------------------------------------
+            VOICE SEARCH
+  ------------------------------------ */
   function startVoiceSearch() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return alert("Voice search not supported.");
 
     const recog = new SR();
     recog.lang = "en-IN";
-    recog.onresult = (e) => setSearch(e.results[0][0].transcript);
+
+    recog.onresult = (e) => {
+      setSearch(e.results[0][0].transcript);
+    };
+
     recog.start();
   }
 
-  /* ---------------- TEXT SEARCH ---------------- */
+  /* ------------------------------------
+            TEXT SEARCH
+  ------------------------------------ */
   useEffect(() => {
     if (!search) {
       setFiltered(products);
@@ -117,30 +121,14 @@ export default function Home() {
     setFiltered(match);
   }, [search, products]);
 
-  /* ---------------- ICON BUTTON STYLE ---------------- */
-  const iconButton = {
-    width: "42px",
-    height: "42px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: "12px",
-    background: "rgba(0,200,255,0.75)",
-    boxShadow: "0 0 10px rgba(0,200,255,0.7)",
-  };
-
-  /* ===========================================================
-            UI STARTS HERE
-  =========================================================== */
-
+  /* ------------------------------------
+               UI STARTS
+  ------------------------------------ */
   return (
     <main className="page-container">
-
-      {/* ---------------- SEARCH BAR ---------------- */}
-      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "12px" }}>
-        
-        {/* SEARCH INPUT */}
-        <div style={{ position: "relative", flex: 1 }}>
+      {/* -------------------------------- SEARCH BAR ------------------------------- */}
+      <div className="flex items-center gap-2 mt-3">
+        <div className="relative flex-1">
           <input
             type="text"
             placeholder="Search products..."
@@ -148,241 +136,154 @@ export default function Home() {
             onChange={(e) => setSearch(e.target.value)}
             className="search-bar"
             style={{
-              width: "100%",
               height: "46px",
-              borderRadius: "12px",
-              fontSize: "1rem",
               paddingLeft: "14px",
               paddingRight: "42px",
-              border: "2px solid #00c3ff",
-              background: "rgba(255,255,255,0.9)",
+              borderRadius: "12px",
             }}
           />
 
-          {/* SEARCH ICON (RESTORED) */}
+          {/* Search Icon */}
           <svg
             width="22"
             height="22"
             fill="#00c3ff"
             viewBox="0 0 24 24"
-            style={{
-              position: "absolute",
-              right: "10px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              pointerEvents: "none",
-            }}
+            className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
           >
             <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
           </svg>
         </div>
 
-        {/* MIC BUTTON */}
-        <button onClick={startVoiceSearch} style={iconButton}>
+        {/* Mic Button */}
+        <button
+          onClick={startVoiceSearch}
+          className="rounded-xl p-2"
+          style={{
+            width: "42px",
+            height: "42px",
+            background: "rgba(0,200,255,0.75)",
+            boxShadow: "0 0 10px rgba(0,200,255,0.7)",
+          }}
+        >
           <svg width="22" height="22" fill="white" viewBox="0 0 24 24">
             <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7zm-1 2h2v3h-2v-3z" />
           </svg>
         </button>
       </div>
 
-      {/* ---------------- BANNER ---------------- */}
+      {/* -------------------------------- BANNER ------------------------------- */}
       <div className="mt-3 px-2">
         <BannerAd ads={ads} />
       </div>
 
-/* ---------------- TRENDING TODAY ---------------- */
-<h2 className="text-xl font-bold text-blue-500 mt-5 mb-2">
-  Trending Today
-</h2>
-
-<div
-  className="flex overflow-x-auto gap-3 no-scrollbar pb-2"
-  style={{ paddingBottom: "10px" }}
->
-  {trending.length === 0 ? (
-    [...Array(5)].map((_, i) => (
-      <div
-        key={i}
-        className="shimmer"
-        style={{
-          minWidth: "120px",
-          height: "150px",
-          borderRadius: "14px",
-          background:
-            "linear-gradient(90deg, #d2f7ff, #b8f1ff, #d2f7ff)",
-        }}
-      />
-    ))
-  ) : (
-    trending.map((item) => (
-      <div
-        key={item.id}
-        onClick={() => (window.location = `/product/${item.id}`)}
-        style={{
-          minWidth: "140px",
-          maxWidth: "140px",
-          background: "white",
-          borderRadius: "14px",
-          padding: "10px",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          cursor: "pointer",
-          textAlign: "center",
-        }}
-      >
-        <Image
-          src={item.imageUrl}
-          width={120}
-          height={120}
-          alt={item.name}
-          style={{
-            borderRadius: "10px",
-            objectFit: "cover",
-          }}
-        />
-        <p
-          style={{
-            fontSize: "0.85rem",
-            marginTop: "4px",
-            fontWeight: 600,
-            color: "#0077aa",
-          }}
-        >
-          {item.name}
-        </p>
-      </div>
-    ))
-  )}
-</div>
-
-{/* ---------------- RECENTLY VIEWED ---------------- */}
-{recent.length > 0 && (
-  <div className="mt-6">
-    <h2 className="text-xl font-bold text-blue-500 mb-2">
-      Recently Viewed
-    </h2>
-
-    <div className="flex overflow-x-auto gap-3 no-scrollbar pb-1">
-      {recent.map((item) => (
-        <div
-          key={item.id}
-          onClick={() => (window.location = `/product/${item.id}`)}
-          className="
-            min-w-[120px] 
-            bg-white 
-            rounded-xl 
-            p-2 
-            shadow-md 
-            cursor-pointer 
-            text-center
-          "
-        >
-          <Image
-            src={item.imageUrl}
-            width={120}
-            height={120}
-            alt={item.name}
-            className="rounded-lg object-cover"
-          />
-
-          <p className="text-[13px] mt-1 font-semibold text-[#0077aa] truncate">
-            {item.name}
-          </p>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
-
-      {/* ---------------- CATEGORIES ---------------- */}
+      {/* -------------------------------- TRENDING TODAY ------------------------------- */}
       <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">
-        Categories
+        Trending Today
       </h2>
 
-      <div
-        style={{
-          display: "flex",
-          overflowX: "auto",
-          gap: "12px",
-          whiteSpace: "nowrap",
-          paddingBottom: "8px",
-        }}
-      >
-        {/* ALL category */}
-        <div
-          onClick={() => filterByCategory("all")}
-          style={{
-            minWidth: "120px",
-            background:
-              selectedCat === "all"
-                ? "rgba(0,195,255,0.15)"
-                : "rgba(255,255,255,0.7)",
-            border:
-              selectedCat === "all"
-                ? "2px solid #00c3ff"
-                : "2px solid #aacbe3",
-            borderRadius: "14px",
-            textAlign: "center",
-            padding: "10px",
-            cursor: "pointer",
-          }}
-        >
-          <strong style={{ color: "#0088cc" }}>All</strong>
-        </div>
-
-        {categories.map((c) => (
+      <div className="flex overflow-x-auto gap-3 no-scrollbar pb-2">
+        {trending.map((item) => (
           <div
-            key={c.id}
-            onClick={() => filterByCategory(c.slug)}
-            style={{
-              minWidth: "120px",
-              background:
-                selectedCat === c.slug
-                  ? "rgba(0,195,255,0.15)"
-                  : "rgba(255,255,255,0.7)",
-              border:
-                selectedCat === c.slug
-                  ? "2px solid #00c3ff"
-                  : "2px solid #aacbe3",
-              borderRadius: "14px",
-              textAlign: "center",
-              padding: "10px",
-              cursor: "pointer",
-            }}
+            key={item.id}
+            onClick={() => (window.location = `/product/${item.id}`)}
+            className="min-w-[120px] bg-white rounded-xl p-2 shadow cursor-pointer text-center"
           >
-            <div style={{ fontSize: "28px" }}>{c.icon}</div>
-            <div style={{ marginTop: "4px", color: "#0088cc", fontWeight: 600 }}>
-              {c.name}
-            </div>
+            <Image
+              src={item.imageUrl}
+              width={120}
+              height={120}
+              alt={item.name}
+              className="rounded-md object-cover"
+            />
+            <p className="text-[0.85rem] mt-1 font-semibold text-blue-700">
+              {item.name}
+            </p>
           </div>
         ))}
       </div>
 
-      {/* ---------------- PRODUCT GRID ---------------- */}
-      <h1
-        style={{
-          marginTop: "18px",
-          color: "#00b7ff",
-          fontSize: "1.4rem",
-          fontWeight: "700",
-        }}
-      >
-        Products
-      </h1>
+      {/* -------------------------------- RECENTLY VIEWED ------------------------------- */}
+      {recent.length > 0 && (
+        <>
+          <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">
+            Recently Viewed
+          </h2>
 
-      <div
-        style={{
-          display: "grid",
-          gap: "0.9rem",
-          gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))",
-          marginBottom: "40px",
-        }}
-      >
-        {loading
-          ? [...Array(8)].map((_, i) => <SkeletonCard key={i} />)
-          : filtered.map((product) => (
-              <ProductCard key={product.id} product={product} />
+          <div className="flex overflow-x-auto gap-3 no-scrollbar pb-2">
+            {recent.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => (window.location = `/product/${item.id}`)}
+                className="min-w-[120px] bg-white rounded-xl p-2 shadow cursor-pointer text-center"
+              >
+                <Image
+                  src={item.imageUrl}
+                  width={120}
+                  height={120}
+                  alt={item.name}
+                  className="rounded-md object-cover"
+                />
+                <p className="text-[0.85rem] mt-1 font-semibold text-blue-700">
+                  {item.name}
+                </p>
+              </div>
             ))}
+          </div>
+        </>
+      )}
+
+      {/* -------------------------------- CATEGORIES ------------------------------- */}
+      <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">
+        Categories
+      </h2>
+
+      <div className="flex overflow-x-auto no-scrollbar gap-3 pb-3">
+        {/* ALL */}
+        <div
+          onClick={() => filterByCategory("all")}
+          className="min-w-[120px] bg-white border rounded-xl p-3 cursor-pointer text-center"
+          style={{
+            borderColor:
+              selectedCat === "all" ? "#00c3ff" : "rgba(0,0,0,0.15)",
+            background:
+              selectedCat === "all"
+                ? "rgba(0,195,255,0.15)"
+                : "rgba(255,255,255,0.7)",
+          }}
+        >
+          <strong className="text-blue-600">All</strong>
+        </div>
+
+        {categories.map((cat) => (
+          <div
+            key={cat.id}
+            onClick={() => filterByCategory(cat.slug)}
+            className="min-w-[120px] bg-white border rounded-xl p-3 cursor-pointer text-center"
+            style={{
+              borderColor:
+                selectedCat === cat.slug ? "#00c3ff" : "rgba(0,0,0,0.15)",
+              background:
+                selectedCat === cat.slug
+                  ? "rgba(0,195,255,0.15)"
+                  : "rgba(255,255,255,0.7)",
+            }}
+          >
+            <div className="text-3xl">{cat.icon}</div>
+            <div className="mt-1 text-blue-600 font-semibold">{cat.name}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* -------------------------------- PRODUCT GRID ------------------------------- */}
+      <h1 className="mt-6 text-blue-500 text-xl font-bold">Products</h1>
+
+      <div className="grid gap-4 mb-10">
+        {filtered.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
       </div>
     </main>
   );
-}
+  }
+       
