@@ -1,354 +1,227 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
-import BannerAd from "@/components/ads/BannerAd";
-
 import { db } from "@/lib/firebase-app";
-import { collection, getDocs, updateDoc, doc, increment } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
+import BannerAd from "@/components/ads/BannerAd";
+import SkeletonLoader from "@/components/SkeletonLoader";
 
 export default function Home() {
-  const router = useRouter();
-
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
-
   const [search, setSearch] = useState("");
-  const [categories, setCategories] = useState([]);
-  const [selectedCat, setSelectedCat] = useState("all");
   const [ads, setAds] = useState([]);
-
+  const [categories, setCategories] = useState([]);
   const [trending, setTrending] = useState([]);
+  const [selectedCat, setSelectedCat] = useState("all");
 
-  /* -----------------------------------------------------------
-     LOAD PRODUCTS
-  ----------------------------------------------------------- */
+  const [loading, setLoading] = useState(true);
+
+  // 🔵 Load all data first → then hide skeleton
   useEffect(() => {
-    async function load() {
-      const snap = await getDocs(collection(db, "products"));
-      const items = snap.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setProducts(items);
-      setFiltered(items);
+    async function loadAll() {
+      try {
+        const prodSnap = await getDocs(collection(db, "products"));
+        const productsData = prodSnap.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
-      // sort trending by views
-      setTrending([...items].sort((a, b) => (b.views || 0) - (a.views || 0)));
+        const adSnap = await getDocs(collection(db, "ads"));
+        const adData = adSnap.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        const catSnap = await getDocs(collection(db, "categories"));
+        const catData = catSnap.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        const trendSnap = await getDocs(collection(db, "trending"));
+        const trendData = trendSnap.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setProducts(productsData);
+        setFiltered(productsData);
+        setAds(adData);
+        setCategories(catData);
+        setTrending(trendData);
+
+        setLoading(false);
+      } catch (err) {
+        console.log("LOAD ERROR:", err);
+      }
     }
-    load();
+
+    loadAll();
   }, []);
 
-  /* -----------------------------------------------------------
-     LOAD CATEGORIES
-  ----------------------------------------------------------- */
-  useEffect(() => {
-    async function loadCategories() {
-      const snap = await getDocs(collection(db, "categories"));
-      const arr = snap.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setCategories(arr);
-    }
-    loadCategories();
-  }, []);
-
-  /* -----------------------------------------------------------
-     LOAD ADS
-  ----------------------------------------------------------- */
-  useEffect(() => {
-    async function loadAds() {
-      const snap = await getDocs(collection(db, "ads"));
-      const arr = snap.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setAds(arr);
-    }
-    loadAds();
-  }, []);
-
-  /* -----------------------------------------------------------
-     CATEGORY FILTER
-  ----------------------------------------------------------- */
-  function filterByCategory(slug) {
-    setSelectedCat(slug);
-
-    if (slug === "all") {
-      setFiltered(products);
-      return;
-    }
-
-    setFiltered(products.filter(p => p.categorySlug === slug));
-  }
-
-  /* -----------------------------------------------------------
-     SEARCH
-  ----------------------------------------------------------- */
+  // 🔍 Search Filter
   useEffect(() => {
     if (!search) {
       setFiltered(products);
       return;
     }
-    const match = products.filter(p =>
-      p.name.toLowerCase().includes(search.toLowerCase())
+    setFiltered(
+      products.filter((p) =>
+        p.name.toLowerCase().includes(search.toLowerCase())
+      )
     );
-    setFiltered(match);
   }, [search, products]);
 
-  /* -----------------------------------------------------------
-     AUTO-SCROLL TRENDING (smooth)
-  ----------------------------------------------------------- */
-  useEffect(() => {
-    const slider = document.getElementById("trendingSlider");
-    if (!slider) return;
+  // Category Filter
+  function filterByCategory(slug) {
+    setSelectedCat(slug);
+    if (slug === "all") return setFiltered(products);
+    setFiltered(products.filter(p => p.categorySlug === slug));
+  }
 
-    let pos = 0;
-
-    const interval = setInterval(() => {
-      if (!slider) return;
-
-      pos += 160; // scroll step
-      if (pos >= slider.scrollWidth) pos = 0;
-
-      slider.scrollTo({
-        left: pos,
-        behavior: "smooth",
-      });
-    }, 2600);
-
-    return () => clearInterval(interval);
-  }, [trending]);
-
-  /* -----------------------------------------------------------
-     MIC BUTTON STYLE
-  ----------------------------------------------------------- */
-  const iconButtonStyle = {
-    width: "46px",
-    height: "46px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: "12px",
-    background: "#00c3ff",
-    boxShadow: "0 0 12px rgba(0,195,255,0.6)",
-  };
+  if (loading) {
+    return (
+      <main className="page-container">
+        <SkeletonLoader />
+      </main>
+    );
+  }
 
   return (
     <main className="page-container">
 
-      {/* ----------------------------------------------------
-          SEARCH ROW
-      ---------------------------------------------------- */}
-      <div style={{ display: "flex", gap: "8px", marginTop: "14px" }}>
-        <div style={{ position: "relative", flex: 1 }}>
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="search-bar"
-            style={{
-              width: "100%",
-              height: "48px",
-              borderRadius: "14px",
-              paddingLeft: "16px",
-              paddingRight: "40px",
-              fontSize: "1rem",
-              border: "2px solid #00c3ff",
-              background: "white",
-            }}
-          />
-
-          {/* Search icon A */}
-          <div
-            style={{
-              position: "absolute",
-              right: "12px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              pointerEvents: "none",
-            }}
-          >
-            <svg width="26" height="26" fill="#00c3ff" viewBox="0 0 24 24">
-              <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707-1.414 1.414-4.707-4.707A8 8 0 0010 2z" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Mic Icon D */}
-        <button style={iconButtonStyle}>
-          <svg width="26" height="26" fill="#fff" viewBox="0 0 24 24">
-            <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3z" />
-          </svg>
-        </button>
-      </div>
-
-      {/* ----------------------------------------------------
-          BANNER
-      ---------------------------------------------------- */}
-      <div className="px-3 mt-2">
-        <BannerAd ads={ads} />
-      </div>
-
-      {/* ----------------------------------------------------
-          🔥 TRENDING TODAY (AUTO SCROLL + TAPPABLE)
-      ---------------------------------------------------- */}
-      {trending.length > 0 && (
-        <div style={{ marginTop: "20px" }}>
-          <h2
-            style={{
-              fontSize: "1.6rem",
-              fontWeight: "700",
-              color: "#00aaff",
-              marginBottom: "12px",
-              paddingLeft: "12px",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
-          >
-            <span>🔥</span> Trending Today
-          </h2>
-
-          <div
-            id="trendingSlider"
-            style={{
-              display: "flex",
-              overflowX: "auto",
-              gap: "14px",
-              padding: "0 12px",
-              scrollSnapType: "x mandatory",
-            }}
-          >
-            {trending.map(item => (
-              <div
-                key={item.id}
-                onClick={() => router.push(`/product/${item.id}`)}
-                style={{
-                  minWidth: "150px",
-                  scrollSnapAlign: "start",
-                  background: "linear-gradient(145deg, #e8ffff, #d7f7ff)",
-                  borderRadius: "14px",
-                  padding: "10px",
-                  boxShadow: "0 3px 10px rgba(0, 200, 255, 0.25)",
-                  cursor: "pointer",
-                }}
-              >
-                <img
-                  src={item.imageUrl}
-                  style={{
-                    width: "100%",
-                    height: "90px",
-                    borderRadius: "10px",
-                    objectFit: "cover",
-                  }}
-                />
-                <div
-                  style={{
-                    marginTop: "8px",
-                    fontWeight: "600",
-                    fontSize: "0.9rem",
-                    color: "#0088cc",
-                  }}
-                >
-                  {item.name}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ----------------------------------------------------
-          CATEGORY ROW
-      ---------------------------------------------------- */}
-      <div
-        style={{
-          display: "flex",
-          overflowX: "auto",
-          gap: "12px",
-          padding: "18px 8px",
-          marginTop: "10px",
-        }}
-      >
-        {/* All Category */}
-        <div
-          onClick={() => filterByCategory("all")}
+      {/* SEARCH BAR */}
+      <div style={{ position: "relative", width: "100%", marginBottom: "12px" }}>
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="search-bar"
           style={{
-            minWidth: "110px",
-            padding: "12px",
-            borderRadius: "14px",
-            border: selectedCat === "all"
-              ? "3px solid #00c3ff"
-              : "2px solid #aacbe3",
-            background: selectedCat === "all"
-              ? "rgba(0,195,255,0.15)"
-              : "white",
-            textAlign: "center",
-            cursor: "pointer",
+            width: "100%",
+            height: "46px",
+            borderRadius: "12px",
+            paddingLeft: "12px",
+            paddingRight: "40px",
+            border: "2px solid #00c3ff",
+            background: "rgba(255,255,255,0.85)",
+          }}
+        />
+
+        {/* ICON INSIDE */}
+        <div
+          style={{
+            position: "absolute",
+            right: "12px",
+            top: "50%",
+            transform: "translateY(-50%)",
           }}
         >
-          <strong style={{ color: "#009fe3" }}>All</strong>
+          🔍
         </div>
+      </div>
 
-        {/* Dynamic categories */}
-        {categories.map(cat => (
+      {/* TRENDING SECTION */}
+      <h2 className="text-lg font-bold mb-1" style={{ color: "#00b7ff" }}>
+        Trending Today
+      </h2>
+
+      <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+        {trending.map((t) => (
           <div
-            key={cat.id}
-            onClick={() => filterByCategory(cat.slug)}
+            key={t.id}
             style={{
               minWidth: "110px",
-              padding: "12px",
-              borderRadius: "14px",
-              border: selectedCat === cat.slug
-                ? "3px solid #00c3ff"
-                : "2px solid #aacbe3",
-              background: selectedCat === cat.slug
-                ? "rgba(0,195,255,0.15)"
-                : "white",
+              padding: "10px",
+              background: "white",
+              borderRadius: "12px",
               textAlign: "center",
-              cursor: "pointer",
+              boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
             }}
           >
-            <div style={{ fontSize: "22px" }}>{cat.icon}</div>
-            <div
-              style={{
-                marginTop: "4px",
-                color: "#0088cc",
-                fontWeight: 600,
-                fontSize: "0.9rem",
-              }}
-            >
-              {cat.name}
+            <img
+              src={t.imageUrl}
+              style={{ width: "70px", height: "70px", borderRadius: "8px" }}
+            />
+            <div style={{ marginTop: "4px", fontSize: "0.85rem", color: "#006699" }}>
+              {t.name}
             </div>
           </div>
         ))}
       </div>
 
-      {/* ----------------------------------------------------
-          PRODUCTS
-      ---------------------------------------------------- */}
-      <h1 style={{ marginTop: "12px", color: "#00b7ff" }}>Products</h1>
+      {/* CATEGORIES */}
+      <h2 className="text-lg font-bold mt-4 mb-2" style={{ color: "#00b7ff" }}>
+        Categories
+      </h2>
 
       <div
         style={{
           display: "flex",
-          flexDirection: "column",
-          gap: "16px",
-          paddingBottom: "30px",
+          overflowX: "auto",
+          gap: "12px",
+          paddingBottom: "8px",
         }}
       >
-        {filtered.map(product => (
-          <ProductCard
-            key={product.id}
-            product={product}
-          />
+        {/* ALL */}
+        <div
+          onClick={() => filterByCategory("all")}
+          style={{
+            minWidth: "90px",
+            background: selectedCat === "all" ? "#e0faff" : "white",
+            border: "2px solid #a0dfff",
+            borderRadius: "12px",
+            textAlign: "center",
+            padding: "10px",
+          }}
+        >
+          <strong>All</strong>
+        </div>
+
+        {/* CATEGORY CARDS */}
+        {categories.map((cat) => (
+          <div
+            key={cat.id}
+            onClick={() => filterByCategory(cat.slug)}
+            style={{
+              minWidth: "90px",
+              background: selectedCat === cat.slug ? "#e0faff" : "white",
+              border: "2px solid #a0dfff",
+              borderRadius: "12px",
+              textAlign: "center",
+              padding: "10px",
+            }}
+          >
+            <div style={{ fontSize: "26px" }}>{cat.icon}</div>
+            <strong>{cat.name}</strong>
+          </div>
+        ))}
+      </div>
+
+      {/* BANNER */}
+      <div className="mt-2 mb-4">
+        <BannerAd ads={ads} />
+      </div>
+
+      {/* PRODUCTS */}
+      <h1 style={{ marginTop: "16px", color: "#00b7ff" }}>Products</h1>
+
+      <div
+        style={{
+          display: "grid",
+          gap: "12px",
+          gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+        }}
+      >
+        {filtered.map((product) => (
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
 
     </main>
   );
-}
+            }
+      
