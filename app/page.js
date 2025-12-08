@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ProductCard from "@/components/ProductCard";
 import { db } from "@/lib/firebase-app";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import BannerAd from "@/components/ads/BannerAd";
-import SkeletonLoader from "@/components/SkeletonLoader";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -13,215 +12,261 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [ads, setAds] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [trending, setTrending] = useState([]);
   const [selectedCat, setSelectedCat] = useState("all");
+  const [trending, setTrending] = useState([]);
 
-  const [loading, setLoading] = useState(true);
+  const sliderRef = useRef(null);
 
-  // 🔵 Load all data first → then hide skeleton
+  // 🚀 Infinite slider speed
+  const SLIDE_SPEED = 0.6; // Smaller = faster
+
   useEffect(() => {
-    async function loadAll() {
-      try {
-        const prodSnap = await getDocs(collection(db, "products"));
-        const productsData = prodSnap.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+    const slider = sliderRef.current;
+    if (!slider) return;
 
-        const adSnap = await getDocs(collection(db, "ads"));
-        const adData = adSnap.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+    let scrollAmount = 0;
 
-        const catSnap = await getDocs(collection(db, "categories"));
-        const catData = catSnap.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+    function autoScroll() {
+      if (!slider) return;
 
-        const trendSnap = await getDocs(collection(db, "trending"));
-        const trendData = trendSnap.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+      scrollAmount += SLIDE_SPEED;
+      slider.scrollLeft = scrollAmount;
 
-        setProducts(productsData);
-        setFiltered(productsData);
-        setAds(adData);
-        setCategories(catData);
-        setTrending(trendData);
-
-        setLoading(false);
-      } catch (err) {
-        console.log("LOAD ERROR:", err);
+      if (scrollAmount >= slider.scrollWidth / 2) {
+        scrollAmount = 0;
+        slider.scrollLeft = 0;
       }
+
+      requestAnimationFrame(autoScroll);
     }
 
-    loadAll();
+    autoScroll();
   }, []);
 
-  // 🔍 Search Filter
+  // Fetch Products
+  useEffect(() => {
+    async function loadProducts() {
+      const snap = await getDocs(collection(db, "products"));
+      const items = snap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setProducts(items);
+      setFiltered(items);
+
+      // 🔥 Sort trending (high views first)
+      const trendingSorted = [...items]
+        .filter((p) => p.views !== undefined)
+        .sort((a, b) => b.views - a.views);
+
+      setTrending(trendingSorted);
+    }
+    loadProducts();
+  }, []);
+
+  // Fetch Ads
+  useEffect(() => {
+    async function loadAds() {
+      const snap = await getDocs(collection(db, "ads"));
+      const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setAds(items);
+    }
+    loadAds();
+  }, []);
+
+  // Fetch Categories
+  useEffect(() => {
+    async function loadCategories() {
+      const snap = await getDocs(collection(db, "categories"));
+      const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setCategories(items);
+    }
+    loadCategories();
+  }, []);
+
+  // Category Filter
+  function filterByCategory(slug) {
+    setSelectedCat(slug);
+
+    if (slug === "all") {
+      setFiltered(products);
+    } else {
+      setFiltered(products.filter((p) => p.categorySlug === slug));
+    }
+  }
+
+  // Search Logic
   useEffect(() => {
     if (!search) {
       setFiltered(products);
       return;
     }
-    setFiltered(
-      products.filter((p) =>
-        p.name.toLowerCase().includes(search.toLowerCase())
-      )
+
+    const results = products.filter((p) =>
+      p.name.toLowerCase().includes(search.toLowerCase())
     );
+    setFiltered(results);
   }, [search, products]);
 
-  // Category Filter
-  function filterByCategory(slug) {
-    setSelectedCat(slug);
-    if (slug === "all") return setFiltered(products);
-    setFiltered(products.filter(p => p.categorySlug === slug));
-  }
-
-  if (loading) {
-    return (
-      <main className="page-container">
-        <SkeletonLoader />
-      </main>
-    );
-  }
+  // Mic Button Style
+  const iconButton = {
+    width: "45px",
+    height: "45px",
+    borderRadius: "12px",
+    background: "rgba(0,200,255,0.8)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    boxShadow: "0 0 10px rgba(0,200,255,0.7)",
+  };
 
   return (
     <main className="page-container">
 
-      {/* SEARCH BAR */}
-      <div style={{ position: "relative", width: "100%", marginBottom: "12px" }}>
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="search-bar"
-          style={{
-            width: "100%",
-            height: "46px",
-            borderRadius: "12px",
-            paddingLeft: "12px",
-            paddingRight: "40px",
-            border: "2px solid #00c3ff",
-            background: "rgba(255,255,255,0.85)",
-          }}
-        />
-
-        {/* ICON INSIDE */}
-        <div
-          style={{
-            position: "absolute",
-            right: "12px",
-            top: "50%",
-            transform: "translateY(-50%)",
-          }}
-        >
-          🔍
-        </div>
-      </div>
-
-      {/* TRENDING SECTION */}
-      <h2 className="text-lg font-bold mb-1" style={{ color: "#00b7ff" }}>
-        Trending Today
-      </h2>
-
-      <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
-        {trending.map((t) => (
-          <div
-            key={t.id}
+      {/* 🔍 SEARCH BAR */}
+      <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
+        <div style={{ position: "relative", flex: 1 }}>
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="search-bar"
             style={{
-              minWidth: "110px",
-              padding: "10px",
-              background: "white",
-              borderRadius: "12px",
-              textAlign: "center",
-              boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+              width: "100%",
+              height: "50px",
+              borderRadius: "14px",
+              paddingLeft: "14px",
+              paddingRight: "40px",
+              fontSize: "1rem",
+              border: "2px solid #00c3ff",
+            }}
+          />
+
+          {/* Correct Search Icon A */}
+          <div
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              pointerEvents: "none",
             }}
           >
-            <img
-              src={t.imageUrl}
-              style={{ width: "70px", height: "70px", borderRadius: "8px" }}
-            />
-            <div style={{ marginTop: "4px", fontSize: "0.85rem", color: "#006699" }}>
-              {t.name}
+            🔍
+          </div>
+        </div>
+
+        {/* Mic Icon D */}
+        <div style={iconButton}>🎤</div>
+      </div>
+
+      {/* 🔥 TRENDING SLIDER (Infinite Loop) */}
+      <h2 style={{ marginTop: "18px", color: "#00b7ff" }}>🔥 Trending Today</h2>
+
+      <div
+        ref={sliderRef}
+        style={{
+          display: "flex",
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+          gap: "12px",
+          padding: "10px 4px",
+        }}
+      >
+        {[...trending, ...trending].map((item, index) => (
+          <div
+            key={index}
+            style={{
+              minWidth: "260px",
+              borderRadius: "14px",
+              padding: "12px",
+              background: "linear-gradient(135deg,#e0fff7,#e6f7ff)",
+              boxShadow: "0 4px 12px rgba(0,195,255,0.3)",
+              cursor: "pointer",
+            }}
+          >
+            <div style={{ fontWeight: 600, fontSize: "1.0rem" }}>
+              {item.name}
+            </div>
+            <div style={{ fontSize: "0.9rem", opacity: 0.7 }}>
+              Views: {item.views}
             </div>
           </div>
         ))}
       </div>
 
       {/* CATEGORIES */}
-      <h2 className="text-lg font-bold mt-4 mb-2" style={{ color: "#00b7ff" }}>
-        Categories
-      </h2>
+      <h2 style={{ marginTop: "10px", color: "#00b7ff" }}>Categories</h2>
 
       <div
         style={{
           display: "flex",
           overflowX: "auto",
           gap: "12px",
-          paddingBottom: "8px",
+          padding: "8px 0",
         }}
       >
-        {/* ALL */}
         <div
           onClick={() => filterByCategory("all")}
           style={{
-            minWidth: "90px",
-            background: selectedCat === "all" ? "#e0faff" : "white",
-            border: "2px solid #a0dfff",
-            borderRadius: "12px",
+            minWidth: "110px",
+            borderRadius: "14px",
+            padding: "12px",
             textAlign: "center",
-            padding: "10px",
+            cursor: "pointer",
+            background:
+              selectedCat === "all"
+                ? "rgba(0,195,255,0.15)"
+                : "rgba(255,255,255,0.7)",
+            border:
+              selectedCat === "all"
+                ? "2px solid #00c3ff"
+                : "2px solid #bbddee",
           }}
         >
-          <strong>All</strong>
+          All
         </div>
 
-        {/* CATEGORY CARDS */}
         {categories.map((cat) => (
           <div
             key={cat.id}
             onClick={() => filterByCategory(cat.slug)}
             style={{
-              minWidth: "90px",
-              background: selectedCat === cat.slug ? "#e0faff" : "white",
-              border: "2px solid #a0dfff",
-              borderRadius: "12px",
+              minWidth: "110px",
+              borderRadius: "14px",
+              padding: "12px",
               textAlign: "center",
-              padding: "10px",
+              cursor: "pointer",
+              background:
+                selectedCat === cat.slug
+                  ? "rgba(0,195,255,0.15)"
+                  : "rgba(255,255,255,0.7)",
+              border:
+                selectedCat === cat.slug
+                  ? "2px solid #00c3ff"
+                  : "2px solid #bbddee",
             }}
           >
-            <div style={{ fontSize: "26px" }}>{cat.icon}</div>
-            <strong>{cat.name}</strong>
+            <div style={{ fontSize: "22px" }}>{cat.icon}</div>
+            <div style={{ marginTop: "4px" }}>{cat.name}</div>
           </div>
         ))}
       </div>
 
-      {/* BANNER */}
-      <div className="mt-2 mb-4">
-        <BannerAd ads={ads} />
-      </div>
+      {/* ADS */}
+      <BannerAd ads={ads} />
 
       {/* PRODUCTS */}
       <h1 style={{ marginTop: "16px", color: "#00b7ff" }}>Products</h1>
 
-      <div
-        style={{
-          display: "grid",
-          gap: "12px",
-          gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
-        }}
-      >
-        {filtered.map((product) => (
-          <ProductCard key={product.id} product={product} />
+      <div style={{ display: "grid", gap: "1rem" }}>
+        {filtered.map((p) => (
+          <ProductCard key={p.id} product={p} />
         ))}
       </div>
-
     </main>
   );
-            }
-      
+        }
+  
