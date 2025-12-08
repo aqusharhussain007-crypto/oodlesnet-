@@ -377,14 +377,3 @@ export default function Home() {
     </main>
   );
 }
-
-/* ---------------- SHIMMER CSS ---------------- */
-const shimmerStyle = document.createElement("style");
-shimmerStyle.innerHTML = `
-@keyframes shimmer {
-  0% { background-position: -200px 0; }
-  100% { background-position: 200px 0; }
-}
-`;
-document.head.appendChild(shimmerStyle);
-      
