@@ -255,52 +255,42 @@ export default function Home() {
 </div>
 
 {/* ---------------- RECENTLY VIEWED ---------------- */}
-{typeof window !== "undefined" && recent.length > 0 && (
-  <>
-    <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">
+{recent.length > 0 && (
+  <div className="mt-6">
+    <h2 className="text-xl font-bold text-blue-500 mb-2">
       Recently Viewed
     </h2>
 
-    <div className="flex overflow-x-auto gap-3 no-scrollbar pb-2">
+    <div className="flex overflow-x-auto gap-3 no-scrollbar pb-1">
       {recent.map((item) => (
         <div
           key={item.id}
           onClick={() => (window.location = `/product/${item.id}`)}
-          style={{
-            minWidth: "140px",
-            maxWidth: "140px",
-            background: "white",
-            borderRadius: "14px",
-            padding: "10px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-            cursor: "pointer",
-            textAlign: "center",
-          }}
+          className="
+            min-w-[120px] 
+            bg-white 
+            rounded-xl 
+            p-2 
+            shadow-md 
+            cursor-pointer 
+            text-center
+          "
         >
           <Image
             src={item.imageUrl}
             width={120}
             height={120}
             alt={item.name}
-            style={{
-              borderRadius: "10px",
-              objectFit: "cover",
-            }}
+            className="rounded-lg object-cover"
           />
-          <p
-            style={{
-              fontSize: "0.85rem",
-              marginTop: "4px",
-              fontWeight: 600,
-              color: "#0077aa",
-            }}
-          >
+
+          <p className="text-[13px] mt-1 font-semibold text-[#0077aa] truncate">
             {item.name}
           </p>
         </div>
       ))}
     </div>
-  </>
+  </div>
 )}
 
       {/* ---------------- CATEGORIES ---------------- */}
