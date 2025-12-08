@@ -7,16 +7,33 @@ import { collection, getDocs } from "firebase/firestore";
 import BannerAd from "@/components/ads/BannerAd";
 import Image from "next/image";
 
+/* -------------------------------------------
+   ⭐ Skeleton Shimmer Component
+-------------------------------------------- */
+function SkeletonCard() {
+  return (
+    <div
+      style={{
+        minWidth: "120px",
+        height: "160px",
+        background: "linear-gradient(90deg,#e6f7ff 0%,#f0fbff 50%,#e6f7ff 100%)",
+        borderRadius: "14px",
+        animation: "shimmer 1.4s infinite linear",
+      }}
+    ></div>
+  );
+}
+
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
   const [ads, setAds] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCat, setSelectedCat] = useState("all");
   const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   /* ---------------- LOAD PRODUCTS ---------------- */
   useEffect(() => {
@@ -27,12 +44,13 @@ export default function Home() {
       setProducts(items);
       setFiltered(items);
 
-      // trending = highest impressions (top 10)
+      // Trending = highest impressions
       const sorted = [...items]
         .sort((a, b) => (b.impressions || 0) - (a.impressions || 0))
         .slice(0, 10);
-
       setTrending(sorted);
+
+      setLoading(false);
     }
     loadProducts();
   }, []);
@@ -81,11 +99,7 @@ export default function Home() {
 
     const recog = new SR();
     recog.lang = "en-IN";
-
-    recog.onresult = (e) => {
-      setSearch(e.results[0][0].transcript);
-    };
-
+    recog.onresult = (e) => setSearch(e.results[0][0].transcript);
     recog.start();
   }
 
@@ -93,7 +107,6 @@ export default function Home() {
   useEffect(() => {
     if (!search) {
       setFiltered(products);
-      setSuggestions([]);
       return;
     }
 
@@ -102,10 +115,9 @@ export default function Home() {
     );
 
     setFiltered(match);
-    setSuggestions(match.slice(0, 5));
   }, [search, products]);
 
-  /* ---------------- REUSABLE ICON BUTTON ---------------- */
+  /* ---------------- ICON BUTTON STYLE ---------------- */
   const iconButton = {
     width: "42px",
     height: "42px",
@@ -125,14 +137,8 @@ export default function Home() {
     <main className="page-container">
 
       {/* ---------------- SEARCH BAR ---------------- */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "6px",
-          marginTop: "12px",
-        }}
-      >
+      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "12px" }}>
+        
         {/* SEARCH INPUT */}
         <div style={{ position: "relative", flex: 1 }}>
           <input
@@ -153,7 +159,7 @@ export default function Home() {
             }}
           />
 
-          {/* SEARCH ICON */}
+          {/* SEARCH ICON (RESTORED) */}
           <svg
             width="22"
             height="22"
@@ -180,7 +186,7 @@ export default function Home() {
       </div>
 
       {/* ---------------- BANNER ---------------- */}
-      <div className="mt-2 px-2">
+      <div className="mt-3 px-2">
         <BannerAd ads={ads} />
       </div>
 
@@ -190,42 +196,44 @@ export default function Home() {
       </h2>
 
       <div className="flex overflow-x-auto gap-3 no-scrollbar pb-2">
-        {trending.map((item) => (
-          <div
-            key={item.id}
-            onClick={() => (window.location = `/product/${item.id}`)}
-            style={{
-              minWidth: "120px",
-              background: "white",
-              borderRadius: "14px",
-              padding: "10px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              cursor: "pointer",
-              textAlign: "center",
-            }}
-          >
-            <Image
-              src={item.imageUrl}
-              width={120}
-              height={120}
-              alt={item.name}
-              style={{
-                borderRadius: "10px",
-                objectFit: "cover",
-              }}
-            />
-            <p
-              style={{
-                fontSize: "0.85rem",
-                marginTop: "4px",
-                fontWeight: 600,
-                color: "#0077aa",
-              }}
-            >
-              {item.name}
-            </p>
-          </div>
-        ))}
+        {loading
+          ? [...Array(5)].map((_, i) => <SkeletonCard key={i} />)
+          : trending.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => (window.location = `/product/${item.id}`)}
+                style={{
+                  minWidth: "120px",
+                  background: "white",
+                  borderRadius: "14px",
+                  padding: "10px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  cursor: "pointer",
+                  textAlign: "center",
+                }}
+              >
+                <Image
+                  src={item.imageUrl}
+                  width={120}
+                  height={120}
+                  alt={item.name}
+                  style={{
+                    borderRadius: "10px",
+                    objectFit: "cover",
+                  }}
+                />
+                <p
+                  style={{
+                    fontSize: "0.85rem",
+                    marginTop: "4px",
+                    fontWeight: 600,
+                    color: "#0077aa",
+                  }}
+                >
+                  {item.name}
+                </p>
+              </div>
+            ))}
       </div>
 
       {/* ---------------- RECENTLY VIEWED ---------------- */}
@@ -276,8 +284,10 @@ export default function Home() {
         </>
       )}
 
-      {/* ---------------- CATEGORY ROW ---------------- */}
-      <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">Categories</h2>
+      {/* ---------------- CATEGORIES ---------------- */}
+      <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">
+        Categories
+      </h2>
 
       <div
         style={{
@@ -330,7 +340,7 @@ export default function Home() {
               cursor: "pointer",
             }}
           >
-            <div style={{ fontSize: "30px" }}>{c.icon}</div>
+            <div style={{ fontSize: "28px" }}>{c.icon}</div>
             <div style={{ marginTop: "4px", color: "#0088cc", fontWeight: 600 }}>
               {c.name}
             </div>
@@ -358,11 +368,23 @@ export default function Home() {
           marginBottom: "40px",
         }}
       >
-        {filtered.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+        {loading
+          ? [...Array(8)].map((_, i) => <SkeletonCard key={i} />)
+          : filtered.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
       </div>
     </main>
   );
 }
-  
+
+/* ---------------- SHIMMER CSS ---------------- */
+const shimmerStyle = document.createElement("style");
+shimmerStyle.innerHTML = `
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
+}
+`;
+document.head.appendChild(shimmerStyle);
+      
