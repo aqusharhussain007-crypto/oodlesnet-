@@ -14,7 +14,8 @@ export default function Home() {
   const [ads, setAds] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCat, setSelectedCat] = useState("all");
-
+  const [catOpen, setCatOpen] = useState(false);
+  
   const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -255,32 +256,76 @@ export default function Home() {
   </>
 )}
 
-      {/* CATEGORIES */}
-      <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">Categories</h2>
+      {/* ---------------- CATEGORY DRAWER ---------------- */}
+<div className="mt-6">
 
-      <div className="flex overflow-x-auto no-scrollbar gap-3 pb-3">
-        <div
-          onClick={() => filterByCategory("all")}
-          className="min-w-[120px] bg-white rounded-xl p-3 shadow cursor-pointer text-center"
-          style={{
-            borderColor: selectedCat === "all" ? "#00c3ff" : "transparent",
-            background: selectedCat === "all" ? "rgba(0,195,255,0.12)" : "rgba(255,255,255,0.7)",
-          }}
+  {/* Drawer Header */}
+  <div
+    onClick={() => setCatOpen(!catOpen)}
+    className="flex items-center justify-between px-1 mb-2 cursor-pointer"
+  >
+    <h2 className="text-xl font-bold text-blue-500">Categories</h2>
+
+    {/* Modern Arrow */}
+    <svg
+      width="26"
+      height="26"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#00a6ff"
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{
+        transform: catOpen ? "rotate(180deg)" : "rotate(0deg)",
+        transition: "0.25s ease",
+      }}
+    >
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  </div>
+
+  {/* Drawer Content */}
+  <div
+    style={{
+      maxHeight: catOpen ? "110px" : "0px",
+      overflow: "hidden",
+      transition: "max-height 0.35s ease",
+    }}
+  >
+    <div className="flex overflow-x-auto no-scrollbar gap-3 pb-2 px-1">
+
+      {/* ALL pill */}
+      <button
+        onClick={() => filterByCategory("all")}
+        className={`px-4 py-2 rounded-full font-semibold whitespace-nowrap 
+          transition-all ${
+            selectedCat === "all"
+              ? "bg-blue-200 text-blue-700 shadow-md"
+              : "bg-white text-blue-500 border border-blue-200"
+          }`}
+      >
+        All
+      </button>
+
+      {categories.map((c) => (
+        <button
+          key={c.id}
+          onClick={() => filterByCategory(c.slug)}
+          className={`px-4 py-2 rounded-full whitespace-nowrap flex items-center gap-2 
+            font-semibold transition-all ${
+              selectedCat === c.slug
+                ? "bg-blue-200 text-blue-700 shadow-md"
+                : "bg-white text-blue-500 border border-blue-200"
+            }`}
         >
-          <strong className="text-blue-600">All</strong>
-        </div>
-
-        {categories.map((c) => (
-          <div
-            key={c.id}
-            onClick={() => filterByCategory(c.slug)}
-            className="min-w-[120px] bg-white rounded-xl p-3 shadow cursor-pointer text-center"
-          >
-            <div className="text-3xl">{c.icon}</div>
-            <div className="font-semibold text-blue-600 mt-1">{c.name}</div>
-          </div>
-        ))}
-      </div>
+          <span className="text-xl">{c.icon}</span>
+          {c.name}
+        </button>
+      ))}
+    </div>
+  </div>
+</div>
 
       {/* PRODUCTS */}
       <h1 className="mt-6 text-blue-500 text-xl font-bold">Products</h1>
