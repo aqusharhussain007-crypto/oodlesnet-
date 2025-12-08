@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* 🌟 GLOBAL RESET — SAFE VERSION (DO NOT BREAK FLEXBOX) */
 * {
   margin: 0;
