@@ -200,80 +200,60 @@ export default function Home() {
         <BannerAd ads={ads} />
       </div>
 
-      {/* TRENDING */}
-      <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">Trending Today</h2>
+{/* ---------------- TRENDING TODAY ---------------- */}
+<h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">
+  Trending Today
+</h2>
 
+<div className="auto-slider-wrapper">
+  <div className="auto-slider-track">
+    {[...trending, ...trending].map((item, i) => (
       <div
-        className="relative overflow-hidden"
-        onMouseEnter={onTrendingEnter}
-        onMouseLeave={onTrendingLeave}
-        onTouchStart={onTrendingEnter}
-        onTouchEnd={onTrendingLeave}
-        ref={trendingRef}
+        key={i}
+        className="slider-card"
+        onClick={() => (window.location = `/product/${item.id}`)}
       >
-        {/* inner container duplicates items for infinite loop */}
-        <div
-          style={sliderStyle(pauseTrending)}
-        >
-          {[...trending, ...trending].map((item, idx) => (
-            <div
-              key={`${item.id}-${idx}`}
-              onClick={() => (window.location = `/product/${item.id}`)}
-              className="min-w-[120px] bg-white rounded-xl p-2 shadow cursor-pointer text-center"
-              style={{ flex: "0 0 auto" }}
-            >
-              <Image
-                src={item.imageUrl}
-                width={120}
-                height={120}
-                alt={item.name}
-                className="rounded-md object-cover"
-              />
-              <p className="text-[0.85rem] mt-1 font-semibold text-blue-700 truncate">
-                {item.name}
-              </p>
-            </div>
-          ))}
-        </div>
+        <Image
+          src={item.imageUrl}
+          width={150}
+          height={100}
+          alt={item.name}
+        />
+        <div className="slider-title">{item.name}</div>
       </div>
+    ))}
+  </div>
+</div>
 
-      {/* RECENTLY VIEWED */}
-      {recent && recent.length > 0 && (
-        <>
-          <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">Recently Viewed</h2>
 
+{/* ---------------- RECENTLY VIEWED ---------------- */}
+{recent.length > 0 && (
+  <>
+    <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">
+      Recently Viewed
+    </h2>
+
+    <div className="auto-slider-wrapper">
+      <div className="auto-slider-track">
+        {[...recent, ...recent].map((item, i) => (
           <div
-            className="relative overflow-hidden"
-            onMouseEnter={onRecentEnter}
-            onMouseLeave={onRecentLeave}
-            onTouchStart={onRecentEnter}
-            onTouchEnd={onRecentLeave}
-            ref={recentRef}
+            key={i}
+            className="slider-card"
+            onClick={() => (window.location = `/product/${item.id}`)}
           >
-            <div style={sliderStyle(pauseRecent)}>
-              {[...recent, ...recent].map((item, idx) => (
-                <div
-                  key={`${item.id}-${idx}`}
-                  onClick={() => (window.location = `/product/${item.id}`)}
-                  className="min-w-[120px] bg-white rounded-xl p-2 shadow cursor-pointer text-center"
-                  style={{ flex: "0 0 auto" }}
-                >
-                  <Image
-                    src={item.imageUrl}
-                    width={120}
-                    height={120}
-                    alt={item.name}
-                    className="rounded-md object-cover"
-                  />
-                  <p className="text-[0.85rem] mt-1 font-semibold text-blue-700 truncate">
-                    {item.name}
-                  </p>
-                </div>
-              ))}
-            </div>
+            <Image
+              src={item.imageUrl}
+              width={150}
+              height={100}
+              alt={item.name}
+            />
+            <div className="slider-title">{item.name}</div>
           </div>
-        </>
-      )}
+        ))}
+      </div>
+    </div>
+  </>
+)}
 
       {/* CATEGORIES */}
       <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">Categories</h2>
