@@ -335,3 +335,47 @@ html, body {
   color: #0077b6;
   }
   
+/* ------------ Filter Drawer Styles ------------ */
+.filter-drawer-backdrop {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1200;
+}
+
+.filter-drawer {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.15);
+  box-sizing: border-box;
+}
+
+/* sections */
+.filter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.filter-header h3 { color: #0077b6; margin: 0; font-size: 1.1rem; }
+.filter-section { margin-top: 12px; }
+.filter-label { font-weight: 700; color: #006b9a; margin-bottom: 8px; display: block; }
+.filter-row { display:flex; flex-direction:column; gap:8px; }
+.radio { display:flex; gap:8px; align-items:center; font-weight:600; color:#334; }
+.filter-num { width: 100px; padding:8px; border:1px solid #ddd; border-radius:8px; }
+
+/* actions */
+.filter-actions { display:flex; align-items:center; gap:10px; margin-top:16px; }
+/* small buttons */
+.btn-small { padding:6px 10px; border-radius:8px; background:#eee; border:none; cursor:pointer; }
+.btn-primary { background: linear-gradient(90deg,#00c6ff,#00ff99); padding:10px 16px; border-radius:10px; border:none; cursor:pointer; font-weight:800; color:#001; }
+.btn-ghost { background: transparent; border: none; color: #0077b6; padding:8px 12px; cursor:pointer; font-weight:700; }
+
+/* range inputs — basic styling */
+input[type="range"] { width: 100%; margin: 6px 0; }
+               
