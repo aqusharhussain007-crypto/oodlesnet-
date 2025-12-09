@@ -23,7 +23,6 @@ export default function Home() {
   const [trending, setTrending] = useState([]);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [showCatDrawer, setShowCatDrawer] = useState(false);
 
   /* LOAD PRODUCTS */
   useEffect(() => {
@@ -104,9 +103,9 @@ export default function Home() {
   return (
     <main className="page-container" style={{ padding: 14 }}>
 
-      {/* SEARCH ROW */}
+      {/* ⭐ TOP BAR: Search + Mic + Filter Button (RIGHT SIDE) */}
       <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 12 }}>
-        
+
         {/* Search box */}
         <div style={{ position: "relative", flex: 1 }}>
           <input
@@ -116,14 +115,23 @@ export default function Home() {
             onChange={(e) => setSearch(e.target.value)}
           />
 
-          {/* Search icon */}
-          <svg width="22" height="22" fill="#00c3ff"
+          {/* Search icon (OG) */}
+          <svg
+            width="22"
+            height="22"
+            fill="#00c3ff"
             viewBox="0 0 24 24"
-            style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)" }}>
-            <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z"/>
+            style={{
+              position: "absolute",
+              right: 14,
+              top: "50%",
+              transform: "translateY(-50%)",
+            }}
+          >
+            <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
           </svg>
 
-          {/* SMALL SUGGESTION BOX */}
+          {/* Suggestions */}
           {suggestions.length > 0 && (
             <div
               style={{
@@ -134,7 +142,7 @@ export default function Home() {
                 borderRadius: 12,
                 padding: "6px 0",
                 boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
-                zIndex: 20
+                zIndex: 20,
               }}
             >
               {suggestions.map((item) => (
@@ -146,7 +154,7 @@ export default function Home() {
                     alignItems: "center",
                     gap: 10,
                     padding: "8px 10px",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                 >
                   <Image
@@ -161,7 +169,7 @@ export default function Home() {
                       fontWeight: 600,
                       whiteSpace: "nowrap",
                       overflow: "hidden",
-                      textOverflow: "ellipsis"
+                      textOverflow: "ellipsis",
                     }}
                   >
                     {item.name}
@@ -172,7 +180,7 @@ export default function Home() {
           )}
         </div>
 
-        {/* Mic */}
+        {/* Mic button (OG icon) */}
         <button
           onClick={startVoiceSearch}
           style={{
@@ -183,7 +191,7 @@ export default function Home() {
             justifyContent: "center",
             alignItems: "center",
             background: "rgba(0,200,255,0.8)",
-            boxShadow: "0 0 12px rgba(0,200,255,0.6)"
+            boxShadow: "0 0 12px rgba(0,200,255,0.6)",
           }}
         >
           <svg width="22" height="22" fill="#fff" viewBox="0 0 24 24">
@@ -191,6 +199,20 @@ export default function Home() {
           </svg>
         </button>
 
+        {/* ⭐ Filter Button (RESTORED to TOP-RIGHT) */}
+        <button
+          onClick={() => setDrawerOpen(true)}
+          style={{
+            padding: "10px 14px",
+            borderRadius: 12,
+            background: "linear-gradient(90deg,#00c6ff,#00ff99)",
+            color: "#003",
+            fontWeight: 700,
+            boxShadow: "0 0 10px rgba(0,200,255,0.4)",
+          }}
+        >
+          Filter ▾
+        </button>
       </div>
 
       {/* BANNER */}
@@ -208,7 +230,7 @@ export default function Home() {
         </>
       )}
 
-      {/* ⭐ CATEGORY PILLS MOVED BELOW SLIDERS */}
+      {/* CATEGORY PILLS */}
       <div
         className="no-scrollbar"
         style={{
@@ -239,8 +261,9 @@ export default function Home() {
         ))}
       </div>
 
-      {/* PRODUCT GRID */}
+      {/* PRODUCTS */}
       <h2 className="mt-4">Products</h2>
+
       <div
         style={{
           display: "grid",
@@ -263,5 +286,4 @@ export default function Home() {
       />
     </main>
   );
-      }
-      
+    }
