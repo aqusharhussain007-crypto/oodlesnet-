@@ -1,65 +1,58 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 
 export default function InfiniteSlider({ items = [] }) {
   const containerRef = useRef(null);
-  const isUserTouching = useRef(false);
-  const autoScrollTimer = useRef(null);
+  const isTouching = useRef(false);
+  const timer = useRef(null);
 
-  // Clone items so we can scroll endlessly without jump
   const doubled = [...items, ...items];
 
-  // --- AUTO SCROLL FUNCTION ---
-  function startAutoScroll() {
-    stopAutoScroll(); // reset if already running
+  function start() {
+    stop();
+    timer.current = setInterval(() => {
+      if (!containerRef.current || isTouching.current) return;
 
-    autoScrollTimer.current = setInterval(() => {
-      if (!containerRef.current || isUserTouching.current) return;
+      containerRef.current.scrollLeft += 0.6; // 🟢 SLOW & SMOOTH
 
-      containerRef.current.scrollLeft += 1.4; // smooth slow movement
-
-      // Reset seamlessly when nearing the end of first copy
       if (
         containerRef.current.scrollLeft >=
         containerRef.current.scrollWidth / 2
       ) {
         containerRef.current.scrollLeft = 0;
       }
-    }, 12); // 12ms ≈ smooth 60fps motion
+    }, 10);
   }
 
-  function stopAutoScroll() {
-    if (autoScrollTimer.current) clearInterval(autoScrollTimer.current);
+  function stop() {
+    if (timer.current) clearInterval(timer.current);
   }
 
-  // --- START AUTO SCROLL ON MOUNT ---
   useEffect(() => {
-    startAutoScroll();
-    return () => stopAutoScroll();
+    start();
+    return () => stop();
   }, [items]);
 
-  // --- TOUCH HANDLERS ---
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
-    const handleTouchStart = () => {
-      isUserTouching.current = true;
-      stopAutoScroll();
+    const down = () => {
+      isTouching.current = true;
+      stop();
+    };
+    const up = () => {
+      isTouching.current = false;
+      start();
     };
 
-    const handleTouchEnd = () => {
-      isUserTouching.current = false;
-      startAutoScroll();
-    };
-
-    el.addEventListener("touchstart", handleTouchStart);
-    el.addEventListener("touchend", handleTouchEnd);
+    el.addEventListener("touchstart", down);
+    el.addEventListener("touchend", up);
 
     return () => {
-      el.removeEventListener("touchstart", handleTouchStart);
-      el.removeEventListener("touchend", handleTouchEnd);
+      el.removeEventListener("touchstart", down);
+      el.removeEventListener("touchend", up);
     };
   }, []);
 
@@ -72,7 +65,7 @@ export default function InfiniteSlider({ items = [] }) {
         gap: 14,
         overflowX: "auto",
         padding: "6px 2px 14px",
-        scrollBehavior: "auto", // IMPORTANT: no smooth scroll, ensures fluid motion
+        scrollBehavior: "auto",
         WebkitOverflowScrolling: "touch",
       }}
     >
@@ -87,13 +80,7 @@ export default function InfiniteSlider({ items = [] }) {
             cursor: "pointer",
           }}
         >
-          <div
-            className="mini-card"
-            style={{
-              width: 150,
-              minWidth: 150,
-            }}
-          >
+          <div className="mini-card">
             <Image
               src={item.imageUrl}
               width={150}
@@ -107,4 +94,4 @@ export default function InfiniteSlider({ items = [] }) {
       ))}
     </div>
   );
-}
+            }
