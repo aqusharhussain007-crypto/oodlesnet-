@@ -8,6 +8,13 @@ import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
 
+/**
+ * Page: Home
+ * - Auto-scroll trending & recent lists
+ * - Single gradient pill for categories (opens drawer)
+ * - Gradient fine border applied to small cards via inline styles
+ */
+
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -19,16 +26,20 @@ export default function Home() {
   const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
 
-  // filter drawer state + active filters
+  // drawer + filters state
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState({
     min: null,
     max: null,
     sort: "none",
     discountOnly: false,
+    category: null,
   });
 
-  const suggestRef = useRef(null);
+  // refs for auto-scroll containers
+  const trendingRef = useRef(null);
+  const recentRef = useRef(null);
+  const autoScrollInterval = useRef(null);
 
   /* ---------------- LOAD PRODUCTS ---------------- */
   useEffect(() => {
@@ -38,7 +49,10 @@ export default function Home() {
       setProducts(items);
       setFiltered(items);
 
-      const sortedTrend = [...items].sort((a, b) => (b.impressions || 0) - (a.impressions || 0)).slice(0, 10);
+      // trending: by impressions
+      const sortedTrend = [...items]
+        .sort((a, b) => (Number(b.impressions || 0) - Number(a.impressions || 0)))
+        .slice(0, 10);
       setTrending(sortedTrend);
     }
     loadProducts();
@@ -62,220 +76,260 @@ export default function Home() {
     loadCats();
   }, []);
 
-  /* ---------------- RECENT ---------------- */
+  /* ---------------- RECENT FROM localStorage ---------------- */
   useEffect(() => {
     if (typeof window === "undefined") return;
     const data = JSON.parse(localStorage.getItem("recent") || "[]");
-    setRecent(data);
+    setRecent(Array.isArray(data) ? data : []);
   }, []);
 
-  /* ---------------- CATEGORY FILTER ---------------- */
-  function filterByCategory(slug) {
-    setSelectedCat(slug);
-    // apply currently active filters after category change
-    applyFilters({ ...activeFilters, category: slug });
-  }
-
-  /* ---------------- VOICE SEARCH ---------------- */
-  function startVoiceSearch() {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) return alert("Voice search not supported.");
-    const recog = new SR();
-    recog.lang = "en-IN";
-    recog.onresult = (e) => setSearch(e.results[0][0].transcript);
-    recog.start();
-  }
-
-  /* ---------------- SEARCH & SUGGESTIONS ---------------- */
-  useEffect(() => {
-    if (!search) {
-      setSuggestions([]);
-      // don't overwrite applied filters view
-      applyFilters(activeFilters);
-      return;
-    }
-    const match = products.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));
-    setSuggestions(match.slice(0, 5));
-    setFiltered(match); // instant search result
-  }, [search, products]);
-
-  /* ---------------- HIDE SUGGESTIONS ON OUTSIDE CLICK ---------------- */
-  useEffect(() => {
-    function h(e) {
-      if (suggestRef.current && !suggestRef.current.contains(e.target)) setSuggestions([]);
-    }
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, []);
-
-  /* ---------------- APPLY FILTERS LOGIC ---------------- */
+  /* ---------------- FILTERS ---------------- */
   function applyFilters(filters) {
-    // save active filters
     setActiveFilters(filters);
-
     let items = [...products];
 
-    // category filter
-    if (filters.category && filters.category !== "all") {
-      items = items.filter((p) => p.categorySlug === filters.category);
-    } else if (selectedCat && selectedCat !== "all") {
-      items = items.filter((p) => p.categorySlug === selectedCat);
-    }
+    // category
+    const cat = filters.category || (selectedCat !== "all" ? selectedCat : null);
+    if (cat && cat !== "all") items = items.filter((p) => p.categorySlug === cat);
 
-    // discount filter
+    // discount only
     if (filters.discountOnly) {
       items = items.filter((p) => {
-        // treat any non-empty offer field as discounted
-        return (p.amazonOffer || p.meeshoOffer || p.ajioOffer || p.offer || "").toString().trim().length > 0;
+        const offer = (p.amazonOffer || p.meeshoOffer || p.ajioOffer || p.offer || "").toString();
+        return offer.trim().length > 0;
       });
     }
 
     // price range
-    if (filters.min != null) {
-      items = items.filter((p) => Number(p.price || 0) >= Number(filters.min));
-    }
-    if (filters.max != null) {
-      items = items.filter((p) => Number(p.price || 0) <= Number(filters.max));
-    }
+    if (filters.min != null) items = items.filter((p) => Number(p.price || 0) >= Number(filters.min));
+    if (filters.max != null) items = items.filter((p) => Number(p.price || 0) <= Number(filters.max));
 
-    // sorting
-    if (filters.sort === "price-asc") {
-      items.sort((a, b) => (Number(a.price || 0) - Number(b.price || 0)));
-    } else if (filters.sort === "price-desc") {
-      items.sort((a, b) => (Number(b.price || 0) - Number(a.price || 0)));
-    } else if (filters.sort === "trending") {
-      items.sort((a, b) => (Number(b.impressions || 0) - Number(a.impressions || 0)));
-    } else if (filters.sort === "newest") {
-      // assume product has createdAt field (timestamp or ISO). fallback: do nothing
-      items.sort((a, b) => {
-        const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return tb - ta;
-      });
-    }
+    // sort
+    if (filters.sort === "price-asc") items.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
+    if (filters.sort === "price-desc") items.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
+    if (filters.sort === "trending") items.sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0));
+    if (filters.sort === "newest") items.sort((a, b) => (new Date(b.createdAt || 0) - new Date(a.createdAt || 0)));
 
     setFiltered(items);
   }
 
-  /* ---------------- RESET ALL FILTERS ---------------- */
-  function resetFilters() {
-    setActiveFilters({ min: null, max: null, sort: "none", discountOnly: false });
-    setSelectedCat("all");
-    setFiltered(products);
+  function filterByCategory(slug) {
+    setSelectedCat(slug);
+    applyFilters({ ...activeFilters, category: slug === "all" ? null : slug });
   }
 
-  /* ---------------- WHEN PRODUCTS LOAD, re-apply any active filters ---------------- */
+  /* ---------------- SEARCH ---------------- */
   useEffect(() => {
-    applyFilters(activeFilters);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [products]);
+    if (!search) {
+      setSuggestions([]);
+      applyFilters(activeFilters); // restore filtered view
+      return;
+    }
+    const match = products.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));
+    setSuggestions(match.slice(0, 5));
+    setFiltered(match);
+  }, [search, products]);
 
-  /* ---------------- ICON BUTTON STYLE ---------------- */
-  const iconButton = {
-    width: "42px",
-    height: "42px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: "12px",
-    background: "rgba(0,200,255,0.75)",
-    boxShadow: "0 0 10px rgba(0,200,255,0.7)",
+  /* ---------------- VOICE SEARCH ---------------- */
+  function startVoiceSearch() {
+    if (typeof window === "undefined") return;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return alert("Voice search not supported.");
+    const recog = new SR();
+    recog.lang = "en-IN";
+    recog.onresult = (e) => setSearch(e.results[0][0].transcript || "");
+    recog.start();
+  }
+
+  /* ---------------- AUTO-SCROLL (Trending & Recent) ---------------- */
+  useEffect(() => {
+    // auto-scroll helper
+    function startAutoScroll(elRef, speed = 2200) {
+      if (!elRef?.current) return null;
+      // clear existing on that ref if any
+      let id = setInterval(() => {
+        const el = elRef.current;
+        if (!el) return;
+        const scrollStep = Math.max(1, Math.round(el.clientWidth * 0.5));
+        if (el.scrollWidth - el.scrollLeft <= el.clientWidth + 8) {
+          // reached end -> jump back smoothly
+          el.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          el.scrollBy({ left: scrollStep, behavior: "smooth" });
+        }
+      }, speed);
+      return id;
+    }
+
+    // only run in browser
+    if (typeof window !== "undefined") {
+      // clear old interval if present
+      if (autoScrollInterval.current) {
+        clearInterval(autoScrollInterval.current);
+        autoScrollInterval.current = null;
+      }
+      // create combined interval that advances both containers
+      // we create *one* interval that advances trending first then recent
+      autoScrollInterval.current = setInterval(() => {
+        try {
+          const tr = trendingRef.current;
+          const rc = recentRef.current;
+          if (tr) {
+            const step = Math.max(1, Math.round(tr.clientWidth * 0.6));
+            if (tr.scrollWidth - tr.scrollLeft <= tr.clientWidth + 8) tr.scrollTo({ left: 0, behavior: "smooth" });
+            else tr.scrollBy({ left: step, behavior: "smooth" });
+          }
+          if (rc) {
+            const step = Math.max(1, Math.round(rc.clientWidth * 0.6));
+            if (rc.scrollWidth - rc.scrollLeft <= rc.clientWidth + 8) rc.scrollTo({ left: 0, behavior: "smooth" });
+            else rc.scrollBy({ left: step, behavior: "smooth" });
+          }
+        } catch (e) {}
+      }, 2400);
+    }
+
+    return () => {
+      if (autoScrollInterval.current) clearInterval(autoScrollInterval.current);
+      autoScrollInterval.current = null;
+    };
+  }, [trending, recent]);
+
+  /* ---------------- small helper: gradient border wrapper ---------------- */
+  const gradientWrapperStyle = {
+    borderRadius: 14,
+    padding: 2,
+    background: "linear-gradient(90deg, rgba(0,198,255,0.95), rgba(0,255,150,0.85))",
+    // inner background will be white - create a 'frame' effect using padding
+  };
+
+  const smallCardInner = {
+    background: "#fff",
+    borderRadius: 12,
+    padding: 8,
+    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+    textAlign: "center",
   };
 
   return (
-    <main className="page-container">
-      {/* SEARCH + FILTER ROW */}
-      <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 12 }}>
-        <div style={{ position: "relative", flex: 1 }} ref={suggestRef}>
+    <main className="page-container" style={{ padding: 12 }}>
+      {/* Search row */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12 }}>
+        <div style={{ position: "relative", flex: 1 }}>
           <input
             type="text"
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="search-bar"
-            style={{ height: 46, paddingLeft: 14, paddingRight: 42, borderRadius: 12 }}
+            style={{ height: 46, paddingLeft: 14, paddingRight: 44, borderRadius: 12 }}
           />
-          <svg width="22" height="22" fill="#00c3ff" viewBox="0 0 24 24" className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+
+          {/* Search icon inside input */}
+          <svg width="22" height="22" fill="#00c3ff" viewBox="0 0 24 24" style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
             <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
           </svg>
-
-          {/* Suggestions (unchanged) */}
-          {suggestions.length > 0 && (
-            <div style={{ position: "absolute", top: 52, width: "100%", background: "white", borderRadius: 14, boxShadow: "0 4px 14px rgba(0,0,0,0.12)", zIndex: 30 }}>
-              {suggestions.map((item) => (
-                <div key={item.id} onClick={() => (window.location = `/product/${item.id}`)} style={{ display: "flex", gap: 10, padding: "10px 12px", cursor: "pointer", alignItems: "center" }}>
-                  <Image src={item.imageUrl} width={50} height={50} alt={item.name} style={{ borderRadius: 10, objectFit: "cover" }} />
-                  <div>
-                    <div style={{ fontWeight: 700, color: "#0077aa" }}>{item.name}</div>
-                    <div style={{ fontWeight: 800, color: "#0097cc" }}>₹ {item.price}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
-        {/* Filter button */}
-        <button onClick={() => setDrawerOpen(true)} className="btn-glow" style={{ padding: "10px 12px", borderRadius: 12 }}>
-          Filter ▾
+        {/* Category pill (opens drawer) */}
+        <button
+          onClick={() => setDrawerOpen(true)}
+          aria-label="Open categories"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            padding: "10px 14px",
+            borderRadius: 999,
+            border: "none",
+            background: "linear-gradient(90deg,#eafffb 0%, #e9fff0 100%)",
+            boxShadow: "0 6px 22px rgba(0,198,255,0.08)",
+            minWidth: 120,
+            justifyContent: "center",
+          }}
+        >
+          <span style={{ color: "#0077aa", fontWeight: 700 }}>{selectedCat === "all" ? "Categories" : (categories.find(c => c.slug === selectedCat)?.name || "Categories")}</span>
+
+          {/* modern chevron arrow */}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ transform: drawerOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform .18s" }}>
+            <path d="M6 9l6 6 6-6" stroke="#0077aa" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </button>
 
-        {/* Mic */}
-        <button onClick={startVoiceSearch} style={iconButton} aria-label="Voice search">
-          <svg width="22" height="22" fill="white" viewBox="0 0 24 24">
-            <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7zm-1 2h2v3h-2v-3z" />
-          </svg>
+        {/* mic button */}
+        <button onClick={startVoiceSearch} style={{ width: 46, height: 46, borderRadius: 12, background: "rgba(0,200,255,0.85)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 10px rgba(0,200,255,0.6)" }}>
+          <svg width="22" height="22" fill="white" viewBox="0 0 24 24"><path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7zm-1 2h2v3h-2v-3z" /></svg>
         </button>
       </div>
 
       {/* Banner */}
-      <div className="mt-2 px-2"><BannerAd ads={ads} /></div>
+      <div className="mt-3 px-1">
+        <BannerAd ads={ads} />
+      </div>
 
-      {/* Trending, Recent, Categories, Products — unchanged UI below */}
-      <h2 className="text-xl font-bold text-blue-500 mt-5 mb-2">Trending Today</h2>
-      <div className="flex overflow-x-auto gap-3 no-scrollbar pb-2">
+      {/* Trending header */}
+      <h2 style={{ marginTop: 18, color: "#0bbcff", textShadow: "0 0 6px rgba(11,188,255,0.25)" }}>Trending Today</h2>
+
+      {/* Trending strip (auto-scrollable + tappable) */}
+      <div ref={trendingRef} className="no-scrollbar" style={{ display: "flex", gap: 12, overflowX: "auto", padding: "8px 4px", marginTop: 6 }}>
         {trending.map((item) => (
-          <div key={item.id} onClick={() => (window.location = `/product/${item.id}`)} style={{ minWidth: 120, background: "white", borderRadius: 14, padding: 10, textAlign: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.1)", cursor: "pointer" }}>
-            <Image src={item.imageUrl} width={120} height={120} alt={item.name} style={{ borderRadius: 10, objectFit: "cover" }} />
-            <p style={{ marginTop: 4, fontWeight: 600, fontSize: 14, color: "#0077aa" }}>{item.name}</p>
+          <div
+            key={item.id}
+            onClick={() => (window.location = `/product/${item.id}`)}
+            style={{ minWidth: 140, cursor: "pointer" }}
+          >
+            <div style={gradientWrapperStyle}>
+              <div style={{ ...smallCardInner }}>
+                <Image src={item.imageUrl} width={140} height={90} alt={item.name} style={{ width: "100%", height: 90, objectFit: "cover", borderRadius: 8 }} />
+                <div style={{ marginTop: 8, color: "#0077aa", fontWeight: 700, fontSize: 13 }}>{item.name}</div>
+              </div>
+            </div>
           </div>
         ))}
       </div>
 
+      {/* Recently viewed */}
       {recent.length > 0 && (
         <>
-          <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">Recently Viewed</h2>
-          <div className="flex overflow-x-auto gap-3 no-scrollbar pb-2">
+          <h2 style={{ marginTop: 18, color: "#0bbcff", textShadow: "0 0 6px rgba(11,188,255,0.25)" }}>Recently Viewed</h2>
+          <div ref={recentRef} className="no-scrollbar" style={{ display: "flex", gap: 12, overflowX: "auto", padding: "8px 4px", marginTop: 6 }}>
             {recent.map((item) => (
-              <div key={item.id} onClick={() => (window.location = `/product/${item.id}`)} style={{ minWidth: 120, background: "white", borderRadius: 14, padding: 10, textAlign: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.1)", cursor: "pointer" }}>
-                <Image src={item.imageUrl} width={120} height={120} alt={item.name} style={{ borderRadius: 10, objectFit: "cover" }} />
-                <p style={{ marginTop: 4, fontWeight: 600, fontSize: 14, color: "#0077aa" }}>{item.name}</p>
+              <div key={item.id} onClick={() => (window.location = `/product/${item.id}`)} style={{ minWidth: 140, cursor: "pointer" }}>
+                <div style={gradientWrapperStyle}>
+                  <div style={{ ...smallCardInner }}>
+                    <Image src={item.imageUrl} width={140} height={90} alt={item.name} style={{ width: "100%", height: 90, objectFit: "cover", borderRadius: 8 }} />
+                    <div style={{ marginTop: 8, color: "#0077aa", fontWeight: 700, fontSize: 13 }}>{item.name}</div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </>
       )}
 
-      <h2 className="text-xl font-bold text-blue-500 mt-6 mb-2">Categories</h2>
-      <div style={{ display: "flex", gap: 12, overflowX: "auto", whiteSpace: "nowrap", paddingBottom: 8 }}>
-        <div onClick={() => filterByCategory("all")} style={{ minWidth: 120, background: selectedCat === "all" ? "rgba(0,195,255,0.15)" : "rgba(255,255,255,0.7)", border: selectedCat === "all" ? "2px solid #00c3ff" : "2px solid #aacbe3", padding: 10, textAlign: "center", borderRadius: 14, cursor: "pointer" }}>
-          <strong style={{ color: "#0088cc" }}>All</strong>
+      {/* Categories heading */}
+      <h2 style={{ marginTop: 20, color: "#0bbcff", textShadow: "0 0 6px rgba(11,188,255,0.25)" }}>Categories</h2>
+
+      {/* Categories inline (small pills) - keep for quick selection */}
+      <div style={{ display: "flex", gap: 10, overflowX: "auto", padding: "8px 4px", marginTop: 6 }}>
+        <div onClick={() => filterByCategory("all")} style={{ minWidth: 86, padding: 10, borderRadius: 999, background: selectedCat === "all" ? "linear-gradient(90deg,#eafffb,#e9fff0)" : "#fff", border: selectedCat === "all" ? "2px solid rgba(0,198,255,0.6)" : "2px solid rgba(170,203,227,0.6)", textAlign: "center", cursor: "pointer", boxShadow: "0 6px 18px rgba(0,198,255,0.04)" }}>
+          <strong style={{ color: "#0077aa" }}>All</strong>
         </div>
 
         {categories.map((c) => (
-          <div key={c.id} onClick={() => filterByCategory(c.slug)} style={{ minWidth: 120, background: selectedCat === c.slug ? "rgba(0,195,255,0.15)" : "rgba(255,255,255,0.7)", border: selectedCat === c.slug ? "2px solid #00c3ff" : "2px solid #aacbe3", padding: 10, borderRadius: 14, cursor: "pointer", textAlign: "center" }}>
-            <div style={{ fontSize: 30 }}>{c.icon}</div>
-            <div style={{ marginTop: 4, color: "#0088cc", fontWeight: 600 }}>{c.name}</div>
+          <div key={c.id} onClick={() => filterByCategory(c.slug)} style={{ minWidth: 86, padding: 10, borderRadius: 999, background: selectedCat === c.slug ? "linear-gradient(90deg,#eafffb,#e9fff0)" : "#fff", border: selectedCat === c.slug ? "2px solid rgba(0,198,255,0.6)" : "2px solid rgba(170,203,227,0.6)", textAlign: "center", cursor: "pointer", boxShadow: "0 6px 18px rgba(0,198,255,0.04)" }}>
+            <div style={{ fontSize: 16 }}>{c.icon}</div>
+            <div style={{ marginTop: 6, color: "#0077aa", fontWeight: 600, fontSize: 13 }}>{c.name}</div>
           </div>
         ))}
       </div>
 
+      {/* Products Grid */}
       <h1 style={{ marginTop: 18, color: "#00b7ff", fontSize: "1.4rem", fontWeight: 700 }}>Products</h1>
-      <div style={{ display: "grid", gap: "0.9rem", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", marginBottom: 40 }}>
+      <div style={{ display: "grid", gap: "0.9rem", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", marginBottom: 40, marginTop: 10 }}>
         {filtered.map((product) => <ProductCard key={product.id} product={product} />)}
       </div>
 
-      {/* Filter Drawer */}
+      {/* Filter Drawer (pass categories, products) */}
       <FilterDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -283,10 +337,12 @@ export default function Home() {
         categories={categories}
         initial={activeFilters}
         onApply={(filters) => {
-          // include currently selected category in filters
-          applyFilters({ ...filters, category: selectedCat === "all" ? null : selectedCat });
+          // when user applies filters from drawer, include category state
+          applyFilters({ ...filters, category: filters.category || (selectedCat === "all" ? null : selectedCat) });
+          setDrawerOpen(false);
         }}
       />
     </main>
   );
-}
+  }
+                       
