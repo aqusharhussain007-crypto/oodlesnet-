@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import ProductCard from "@/components/ProductCard";
 import BannerAd from "@/components/ads/BannerAd";
 import FilterDrawer from "@/components/FilterDrawer";
+import InfiniteSlider from "@/components/InfiniteSlider";
 import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
@@ -26,10 +27,6 @@ export default function Home() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showCatDrawer, setShowCatDrawer] = useState(false);
 
-  const trendingRef = useRef(null);
-  const recentRef = useRef(null);
-  const scrollTimer = useRef(null);
-
   /* ---------------- LOAD PRODUCTS ---------------- */
   useEffect(() => {
     async function load() {
@@ -42,6 +39,7 @@ export default function Home() {
       const top = [...items]
         .sort((a, b) => (b.impressions || 0) - (a.impressions || 0))
         .slice(0, 10);
+
       setTrending(top);
     }
     load();
@@ -86,9 +84,11 @@ export default function Home() {
       setFiltered(products);
       return;
     }
+
     const match = products.filter((p) =>
       p.name.toLowerCase().includes(search.toLowerCase())
     );
+
     setSuggestions(match.slice(0, 5));
     setFiltered(match);
   }, [search, products]);
@@ -97,36 +97,19 @@ export default function Home() {
   function startVoiceSearch() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return alert("Voice search not supported");
+
     const recog = new SR();
     recog.lang = "en-IN";
-    recog.onresult = (e) => setSearch(e.results[0][0].transcript);
+
+    recog.onresult = (e) => {
+      setSearch(e.results[0][0].transcript);
+    };
+
     recog.start();
   }
 
-  /* ---------------- AUTO-SCROLL ---------------- */
-  useEffect(() => {
-    function autoScroll(ref) {
-      if (!ref.current) return;
-      const el = ref.current;
-      const step = el.clientWidth * 0.55;
-
-      if (el.scrollLeft + el.clientWidth + 10 >= el.scrollWidth)
-        el.scrollTo({ left: 0, behavior: "smooth" });
-      else
-        el.scrollBy({ left: step, behavior: "smooth" });
-    }
-
-    scrollTimer.current = setInterval(() => {
-      autoScroll(trendingRef);
-      autoScroll(recentRef);
-    }, 2400);
-
-    return () => clearInterval(scrollTimer.current);
-  }, [trending, recent]);
-
-  /* ---------------- MINI CARD GRADIENT WRAPPER ---------------- */
+  /* ---------------- Mini-card wrappers ---------------- */
   const wrap = { padding: 2, borderRadius: 16, background: "linear-gradient(90deg,#00c6ff,#00ff99)" };
-  const inner = { background: "white", borderRadius: 14, padding: 10, textAlign: "center" };
 
   return (
     <main className="page-container" style={{ padding: 14 }}>
@@ -150,7 +133,15 @@ export default function Home() {
 
           {/* Suggestions */}
           {suggestions.length > 0 && (
-            <div style={{ position: "absolute", top: 52, width: "100%", background: "white", borderRadius: 12, boxShadow: "0 4px 14px rgba(0,0,0,0.15)", zIndex: 20 }}>
+            <div style={{
+              position: "absolute",
+              top: 52,
+              width: "100%",
+              background: "white",
+              borderRadius: 12,
+              boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
+              zIndex: 20
+            }}>
               {suggestions.map((item) => (
                 <div key={item.id}
                   onClick={() => (window.location = `/product/${item.id}`)}
@@ -219,37 +210,23 @@ export default function Home() {
 
       {/* ---------------- TRENDING ---------------- */}
       <h2 className="mt-4">Trending Today</h2>
-      <div ref={trendingRef} className="scroll-strip no-scrollbar">
-        {trending.map((item) => (
-          <div key={item.id} style={wrap} onClick={() => (window.location = `/product/${item.id}`)}>
-            <div className="mini-card">
-              <Image src={item.imageUrl} width={150} height={95} alt="" />
-              <p className="mini-title">{item.name}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+      <InfiniteSlider items={trending} />
 
       {/* ---------------- RECENT ---------------- */}
       {recent.length > 0 && (
         <>
           <h2 className="mt-4">Recently Viewed</h2>
-          <div ref={recentRef} className="scroll-strip no-scrollbar">
-            {recent.map((item) => (
-              <div key={item.id} style={wrap} onClick={() => (window.location = `/product/${item.id}`)}>
-                <div className="mini-card">
-                  <Image src={item.imageUrl} width={150} height={95} alt="" />
-                  <p className="mini-title">{item.name}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <InfiniteSlider items={recent} />
         </>
       )}
 
       {/* ---------------- PRODUCT GRID ---------------- */}
       <h2 className="mt-4">Products</h2>
-      <div style={{ display: "grid", gap: 16, gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))" }}>
+      <div style={{
+        display: "grid",
+        gap: 16,
+        gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))"
+      }}>
         {filtered.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
@@ -262,11 +239,10 @@ export default function Home() {
         products={products}
         categories={categories}
         onApply={(filters) => {
-          setFiltered(products); // placeholder – full filtering already implemented earlier
+          setFiltered(products); // placeholder
           setDrawerOpen(false);
         }}
       />
     </main>
   );
-    }
-  
+                            }
