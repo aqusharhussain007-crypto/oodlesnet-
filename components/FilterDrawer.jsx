@@ -100,20 +100,39 @@ export default function FilterDrawer({
           />
 
           {/* ⭐ NEW PILL INPUT BOXES */}
-          <div style={{ display: "flex", gap: 16, marginTop: 12 }}>
-            <input
-              type="number"
-              value={selMin}
-              onChange={(e) => setSelMin(Math.min(Number(e.target.value), selMax))}
-              style={{
-                flex: 1,
-                padding: "10px 14px",
-                borderRadius: 50,
-                border: "2px solid #0bbcff",
-                fontWeight: 600,
-                textAlign: "center",
-              }}
-            />
+        <div style={{ display: "flex", gap: 16, marginTop: 12, justifyContent: "center" }}>
+  <input
+    type="number"
+    value={selMin}
+    onChange={(e) => setSelMin(Math.min(Number(e.target.value), selMax))}
+    style={{
+      width: 110,
+      padding: "10px 14px",
+      borderRadius: 50,
+      border: "2px solid #0bbcff",
+      fontWeight: 700,
+      textAlign: "center",
+      fontSize: 16,
+      background: "#f7feff",
+    }}
+  />
+
+  <input
+    type="number"
+    value={selMax}
+    onChange={(e) => setSelMax(Math.max(Number(e.target.value), selMin))}
+    style={{
+      width: 110,
+      padding: "10px 14px",
+      borderRadius: 50,
+      border: "2px solid #0bbcff",
+      fontWeight: 700,
+      textAlign: "center",
+      fontSize: 16,
+      background: "#f7feff",
+    }}
+  />
+</div>
 
             <input
               type="number"
