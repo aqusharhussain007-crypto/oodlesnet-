@@ -9,7 +9,6 @@ export default function FilterDrawer({
   initial = {},
   onApply,
 }) {
-  // compute absolute min/max from products
   const prices = products.map((p) => Number(p.price || 0)).filter(Boolean);
   const absoluteMin = prices.length ? Math.min(...prices) : 0;
   const absoluteMax = prices.length ? Math.max(...prices) : 10000;
@@ -51,20 +50,33 @@ export default function FilterDrawer({
       }}
     >
       <div className="filter-drawer">
-        <div className="filter-header">
-          <h3>Filters</h3>
-          <button className="btn-small" onClick={onClose}>Close</button>
-        </div>
 
-        {/* ❌ REMOVED CATEGORY SECTION COMPLETELY */}
+        {/* HEADER */}
+        <div className="filter-header" style={{ display: "flex", justifyContent: "space-between" }}>
+          <h3 style={{ fontSize: 20, color: "#0bbcff" }}>Filters</h3>
+
+          {/* ⭐ NEW CLOSE BUTTON */}
+          <button
+            onClick={onClose}
+            style={{
+              padding: "6px 14px",
+              background: "#eef9ff",
+              borderRadius: 20,
+              border: "1px solid #c9eaff",
+              color: "#0077aa",
+              fontWeight: 700,
+            }}
+          >
+            Close ✕
+          </button>
+        </div>
 
         {/* PRICE RANGE */}
         <div className="filter-section">
           <label className="filter-label">Price range</label>
 
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div>₹ {selMin}</div>
-
             <input
               type="range"
               min={absoluteMin}
@@ -74,7 +86,6 @@ export default function FilterDrawer({
                 setSelMin(Math.min(Number(e.target.value), selMax))
               }
             />
-
             <div>₹ {selMax}</div>
           </div>
 
@@ -88,84 +99,51 @@ export default function FilterDrawer({
             }
           />
 
-          {/* numeric boxes */}
-          <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+          {/* ⭐ NEW PILL INPUT BOXES */}
+          <div style={{ display: "flex", gap: 16, marginTop: 12 }}>
             <input
               type="number"
-              className="filter-num"
               value={selMin}
-              onChange={(e) =>
-                setSelMin(Math.min(Number(e.target.value), selMax))
-              }
+              onChange={(e) => setSelMin(Math.min(Number(e.target.value), selMax))}
+              style={{
+                flex: 1,
+                padding: "10px 14px",
+                borderRadius: 50,
+                border: "2px solid #0bbcff",
+                fontWeight: 600,
+                textAlign: "center",
+              }}
             />
+
             <input
               type="number"
-              className="filter-num"
               value={selMax}
-              onChange={(e) =>
-                setSelMax(Math.max(Number(e.target.value), selMin))
-              }
+              onChange={(e) => setSelMax(Math.max(Number(e.target.value), selMin))}
+              style={{
+                flex: 1,
+                padding: "10px 14px",
+                borderRadius: 50,
+                border: "2px solid #0bbcff",
+                fontWeight: 600,
+                textAlign: "center",
+              }}
             />
           </div>
         </div>
 
-        {/* SORTING */}
+        {/* SORT */}
         <div className="filter-section">
           <label className="filter-label">Sort by</label>
           <div className="filter-row">
-            <label className="radio">
-              <input
-                type="radio"
-                name="sort"
-                checked={sort === "none"}
-                onChange={() => setSort("none")}
-              />
-              None
-            </label>
-
-            <label className="radio">
-              <input
-                type="radio"
-                name="sort"
-                checked={sort === "price-asc"}
-                onChange={() => setSort("price-asc")}
-              />
-              Price: Low → High
-            </label>
-
-            <label className="radio">
-              <input
-                type="radio"
-                name="sort"
-                checked={sort === "price-desc"}
-                onChange={() => setSort("price-desc")}
-              />
-              Price: High → Low
-            </label>
-
-            <label className="radio">
-              <input
-                type="radio"
-                name="sort"
-                checked={sort === "trending"}
-                onChange={() => setSort("trending")}
-              />
-              Trending
-            </label>
-
-            <label className="radio">
-              <input
-                type="radio"
-                name="sort"
-                checked={sort === "newest"}
-                onChange={() => setSort("newest")}
-              />
-              Newest
-            </label>
+            <label className="radio"><input type="radio" checked={sort==="none"} onChange={()=>setSort("none")} />None</label>
+            <label className="radio"><input type="radio" checked={sort==="price-asc"} onChange={()=>setSort("price-asc")} />Price: Low → High</label>
+            <label className="radio"><input type="radio" checked={sort==="price-desc"} onChange={()=>setSort("price-desc")} />Price: High → Low</label>
+            <label className="radio"><input type="radio" checked={sort==="trending"} onChange={()=>setSort("trending")} />Trending</label>
+            <label className="radio"><input type="radio" checked={sort==="newest"} onChange={()=>setSort("newest")} />Newest</label>
           </div>
         </div>
 
-        {/* DISCOUNT ONLY */}
+        {/* DISCOUNT */}
         <div className="filter-section">
           <label className="filter-label">Discount</label>
           <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -178,14 +156,44 @@ export default function FilterDrawer({
           </label>
         </div>
 
-        {/* ACTION BUTTONS */}
-        <div className="filter-actions">
-          <button className="btn-ghost" onClick={handleReset}>Reset</button>
-          <div style={{ flex: 1 }} />
-          <button className="btn-primary" onClick={handleApply}>Apply</button>
+        {/* FOOTER BUTTONS */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginTop: 20,
+          }}
+        >
+          {/* ⭐ RESET button */}
+          <button
+            onClick={handleReset}
+            style={{
+              fontWeight: 700,
+              color: "#0077aa",
+              background: "transparent",
+              border: "none",
+            }}
+          >
+            Reset
+          </button>
+
+          {/* APPLY BUTTON */}
+          <button
+            onClick={handleApply}
+            className="btn-primary"
+            style={{
+              padding: "10px 26px",
+              borderRadius: 12,
+              background: "linear-gradient(90deg,#00c6ff,#00ff99)",
+              color: "#003",
+              fontWeight: 800,
+              border: "none",
+            }}
+          >
+            Apply
+          </button>
         </div>
       </div>
     </div>
   );
-    }
-                                               
+}
