@@ -1,0 +1,55 @@
+.swiper-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.swiper-inner {
+  display: flex;
+  transition: transform 0.35s ease;
+  touch-action: pan-y;
+}
+
+.swiper-item {
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-image {
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  transition: transform 0.3s ease;
+}
+
+.swiper-container.zoomed .swiper-image {
+  transform: scale(2.1);
+}
+
+/* Dots */
+.swiper-dots {
+  position: absolute;
+  bottom: 8px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: #c8eaff;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+.dot.active {
+  background: #00c4ff;
+  width: 18px;
+  border-radius: 8px;
+}
