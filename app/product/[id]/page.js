@@ -1,135 +1,242 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { db } from "@/lib/firebase-app";
-import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
+import InfiniteSlider from "@/components/InfiniteSlider";
+import ProductCard from "@/components/ProductCard";
+import { db } from "@/lib/firebase-app";
+import {
+  doc,
+  getDoc,
+  getDocs,
+  collection,
+  updateDoc,
+  increment,
+  query,
+  where,
+  orderBy,
+  limit,
+} from "firebase/firestore";
 
-export default function ProductDetail({ params }) {
-  const { id } = params;
+/**
+ * Product details page (client component)
+ * - Fetches product doc by id (Firestore)
+ * - Increments impressions (safe guarded)
+ * - Stores recent view in localStorage
+ * - Shows image gallery, price compare, affiliate buttons
+ * - Shows similar products slider (same category, fallback trending)
+ */
+
+export default function ProductPage() {
+  const { id } = useParams();
+  const router = useRouter();
+
   const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [similar, setSimilar] = useState([]);
+  const [images, setImages] = useState([]);
+  const [savingImpression, setSavingImpression] = useState(false);
 
-  // 🚀 STEP 1 — Fetch product
   useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+
     async function loadProduct() {
-      const snap = await getDoc(doc(db, "products", id));
-      if (snap.exists()) {
-        setProduct(snap.data());
+      setLoading(true);
+      try {
+        const ref = doc(db, "products", id);
+        const snap = await getDoc(ref);
+        if (!snap.exists()) {
+          setProduct(null);
+          setLoading(false);
+          return;
+        }
+        const data = { id: snap.id, ...snap.data() };
+
+        if (cancelled) return;
+        setProduct(data);
+
+        // images array fallback
+        const imgs = [];
+        if (data.imageUrl) imgs.push(data.imageUrl);
+        if (Array.isArray(data.images)) imgs.push(...data.images);
+        setImages(imgs.length ? imgs : ["/placeholder-500x300.png"]);
+
+        // add to recent (localStorage)
+        try {
+          if (typeof window !== "undefined") {
+            const raw = JSON.parse(localStorage.getItem("recent") || "[]");
+            const arr = Array.isArray(raw) ? raw : [];
+            // remove existing duplicate
+            const filtered = arr.filter((r) => r.id !== data.id);
+            filtered.unshift({ id: data.id, name: data.name, imageUrl: data.imageUrl, price: data.price, categorySlug: data.categorySlug });
+            // keep max 12
+            localStorage.setItem("recent", JSON.stringify(filtered.slice(0, 12)));
+          }
+        } catch (e) {}
+
+        // fetch similar (by category) fallback trending
+        const sim = [];
+        if (data.categorySlug) {
+          try {
+            const q = query(
+              collection(db, "products"),
+              where("categorySlug", "==", data.categorySlug),
+              orderBy("impressions", "desc"),
+              limit(10)
+            );
+            const snap2 = await getDocs(q);
+            snap2.forEach((d) => {
+              if (d.id !== data.id) sim.push({ id: d.id, ...d.data() });
+            });
+          } catch (e) {
+            // ignore
+          }
+        }
+
+        // fallback: top impressions
+        if (sim.length === 0) {
+          const q2 = query(collection(db, "products"), orderBy("impressions", "desc"), limit(10));
+          const snap3 = await getDocs(q2);
+          snap3.forEach((d) => {
+            if (d.id !== data.id) sim.push({ id: d.id, ...d.data() });
+          });
+        }
+        if (!cancelled) setSimilar(sim);
+
+        // increment impressions once
+        try {
+          setSavingImpression(true);
+          await updateDoc(ref, { impressions: increment(1) });
+        } catch (e) {
+          // ignore write errors silently
+        } finally {
+          setSavingImpression(false);
+        }
+      } catch (err) {
+        console.error("load product err", err);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     }
+
     loadProduct();
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
-  // 🚀 STEP 2 — Increase VIEWS (only once per product per session)
-  useEffect(() => {
-    if (!product) return;
+  if (loading) {
+    return (
+      <main className="page-container" style={{ padding: 12 }}>
+        <div className="skeleton shimmer" style={{ height: 280, borderRadius: 18 }} />
+      </main>
+    );
+  }
 
-    const viewedKey = `viewed_${id}`;
+  if (!product) {
+    return (
+      <main className="page-container" style={{ padding: 12 }}>
+        <div style={{ padding: 24, background: "#fff", borderRadius: 14 }}>
+          <h2 style={{ color: "#0077aa" }}>Product not found</h2>
+          <p>We couldn't find that product. It may have been removed.</p>
+          <button className="btn-ghost" onClick={() => router.push("/")}>Go home</button>
+        </div>
+      </main>
+    );
+  }
 
-    // Prevent double-increment on refresh
-    if (sessionStorage.getItem(viewedKey)) return;
-
-    sessionStorage.setItem(viewedKey, "true");
-
-    const productRef = doc(db, "products", id);
-    updateDoc(productRef, { views: increment(1) });
-  }, [product, id]);
-
-  if (!product) return <p className="p-4 text-gray-600">Loading...</p>;
-
-  // ⭐ STORE LOGOS (unchanged)
-  const stores = [
-    { name: "Amazon", logo: "/logos/amazon.png" },
-    { name: "Meesho", logo: "/logos/meesho.png" },
-    { name: "Ajio", logo: "/logos/ajio.png" }
-  ];
+  // helper to open affiliate link (in new tab)
+  function openAffiliate(url) {
+    if (!url) return alert("No affiliate link available for this product.");
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
 
   return (
-    <div className="p-4 pb-20">
-      {/* TITLE */}
-      <h1 className="text-4xl font-bold text-blue-400 leading-tight">
-        {product.name}
-      </h1>
-
-      <p className="text-gray-700 mt-1">{product.description}</p>
-
-      {/* IMAGE */}
-      <div className="mt-4">
-        <Image
-          src={product.imageUrl}
-          width={800}
-          height={500}
-          alt={product.name}
-          className="rounded-2xl border border-blue-200 shadow-lg"
-        />
-      </div>
-
-      {/* ⭐ AVAILABLE ON — (UNCHANGED UI BELOW THIS LINE) */}
-      <h2 className="text-3xl font-bold text-blue-400 mt-6">Available On</h2>
-
-      <div className="relative overflow-hidden mt-4">
-        <div className="flex gap-6 animate-slideSlow" style={{ width: "max-content" }}>
-          {stores.map((s, i) => (
-            <div key={i} className="flex flex-col items-center">
-              <div className="w-[90px] h-[90px] rounded-full bg-white shadow-lg border border-blue-100 flex items-center justify-center">
-                <Image
-                  src={s.logo}
-                  width={60}
-                  height={60}
-                  alt={s.name}
-                  className="object-contain"
-                />
+    <main className="page-container" style={{ padding: 12 }}>
+      {/* Top: gallery + title + price */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
+        <div style={{ borderRadius: 18, overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.08)", padding: 6, background: "linear-gradient(90deg, rgba(0,198,255,0.08), rgba(0,255,150,0.06))" }}>
+          {/* simple horizontal image gallery */}
+          <div style={{ display: "flex", gap: 8, overflowX: "auto", padding: 6 }} className="no-scrollbar">
+            {images.map((src, i) => (
+              <div key={i} style={{ minWidth: 320, width: "100%", maxWidth: 640, flex: "0 0 auto", borderRadius: 12, overflow: "hidden" }}>
+                <Image src={src} alt={product.name} width={900} height={540} style={{ width: "100%", height: "auto", objectFit: "cover" }} />
               </div>
-              <p className="mt-1 font-semibold text-gray-700">{s.name}</p>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: "flex", gap: 12, alignItems: "flex-start", flexDirection: "column" }}>
+          <h1 style={{ fontSize: "1.6rem", color: "#00b7ff", margin: 0 }}>{product.name}</h1>
+
+          <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+            <div style={{ fontSize: "1.3rem", fontWeight: 800, color: "#0077b6" }}>₹ {product.price?.toLocaleString?.() ?? product.price}</div>
+            <div style={{ padding: "6px 10px", borderRadius: 999, background: "linear-gradient(90deg,#00c6ff,#00ff99)", color: "#001", fontWeight: 800, boxShadow: "0 10px 20px rgba(0,198,255,0.12)" }}>
+              Compare
             </div>
-          ))}
+
+            {/* affiliate buttons area */}
+            <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
+              <button onClick={() => openAffiliate(product.amazonUrl)} className="btn-primary">Buy on Amazon</button>
+              <button onClick={() => openAffiliate(product.meeshoUrl)} className="btn-primary" style={{ background: "linear-gradient(90deg,#00ff99,#00c6ff)" }}>Meesho</button>
+              <button onClick={() => openAffiliate(product.ajioUrl)} className="btn-ghost">Other</button>
+            </div>
+          </div>
+
+          {/* short description */}
+          {product.description && (
+            <p style={{ color: "#333", marginTop: 6 }}>{product.description}</p>
+          )}
+
+          {/* price comparison block (simple presentation of collected marketplaces) */}
+          <div style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+            {product.amazonPrice != null && (
+              <div style={{ background: "#fff", borderRadius: 12, padding: "10px 12px", boxShadow: "0 6px 18px rgba(0,0,0,0.06)" }}>
+                <div style={{ fontSize: 12, color: "#777" }}>Amazon</div>
+                <div style={{ fontWeight: 800, color: "#0077b6" }}>₹ {product.amazonPrice}</div>
+              </div>
+            )}
+            {product.meeshoPrice != null && (
+              <div style={{ background: "#fff", borderRadius: 12, padding: "10px 12px", boxShadow: "0 6px 18px rgba(0,0,0,0.06)" }}>
+                <div style={{ fontSize: 12, color: "#777" }}>Meesho</div>
+                <div style={{ fontWeight: 800, color: "#0077b6" }}>₹ {product.meeshoPrice}</div>
+              </div>
+            )}
+            {product.ajioPrice != null && (
+              <div style={{ background: "#fff", borderRadius: 12, padding: "10px 12px", boxShadow: "0 6px 18px rgba(0,0,0,0.06)" }}>
+                <div style={{ fontSize: 12, color: "#777" }}>Ajio</div>
+                <div style={{ fontWeight: 800, color: "#0077b6" }}>₹ {product.ajioPrice}</div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* COMPARE PRICES (unchanged) */}
-      <h2 className="text-3xl font-bold text-blue-400 mt-8">Compare Prices</h2>
-
-      <div className="mt-4 flex overflow-x-scroll gap-4 no-scrollbar pb-4">
-        {[
-          {
-            name: "Amazon",
-            price: product.amazonPrice,
-            offer: product.amazonOffer,
-            url: product.amazonUrl,
-          },
-          {
-            name: "Meesho",
-            price: product.meeshoPrice,
-            offer: product.meeshoOffer,
-            url: product.meeshoUrl,
-          },
-          {
-            name: "Ajio",
-            price: product.ajioPrice,
-            offer: product.ajioOffer,
-            url: product.ajioUrl,
-          }
-        ].map((s, i) => (
-          <div
-            key={i}
-            className="min-w-[63%] bg-white rounded-3xl p-4 border border-blue-200 shadow-xl"
-          >
-            <h3 className="text-2xl font-bold text-blue-500">{s.name}</h3>
-            <p className="text-3xl font-bold text-blue-600 mt-1">₹{s.price}</p>
-            <p className="text-gray-600 mt-1">{s.offer}</p>
-
-            <a
-              href={s.url}
-              target="_blank"
-              className="mt-4 inline-block px-6 py-2 rounded-full shadow-md font-semibold text-black text-lg"
-              style={{ background: "linear-gradient(to right, #00c6ff, #00ff99)" }}
-            >
-              Buy →
-            </a>
+      {/* Details & specs */}
+      <section style={{ marginTop: 18 }}>
+        <h3 style={{ color: "#00b7ff", marginBottom: 8 }}>Product details</h3>
+        {product.details ? (
+          <div style={{ background: "#f8feff", padding: 12, borderRadius: 12 }}>
+            <div dangerouslySetInnerHTML={{ __html: product.details }} />
           </div>
-        ))}
-      </div>
-    </div>
+        ) : (
+          <div style={{ color: "#333" }}>
+            <p>{product.description ?? "No additional details available."}</p>
+          </div>
+        )}
+      </section>
+
+      {/* Similar / You may like (infinite slider) */}
+      {similar.length > 0 && (
+        <section style={{ marginTop: 18 }}>
+          <h3 style={{ color: "#00b7ff" }}>Similar products</h3>
+          {/* InfiniteSlider expects items prop with id, name, imageUrl */}
+          <InfiniteSlider items={similar} />
+        </section>
+      )}
+    </main>
   );
-        }
-        
+}
