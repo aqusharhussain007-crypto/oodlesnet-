@@ -3,67 +3,60 @@
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase-app";
 import { doc, getDoc } from "firebase/firestore";
-import ImageSwiper from "@/components/ImageSwiper";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function ProductPage({ params }) {
   const { id } = params;
-
   const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  /* ====================== LOAD PRODUCT ====================== */
+  /* ---------------- LOAD PRODUCT ---------------- */
   useEffect(() => {
-    async function loadProduct() {
+    async function load() {
       const snap = await getDoc(doc(db, "products", id));
-
       if (snap.exists()) {
-        const data = { id: snap.id, ...snap.data() };
-        setProduct(data);
+        const data = snap.data();
+        setProduct({ id: snap.id, ...data });
 
-        saveRecentProduct(data);
+        // Save to recently viewed
+        saveRecent({ id: snap.id, ...data });
       }
-
-      setLoading(false);
     }
-    loadProduct();
+    load();
   }, [id]);
 
-  /* =============== SAVE RECENT PRODUCT =================== */
-  function saveRecentProduct(p) {
+  /* ---------------- SAVE RECENTLY VIEWED ---------------- */
+  function saveRecent(p) {
     if (typeof window === "undefined") return;
 
     let recent = JSON.parse(localStorage.getItem("recent") || "[]");
 
-    recent = recent.filter((x) => x.id !== p.id);
+    // remove if exists
+    recent = recent.filter((r) => r.id !== p.id);
+
+    // add to front
     recent.unshift({
       id: p.id,
       name: p.name,
       price: p.price,
       imageUrl: p.imageUrl,
+      categorySlug: p.categorySlug,
     });
 
+    // max 10
     if (recent.length > 10) recent = recent.slice(0, 10);
+
     localStorage.setItem("recent", JSON.stringify(recent));
   }
 
-  /* ================= LOADING UI ================= */
-  if (loading) {
-    return <main style={{ padding: 20 }}>Loading...</main>;
-  }
+  if (!product) return <p style={{ padding: 20 }}>Loading…</p>;
 
-  if (!product) {
-    return <main style={{ padding: 20 }}>Product not found</main>;
-  }
-
-  const imgs = product.images && product.images.length > 0 ? product.images : [product.imageUrl];
-
-  /* ===================== SHARE FEATURE ==================== */
+  /* ---------------- SHARE PRODUCT ---------------- */
   function shareProduct() {
     if (navigator.share) {
       navigator.share({
         title: product.name,
-        text: "Check out this product!",
+        text: "Check this out!",
         url: window.location.href,
       });
     } else {
@@ -72,147 +65,212 @@ export default function ProductPage({ params }) {
   }
 
   return (
-    <main style={{ padding: 14, paddingBottom: 80 }}>
+    <main style={{ padding: 16, maxWidth: 900, margin: "0 auto" }}>
 
-      {/* ====================== BREADCRUMBS ====================== */}
-      <div style={{ fontSize: 14, marginBottom: 10 }}>
-        <Link href="/" style={{ color: "#0099dd" }}>Home</Link> /
-        <Link
-          href={`/?cat=${product.categorySlug}`}
-          style={{ color: "#0099dd", marginLeft: 6 }}
-        >
-          {product.categoryName || product.categorySlug}
-        </Link>{" "}
-        / <span style={{ fontWeight: 700 }}>{product.name}</span>
+      {/* Breadcrumb */}
+      <div style={{ marginBottom: 12, fontSize: 14 }}>
+        <Link href="/">Home</Link> /
+        <Link href={`/category/${product.categorySlug}`} style={{ marginLeft: 6 }}>
+          {product.categorySlug}
+        </Link> /
+        <span style={{ marginLeft: 6, fontWeight: 700 }}>{product.name}</span>
       </div>
 
-      {/* ====================== IMAGE SWIPER ====================== */}
-      <ImageSwiper images={imgs} />
-
-      {/* ====================== SHARE BUTTON ====================== */}
-      <div style={{ marginTop: 10, display: "flex", justifyContent: "flex-end" }}>
-        <button
-          onClick={shareProduct}
+      {/* IMAGE BOX */}
+      <div
+        style={{
+          width: "100%",
+          borderRadius: 18,
+          padding: 10,
+          background: "white",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
+        }}
+      >
+        <Image
+          src={product.imageUrl}
+          width={900}
+          height={600}
+          alt={product.name}
           style={{
-            background: "#e2f7ff",
-            padding: "8px 14px",
-            borderRadius: 8,
-            border: "1px solid #00c3ff",
-            color: "#0077b6",
-            fontWeight: 600,
+            width: "100%",
+            height: "auto",
+            borderRadius: 14,
+            objectFit: "cover",
           }}
-        >
-          Share 🔗
-        </button>
+        />
       </div>
 
-      {/* ====================== PRODUCT TITLE & PRICE ====================== */}
-      <h1 style={{ marginTop: 16, fontSize: "1.45rem", fontWeight: 800, color: "#0077b6" }}>
+      {/* TITLE + PRICE */}
+      <h1
+        style={{
+          marginTop: 16,
+          fontSize: "1.7rem",
+          fontWeight: 800,
+          color: "#007bcd",
+        }}
+      >
         {product.name}
       </h1>
 
-      <p style={{ fontSize: "1.4rem", color: "#00a8e8", fontWeight: 800 }}>
+      <p
+        style={{
+          marginTop: 6,
+          fontWeight: 700,
+          fontSize: "1.4rem",
+          color: "#0088cc",
+        }}
+      >
         ₹ {product.price}
       </p>
 
-      {/* ====================== PRICE COMPARISON ====================== */}
-      <div
+      {/* DESCRIPTION */}
+      <h2 style={{ marginTop: 20, fontWeight: 700, fontSize: "1.2rem", color: "#0077cc" }}>
+        Description
+      </h2>
+      <p style={{ marginTop: 6, fontSize: 16, color: "#333" }}>
+        {product.description}
+      </p>
+
+      {/* PRICE COMPARISON */}
+      <h2 style={{ marginTop: 26, fontWeight: 700, fontSize: "1.2rem", color: "#0077cc" }}>
+        Compare Prices
+      </h2>
+
+      <div style={{ marginTop: 12 }}>
+        {/* AMAZON ROW */}
+        {product.amazonUrl && (
+          <div
+            style={{
+              padding: 14,
+              borderRadius: 12,
+              background: "#fff",
+              marginBottom: 12,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            }}
+          >
+            <strong>Amazon:</strong> ₹ {product.amazonPrice}
+            <br />
+            <small style={{ color: "#777" }}>{product.amazonOffer}</small>
+
+            <a
+              href={product.amazonUrl}
+              target="_blank"
+              style={{
+                display: "block",
+                marginTop: 10,
+                padding: 12,
+                borderRadius: 10,
+                textAlign: "center",
+                fontWeight: 800,
+                background: "linear-gradient(90deg,#ff9900,#ffb74d)",
+                color: "white",
+                textDecoration: "none",
+              }}
+            >
+              Buy on Amazon
+            </a>
+          </div>
+        )}
+
+        {/* MEESHO ROW */}
+        {product.meeshoUrl && (
+          <div
+            style={{
+              padding: 14,
+              borderRadius: 12,
+              background: "#fff",
+              marginBottom: 12,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            }}
+          >
+            <strong>Meesho:</strong> ₹ {product.meeshoPrice}
+            <br />
+            <small style={{ color: "#777" }}>{product.meeshoOffer}</small>
+
+            <a
+              href={product.meeshoUrl}
+              target="_blank"
+              style={{
+                display: "block",
+                marginTop: 10,
+                padding: 12,
+                borderRadius: 10,
+                textAlign: "center",
+                fontWeight: 800,
+                background: "linear-gradient(90deg,#ff4fa5,#ff7bbd)",
+                color: "white",
+                textDecoration: "none",
+              }}
+            >
+              Buy on Meesho
+            </a>
+          </div>
+        )}
+
+        {/* AJIO ROW */}
+        {product.ajioUrl && (
+          <div
+            style={{
+              padding: 14,
+              borderRadius: 12,
+              background: "#fff",
+              marginBottom: 12,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            }}
+          >
+            <strong>Ajio:</strong> ₹ {product.ajioPrice}
+            <br />
+            <small style={{ color: "#777" }}>{product.ajioOffer}</small>
+
+            <a
+              href={product.ajioUrl}
+              target="_blank"
+              style={{
+                display: "block",
+                marginTop: 10,
+                padding: 12,
+                borderRadius: 10,
+                textAlign: "center",
+                fontWeight: 800,
+                background: "linear-gradient(90deg,#004cff,#00d2ff)",
+                color: "white",
+                textDecoration: "none",
+              }}
+            >
+              Buy on Ajio
+            </a>
+          </div>
+        )}
+      </div>
+
+      {/* SHARE BUTTON */}
+      <button
+        onClick={shareProduct}
         style={{
-          marginTop: 14,
-          background: "#f2fbff",
+          width: "100%",
+          marginTop: 20,
           padding: 14,
-          borderRadius: 14,
-          border: "1px solid #c7eefb",
+          borderRadius: 12,
+          fontWeight: 700,
+          background: "linear-gradient(90deg,#00c6ff,#00ff9d)",
+          color: "#003",
+          border: "none",
         }}
       >
-        <h3 style={{ fontWeight: 700, color: "#0077b6", marginBottom: 10 }}>
-          Price Comparison
-        </h3>
+        Share Product
+      </button>
 
-        {product.amazonLink && (
-          <p style={{ marginBottom: 6 }}>Amazon: ₹{product.amazonPrice || product.price}</p>
-        )}
-        {product.meeshoLink && (
-          <p style={{ marginBottom: 6 }}>Meesho: ₹{product.meeshoPrice || product.price}</p>
-        )}
-        {product.ajioLink && (
-          <p style={{ marginBottom: 6 }}>Ajio: ₹{product.ajioPrice || product.price}</p>
-        )}
-      </div>
-
-      {/* ====================== BUY BUTTONS ====================== */}
-      <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 12 }}>
-
-        {product.amazonLink && (
-          <a
-            href={product.amazonLink}
-            target="_blank"
-            className="btn-glow"
-            style={{
-              background: "linear-gradient(90deg,#00c6ff,#00ff99)",
-              padding: 14,
-              borderRadius: 12,
-              fontWeight: 800,
-              textAlign: "center",
-              fontSize: "1rem",
-              color: "#00222d",
-              textDecoration: "none",
-            }}
-          >
-            Buy on Amazon
-          </a>
-        )}
-
-        {product.meeshoLink && (
-          <a
-            href={product.meeshoLink}
-            target="_blank"
-            style={{
-              background: "linear-gradient(90deg,#ff7bbd,#ff4fa5)",
-              padding: 14,
-              borderRadius: 12,
-              fontWeight: 800,
-              textAlign: "center",
-              fontSize: "1rem",
-              color: "white",
-              textDecoration: "none",
-            }}
-          >
-            Buy on Meesho
-          </a>
-        )}
-
-        {product.ajioLink && (
-          <a
-            href={product.ajioLink}
-            target="_blank"
-            style={{
-              background: "linear-gradient(90deg,#004cff,#00d2ff)",
-              padding: 14,
-              borderRadius: 12,
-              fontWeight: 800,
-              textAlign: "center",
-              fontSize: "1rem",
-              color: "white",
-              textDecoration: "none",
-            }}
-          >
-            Buy on Ajio
-          </a>
-        )}
-      </div>
-
-      {/* ====================== DESCRIPTION ====================== */}
-      <div style={{ marginTop: 24 }}>
-        <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#0077b6" }}>
-          Description
-        </h3>
-        <p style={{ marginTop: 6, color: "#444", fontSize: "1rem" }}>
-          {product.description || "No description available."}
-        </p>
-      </div>
-
+      <footer
+        style={{
+          marginTop: 30,
+          textAlign: "center",
+          color: "#777",
+          fontSize: 14,
+        }}
+      >
+        © 2025 OodlesNet. All Rights Reserved.
+      </footer>
     </main>
   );
-  }
-  
+                    }
+                    
