@@ -187,3 +187,29 @@ h1, h2, h3, h4, h5, h6 {
   cursor: pointer;
 }
 
+/* Product page helpers */
+.page-container { max-width: 1100px; margin: 0 auto; }
+.skeleton { background: linear-gradient(90deg, #e8f8ff 0%, #e4fff0 50%, #e8f8ff 100%); border-radius: 12px; }
+
+/* Buttons used above */
+.btn-primary {
+  background: linear-gradient(90deg,#00c6ff,#00ff99);
+  color: #001;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 800;
+  border: none;
+  box-shadow: 0 8px 20px rgba(0,198,255,0.12);
+  cursor: pointer;
+}
+.btn-ghost {
+  background: transparent;
+  border-radius: 10px;
+  padding: 8px 12px;
+  border: 1px solid rgba(0,0,0,0.06);
+  cursor: pointer;
+}
+@media (min-width: 880px) {
+  .page-container { padding: 28px; }
+   }
+   
