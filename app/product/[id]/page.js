@@ -1,229 +1,228 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 import { db } from "@/lib/firebase-app";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import Image from "next/image";
+
+/**
+ * Product page (App Router)
+ * - Thumbnail carousel + main image
+ * - Share button (top-right floating)
+ * - Sticky "Buy buttons" column that stays visible and scrolls under header (behaves like YouTube sticky)
+ * - Compare prices read from Firestore fields: amazonPrice/amazonOffer/amazonUrl, meeshoPrice/meeshoUrl, ajioPrice/ajioUrl
+ *
+ * Usage: file placed at app/product/[id]/page.js
+ */
 
 export default function ProductPage({ params }) {
-  const { id } = params;
+  const id = params.id;
   const [product, setProduct] = useState(null);
+  const mainRef = useRef(null);
 
-  /* ---------------- FETCH PRODUCT ---------------- */
   useEffect(() => {
-    async function loadProduct() {
-      const snap = await getDoc(doc(db, "products", id));
-      if (snap.exists()) {
-        const data = snap.data();
-        setProduct(data);
+    async function load() {
+      try {
+        const d = doc(db, "products", id);
+        const snap = await getDoc(d);
+        if (snap.exists()) {
+          const data = { id: snap.id, ...snap.data() };
+          setProduct(data);
 
-        // update views (non-blocking)
-        updateDoc(doc(db, "products", id), {
-          views: Number(data.views || 0) + 1,
-        }).catch(() => {});
+          // increase views (best-effort)
+          try {
+            await updateDoc(d, { views: (data.views || 0) + 1 });
+          } catch (e) {
+            // ignore write errors
+          }
+        } else {
+          setProduct(null);
+        }
+      } catch (e) {
+        console.error("load product", e);
       }
     }
-    loadProduct();
+    load();
   }, [id]);
 
   if (!product) {
     return (
-      <div style={{ padding: 20, textAlign: "center", color: "#0077b6" }}>
-        Loading product...
-      </div>
+      <main className="page-container" style={{ padding: 12 }}>
+        <div style={{ height: 380, borderRadius: 14, background: "#fff", boxShadow: "0 6px 20px rgba(0,0,0,0.06)" }} />
+        <h2 style={{ marginTop: 18, color: "#0bbcff" }}>Loading...</h2>
+      </main>
     );
   }
 
-  /* ---------------- SHARE HANDLER ---------------- */
+  // helpers for store buttons
+  const stores = [
+    {
+      key: "amazon",
+      label: "Buy on Amazon",
+      price: product.amazonPrice,
+      offer: product.amazonOffer,
+      url: product.amazonUrl,
+      color: "linear-gradient(90deg,#ffb347,#ffcc33)",
+    },
+    {
+      key: "meesho",
+      label: "Buy on Meesho",
+      price: product.meeshoPrice,
+      offer: product.meeshoOffer,
+      url: product.meeshoUrl,
+      color: "linear-gradient(90deg,#ff64b4,#ff6e9a)",
+    },
+    {
+      key: "ajio",
+      label: "Buy on Ajio",
+      price: product.ajioPrice,
+      offer: product.ajioOffer,
+      url: product.ajioUrl,
+      color: "linear-gradient(90deg,#6ad7ff,#00ffd0)",
+    },
+  ].filter((s) => s.url || s.price != null);
+
   function shareProduct() {
+    const text = `${product.name} - ₹${product.price}\n${typeof window !== "undefined" ? window.location.href : ""}`;
     if (navigator.share) {
-      navigator.share({
-        title: product.name,
-        text: "Check out this product!",
-        url: window.location.href,
-      });
+      navigator.share({ title: product.name, text, url: typeof window !== "undefined" ? window.location.href : "" }).catch(() => {});
     } else {
-      alert("Sharing not supported on this device.");
+      // fallback copy
+      navigator.clipboard?.writeText(text);
+      alert("Link copied to clipboard");
     }
   }
 
-  /* ---------------- PRICE ROW COMPONENT ---------------- */
-  const PriceRow = ({ label, price, offer, url, color1, color2 }) => {
-    if (!price || !url) return null;
-
-    return (
-      <div
-        style={{
-          background: "#fff",
-          borderRadius: 18,
-          padding: "16px 18px",
-          marginBottom: 16,
-          boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-        }}
-      >
-        <h3 style={{ color: "#005f99", marginBottom: 6 }}>
-          {label}: ₹ {price}
-        </h3>
-        <p style={{ color: "#666", marginBottom: 14 }}>{offer}</p>
-
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: "block",
-            width: "100%",
-            padding: "14px 0",
-            textAlign: "center",
-            borderRadius: 14,
-            fontWeight: 700,
-            color: "#fff",
-            background: `linear-gradient(90deg, ${color1}, ${color2})`,
-            boxShadow: "0 4px 18px rgba(0,0,0,0.12)",
-          }}
-        >
-          Buy on {label}
-        </a>
-      </div>
-    );
-  };
+  // thumbnail carousel simple handlers
+  const [selectedImage, setSelectedImage] = useState(product.imageUrl || "");
+  const thumbsRef = useRef(null);
+  useEffect(() => setSelectedImage(product.imageUrl || ""), [product.imageUrl]);
 
   return (
-    <main style={{ padding: 14, paddingBottom: 40 }}>
-      {/* Breadcrumbs */}
-      <div style={{ fontSize: 14, marginBottom: 12, color: "#0077b6" }}>
-        <span
-          onClick={() => (window.location = "/")}
-          style={{ cursor: "pointer", fontWeight: 600 }}
+    <main className="page-container" style={{ padding: 12 }}>
+      {/* Breadcrumb */}
+      <div style={{ color: "#0077aa", marginBottom: 8 }}>
+        Home / {product.categorySlug || "category"} / <strong style={{ color: "#0b9bdc" }}>{product.name}</strong>
+      </div>
+
+      {/* Image area */}
+      <div style={{ position: "relative" }}>
+        <div
+          ref={mainRef}
+          style={{
+            width: "100%",
+            height: 320,
+            background: "#fff",
+            borderRadius: 16,
+            overflow: "hidden",
+            boxShadow: "0 8px 26px rgba(0,0,0,0.06)",
+          }}
         >
-          Home
-        </span>{" "}
-        /{" "}
-        <span style={{ fontWeight: 600 }}>
-          {product.categorySlug?.replace("-", " ")}
-        </span>{" "}
-        /{" "}
-        <span style={{ fontWeight: 700, color: "#023e8a" }}>{product.name}</span>
-      </div>
+          {selectedImage ? (
+            <Image src={selectedImage} alt={product.name} width={1200} height={800} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          ) : (
+            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#aaa" }}>
+              No image
+            </div>
+          )}
+        </div>
 
-      {/* Main product image */}
-      <div
-        style={{
-          width: "100%",
-          background: "#fff",
-          borderRadius: 20,
-          overflow: "hidden",
-          boxShadow: "0 4px 18px rgba(0,0,0,0.1)",
-        }}
-      >
-        <Image
-          src={product.imageUrl}
-          width={700}
-          height={500}
-          alt={product.name}
-          style={{ width: "100%", height: "auto", objectFit: "cover" }}
-        />
-      </div>
-
-      {/* Share Button */}
-      <div style={{ marginTop: 12, textAlign: "right" }}>
+        {/* Share button (floating top-right of image) */}
         <button
           onClick={shareProduct}
           style={{
-            padding: "10px 16px",
+            position: "absolute",
+            right: 12,
+            top: 12,
+            background: "#e9fbff",
             borderRadius: 12,
+            padding: "8px 12px",
             border: "none",
-            background: "#e0f7ff",
-            color: "#0077b6",
+            boxShadow: "0 6px 18px rgba(0,198,255,0.08)",
+            color: "#0077aa",
             fontWeight: 700,
-            boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
           }}
         >
           Share
         </button>
       </div>
 
-      {/* Product Title */}
-      <h1
-        style={{
-          fontSize: "1.6rem",
-          marginTop: 14,
-          fontWeight: 800,
-          color: "#005f99",
-        }}
-      >
-        {product.name}
-      </h1>
+      {/* Thumbnails (horizontal) */}
+      <div style={{ display: "flex", gap: 10, overflowX: "auto", marginTop: 10, paddingBottom: 8 }}>
+        {/* We only have single image now; if you add more fields like images: [..] they can be listed */}
+        {[product.imageUrl, product.imageUrl].filter(Boolean).map((src, i) => (
+          <div key={i} onClick={() => setSelectedImage(src)} style={{ minWidth: 90, height: 64, borderRadius: 10, overflow: "hidden", cursor: "pointer", border: selectedImage === src ? "3px solid #00c6ff" : "2px solid rgba(0,0,0,0.06)" }}>
+            <Image src={src} width={240} height={160} alt={`thumb-${i}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          </div>
+        ))}
+      </div>
 
-      {/* Main price */}
-      <h2
-        style={{
-          fontSize: "1.3rem",
-          fontWeight: 700,
-          marginTop: 6,
-          color: "#0085c7",
-        }}
-      >
-        ₹ {product.price}
-      </h2>
+      {/* Title & price */}
+      <h1 style={{ marginTop: 16, color: "#0078c6", fontSize: 28 }}>{product.name}</h1>
+      <div style={{ fontSize: 22, color: "#00a3d6", fontWeight: 800, marginTop: 8 }}>₹ {product.price}</div>
 
       {/* Description */}
-      <h2
+      <h3 style={{ marginTop: 16, color: "#0077aa" }}>Description</h3>
+      <p style={{ color: "#444", marginTop: 6 }}>{product.description}</p>
+
+      {/* Compare Prices heading */}
+      <h3 style={{ marginTop: 18, color: "#0077aa" }}>Compare Prices</h3>
+
+      {/* BUY BUTTONS SECTION
+          This container is NOT fixed to bottom. It's a normal block that we make sticky
+          so while the product image is visible it stays pinned; when user scrolls past details,
+          it will scroll away under the header (like YouTube sticky).
+      */}
+      <div
         style={{
-          marginTop: 18,
-          fontSize: "1.2rem",
-          fontWeight: 700,
-          color: "#0a5f91",
+          position: "sticky",
+          top: 80, // adjust so it sits under the top header
+          zIndex: 40,
+          marginTop: 12,
         }}
       >
-        Description
-      </h2>
-      <p style={{ color: "#444", fontSize: 16, marginTop: 4 }}>
-        {product.description}
-      </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {stores.map((s) => (
+            <div key={s.key} style={{ background: "#fff", borderRadius: 12, padding: 14, boxShadow: "0 6px 20px rgba(0,0,0,0.06)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <div style={{ fontWeight: 800 }}>{s.label.replace("Buy on ", "")}: <span style={{ color: "#0077aa" }}>₹ {s.price ?? "-"}</span></div>
+                <div style={{ color: "#666", fontSize: 13 }}>{s.offer || ""}</div>
+              </div>
 
-      {/* Compare Prices */}
-      <h2
-        style={{
-          marginTop: 22,
-          fontSize: "1.25rem",
-          fontWeight: 800,
-          color: "#0077b6",
-        }}
-      >
-        Compare Prices
-      </h2>
+              <div style={{ marginTop: 12 }}>
+                <a
+                  href={s.url || "#"}
+                  rel="noreferrer"
+                  target="_blank"
+                  style={{
+                    display: "inline-block",
+                    width: "100%",
+                    textAlign: "center",
+                    padding: "14px 18px",
+                    borderRadius: 12,
+                    background: s.color,
+                    color: "#fff",
+                    fontWeight: 800,
+                    textDecoration: "none",
+                    boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+                  }}
+                >
+                  {s.label}
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-      {/* Amazon */}
-      <PriceRow
-        label="Amazon"
-        price={product.amazonPrice}
-        offer={product.amazonOffer}
-        url={product.amazonUrl}
-        color1="#ff9900"
-        color2="#ff6600"
-      />
-
-      {/* Meesho */}
-      <PriceRow
-        label="Meesho"
-        price={product.meeshoPrice}
-        offer={product.meeshoOffer}
-        url={product.meeshoUrl}
-        color1="#ff4da6"
-        color2="#ff1a75"
-      />
-
-      {/* Ajio */}
-      <PriceRow
-        label="Ajio"
-        price={product.ajioPrice}
-        offer={product.ajioOffer}
-        url={product.ajioUrl}
-        color1="#0059ff"
-        color2="#00a2ff"
-      />
+      {/* Below buttons: any extra details */}
+      <div style={{ marginTop: 20 }}>
+        <h3 style={{ color: "#0077aa" }}>More details</h3>
+        <p style={{ color: "#444", marginTop: 8 }}>
+          {product.longDescription || "No extra details available."}
+        </p>
+      </div>
     </main>
   );
-            }
-            
+                    }
+  
