@@ -2,61 +2,44 @@
 
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase-app";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Image from "next/image";
-import Link from "next/link";
 
 export default function ProductPage({ params }) {
   const { id } = params;
   const [product, setProduct] = useState(null);
 
-  /* ---------------- LOAD PRODUCT ---------------- */
+  /* ---------------- FETCH PRODUCT ---------------- */
   useEffect(() => {
-    async function load() {
+    async function loadProduct() {
       const snap = await getDoc(doc(db, "products", id));
       if (snap.exists()) {
         const data = snap.data();
-        setProduct({ id: snap.id, ...data });
+        setProduct(data);
 
-        // Save to recently viewed
-        saveRecent({ id: snap.id, ...data });
+        // update views (non-blocking)
+        updateDoc(doc(db, "products", id), {
+          views: Number(data.views || 0) + 1,
+        }).catch(() => {});
       }
     }
-    load();
+    loadProduct();
   }, [id]);
 
-  /* ---------------- SAVE RECENTLY VIEWED ---------------- */
-  function saveRecent(p) {
-    if (typeof window === "undefined") return;
-
-    let recent = JSON.parse(localStorage.getItem("recent") || "[]");
-
-    // remove if exists
-    recent = recent.filter((r) => r.id !== p.id);
-
-    // add to front
-    recent.unshift({
-      id: p.id,
-      name: p.name,
-      price: p.price,
-      imageUrl: p.imageUrl,
-      categorySlug: p.categorySlug,
-    });
-
-    // max 10
-    if (recent.length > 10) recent = recent.slice(0, 10);
-
-    localStorage.setItem("recent", JSON.stringify(recent));
+  if (!product) {
+    return (
+      <div style={{ padding: 20, textAlign: "center", color: "#0077b6" }}>
+        Loading product...
+      </div>
+    );
   }
 
-  if (!product) return <p style={{ padding: 20 }}>Loading…</p>;
-
-  /* ---------------- SHARE PRODUCT ---------------- */
+  /* ---------------- SHARE HANDLER ---------------- */
   function shareProduct() {
     if (navigator.share) {
       navigator.share({
         title: product.name,
-        text: "Check this out!",
+        text: "Check out this product!",
         url: window.location.href,
       });
     } else {
@@ -64,213 +47,183 @@ export default function ProductPage({ params }) {
     }
   }
 
-  return (
-    <main style={{ padding: 16, maxWidth: 900, margin: "0 auto" }}>
+  /* ---------------- PRICE ROW COMPONENT ---------------- */
+  const PriceRow = ({ label, price, offer, url, color1, color2 }) => {
+    if (!price || !url) return null;
 
-      {/* Breadcrumb */}
-      <div style={{ marginBottom: 12, fontSize: 14 }}>
-        <Link href="/">Home</Link> /
-        <Link href={`/category/${product.categorySlug}`} style={{ marginLeft: 6 }}>
-          {product.categorySlug}
-        </Link> /
-        <span style={{ marginLeft: 6, fontWeight: 700 }}>{product.name}</span>
+    return (
+      <div
+        style={{
+          background: "#fff",
+          borderRadius: 18,
+          padding: "16px 18px",
+          marginBottom: 16,
+          boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+        }}
+      >
+        <h3 style={{ color: "#005f99", marginBottom: 6 }}>
+          {label}: ₹ {price}
+        </h3>
+        <p style={{ color: "#666", marginBottom: 14 }}>{offer}</p>
+
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: "block",
+            width: "100%",
+            padding: "14px 0",
+            textAlign: "center",
+            borderRadius: 14,
+            fontWeight: 700,
+            color: "#fff",
+            background: `linear-gradient(90deg, ${color1}, ${color2})`,
+            boxShadow: "0 4px 18px rgba(0,0,0,0.12)",
+          }}
+        >
+          Buy on {label}
+        </a>
+      </div>
+    );
+  };
+
+  return (
+    <main style={{ padding: 14, paddingBottom: 40 }}>
+      {/* Breadcrumbs */}
+      <div style={{ fontSize: 14, marginBottom: 12, color: "#0077b6" }}>
+        <span
+          onClick={() => (window.location = "/")}
+          style={{ cursor: "pointer", fontWeight: 600 }}
+        >
+          Home
+        </span>{" "}
+        /{" "}
+        <span style={{ fontWeight: 600 }}>
+          {product.categorySlug?.replace("-", " ")}
+        </span>{" "}
+        /{" "}
+        <span style={{ fontWeight: 700, color: "#023e8a" }}>{product.name}</span>
       </div>
 
-      {/* IMAGE BOX */}
+      {/* Main product image */}
       <div
         style={{
           width: "100%",
-          borderRadius: 18,
-          padding: 10,
-          background: "white",
-          boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
+          background: "#fff",
+          borderRadius: 20,
+          overflow: "hidden",
+          boxShadow: "0 4px 18px rgba(0,0,0,0.1)",
         }}
       >
         <Image
           src={product.imageUrl}
-          width={900}
-          height={600}
+          width={700}
+          height={500}
           alt={product.name}
-          style={{
-            width: "100%",
-            height: "auto",
-            borderRadius: 14,
-            objectFit: "cover",
-          }}
+          style={{ width: "100%", height: "auto", objectFit: "cover" }}
         />
       </div>
 
-      {/* TITLE + PRICE */}
+      {/* Share Button */}
+      <div style={{ marginTop: 12, textAlign: "right" }}>
+        <button
+          onClick={shareProduct}
+          style={{
+            padding: "10px 16px",
+            borderRadius: 12,
+            border: "none",
+            background: "#e0f7ff",
+            color: "#0077b6",
+            fontWeight: 700,
+            boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+          }}
+        >
+          Share
+        </button>
+      </div>
+
+      {/* Product Title */}
       <h1
         style={{
-          marginTop: 16,
-          fontSize: "1.7rem",
+          fontSize: "1.6rem",
+          marginTop: 14,
           fontWeight: 800,
-          color: "#007bcd",
+          color: "#005f99",
         }}
       >
         {product.name}
       </h1>
 
-      <p
+      {/* Main price */}
+      <h2
         style={{
-          marginTop: 6,
+          fontSize: "1.3rem",
           fontWeight: 700,
-          fontSize: "1.4rem",
-          color: "#0088cc",
+          marginTop: 6,
+          color: "#0085c7",
         }}
       >
         ₹ {product.price}
-      </p>
+      </h2>
 
-      {/* DESCRIPTION */}
-      <h2 style={{ marginTop: 20, fontWeight: 700, fontSize: "1.2rem", color: "#0077cc" }}>
+      {/* Description */}
+      <h2
+        style={{
+          marginTop: 18,
+          fontSize: "1.2rem",
+          fontWeight: 700,
+          color: "#0a5f91",
+        }}
+      >
         Description
       </h2>
-      <p style={{ marginTop: 6, fontSize: 16, color: "#333" }}>
+      <p style={{ color: "#444", fontSize: 16, marginTop: 4 }}>
         {product.description}
       </p>
 
-      {/* PRICE COMPARISON */}
-      <h2 style={{ marginTop: 26, fontWeight: 700, fontSize: "1.2rem", color: "#0077cc" }}>
+      {/* Compare Prices */}
+      <h2
+        style={{
+          marginTop: 22,
+          fontSize: "1.25rem",
+          fontWeight: 800,
+          color: "#0077b6",
+        }}
+      >
         Compare Prices
       </h2>
 
-      <div style={{ marginTop: 12 }}>
-        {/* AMAZON ROW */}
-        {product.amazonUrl && (
-          <div
-            style={{
-              padding: 14,
-              borderRadius: 12,
-              background: "#fff",
-              marginBottom: 12,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-            }}
-          >
-            <strong>Amazon:</strong> ₹ {product.amazonPrice}
-            <br />
-            <small style={{ color: "#777" }}>{product.amazonOffer}</small>
+      {/* Amazon */}
+      <PriceRow
+        label="Amazon"
+        price={product.amazonPrice}
+        offer={product.amazonOffer}
+        url={product.amazonUrl}
+        color1="#ff9900"
+        color2="#ff6600"
+      />
 
-            <a
-              href={product.amazonUrl}
-              target="_blank"
-              style={{
-                display: "block",
-                marginTop: 10,
-                padding: 12,
-                borderRadius: 10,
-                textAlign: "center",
-                fontWeight: 800,
-                background: "linear-gradient(90deg,#ff9900,#ffb74d)",
-                color: "white",
-                textDecoration: "none",
-              }}
-            >
-              Buy on Amazon
-            </a>
-          </div>
-        )}
+      {/* Meesho */}
+      <PriceRow
+        label="Meesho"
+        price={product.meeshoPrice}
+        offer={product.meeshoOffer}
+        url={product.meeshoUrl}
+        color1="#ff4da6"
+        color2="#ff1a75"
+      />
 
-        {/* MEESHO ROW */}
-        {product.meeshoUrl && (
-          <div
-            style={{
-              padding: 14,
-              borderRadius: 12,
-              background: "#fff",
-              marginBottom: 12,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-            }}
-          >
-            <strong>Meesho:</strong> ₹ {product.meeshoPrice}
-            <br />
-            <small style={{ color: "#777" }}>{product.meeshoOffer}</small>
-
-            <a
-              href={product.meeshoUrl}
-              target="_blank"
-              style={{
-                display: "block",
-                marginTop: 10,
-                padding: 12,
-                borderRadius: 10,
-                textAlign: "center",
-                fontWeight: 800,
-                background: "linear-gradient(90deg,#ff4fa5,#ff7bbd)",
-                color: "white",
-                textDecoration: "none",
-              }}
-            >
-              Buy on Meesho
-            </a>
-          </div>
-        )}
-
-        {/* AJIO ROW */}
-        {product.ajioUrl && (
-          <div
-            style={{
-              padding: 14,
-              borderRadius: 12,
-              background: "#fff",
-              marginBottom: 12,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-            }}
-          >
-            <strong>Ajio:</strong> ₹ {product.ajioPrice}
-            <br />
-            <small style={{ color: "#777" }}>{product.ajioOffer}</small>
-
-            <a
-              href={product.ajioUrl}
-              target="_blank"
-              style={{
-                display: "block",
-                marginTop: 10,
-                padding: 12,
-                borderRadius: 10,
-                textAlign: "center",
-                fontWeight: 800,
-                background: "linear-gradient(90deg,#004cff,#00d2ff)",
-                color: "white",
-                textDecoration: "none",
-              }}
-            >
-              Buy on Ajio
-            </a>
-          </div>
-        )}
-      </div>
-
-      {/* SHARE BUTTON */}
-      <button
-        onClick={shareProduct}
-        style={{
-          width: "100%",
-          marginTop: 20,
-          padding: 14,
-          borderRadius: 12,
-          fontWeight: 700,
-          background: "linear-gradient(90deg,#00c6ff,#00ff9d)",
-          color: "#003",
-          border: "none",
-        }}
-      >
-        Share Product
-      </button>
-
-      <footer
-        style={{
-          marginTop: 30,
-          textAlign: "center",
-          color: "#777",
-          fontSize: 14,
-        }}
-      >
-        © 2025 OodlesNet. All Rights Reserved.
-      </footer>
+      {/* Ajio */}
+      <PriceRow
+        label="Ajio"
+        price={product.ajioPrice}
+        offer={product.ajioOffer}
+        url={product.ajioUrl}
+        color1="#0059ff"
+        color2="#00a2ff"
+      />
     </main>
   );
-                    }
-                    
+            }
+            
