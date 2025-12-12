@@ -6,45 +6,23 @@ import { useRouter } from "next/navigation";
 export default function ProductCard({ product }) {
   const router = useRouter();
 
-  /* ------------------------------
-     Recently Viewed
-  ------------------------------ */
   function saveRecent() {
     if (typeof window === "undefined") return;
-
     let recent = JSON.parse(localStorage.getItem("recent") || "[]");
-
     recent = recent.filter((p) => p.id !== product.id);
-    recent.unshift({
-      id: product.id,
-      name: product.name,
-      imageUrl: product.imageUrl,
-    });
-
+    recent.unshift({ id: product.id, name: product.name, imageUrl: product.imageUrl });
     if (recent.length > 12) recent = recent.slice(0, 12);
-
     localStorage.setItem("recent", JSON.stringify(recent));
   }
 
-  /* ------------------------------
-     Navigate to product page
-  ------------------------------ */
   function openProduct() {
     saveRecent();
     router.push(`/product/${product.id}`);
   }
 
-  /* ------------------------------
-     ⭐ PRICE CALCULATIONS (store[])
-  ------------------------------ */
-  const prices =
-    product.store?.length > 0
-      ? product.store.map((s) => Number(s.price))
-      : [];
-
+  const prices = product.store?.length > 0 ? product.store.map((s) => Number(s.price)) : [];
   const lowest = prices.length ? Math.min(...prices) : null;
   const highest = prices.length ? Math.max(...prices) : null;
-
   let medium = null;
   if (prices.length >= 3) {
     const sorted = [...prices].sort((a, b) => a - b);
@@ -71,111 +49,38 @@ export default function ProductCard({ product }) {
         transition: "transform 0.2s ease",
       }}
     >
-      {/* IMAGE */}
       <div style={{ width: "100%", borderRadius: "16px", overflow: "hidden" }}>
         <Image
           src={product.imageUrl}
           alt={product.name}
           width={500}
           height={350}
-          style={{
-            width: "100%",
-            height: "auto",
-            objectFit: "cover",
-            borderRadius: "16px",
-          }}
+          style={{ width: "100%", height: "auto", objectFit: "cover", borderRadius: "16px" }}
         />
       </div>
 
-      {/* NAME */}
-      <h3
-        style={{
-          marginTop: "10px",
-          fontSize: "1.15rem",
-          fontWeight: 700,
-          color: "#0094d9",
-        }}
-      >
+      <h3 style={{ marginTop: "10px", fontSize: "1.15rem", fontWeight: 700, color: "#0094d9" }}>
         {product.name}
       </h3>
 
-      {/* ⭐ PRICE BLOCK (shimmer + flip animation) */}
       {lowest !== null ? (
         <div style={{ marginTop: "8px" }} className="shimmer">
-          {/* PRICES */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              fontSize: "0.85rem",
-              fontWeight: 700,
-              padding: "6px 8px",
-            }}
-          >
-            <span style={{ color: "#0a9d4a" }}>
-              ₹{lowest.toLocaleString("en-IN")}
-            </span>
-            <span style={{ color: "#0077b6" }}>
-              ₹{medium?.toLocaleString("en-IN")}
-            </span>
-            <span style={{ color: "#d93742" }}>
-              ₹{highest.toLocaleString("en-IN")}
-            </span>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", fontWeight: 700, padding: "6px 8px" }}>
+            <span style={{ color: "#0a9d4a" }}>₹{lowest.toLocaleString("en-IN")}</span>
+            <span style={{ color: "#0077b6" }}>₹{medium?.toLocaleString("en-IN")}</span>
+            <span style={{ color: "#d93742" }}>₹{highest.toLocaleString("en-IN")}</span>
           </div>
 
-          {/* LABELS */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginTop: "4px",
-              padding: "0 8px 6px 8px",
-              fontSize: "0.7rem",
-            }}
-          >
-            <span
-              className="flip"
-              style={{
-                background: "#e3f9e8",
-                padding: "2px 6px",
-                borderRadius: "6px",
-                color: "#0a9d4a",
-              }}
-            >
-              Lowest
-            </span>
-
-            <span
-              className="flip"
-              style={{
-                background: "#e8f4ff",
-                padding: "2px 6px",
-                borderRadius: "6px",
-                color: "#0077b6",
-              }}
-            >
-              Medium
-            </span>
-
-            <span
-              className="flip"
-              style={{
-                background: "#ffe7e8",
-                padding: "2px 6px",
-                borderRadius: "6px",
-                color: "#d93742",
-              }}
-            >
-              Highest
-            </span>
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px", padding: "0 8px 6px 8px", fontSize: "0.7rem" }}>
+            <span className="flip" style={{ background: "#e3f9e8", padding: "2px 6px", borderRadius: "6px", color: "#0a9d4a" }}>Lowest</span>
+            <span className="flip" style={{ background: "#e8f4ff", padding: "2px 6px", borderRadius: "6px", color: "#0077b6" }}>Medium</span>
+            <span className="flip" style={{ background: "#ffe7e8", padding: "2px 6px", borderRadius: "6px", color: "#d93742" }}>Highest</span>
           </div>
         </div>
       ) : (
-        <p style={{ marginTop: "6px", fontSize: "0.9rem", color: "#666" }}>
-          No price data
-        </p>
+        <p style={{ marginTop: "6px", fontSize: "0.9rem", color: "#666" }}>No price data</p>
       )}
     </div>
   );
-                }
-                                      
+}
+  
