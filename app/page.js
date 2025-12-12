@@ -5,6 +5,7 @@ import ProductCard from "@/components/ProductCard";
 import BannerAd from "@/components/ads/BannerAd";
 import FilterDrawer from "@/components/FilterDrawer";
 import InfiniteSlider from "@/components/InfiniteSlider";
+import CompareDrawer from "@/components/CompareDrawer";   // ✅ Added
 import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
@@ -24,6 +25,10 @@ export default function Home() {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  // 👉 NEW: Compare drawer state
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
   const trendingRef = useRef(null);
   const recentRef = useRef(null);
   const autoScrollInterval = useRef(null);
@@ -37,7 +42,7 @@ export default function Home() {
       setFiltered(items);
 
       const top = [...items]
-        .sort((a, b) => (Number(b.impressions || 0) - Number(a.impressions || 0)))
+        .sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0))
         .slice(0, 10);
       setTrending(top);
     }
@@ -76,7 +81,9 @@ export default function Home() {
       setFiltered(products);
       return;
     }
-    const match = products.filter((p) => (p.name || "").toLowerCase().includes(search.toLowerCase()));
+    const match = products.filter((p) =>
+      (p.name || "").toLowerCase().includes(search.toLowerCase())
+    );
     setSuggestions(match.slice(0, 5));
     setFiltered(match);
   }, [search, products]);
@@ -106,12 +113,14 @@ export default function Home() {
         const rc = recentRef.current;
         if (tr) {
           const step = Math.round(tr.clientWidth * 0.5);
-          if (tr.scrollWidth - tr.scrollLeft <= tr.clientWidth + 8) tr.scrollTo({ left: 0, behavior: "smooth" });
+          if (tr.scrollWidth - tr.scrollLeft <= tr.clientWidth + 8)
+            tr.scrollTo({ left: 0, behavior: "smooth" });
           else tr.scrollBy({ left: step, behavior: "smooth" });
         }
         if (rc) {
           const step = Math.round(rc.clientWidth * 0.5);
-          if (rc.scrollWidth - rc.scrollLeft <= rc.clientWidth + 8) rc.scrollTo({ left: 0, behavior: "smooth" });
+          if (rc.scrollWidth - rc.scrollLeft <= rc.clientWidth + 8)
+            rc.scrollTo({ left: 0, behavior: "smooth" });
           else rc.scrollBy({ left: step, behavior: "smooth" });
         }
       } catch (e) {}
@@ -130,11 +139,17 @@ export default function Home() {
     else setFiltered(products.filter((p) => p.categorySlug === slug));
   }
 
-  /* small shared styles (inline for clarity) */
+  /* ---------------- COMPARE DRAWER HANDLER ---------------- */
+  function openCompare(product) {
+    setSelectedProduct(product);
+    setCompareOpen(true);
+  }
+
   const gradientFrame = {
     padding: 3,
     borderRadius: 14,
-    background: "linear-gradient(180deg, rgba(0,198,255,0.95), rgba(0,255,150,0.85))",
+    background:
+      "linear-gradient(180deg, rgba(0,198,255,0.95), rgba(0,255,150,0.85))",
     display: "inline-block",
   };
   const smallCardInner = {
@@ -158,7 +173,19 @@ export default function Home() {
             className="search-bar compact"
             style={{ height: 40, paddingLeft: 12, paddingRight: 42, borderRadius: 12 }}
           />
-          <svg width="20" height="20" fill="#00c3ff" viewBox="0 0 24 24" style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+          <svg
+            width="20"
+            height="20"
+            fill="#00c3ff"
+            viewBox="0 0 24 24"
+            style={{
+              position: "absolute",
+              right: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              pointerEvents: "none",
+            }}
+          >
             <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
           </svg>
 
@@ -166,11 +193,31 @@ export default function Home() {
           {suggestions.length > 0 && (
             <div className="autocomplete-box" style={{ top: 48 }}>
               {suggestions.map((item) => (
-                <div key={item.id} onClick={() => (window.location = `/product/${item.id}`)} style={{ display: "flex", gap: 8, padding: 8, alignItems: "center", cursor: "pointer" }}>
-                  <Image src={item.imageUrl || "/placeholder.png"} width={42} height={42} alt={item.name || "img"} style={{ borderRadius: 8, objectFit: "cover" }} />
+                <div
+                  key={item.id}
+                  onClick={() => (window.location = `/product/${item.id}`)}
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    padding: 8,
+                    alignItems: "center",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Image
+                    src={item.imageUrl || "/placeholder.png"}
+                    width={42}
+                    height={42}
+                    alt={item.name || "img"}
+                    style={{ borderRadius: 8, objectFit: "cover" }}
+                  />
                   <div>
-                    <div style={{ fontWeight: 700, color: "#0077aa" }}>{item.name}</div>
-                    <div style={{ color: "#0097cc", fontWeight: 800 }}>₹ {item.price}</div>
+                    <div style={{ fontWeight: 700, color: "#0077aa" }}>
+                      {item.name}
+                    </div>
+                    <div style={{ color: "#0097cc", fontWeight: 800 }}>
+                      ₹ {item.price}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -178,7 +225,7 @@ export default function Home() {
           )}
         </div>
 
-        {/* category pill that opens drawer (kept small) */}
+        {/* category pill that opens drawer */}
         <button
           onClick={() => setDrawerOpen(true)}
           aria-label="Open filters"
@@ -189,17 +236,37 @@ export default function Home() {
         </button>
 
         {/* mic */}
-        <button onClick={startVoiceSearch} style={{ width: 42, height: 42, borderRadius: 10, background: "rgba(0,200,255,0.85)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 10px rgba(0,200,255,0.6)" }}>
-          <svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3z" /></svg>
+        <button
+          onClick={startVoiceSearch}
+          style={{
+            width: 42,
+            height: 42,
+            borderRadius: 10,
+            background: "rgba(0,200,255,0.85)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 0 10px rgba(0,200,255,0.6)",
+          }}
+        >
+          <svg width="18" height="18" fill="white" viewBox="0 0 24 24">
+            <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3z" />
+          </svg>
         </button>
       </div>
 
       {/* Banner */}
-      <div className="mt-3 px-1"><BannerAd ads={ads} /></div>
+      <div className="mt-3 px-1">
+        <BannerAd ads={ads} />
+      </div>
 
       {/* Trending */}
       <h2 className="section-title">Trending Today</h2>
-      <div ref={trendingRef} className="slider-row no-scrollbar" style={{ marginBottom: 6 }}>
+      <div
+        ref={trendingRef}
+        className="slider-row no-scrollbar"
+        style={{ marginBottom: 6 }}
+      >
         <InfiniteSlider items={trending} cardStyle="rounded-img" />
       </div>
 
@@ -214,11 +281,22 @@ export default function Home() {
       )}
 
       {/* Categories pills */}
-      <h2 className="section-title" style={{ marginTop: 16 }}>Categories</h2>
+      <h2 className="section-title" style={{ marginTop: 16 }}>
+        Categories
+      </h2>
       <div className="cat-pills-row no-scrollbar" style={{ marginBottom: 12 }}>
-        <div className={`cat-pill ${selectedCat === "all" ? "active" : ""}`} onClick={() => filterByCategory("all")}>All</div>
+        <div
+          className={`cat-pill ${selectedCat === "all" ? "active" : ""}`}
+          onClick={() => filterByCategory("all")}
+        >
+          All
+        </div>
         {categories.map((c) => (
-          <div key={c.id} className={`cat-pill ${selectedCat === c.slug ? "active" : ""}`} onClick={() => filterByCategory(c.slug)}>
+          <div
+            key={c.id}
+            className={`cat-pill ${selectedCat === c.slug ? "active" : ""}`}
+            onClick={() => filterByCategory(c.slug)}
+          >
             <span style={{ marginRight: 6 }}>{c.icon}</span>
             <span>{c.name}</span>
           </div>
@@ -226,9 +304,17 @@ export default function Home() {
       </div>
 
       {/* Products grid */}
-      <h2 className="section-title" style={{ marginTop: 6 }}>Products</h2>
+      <h2 className="section-title" style={{ marginTop: 6 }}>
+        Products
+      </h2>
       <div className="products-grid">
-        {filtered.map((product) => <ProductCard key={product.id} product={product} />)}
+        {filtered.map((product) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+            onOpenCompare={openCompare} // ✅ Added
+          />
+        ))}
       </div>
 
       {/* Filter Drawer */}
@@ -237,20 +323,49 @@ export default function Home() {
         onClose={() => setDrawerOpen(false)}
         products={products}
         categories={categories}
-        initial={{ min: 1, max: Math.max(...products.map(p => Number(p.price || 0)), 1), sort: "none", discountOnly: false }}
+        initial={{
+          min: 1,
+          max: Math.max(...products.map((p) => Number(p.price || 0)), 1),
+          sort: "none",
+          discountOnly: false,
+        }}
         onApply={(filters) => {
-          // apply simple filter: min/max & sort & discounted
           let items = [...products];
-          if (filters.min != null) items = items.filter((p) => Number(p.price || 0) >= Number(filters.min));
-          if (filters.max != null) items = items.filter((p) => Number(p.price || 0) <= Number(filters.max));
-          if (filters.discountOnly) items = items.filter((p) => ((p.offer || p.amazonOffer || p.meeshoOffer || "").toString().trim().length > 0));
-          if (filters.sort === "price-asc") items.sort((a,b)=> Number(a.price||0)-Number(b.price||0));
-          if (filters.sort === "price-desc") items.sort((a,b)=> Number(b.price||0)-Number(a.price||0));
-          if (filters.sort === "trending") items.sort((a,b)=> Number(b.impressions||0)-Number(a.impressions||0));
+          if (filters.min != null)
+            items = items.filter(
+              (p) => Number(p.price || 0) >= Number(filters.min)
+            );
+          if (filters.max != null)
+            items = items.filter(
+              (p) => Number(p.price || 0) <= Number(filters.max)
+            );
+          if (filters.discountOnly)
+            items = items.filter(
+              (p) =>
+                (p.offer || p.amazonOffer || p.meeshoOffer || "")
+                  .toString()
+                  .trim().length > 0
+            );
+          if (filters.sort === "price-asc")
+            items.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
+          if (filters.sort === "price-desc")
+            items.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
+          if (filters.sort === "trending")
+            items.sort(
+              (a, b) => Number(b.impressions || 0) - Number(a.impressions || 0)
+            );
           setFiltered(items);
           setDrawerOpen(false);
         }}
       />
+
+      {/* Compare Drawer — NEW */}
+      <CompareDrawer
+        open={compareOpen}
+        product={selectedProduct}
+        onClose={() => setCompareOpen(false)}
+      />
     </main>
   );
-  }
+        }
+    
