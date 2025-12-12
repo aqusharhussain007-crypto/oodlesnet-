@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
-import { db } from "@/firebase";
+import { db } from "@/lib/firebase-app";
 import Image from "next/image";
 import Link from "next/link";
 
