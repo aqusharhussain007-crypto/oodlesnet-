@@ -9,15 +9,28 @@ export default function FilterDrawer({
   initial = {},
   onApply,
 }) {
-  // Get all prices from products
-  const prices = products.map((p) => Number(p.price || 0));
-  const highest = prices.length ? Math.max(...prices) : 1000;
+  /* ------------------ GET LOWEST & HIGHEST STORE PRICE ------------------ */
 
-  // Dynamic absolute min/max
+  const getLowest = (p) =>
+    p.store && p.store.length
+      ? Math.min(...p.store.map((s) => Number(s.price)))
+      : Infinity;
+
+  const getHighest = (p) =>
+    p.store && p.store.length
+      ? Math.max(...p.store.map((s) => Number(s.price)))
+      : 0;
+
+  // Find global max price across ALL stores
+  const globalMax = products.length
+    ? Math.max(...products.map((p) => getHighest(p)))
+    : 1000;
+
   const absoluteMin = 0;
-  const absoluteMax = highest;
+  const absoluteMax = globalMax;
 
-  // Selected values
+  /* ------------------ STATES ------------------ */
+
   const [selMin, setSelMin] = useState(initial.min ?? absoluteMin);
   const [selMax, setSelMax] = useState(initial.max ?? absoluteMax);
   const [sort, setSort] = useState(initial.sort ?? "none");
@@ -25,12 +38,13 @@ export default function FilterDrawer({
     initial.discountOnly ?? false
   );
 
-  // Sync when products change
+  /* ------------------ SYNC WHEN PRODUCTS UPDATE ------------------ */
   useEffect(() => {
     setSelMin(initial.min ?? absoluteMin);
     setSelMax(initial.max ?? absoluteMax);
   }, [absoluteMax, initial.min, initial.max]);
 
+  /* ------------------ RESET ------------------ */
   function handleReset() {
     setSelMin(absoluteMin);
     setSelMax(absoluteMax);
@@ -38,6 +52,7 @@ export default function FilterDrawer({
     setDiscountOnly(false);
   }
 
+  /* ------------------ APPLY ------------------ */
   function handleApply() {
     onApply({
       min: Number(selMin),
@@ -70,7 +85,7 @@ export default function FilterDrawer({
         <div className="filter-section">
           <label className="filter-label">Price range</label>
 
-          {/* Display range (₹00 — ₹highest) */}
+          {/* Display values */}
           <div
             style={{
               display: "flex",
@@ -97,8 +112,7 @@ export default function FilterDrawer({
                     right: 0,
                     height: 6,
                     borderRadius: 6,
-                    background:
-                      "linear-gradient(90deg,#00c6ff,#00ff99)",
+                    background: "linear-gradient(90deg,#00c6ff,#00ff99)",
                     opacity: 0.15,
                   }}
                 />
