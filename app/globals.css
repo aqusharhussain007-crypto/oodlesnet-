@@ -233,3 +233,27 @@ body {
     height: 150px;
   }
 }
+
+/* ⭐ Shimmer behind prices */
+.shimmer {
+  background: linear-gradient(90deg, #f4fefe 0%, #e6faff 50%, #f4fefe 100%);
+  background-size: 200% 100%;
+  animation: shimmerMove 2.2s infinite linear;
+  border-radius: 10px;
+}
+
+@keyframes shimmerMove {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ⭐ Flip animation for badges */
+.flip {
+  animation: flipIn 0.6s ease;
+}
+
+@keyframes flipIn {
+  0% { transform: rotateX(90deg); opacity: 0; }
+  100% { transform: rotateX(0deg); opacity: 1; }
+  }
+  
