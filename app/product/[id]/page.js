@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { db } from "@/firebase";
 import Image from "next/image";
-import { db } from "@/lib/firebase-app";
-import { doc, getDoc } from "firebase/firestore";
 import Link from "next/link";
 
 export default function ProductPage({ params }) {
@@ -12,78 +12,102 @@ export default function ProductPage({ params }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function load() {
+    async function loadProduct() {
       try {
         const ref = doc(db, "products", id);
         const snap = await getDoc(ref);
-        if (snap.exists()) setProduct({ id: snap.id, ...snap.data() });
-        else setProduct(null);
-      } catch (e) {
-        console.error(e);
-        setProduct(null);
-      } finally {
-        setLoading(false);
+        if (snap.exists()) {
+          setProduct({ id: snap.id, ...snap.data() });
+
+          // Increment views
+          updateDoc(ref, { views: increment(1) });
+        }
+      } catch (err) {
+        console.error("Error loading product:", err);
       }
+      setLoading(false);
     }
-    load();
+
+    loadProduct();
   }, [id]);
 
-  if (loading) return <div style={{ padding: 20 }}>Loading…</div>;
-  if (!product) return <div style={{ padding: 20 }}>Product not found</div>;
+  if (loading) return <div className="p-4">Loading…</div>;
+  if (!product) return <div className="p-4 text-red-600">Product not found.</div>;
 
-  // buy buttons list
-  const stores = [
-    { name: "Amazon", price: product.amazonPrice, url: product.amazonUrl, note: product.amazonOffer },
-    { name: "Meesho", price: product.meeshoPrice, url: product.meeshoUrl, note: product.meeshoOffer },
-    { name: "Ajio", price: product.ajioPrice, url: product.ajioUrl, note: product.ajioOffer },
-  ].filter(s => s.url);
-
-  // make sure numbers exist
-  const price = Number(product.price || 0);
+  const stores = product.store || [];
 
   return (
-    <main className="page-container" style={{ padding: 12 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-        <nav style={{ color: "#0077aa" }}>
-          <Link href="/">Home</Link> / <span style={{ textTransform: "capitalize" }}>{product.categorySlug || "category"}</span> / <strong>{product.name}</strong>
-        </nav>
-        <button className="btn-small" style={{ background: "#e8f8ff", borderRadius: 10 }}>Share</button>
+    <div className="p-4 pb-24 max-w-[700px] mx-auto">
+      {/* Breadcrumb */}
+      <div className="text-sm mb-3">
+        <Link href="/" className="text-blue-500">Home</Link> /{" "}
+        <span className="text-blue-600 font-semibold">{product.categorySlug}</span> /{" "}
+        <span className="font-bold">{product.name}</span>
       </div>
 
-      <div style={{ borderRadius: 16, overflow: "hidden", background: "#fff", padding: 8, boxShadow: "0 8px 30px rgba(0,0,0,0.06)" }}>
-        <Image src={product.imageUrl || "/placeholder.png"} alt={product.name} width={1200} height={650} style={{ width: "100%", height: "300px", objectFit: "cover", borderRadius: 12 }} />
+      {/* Product Image */}
+      <div className="rounded-2xl overflow-hidden shadow-md mb-4 bg-white">
+        <Image
+          src={product.imageUrl}
+          alt={product.name}
+          width={800}
+          height={600}
+          className="w-full object-cover"
+        />
       </div>
 
-      <h1 style={{ marginTop: 12, color: "#0077aa", fontSize: "1.6rem", fontWeight: 800 }}>{product.name}</h1>
-      <div style={{ fontSize: "1.4rem", color: "#0077aa", fontWeight: 800, marginTop: 6 }}>₹ {price}</div>
+      {/* Title */}
+      <h1 className="text-2xl font-bold text-blue-700">{product.name}</h1>
 
-      <h3 style={{ marginTop: 12, color: "#0b9fd6" }}>Description</h3>
-      <p style={{ color: "#333", marginTop: 6 }}>{product.description || "No description available."}</p>
+      {/* Description */}
+      <h3 className="mt-4 text-lg font-bold text-blue-600">Description</h3>
+      <p className="text-gray-700">{product.description}</p>
 
-      <h3 style={{ marginTop: 16, color: "#0b9fd6" }}>Compare Prices</h3>
+      {/* Share Button */}
+      <button
+        onClick={() => navigator.share?.({
+          title: product.name,
+          url: window.location.href
+        })}
+        className="mt-4 px-4 py-2 bg-gradient-to-r from-blue-400 to-cyan-400 text-white font-bold rounded-xl shadow"
+      >
+        Share
+      </button>
 
-      {/* compare prices cards */}
-      <div style={{ display: "grid", gap: 12, marginTop: 8 }}>
-        {stores.map((s) => (
-          <div key={s.name} style={{ background: "#fff", borderRadius: 12, padding: 12, boxShadow: "0 8px 30px rgba(0,0,0,0.06)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <div style={{ fontWeight: 800 }}>{s.name}: ₹ {Number(s.price || 0)}</div>
-                {s.note && <div style={{ color: "#666", marginTop: 6 }}>{s.note}</div>}
-              </div>
-            </div>
+      {/* Compare Prices */}
+      <h3 className="mt-6 text-xl font-bold text-blue-600">Compare Prices</h3>
 
-            {/* vertical scrolling buy area (fixed height, internal scroll) */}
-            <div style={{ marginTop: 12, maxHeight: 200, overflowY: "auto", paddingRight: 6 }}>
-              <a href={s.url} target="_blank" rel="noreferrer" className="buy-button-vertical">
-                Buy on {s.name}
-              </a>
-              {/* (if you want multiple buy options per store, add more buttons here) */}
-            </div>
+      <div className="flex gap-4 overflow-x-auto py-3 no-scrollbar">
+        {stores.map((store, index) => (
+          <div
+            key={index}
+            className="min-w-[260px] bg-white p-4 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
+          >
+            <div className="text-lg font-bold">{store.name}: ₹ {store.price}</div>
+            <div className="text-gray-600 text-sm mb-3">{store.offer}</div>
+
+            {/* Buy Button */}
+            <a
+              href={store.url}
+              target="_blank"
+              className="block text-center text-white font-bold py-3 rounded-xl shadow-md"
+              style={{
+                background:
+                  store.name === "Amazon"
+                    ? "linear-gradient(90deg,#ff9900,#ff6600)"
+                    : store.name === "Meesho"
+                    ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
+                    : store.name === "Ajio"
+                    ? "linear-gradient(90deg,#005bea,#00c6fb)"
+                    : "linear-gradient(90deg,#00c6ff,#00ff99)"
+              }}
+            >
+              Buy on {store.name}
+            </a>
           </div>
         ))}
       </div>
-    </main>
+    </div>
   );
     }
-    
+        
