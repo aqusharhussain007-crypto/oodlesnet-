@@ -216,9 +216,12 @@ export default function Home() {
                       {item.name}
                     </div>
                     <div style={{ color: "#0097cc", fontWeight: 800 }}>
-                      ₹ {item.price}
-                    </div>
-                  </div>
+  ₹
+  {item.store && item.store.length
+    ? Math.min(...item.store.map((s) => Number(s.price))).toLocaleString("en-IN")
+    : "N/A"}
+</div>
+                 </div>
                 </div>
               ))}
             </div>
