@@ -116,11 +116,12 @@ body {
 }
 
 /* product grid */
+
 .products-grid {
-  display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;  /* ⭐ force single column */
+  gap: 20px;               /* space between cards */
+  width: 100%;
 }
 
 /* filter drawer BACKDROP */
