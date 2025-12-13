@@ -9,232 +9,138 @@ export default function FilterDrawer({
   initial = {},
   onApply,
 }) {
-  /* ------------------ GET LOWEST & HIGHEST STORE PRICE ------------------ */
-
-  const getLowest = (p) =>
-    p.store && p.store.length
-      ? Math.min(...p.store.map((s) => Number(s.price)))
-      : Infinity;
-
-  const getHighest = (p) =>
-    p.store && p.store.length
-      ? Math.max(...p.store.map((s) => Number(s.price)))
-      : 0;
-
-  // Find global max price across ALL stores
-  const globalMax = products.length
-    ? Math.max(...products.map((p) => getHighest(p)))
-    : 1000;
-
-  const absoluteMin = 0;
-  const absoluteMax = globalMax;
-
-  /* ------------------ STATES ------------------ */
-
-  const [selMin, setSelMin] = useState(initial.min ?? absoluteMin);
-  const [selMax, setSelMax] = useState(initial.max ?? absoluteMax);
-  const [sort, setSort] = useState(initial.sort ?? "none");
-  const [discountOnly, setDiscountOnly] = useState(
-    initial.discountOnly ?? false
+  const storePrices = products.flatMap((p) =>
+    p.store?.length ? p.store.map((s) => Number(s.price)) : []
   );
 
-  /* ------------------ SYNC WHEN PRODUCTS UPDATE ------------------ */
+  const absoluteMax = storePrices.length ? Math.max(...storePrices) : 1000;
+
+  const [min, setMin] = useState(initial.min ?? 0);
+  const [max, setMax] = useState(initial.max ?? absoluteMax);
+  const [sort, setSort] = useState(initial.sort ?? "none");
+
   useEffect(() => {
-    setSelMin(initial.min ?? absoluteMin);
-    setSelMax(initial.max ?? absoluteMax);
-  }, [absoluteMax, initial.min, initial.max]);
-
-  /* ------------------ RESET ------------------ */
-  function handleReset() {
-    setSelMin(absoluteMin);
-    setSelMax(absoluteMax);
-    setSort("none");
-    setDiscountOnly(false);
-  }
-
-  /* ------------------ APPLY ------------------ */
-  function handleApply() {
-    onApply({
-      min: Number(selMin),
-      max: Number(selMax),
-      sort,
-      discountOnly,
-    });
-    onClose();
-  }
+    setMin(0);
+    setMax(absoluteMax);
+  }, [absoluteMax]);
 
   if (!isOpen) return null;
+
+  function applyFilter() {
+    onApply({ min, max, sort });
+    onClose();
+  }
 
   return (
     <div
       className="filter-drawer-backdrop"
       onClick={(e) => {
-        if (e.target.className === "filter-drawer-backdrop") onClose();
+        if (e.target.classList.contains("filter-drawer-backdrop")) onClose();
+      }}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.4)",
+        zIndex: 999,
       }}
     >
-      <div className="filter-drawer">
-        {/* HEADER */}
-        <div className="filter-header">
-          <h3>Filters</h3>
-          <button className="btn-small" onClick={onClose}>
-            Close ✕
-          </button>
-        </div>
+      <div
+        className="filter-drawer"
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          background: "#ffffff",
+          borderTopLeftRadius: "20px",
+          borderTopRightRadius: "20px",
+          padding: "20px",
+          animation: "slideUp 0.25s ease",
+        }}
+      >
+        <h3 style={{ fontWeight: 700, color: "#0077b6" }}>Filters</h3>
 
         {/* PRICE RANGE */}
-        <div className="filter-section">
-          <label className="filter-label">Price range</label>
+        <div style={{ marginTop: 16 }}>
+          <label style={{ fontWeight: 600 }}>Price Range</label>
 
-          {/* Display values */}
-          <div
+          <div style={{ display: "flex", gap: 12, marginTop: 10 }}>
+            <input
+              type="number"
+              value={min}
+              onChange={(e) => setMin(Number(e.target.value))}
+              style={{
+                flex: 1,
+                padding: "8px",
+                borderRadius: "10px",
+                border: "1px solid #ccc",
+              }}
+            />
+
+            <input
+              type="number"
+              value={max}
+              onChange={(e) => setMax(Number(e.target.value))}
+              style={{
+                flex: 1,
+                padding: "8px",
+                borderRadius: "10px",
+                border: "1px solid #ccc",
+              }}
+            />
+          </div>
+        </div>
+
+        {/* SORT OPTIONS */}
+        <div style={{ marginTop: 20 }}>
+          <label style={{ fontWeight: 600 }}>Sort By</label>
+
+          <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 6 }}>
+            <label><input type="radio" checked={sort === "none"} onChange={() => setSort("none")} /> None</label>
+            <label><input type="radio" checked={sort === "price-asc"} onChange={() => setSort("price-asc")} /> Price Low → High</label>
+            <label><input type="radio" checked={sort === "price-desc"} onChange={() => setSort("price-desc")} /> Price High → Low</label>
+            <label><input type="radio" checked={sort === "trending"} onChange={() => setSort("trending")} /> Trending</label>
+          </div>
+        </div>
+
+        {/* BUTTONS */}
+        <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
+          <button
+            onClick={applyFilter}
             style={{
-              display: "flex",
-              gap: 12,
-              alignItems: "center",
-              marginBottom: 10,
+              flex: 1,
+              background: "linear-gradient(90deg,#0094ff,#00e0ff)",
+              padding: "10px",
+              borderRadius: "12px",
+              color: "white",
+              fontWeight: 700,
             }}
           >
-            <div style={{ color: "#333" }}>₹ {selMin}</div>
-
-            <div style={{ flex: 1 }}>
-              <div
-                style={{
-                  height: 6,
-                  background: "#e6e6e6",
-                  borderRadius: 6,
-                  position: "relative",
-                }}
-              >
-                <div
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    right: 0,
-                    height: 6,
-                    borderRadius: 6,
-                    background: "linear-gradient(90deg,#00c6ff,#00ff99)",
-                    opacity: 0.15,
-                  }}
-                />
-              </div>
-            </div>
-
-            <div style={{ color: "#333" }}>₹ {selMax}</div>
-          </div>
-
-          {/* Number inputs */}
-          <div style={{ display: "flex", gap: 10 }}>
-            <input
-              type="number"
-              value={selMin}
-              min={absoluteMin}
-              max={selMax}
-              onChange={(e) => {
-                const v = Number(e.target.value || absoluteMin);
-                setSelMin(Math.max(absoluteMin, Math.min(v, selMax)));
-              }}
-              className="pill-number"
-            />
-
-            <input
-              type="number"
-              value={selMax}
-              min={selMin}
-              max={absoluteMax}
-              onChange={(e) => {
-                const v = Number(e.target.value || absoluteMax);
-                setSelMax(Math.min(absoluteMax, Math.max(v, selMin)));
-              }}
-              className="pill-number"
-            />
-          </div>
-        </div>
-
-        {/* SORT SECTION */}
-        <div className="filter-section">
-          <label className="filter-label">Sort by</label>
-
-          <div className="filter-row">
-            <label className="radio">
-              <input
-                type="radio"
-                name="sort"
-                checked={sort === "none"}
-                onChange={() => setSort("none")}
-              />{" "}
-              None
-            </label>
-
-            <label className="radio">
-              <input
-                type="radio"
-                name="sort"
-                checked={sort === "price-asc"}
-                onChange={() => setSort("price-asc")}
-              />{" "}
-              Price: Low → High
-            </label>
-
-            <label className="radio">
-              <input
-                type="radio"
-                name="sort"
-                checked={sort === "price-desc"}
-                onChange={() => setSort("price-desc")}
-              />{" "}
-              Price: High → Low
-            </label>
-
-            <label className="radio">
-              <input
-                type="radio"
-                name="sort"
-                checked={sort === "trending"}
-                onChange={() => setSort("trending")}
-              />{" "}
-              Trending
-            </label>
-
-            <label className="radio">
-              <input
-                type="radio"
-                name="sort"
-                checked={sort === "newest"}
-                onChange={() => setSort("newest")}
-              />{" "}
-              Newest
-            </label>
-          </div>
-        </div>
-
-        {/* DISCOUNT SECTION */}
-        <div className="filter-section">
-          <label className="filter-label">Discount</label>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <input
-              id="discount"
-              type="checkbox"
-              checked={discountOnly}
-              onChange={(e) => setDiscountOnly(e.target.checked)}
-            />
-            <label htmlFor="discount">Show discounted items only</label>
-          </div>
-        </div>
-
-        {/* ACTION BUTTONS */}
-        <div className="filter-actions">
-          <button className="btn-ghost" onClick={handleReset}>
-            Reset
+            Apply
           </button>
 
-          <div style={{ flex: 1 }}></div>
-
-          <button className="btn-primary" onClick={handleApply}>
-            Apply
+          <button
+            onClick={onClose}
+            style={{
+              flex: 1,
+              background: "#eee",
+              padding: "10px",
+              borderRadius: "12px",
+              fontWeight: 700,
+            }}
+          >
+            Cancel
           </button>
         </div>
       </div>
+
+      <style>{`
+        @keyframes slideUp {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
-}
+                       }
+          
