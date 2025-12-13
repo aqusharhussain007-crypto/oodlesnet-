@@ -2,13 +2,10 @@
 
 import { useContext } from "react";
 import Link from "next/link";
-import { DrawerContext } from "@/app/layout";
+import { DrawerContext } from "@/components/DrawerProvider";
 
 export default function Navbar() {
-  const {
-    setOpenFilter,
-    setOpenCategory,
-  } = useContext(DrawerContext);
+  const { setOpenFilter, setOpenCategory } = useContext(DrawerContext);
 
   return (
     <nav
@@ -78,10 +75,7 @@ export default function Navbar() {
         >
           <button
             className="nav-link"
-            style={{
-              color: "white",
-              textAlign: "left",
-            }}
+            style={{ color: "white", textAlign: "left" }}
             onClick={() => setOpenCategory(true)}
           >
             Categories
@@ -89,10 +83,7 @@ export default function Navbar() {
 
           <button
             className="nav-link"
-            style={{
-              color: "white",
-              textAlign: "left",
-            }}
+            style={{ color: "white", textAlign: "left" }}
             onClick={() => setOpenFilter(true)}
           >
             Filters
@@ -105,4 +96,4 @@ export default function Navbar() {
       </div>
     </nav>
   );
-              }
+}
