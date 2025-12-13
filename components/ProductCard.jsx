@@ -82,58 +82,51 @@ export default function ProductCard({ product, compact = false }) {
 
         {/* NAME */}
         <h3
-          style={{
-            marginTop: 10,
-            fontSize: "0.95rem",
-            fontWeight: 700,
-            color: "#0077b6",
-            lineHeight: "1.25rem",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-        >
-          {product.name}
-        </h3>
+  style={{
+    marginTop: 10,
+    fontSize: "0.95rem",
+    fontWeight: 700,
+    color: "#0077b6",
+    lineHeight: "1.25rem",
+    height: "2.5rem",        // ✅ FIX
+    overflow: "hidden",
+  }}
+>
+  {product.name}
+</h3>
 
         {/* PRICES */}
+        
         {lowest != null && (
-          <>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginTop: 6,
-                fontWeight: 800,
-                fontSize: 14,
-              }}
-            >
-              <span style={{ color: "#16a34a" }}>₹{lowest}</span>
-              {medium && <span style={{ color: "#0284c7" }}>₹{medium}</span>}
-              <span style={{ color: "#dc2626" }}>₹{highest}</span>
-            </div>
-
-            {/* BADGES */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginTop: 6,
-                fontSize: 11,
-              }}
-            >
-              <Badge text="Lowest" bg="#dcfce7" color="#166534" />
-              {medium && <Badge text="Medium" bg="#e0f2fe" color="#075985" />}
-              <Badge text="Highest" bg="#fee2e2" color="#7f1d1d" />
-            </div>
-          </>
-        )}
-      </div>
+  <div style={{ height: 64 }}>   {/* ✅ FIX */}
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        marginTop: 6,
+        fontWeight: 800,
+        fontSize: 14,
+      }}
+    >
+      <span style={{ color: "#16a34a" }}>₹{lowest}</span>
+      {medium && <span style={{ color: "#0284c7" }}>₹{medium}</span>}
+      <span style={{ color: "#dc2626" }}>₹{highest}</span>
     </div>
-  );
-}
 
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        marginTop: 6,
+        fontSize: 11,
+      }}
+    >
+      <Badge text="Lowest" bg="#dcfce7" color="#166534" />
+      {medium && <Badge text="Medium" bg="#e0f2fe" color="#075985" />}
+      <Badge text="Highest" bg="#fee2e2" color="#7f1d1d" />
+    </div>
+  </div>
+)}
 function Badge({ text, bg, color }) {
   return (
     <span
