@@ -3,11 +3,33 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+function Badge({ text, bg, color }) {
+  return (
+    <span
+      style={{
+        padding: "4px 10px",
+        borderRadius: 999,
+        background: bg,
+        color,
+        fontWeight: 700,
+        fontSize: 11,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {text}
+    </span>
+  );
+}
+
 export default function ProductCard({ product, compact = false }) {
   const router = useRouter();
 
+  // ------------------------------
+  // Save Recently Viewed
+  // ------------------------------
   function saveRecent() {
     if (typeof window === "undefined") return;
+
     let recent = JSON.parse(localStorage.getItem("recent") || "[]");
     recent = recent.filter((p) => p.id !== product.id);
     recent.unshift({
@@ -24,30 +46,36 @@ export default function ProductCard({ product, compact = false }) {
     router.push(`/product/${product.id}`);
   }
 
+  // ------------------------------
+  // Prices
+  // ------------------------------
   const prices = product.store?.map((s) => Number(s.price)) || [];
-  const lowest = prices.length ? Math.min(...prices) : null;
-  const highest = prices.length ? Math.max(...prices) : null;
-  const medium =
-    prices.length >= 3
-      ? [...prices].sort((a, b) => a - b)[1]
-      : prices.length === 2
-      ? Math.round((prices[0] + prices[1]) / 2)
-      : null;
+  if (!prices.length) return null;
 
+  const sorted = [...prices].sort((a, b) => a - b);
+  const lowest = sorted[0];
+  const highest = sorted[sorted.length - 1];
+  const medium =
+    sorted.length > 2 ? sorted[Math.floor(sorted.length / 2)] : null;
+
+  // ------------------------------
+  // CARD
+  // ------------------------------
   return (
     <div
       onClick={openProduct}
       style={{
-        width: "100%",
-        maxWidth: compact ? 220 : 420,
-        margin: compact ? 0 : "0 auto 18px auto",
+        width: compact ? 220 : "100%",
+        minHeight: compact ? 330 : 360,
         borderRadius: 22,
 
-        /* thin gradient border */
+        /* ✅ THIN GRADIENT BORDER */
         background: "linear-gradient(135deg,#00c6ff,#00ff99)",
         padding: "1.5px",
+
         boxShadow: "0 4px 12px rgba(0,200,255,0.18)",
         cursor: "pointer",
+        flexShrink: 0,
       }}
     >
       {/* INNER CARD */}
@@ -56,22 +84,26 @@ export default function ProductCard({ product, compact = false }) {
           background: "#f0fffb",
           borderRadius: 20,
           padding: 12,
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         {/* IMAGE */}
         <div
           style={{
-            height: compact ? 135 : 180,
-            borderRadius: 16,
+            width: "100%",
+            height: 150,
+            borderRadius: 14,
             overflow: "hidden",
-            background: "#e6faff",
+            background: "#fff",
           }}
         >
           <Image
-            src={product.imageUrl || "/placeholder.png"}
+            src={product.imageUrl}
             alt={product.name}
-            width={500}
-            height={350}
+            width={300}
+            height={200}
             style={{
               width: "100%",
               height: "100%",
@@ -80,66 +112,62 @@ export default function ProductCard({ product, compact = false }) {
           />
         </div>
 
-        {/* NAME */}
+        {/* TITLE (FIXED HEIGHT) */}
         <h3
-  style={{
-    marginTop: 10,
-    fontSize: "0.95rem",
-    fontWeight: 700,
-    color: "#0077b6",
-    lineHeight: "1.25rem",
-    height: "2.5rem",        // ✅ FIX
-    overflow: "hidden",
-  }}
->
-  {product.name}
-</h3>
+          style={{
+            marginTop: 10,
+            fontSize: "0.95rem",
+            fontWeight: 700,
+            color: "#0077b6",
+            lineHeight: "1.25rem",
+            height: "2.5rem",
+            overflow: "hidden",
+          }}
+        >
+          {product.name}
+        </h3>
 
-        {/* PRICES */}
-        
-        {lowest != null && (
-  <div style={{ height: 64 }}>   {/* ✅ FIX */}
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        marginTop: 6,
-        fontWeight: 800,
-        fontSize: 14,
-      }}
-    >
-      <span style={{ color: "#16a34a" }}>₹{lowest}</span>
-      {medium && <span style={{ color: "#0284c7" }}>₹{medium}</span>}
-      <span style={{ color: "#dc2626" }}>₹{highest}</span>
-    </div>
+        {/* PRICE + BADGES (FIXED HEIGHT) */}
+        <div style={{ height: 64 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: 6,
+              fontWeight: 800,
+              fontSize: 14,
+            }}
+          >
+            <span style={{ color: "#16a34a" }}>
+              ₹{lowest.toLocaleString("en-IN")}
+            </span>
 
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        marginTop: 6,
-        fontSize: 11,
-      }}
-    >
-      <Badge text="Lowest" bg="#dcfce7" color="#166534" />
-      {medium && <Badge text="Medium" bg="#e0f2fe" color="#075985" />}
-      <Badge text="Highest" bg="#fee2e2" color="#7f1d1d" />
+            {medium && (
+              <span style={{ color: "#0284c7" }}>
+                ₹{medium.toLocaleString("en-IN")}
+              </span>
+            )}
+
+            <span style={{ color: "#dc2626" }}>
+              ₹{highest.toLocaleString("en-IN")}
+            </span>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: 6,
+            }}
+          >
+            <Badge text="Lowest" bg="#dcfce7" color="#166534" />
+            {medium && (
+              <Badge text="Medium" bg="#e0f2fe" color="#075985" />
+            )}
+            <Badge text="Highest" bg="#fee2e2" color="#7f1d1d" />
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-)}
-function Badge({ text, bg, color }) {
-  return (
-    <span
-      style={{
-        background: bg,
-        color,
-        padding: "3px 8px",
-        borderRadius: 8,
-        fontWeight: 600,
-      }}
-    >
-      {text}
-    </span>
   );
-        }
-        
+}
