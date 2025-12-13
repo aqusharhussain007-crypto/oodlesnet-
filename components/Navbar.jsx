@@ -3,12 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-export default function Navbar() {
+export default function Navbar({ onOpenFilter, onOpenCategory }) {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
-  const [language, setLanguage] = useState("en"); // en = English, hi = Hindi
+  const [language, setLanguage] = useState("en");
 
-  /* LOAD SETTINGS FROM LOCAL STORAGE */
   useEffect(() => {
     const savedDark = localStorage.getItem("dark-mode");
     const savedLang = localStorage.getItem("language");
@@ -18,25 +17,18 @@ export default function Navbar() {
       document.documentElement.classList.add("dark");
     }
 
-    if (savedLang) {
-      setLanguage(savedLang);
-    }
+    if (savedLang) setLanguage(savedLang);
   }, []);
 
-  /* TOGGLE DARK MODE */
   function toggleDarkMode() {
     const newDark = !dark;
     setDark(newDark);
     localStorage.setItem("dark-mode", newDark);
 
-    if (newDark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    if (newDark) document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
   }
 
-  /* CHANGE LANGUAGE */
   function changeLanguage(lang) {
     setLanguage(lang);
     localStorage.setItem("language", lang);
@@ -45,7 +37,7 @@ export default function Navbar() {
   return (
     <nav
       style={{
-        backgroundColor: dark ? "#000000" : "#000D1A",
+        backgroundColor: dark ? "#000" : "#000D1A",
         padding: "6px 12px",
         height: "54px",
         display: "flex",
@@ -54,7 +46,6 @@ export default function Navbar() {
         position: "sticky",
         top: 0,
         zIndex: 999,
-        transition: "0.3s ease",
       }}
     >
       {/* LOGO */}
@@ -66,7 +57,7 @@ export default function Navbar() {
         />
       </Link>
 
-      {/* HAMBURGER */}
+      {/* MENU BUTTON */}
       <div style={{ position: "relative" }}>
         <button
           onClick={() => setOpen(!open)}
@@ -76,20 +67,14 @@ export default function Navbar() {
             borderRadius: "10px",
             background: dark ? "#333" : "#00c3ff",
             border: "none",
-            boxShadow: dark ? "0 0 12px #555" : "0 0 12px #00c3ff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
+            color: "white",
             fontSize: "22px",
-            color: dark ? "white" : "white",
-            transition: "0.3s",
           }}
         >
           ☰
         </button>
 
-        {/* DROPDOWN MENU */}
+        {/* DROPDOWN */}
         {open && (
           <div
             style={{
@@ -99,26 +84,56 @@ export default function Navbar() {
               background: dark ? "#0e0e0e" : "#00172A",
               padding: "12px",
               borderRadius: "12px",
-              boxShadow: "0 0 14px rgba(0,0,0,0.4)",
+              boxShadow: "0 0 12px rgba(0,0,0,0.4)",
               minWidth: "170px",
               display: "flex",
               flexDirection: "column",
               gap: "12px",
-              zIndex: 2000,
-              transition: "0.3s",
             }}
           >
             {/* HOME */}
-            <Link
-              href="/"
-              style={{ color: "white", fontSize: "15px" }}
-              onClick={() => setOpen(false)}
-            >
+            <Link href="/" style={{ color: "white" }}>
               Home
             </Link>
 
-            {/* LANGUAGE SELECTOR */}
-            <div style={{ color: "white", fontSize: "15px" }}>
+            {/* OPEN CATEGORY DRAWER */}
+            <button
+              onClick={() => {
+                onOpenCategory();
+                setOpen(false);
+              }}
+              style={{
+                color: "white",
+                background: "none",
+                border: "none",
+                textAlign: "left",
+                fontSize: "15px",
+                cursor: "pointer",
+              }}
+            >
+              Categories
+            </button>
+
+            {/* OPEN FILTER DRAWER */}
+            <button
+              onClick={() => {
+                onOpenFilter();
+                setOpen(false);
+              }}
+              style={{
+                color: "white",
+                background: "none",
+                border: "none",
+                textAlign: "left",
+                fontSize: "15px",
+                cursor: "pointer",
+              }}
+            >
+              Filters
+            </button>
+
+            {/* LANGUAGE */}
+            <div style={{ color: "white" }}>
               <strong>Language</strong>
               <div style={{ marginTop: 6, display: "flex", gap: 10 }}>
                 <button
@@ -127,9 +142,8 @@ export default function Navbar() {
                     padding: "4px 10px",
                     borderRadius: "8px",
                     background: language === "en" ? "#00c3ff" : "#333",
-                    color: "white",
                     border: "none",
-                    cursor: "pointer",
+                    color: "white",
                   }}
                 >
                   English
@@ -141,9 +155,8 @@ export default function Navbar() {
                     padding: "4px 10px",
                     borderRadius: "8px",
                     background: language === "hi" ? "#00c3ff" : "#333",
-                    color: "white",
                     border: "none",
-                    cursor: "pointer",
+                    color: "white",
                   }}
                 >
                   हिंदी
@@ -151,10 +164,9 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* DARK MODE TOGGLE */}
-            <div style={{ color: "white", fontSize: "15px" }}>
+            {/* DARK MODE */}
+            <div style={{ color: "white" }}>
               <strong>Dark Mode</strong>
-
               <div
                 onClick={toggleDarkMode}
                 style={{
@@ -183,12 +195,7 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* CONTACT */}
-            <Link
-              href="/contact"
-              style={{ color: "white", fontSize: "15px" }}
-              onClick={() => setOpen(false)}
-            >
+            <Link href="/contact" style={{ color: "white" }}>
               Contact
             </Link>
           </div>
@@ -196,5 +203,5 @@ export default function Navbar() {
       </div>
     </nav>
   );
-  }
-  
+        }
+            
