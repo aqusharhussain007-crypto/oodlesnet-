@@ -286,8 +286,67 @@ export default function Home() {
         ))}
       </div>
 
+      {/* CATEGORY + FILTER BUTTON ROW */}
+<div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    marginTop: "20px",
+    marginBottom: "16px",
+    padding: "0 4px",
+  }}
+>
+  {/* CATEGORY BUTTON (LEFT) */}
+  <button
+    onClick={() => setCatDrawer(true)}
+    style={{
+      flex: 1,
+      marginRight: "8px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "10px 12px",
+      fontWeight: "700",
+      borderRadius: "14px",
+      color: "white",
+      border: "none",
+      cursor: "pointer",
+      background: "linear-gradient(90deg,#0094ff,#00e0ff)",
+      boxShadow: "0 3px 10px rgba(0,150,255,0.35)",
+    }}
+  >
+    Categories
+    <svg width="18" height="18" fill="white" viewBox="0 0 24 24" style={{ marginLeft: 6 }}>
+      <path d="M9 18l6-6-6-6" />
+    </svg>
+  </button>
+
+  {/* FILTER BUTTON (RIGHT) */}
+  <button
+    onClick={() => setDrawerOpen(true)}
+    style={{
+      flex: 1,
+      marginLeft: "8px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "10px 12px",
+      fontWeight: "700",
+      borderRadius: "14px",
+      color: "white",
+      border: "none",
+      cursor: "pointer",
+      background: "linear-gradient(90deg,#00c85f,#00f7a0)",
+      boxShadow: "0 3px 10px rgba(0,200,120,0.35)",
+    }}
+  >
+    Filters
+    <svg width="18" height="18" fill="white" viewBox="0 0 24 24" style={{ marginLeft: 6 }}>
+      <path d="M9 18l6-6-6-6" />
+    </svg>
+  </button>
+</div>
       {/* PRODUCTS GRID */}
-      <h2 className="section-title" style={{ marginTop: 12 }}>Products</h2>
       <div className="products-grid">
         {filtered.map(product => (
           <ProductCard key={product.id} product={product} />
