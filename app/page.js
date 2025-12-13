@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import Navbar from "@/components/Navbar";
+import { useState, useEffect, useRef, useContext } from "react";
+import { DrawerContext } from "@/app/layout";
 import ProductCard from "@/components/ProductCard";
 import BannerAd from "@/components/ads/BannerAd";
 import FilterDrawer from "@/components/FilterDrawer";
@@ -12,6 +12,13 @@ import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
 
 export default function Home() {
+  const { 
+    openFilter,
+    setOpenFilter,
+    openCategory,
+    setOpenCategory 
+  } = useContext(DrawerContext);
+
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
@@ -24,15 +31,10 @@ export default function Home() {
   const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
 
-  // Drawers
-  const [drawerOpen, setDrawerOpen] = useState(false); // Filter drawer
-  const [catDrawer, setCatDrawer] = useState(false); // Category drawer
-
   const trendingRef = useRef(null);
   const recentRef = useRef(null);
-  const autoScrollInterval = useRef(null);
 
-  /* ---------------- LOAD PRODUCTS ---------------- */
+  /* LOAD PRODUCTS */
   useEffect(() => {
     async function load() {
       const snap = await getDocs(collection(db, "products"));
@@ -41,14 +43,15 @@ export default function Home() {
       setFiltered(items);
 
       const top = [...items]
-        .sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0))
+        .sort((a, b) => (b.impressions || 0) - (a.impressions || 0))
         .slice(0, 10);
+
       setTrending(top);
     }
     load();
   }, []);
 
-  /* ---------------- LOAD ADS ---------------- */
+  /* LOAD ADS */
   useEffect(() => {
     async function load() {
       const snap = await getDocs(collection(db, "ads"));
@@ -57,7 +60,7 @@ export default function Home() {
     load();
   }, []);
 
-  /* ---------------- LOAD CATEGORIES ---------------- */
+  /* LOAD CATEGORIES */
   useEffect(() => {
     async function load() {
       const snap = await getDocs(collection(db, "categories"));
@@ -66,14 +69,14 @@ export default function Home() {
     load();
   }, []);
 
-  /* ---------------- RECENT ---------------- */
+  /* RECENT */
   useEffect(() => {
     if (typeof window === "undefined") return;
     const data = JSON.parse(localStorage.getItem("recent") || "[]");
     setRecent(Array.isArray(data) ? data : []);
   }, []);
 
-  /* ---------------- SEARCH ---------------- */
+  /* SEARCH */
   useEffect(() => {
     if (!search) {
       setSuggestions([]);
@@ -89,75 +92,19 @@ export default function Home() {
     setFiltered(match);
   }, [search, products]);
 
-  function startVoiceSearch() {
-    if (typeof window === "undefined") return;
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) return alert("Voice search not supported.");
-    const recog = new SR();
-    recog.lang = "en-IN";
-    recog.onresult = (e) => setSearch(e.results[0][0].transcript || "");
-    recog.start();
-  }
-
-  /* ---------------- AUTO-SCROLL ---------------- */
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (autoScrollInterval.current) {
-      clearInterval(autoScrollInterval.current);
-      autoScrollInterval.current = null;
-    }
-
-    autoScrollInterval.current = setInterval(() => {
-      try {
-        const tr = trendingRef.current;
-        const rc = recentRef.current;
-
-        if (tr) {
-          const step = Math.round(tr.clientWidth * 0.5);
-          if (tr.scrollWidth - tr.scrollLeft <= tr.clientWidth + 8) {
-            tr.scrollTo({ left: 0, behavior: "smooth" });
-          } else tr.scrollBy({ left: step, behavior: "smooth" });
-        }
-
-        if (rc) {
-          const step = Math.round(rc.clientWidth * 0.5);
-          if (rc.scrollWidth - rc.scrollLeft <= rc.clientWidth + 8) {
-            rc.scrollTo({ left: 0, behavior: "smooth" });
-          } else rc.scrollBy({ left: step, behavior: "smooth" });
-        }
-      } catch (e) {}
-    }, 2600);
-
-    return () => {
-      if (autoScrollInterval.current) clearInterval(autoScrollInterval.current);
-      autoScrollInterval.current = null;
-    };
-  }, [trending, recent]);
-
-  /* ---------------- FILTER CATEGORY FUNCTION ---------------- */
+  /* CATEGORY FILTER */
   function filterByCategory(slug) {
     setSelectedCat(slug);
     if (slug === "all") setFiltered(products);
     else setFiltered(products.filter((p) => p.categorySlug === slug));
   }
 
+  /* ---------- UI ---------- */
   return (
     <main className="page-container" style={{ padding: 12 }}>
-      {/* NAVBAR WITH DRAWER BUTTONS */}
-      <Navbar
-        openCategory={() => setCatDrawer(true)}
-        openFilter={() => setDrawerOpen(true)}
-      />
 
       {/* SEARCH BAR */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          marginTop: 8,
-        }}
-      >
+      <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
         <div style={{ position: "relative", flex: 1 }}>
           <input
             type="text"
@@ -165,91 +112,9 @@ export default function Home() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="search-bar compact"
-            style={{
-              height: 40,
-              paddingLeft: 12,
-              paddingRight: 42,
-              borderRadius: 12,
-            }}
+            style={{ height: 40, borderRadius: 12 }}
           />
-
-          {/* Search Icon */}
-          <svg
-            width="20"
-            height="20"
-            fill="#00c3ff"
-            viewBox="0 0 24 24"
-            style={{
-              position: "absolute",
-              right: 12,
-              top: "50%",
-              transform: "translateY(-50%)",
-              pointerEvents: "none",
-            }}
-          >
-            <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
-          </svg>
-
-          {/* AUTOCOMPLETE */}
-          {suggestions.length > 0 && (
-            <div className="autocomplete-box" style={{ top: 48 }}>
-              {suggestions.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => (window.location = `/product/${item.id}`)}
-                  style={{
-                    display: "flex",
-                    gap: 8,
-                    padding: 8,
-                    alignItems: "center",
-                    cursor: "pointer",
-                  }}
-                >
-                  <Image
-                    src={item.imageUrl || "/placeholder.png"}
-                    width={42}
-                    height={42}
-                    alt={item.name}
-                    style={{ borderRadius: 8, objectFit: "cover" }}
-                  />
-
-                  <div>
-                    <div style={{ fontWeight: 700, color: "#0077aa" }}>
-                      {item.name}
-                    </div>
-                    <div style={{ color: "#0097cc", fontWeight: 800 }}>
-                      ₹
-                      {item.store?.length
-                        ? Math.min(
-                            ...item.store.map((s) => Number(s.price))
-                          ).toLocaleString("en-IN")
-                        : "N/A"}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
-
-        {/* VOICE SEARCH */}
-        <button
-          onClick={startVoiceSearch}
-          style={{
-            width: 42,
-            height: 42,
-            borderRadius: 10,
-            background: "rgba(0,200,255,0.85)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 0 10px rgba(0,200,255,0.6)",
-          }}
-        >
-          <svg width="18" height="18" fill="white" viewBox="0 0 24 24">
-            <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3z" />
-          </svg>
-        </button>
       </div>
 
       {/* Banner Ads */}
@@ -259,11 +124,7 @@ export default function Home() {
 
       {/* Trending */}
       <h2 className="section-title">Trending Today</h2>
-      <div
-        ref={trendingRef}
-        className="slider-row no-scrollbar"
-        style={{ marginBottom: 20 }}
-      >
+      <div ref={trendingRef} className="slider-row no-scrollbar">
         <InfiniteSlider items={trending} cardStyle="rounded-img" />
       </div>
 
@@ -271,21 +132,14 @@ export default function Home() {
       {recent.length > 0 && (
         <>
           <h2 className="section-title">Recently Viewed</h2>
-          <div
-            ref={recentRef}
-            className="slider-row no-scrollbar"
-            style={{ marginBottom: 20 }}
-          >
+          <div ref={recentRef} className="slider-row no-scrollbar">
             <InfiniteSlider items={recent} cardStyle="rounded-img" />
           </div>
         </>
       )}
 
-      {/* Products Section */}
-      <h2 className="section-title" style={{ marginTop: 6 }}>
-        Products
-      </h2>
-
+      {/* Products */}
+      <h2 className="section-title">Products</h2>
       <div className="products-grid">
         {filtered.map((product) => (
           <ProductCard key={product.id} product={product} />
@@ -294,8 +148,8 @@ export default function Home() {
 
       {/* CATEGORY DRAWER */}
       <CategoryDrawer
-        isOpen={catDrawer}
-        onClose={() => setCatDrawer(false)}
+        isOpen={openCategory}
+        onClose={() => setOpenCategory(false)}
         categories={categories}
         selectedCat={selectedCat}
         onSelect={(slug) => filterByCategory(slug)}
@@ -303,8 +157,8 @@ export default function Home() {
 
       {/* FILTER DRAWER */}
       <FilterDrawer
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        isOpen={openFilter}
+        onClose={() => setOpenFilter(false)}
         products={products}
         categories={categories}
         initial={{
@@ -320,39 +174,35 @@ export default function Home() {
         onApply={(filters) => {
           let items = [...products];
 
-          // lowest price helper
-          const getLowest = (p) =>
+          const lowest = (p) =>
             p.store?.length
               ? Math.min(...p.store.map((s) => Number(s.price)))
               : Infinity;
 
           if (filters.min != null)
-            items = items.filter((p) => getLowest(p) >= Number(filters.min));
+            items = items.filter((p) => lowest(p) >= Number(filters.min));
 
           if (filters.max != null)
-            items = items.filter((p) => getLowest(p) <= Number(filters.max));
+            items = items.filter((p) => lowest(p) <= Number(filters.max));
 
           if (filters.discountOnly)
             items = items.filter((p) =>
-              p.store?.some((s) => (s.offer || "").trim().length > 0)
+              p.store?.some((s) => (s.offer || "").trim().length)
             );
 
           if (filters.sort === "price-asc")
-            items.sort((a, b) => getLowest(a) - getLowest(b));
+            items.sort((a, b) => lowest(a) - lowest(b));
 
           if (filters.sort === "price-desc")
-            items.sort((a, b) => getLowest(b) - getLowest(a));
+            items.sort((a, b) => lowest(b) - lowest(a));
 
           if (filters.sort === "trending")
-            items.sort(
-              (a, b) => Number(b.impressions || 0) - Number(a.impressions || 0)
-            );
+            items.sort((a, b) => (b.impressions || 0) - (a.impressions || 0));
 
           setFiltered(items);
-          setDrawerOpen(false);
+          setOpenFilter(false);
         }}
       />
     </main>
   );
-}
-  
+    }
