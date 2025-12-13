@@ -11,6 +11,8 @@ import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
 
 export default function Home() {
+  const [catDrawer, setCatDrawer] = useState(false);
+
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
