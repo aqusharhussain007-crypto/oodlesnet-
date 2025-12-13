@@ -1,18 +1,17 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Navbar from "@/components/Navbar";
 import ProductCard from "@/components/ProductCard";
 import BannerAd from "@/components/ads/BannerAd";
 import FilterDrawer from "@/components/FilterDrawer";
+import CategoryDrawer from "@/components/CategoryDrawer";
 import InfiniteSlider from "@/components/InfiniteSlider";
-import CompareDrawer from "@/components/CompareDrawer";   // ✅ Added
 import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
 
 export default function Home() {
-  const [catDrawer, setCatDrawer] = useState(false);
-
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
@@ -25,11 +24,9 @@ export default function Home() {
   const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
 
-  const [drawerOpen, setDrawerOpen] = useState(false);
-
-  // 👉 NEW: Compare drawer state
-  const [compareOpen, setCompareOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  // Drawers
+  const [drawerOpen, setDrawerOpen] = useState(false); // Filter drawer
+  const [catDrawer, setCatDrawer] = useState(false); // Category drawer
 
   const trendingRef = useRef(null);
   const recentRef = useRef(null);
@@ -83,14 +80,15 @@ export default function Home() {
       setFiltered(products);
       return;
     }
+
     const match = products.filter((p) =>
       (p.name || "").toLowerCase().includes(search.toLowerCase())
     );
+
     setSuggestions(match.slice(0, 5));
     setFiltered(match);
   }, [search, products]);
 
-  /* ---------------- VOICE SEARCH ---------------- */
   function startVoiceSearch() {
     if (typeof window === "undefined") return;
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -113,17 +111,19 @@ export default function Home() {
       try {
         const tr = trendingRef.current;
         const rc = recentRef.current;
+
         if (tr) {
           const step = Math.round(tr.clientWidth * 0.5);
-          if (tr.scrollWidth - tr.scrollLeft <= tr.clientWidth + 8)
+          if (tr.scrollWidth - tr.scrollLeft <= tr.clientWidth + 8) {
             tr.scrollTo({ left: 0, behavior: "smooth" });
-          else tr.scrollBy({ left: step, behavior: "smooth" });
+          } else tr.scrollBy({ left: step, behavior: "smooth" });
         }
+
         if (rc) {
           const step = Math.round(rc.clientWidth * 0.5);
-          if (rc.scrollWidth - rc.scrollLeft <= rc.clientWidth + 8)
+          if (rc.scrollWidth - rc.scrollLeft <= rc.clientWidth + 8) {
             rc.scrollTo({ left: 0, behavior: "smooth" });
-          else rc.scrollBy({ left: step, behavior: "smooth" });
+          } else rc.scrollBy({ left: step, behavior: "smooth" });
         }
       } catch (e) {}
     }, 2600);
@@ -134,38 +134,30 @@ export default function Home() {
     };
   }, [trending, recent]);
 
-  /* ---------------- FILTER CATEGORY ---------------- */
+  /* ---------------- FILTER CATEGORY FUNCTION ---------------- */
   function filterByCategory(slug) {
     setSelectedCat(slug);
     if (slug === "all") setFiltered(products);
     else setFiltered(products.filter((p) => p.categorySlug === slug));
   }
 
-  /* ---------------- COMPARE DRAWER HANDLER ---------------- */
-  function openCompare(product) {
-    setSelectedProduct(product);
-    setCompareOpen(true);
-  }
-
-  const gradientFrame = {
-    padding: 3,
-    borderRadius: 14,
-    background:
-      "linear-gradient(180deg, rgba(0,198,255,0.95), rgba(0,255,150,0.85))",
-    display: "inline-block",
-  };
-  const smallCardInner = {
-    background: "#fff",
-    borderRadius: 12,
-    padding: 8,
-    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-    textAlign: "center",
-  };
-
   return (
     <main className="page-container" style={{ padding: 12 }}>
-      {/* Search row */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
+      {/* NAVBAR WITH DRAWER BUTTONS */}
+      <Navbar
+        openCategory={() => setCatDrawer(true)}
+        openFilter={() => setDrawerOpen(true)}
+      />
+
+      {/* SEARCH BAR */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          marginTop: 8,
+        }}
+      >
         <div style={{ position: "relative", flex: 1 }}>
           <input
             type="text"
@@ -173,8 +165,15 @@ export default function Home() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="search-bar compact"
-            style={{ height: 40, paddingLeft: 12, paddingRight: 42, borderRadius: 12 }}
+            style={{
+              height: 40,
+              paddingLeft: 12,
+              paddingRight: 42,
+              borderRadius: 12,
+            }}
           />
+
+          {/* Search Icon */}
           <svg
             width="20"
             height="20"
@@ -191,7 +190,7 @@ export default function Home() {
             <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
           </svg>
 
-          {/* suggestions */}
+          {/* AUTOCOMPLETE */}
           {suggestions.length > 0 && (
             <div className="autocomplete-box" style={{ top: 48 }}>
               {suggestions.map((item) => (
@@ -210,44 +209,30 @@ export default function Home() {
                     src={item.imageUrl || "/placeholder.png"}
                     width={42}
                     height={42}
-                    alt={item.name || "img"}
+                    alt={item.name}
                     style={{ borderRadius: 8, objectFit: "cover" }}
                   />
+
                   <div>
                     <div style={{ fontWeight: 700, color: "#0077aa" }}>
                       {item.name}
                     </div>
                     <div style={{ color: "#0097cc", fontWeight: 800 }}>
-  ₹
-  {item.store && item.store.length
-    ? Math.min(...item.store.map((s) => Number(s.price))).toLocaleString("en-IN")
-    : "N/A"}
-</div>
-                 </div>
+                      ₹
+                      {item.store?.length
+                        ? Math.min(
+                            ...item.store.map((s) => Number(s.price))
+                          ).toLocaleString("en-IN")
+                        : "N/A"}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* category pill that opens drawer */}
-
-        <button
-  onClick={() => setCatDrawer(true)}
-  className="pill-button"
-  style={{
-    padding: "10px 16px",
-    borderRadius: "14px",
-    background: "#fff",
-    border: "2px solid #00c6ff",
-    fontWeight: 700,
-    color: "#0077b6",
-  }}
->
-  Categories ▾
-</button>
-
-        {/* mic */}
+        {/* VOICE SEARCH */}
         <button
           onClick={startVoiceSearch}
           style={{
@@ -267,7 +252,7 @@ export default function Home() {
         </button>
       </div>
 
-      {/* Banner */}
+      {/* Banner Ads */}
       <div className="mt-3 px-1">
         <BannerAd ads={ads} />
       </div>
@@ -277,107 +262,97 @@ export default function Home() {
       <div
         ref={trendingRef}
         className="slider-row no-scrollbar"
-        style={{ marginBottom: 6 }}
+        style={{ marginBottom: 20 }}
       >
         <InfiniteSlider items={trending} cardStyle="rounded-img" />
       </div>
 
-      {/* Recently */}
+      {/* Recently Viewed */}
       {recent.length > 0 && (
         <>
           <h2 className="section-title">Recently Viewed</h2>
-          <div ref={recentRef} className="slider-row no-scrollbar">
+          <div
+            ref={recentRef}
+            className="slider-row no-scrollbar"
+            style={{ marginBottom: 20 }}
+          >
             <InfiniteSlider items={recent} cardStyle="rounded-img" />
           </div>
         </>
       )}
 
-      {/* Categories pills */}
-      <h2 className="section-title" style={{ marginTop: 16 }}>
-        Categories
-      </h2>
-      <div className="cat-pills-row no-scrollbar" style={{ marginBottom: 12 }}>
-        <div
-          className={`cat-pill ${selectedCat === "all" ? "active" : ""}`}
-          onClick={() => filterByCategory("all")}
-        >
-          All
-        </div>
-        {categories.map((c) => (
-          <div
-            key={c.id}
-            className={`cat-pill ${selectedCat === c.slug ? "active" : ""}`}
-            onClick={() => filterByCategory(c.slug)}
-          >
-            <span style={{ marginRight: 6 }}>{c.icon}</span>
-            <span>{c.name}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Products grid */}
+      {/* Products Section */}
       <h2 className="section-title" style={{ marginTop: 6 }}>
         Products
       </h2>
+
       <div className="products-grid">
         {filtered.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            onOpenCompare={openCompare} // ✅ Added
-          />
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
 
-      {/* Filter Drawer */}
+      {/* CATEGORY DRAWER */}
+      <CategoryDrawer
+        isOpen={catDrawer}
+        onClose={() => setCatDrawer(false)}
+        categories={categories}
+        selectedCat={selectedCat}
+        onSelect={(slug) => filterByCategory(slug)}
+      />
+
+      {/* FILTER DRAWER */}
       <FilterDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         products={products}
         categories={categories}
         initial={{
-          min: 1,
-          max: Math.max(...products.map((p) => Number(p.price || 0)), 1),
+          min: 0,
+          max: Math.max(
+            ...products.map((p) =>
+              p.store?.length ? Math.max(...p.store.map((s) => s.price)) : 0
+            )
+          ),
           sort: "none",
           discountOnly: false,
         }}
         onApply={(filters) => {
           let items = [...products];
+
+          // lowest price helper
+          const getLowest = (p) =>
+            p.store?.length
+              ? Math.min(...p.store.map((s) => Number(s.price)))
+              : Infinity;
+
           if (filters.min != null)
-            items = items.filter(
-              (p) => Number(p.price || 0) >= Number(filters.min)
-            );
+            items = items.filter((p) => getLowest(p) >= Number(filters.min));
+
           if (filters.max != null)
-            items = items.filter(
-              (p) => Number(p.price || 0) <= Number(filters.max)
-            );
+            items = items.filter((p) => getLowest(p) <= Number(filters.max));
+
           if (filters.discountOnly)
-            items = items.filter(
-              (p) =>
-                (p.offer || p.amazonOffer || p.meeshoOffer || "")
-                  .toString()
-                  .trim().length > 0
+            items = items.filter((p) =>
+              p.store?.some((s) => (s.offer || "").trim().length > 0)
             );
+
           if (filters.sort === "price-asc")
-            items.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
+            items.sort((a, b) => getLowest(a) - getLowest(b));
+
           if (filters.sort === "price-desc")
-            items.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
+            items.sort((a, b) => getLowest(b) - getLowest(a));
+
           if (filters.sort === "trending")
             items.sort(
               (a, b) => Number(b.impressions || 0) - Number(a.impressions || 0)
             );
+
           setFiltered(items);
           setDrawerOpen(false);
         }}
       />
-
-      {/* Compare Drawer — NEW */}
-      <CompareDrawer
-        open={compareOpen}
-        product={selectedProduct}
-        onClose={() => setCompareOpen(false)}
-      />
     </main>
   );
-        }
-    
+}
+  
