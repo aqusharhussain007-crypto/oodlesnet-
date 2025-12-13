@@ -206,7 +206,9 @@ export default function Home() {
             boxShadow: "0 0 10px rgba(0,200,255,0.6)",
           }}
         >
-          🎤
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+  <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zM11 19.93V23h2v-3.07A9 9 0 0021 12h-2a7 7 0 01-14 0H3a9 9 0 008 7.93z"/>
+</svg>
         </button>
       </div>
 
