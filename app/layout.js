@@ -1,9 +1,6 @@
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { createContext, useState } from "react";
-
-export const DrawerContext = createContext();
 
 export const metadata = {
   title: "OodlesNet",
@@ -11,9 +8,6 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  const [openFilter, setOpenFilter] = useState(false);
-  const [openCategory, setOpenCategory] = useState(false);
-
   return (
     <html lang="en">
       <body
@@ -24,23 +18,12 @@ export default function RootLayout({ children }) {
           background: "#e4e9f1",
         }}
       >
-        {/* Provide drawer state globally */}
-        <DrawerContext.Provider
-          value={{
-            openFilter,
-            setOpenFilter,
-            openCategory,
-            setOpenCategory,
-          }}
-        >
-          <Navbar />
+        <Navbar />
 
-          <main style={{ flex: 1 }}>{children}</main>
+        <main style={{ flex: 1 }}>{children}</main>
 
-          <Footer />
-        </DrawerContext.Provider>
+        <Footer />
       </body>
     </html>
   );
-          }
-            
+}
