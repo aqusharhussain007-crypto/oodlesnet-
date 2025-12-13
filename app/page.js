@@ -18,60 +18,61 @@ export default function Home() {
 
   const [ads, setAds] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [selectedCat, setSelectedCat] = useState("all");
 
+  const [selectedCat, setSelectedCat] = useState("all");
   const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
 
-  const [openFilter, setOpenFilter] = useState(false);
-  const [openCategory, setOpenCategory] = useState(false);
+  // Drawers
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [catDrawer, setCatDrawer] = useState(false);
 
   const trendingRef = useRef(null);
   const recentRef = useRef(null);
+  const autoScrollInterval = useRef(null);
 
-  /* LOAD PRODUCTS */
+  /* ---------------- LOAD PRODUCTS ---------------- */
   useEffect(() => {
     async function load() {
       const snap = await getDocs(collection(db, "products"));
-      const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
+      const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       setProducts(items);
       setFiltered(items);
 
-      const trendingList = [...items]
-        .sort((a, b) => (b.impressions || 0) - (a.impressions || 0))
+      const top = [...items]
+        .sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0))
         .slice(0, 10);
-
-      setTrending(trendingList);
+      setTrending(top);
     }
     load();
   }, []);
 
-  /* LOAD ADS */
+  /* ---------------- LOAD ADS ---------------- */
   useEffect(() => {
     async function load() {
       const snap = await getDocs(collection(db, "ads"));
-      setAds(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setAds(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     }
     load();
   }, []);
 
-  /* LOAD CATEGORIES */
+  /* ---------------- LOAD CATEGORIES ---------------- */
   useEffect(() => {
     async function load() {
       const snap = await getDocs(collection(db, "categories"));
-      setCategories(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setCategories(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     }
     load();
   }, []);
 
-  /* LOAD RECENT */
+  /* ---------------- RECENT ---------------- */
   useEffect(() => {
+    if (typeof window === "undefined") return;
     const data = JSON.parse(localStorage.getItem("recent") || "[]");
-    if (Array.isArray(data)) setRecent(data);
+    setRecent(Array.isArray(data) ? data : []);
   }, []);
 
-  /* SEARCH LOGIC */
+  /* ---------------- SEARCH ---------------- */
   useEffect(() => {
     if (!search) {
       setSuggestions([]);
@@ -79,7 +80,7 @@ export default function Home() {
       return;
     }
 
-    const match = products.filter(p =>
+    const match = products.filter((p) =>
       (p.name || "").toLowerCase().includes(search.toLowerCase())
     );
 
@@ -87,61 +88,51 @@ export default function Home() {
     setFiltered(match);
   }, [search, products]);
 
-  /* GET LOWEST PRICE */
-  const lowestPrice = (p) =>
-    p.store?.length ? Math.min(...p.store.map(s => Number(s.price))) : Infinity;
+  function startVoiceSearch() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return alert("Voice search not supported.");
 
-  /* CATEGORY FILTER */
-  function filterByCategory(slug) {
-    setSelectedCat(slug);
-    if (slug === "all") setFiltered(products);
-    else setFiltered(products.filter(p => p.categorySlug === slug));
+    const recog = new SR();
+    recog.lang = "en-IN";
+    recog.onresult = (e) => setSearch(e.results[0][0].transcript || "");
+    recog.start();
   }
 
-  /* ----------------------------------------------- */
-  /* AUTO-SCROLL (Trending + Recent Very Slow Loop)  */
-  /* ----------------------------------------------- */
+  /* ---------------- AUTO SCROLL ---------------- */
   useEffect(() => {
-    const speed = 0.25;
-    let rafId;
+    autoScrollInterval.current = setInterval(() => {
+      try {
+        const tr = trendingRef.current;
+        const rc = recentRef.current;
 
-    function loop() {
-      // Trending
-      if (trendingRef.current) {
-        trendingRef.current.scrollLeft += speed;
-        if (
-          trendingRef.current.scrollLeft + trendingRef.current.clientWidth >=
-          trendingRef.current.scrollWidth
-        ) {
-          trendingRef.current.scrollLeft = 0;
-        }
-      }
+        if (tr) tr.scrollBy({ left: 2, behavior: "smooth" }); // slow scroll
+        if (rc) rc.scrollBy({ left: 2, behavior: "smooth" });
+      } catch (e) {}
+    }, 40);
 
-      // Recently viewed
-      if (recentRef.current) {
-        recentRef.current.scrollLeft += speed;
-        if (
-          recentRef.current.scrollLeft + recentRef.current.clientWidth >=
-          recentRef.current.scrollWidth
-        ) {
-          recentRef.current.scrollLeft = 0;
-        }
-      }
+    return () => clearInterval(autoScrollInterval.current);
+  }, []);
 
-      rafId = requestAnimationFrame(loop);
-    }
+  /* ---------------- FILTER BY CATEGORY ---------------- */
+  function filterByCategory(slug) {
+    setSelectedCat(slug);
 
-    rafId = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(rafId);
-  }, [trending, recent]);
+    if (slug === "all") return setFiltered(products);
 
-  /* ----------------------------------------------- */
+    setFiltered(products.filter((p) => p.categorySlug === slug));
+  }
+
+  /* Helper: lowest store price */
+  const getLowest = (p) =>
+    p.store?.length
+      ? Math.min(...p.store.map((s) => Number(s.price)))
+      : Infinity;
 
   return (
     <main className="page-container" style={{ padding: 12 }}>
 
       {/* SEARCH BAR */}
-      <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
         <div style={{ position: "relative", flex: 1 }}>
           <input
             type="text"
@@ -149,13 +140,7 @@ export default function Home() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="search-bar compact"
-            style={{
-              height: 40,
-              paddingLeft: 12,
-              paddingRight: 42,
-              borderRadius: 12,
-              width: "100%",
-            }}
+            style={{ height: 40, paddingLeft: 12, paddingRight: 42, borderRadius: 12 }}
           />
 
           {/* Search Icon */}
@@ -175,32 +160,30 @@ export default function Home() {
             <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
           </svg>
 
-          {/* SEARCH SUGGESTIONS */}
+          {/* AUTOCOMPLETE */}
           {suggestions.length > 0 && (
             <div className="autocomplete-box" style={{ top: 48 }}>
               {suggestions.map((item) => (
                 <div
                   key={item.id}
                   onClick={() => (window.location = `/product/${item.id}`)}
-                  style={{
-                    display: "flex",
-                    gap: 8,
-                    padding: 8,
-                    alignItems: "center",
-                    cursor: "pointer",
-                  }}
+                  style={{ display: "flex", gap: 8, padding: 8, cursor: "pointer" }}
                 >
                   <Image
-                    src={item.imageUrl}
+                    src={item.imageUrl || "/placeholder.png"}
                     width={42}
                     height={42}
                     alt={item.name}
                     style={{ borderRadius: 8 }}
                   />
+
                   <div>
-                    <div style={{ fontWeight: 700 }}>{item.name}</div>
-                    <div style={{ color: "#0077b6", fontWeight: 800 }}>
-                      ₹{lowestPrice(item).toLocaleString("en-IN")}
+                    <div style={{ fontWeight: 700, color: "#0077aa" }}>{item.name}</div>
+
+                    <div style={{ color: "#0097cc", fontWeight: 800 }}>
+                      ₹{item.store?.length
+                        ? Math.min(...item.store.map((s) => s.price)).toLocaleString("en-IN")
+                        : "N/A"}
                     </div>
                   </div>
                 </div>
@@ -209,16 +192,9 @@ export default function Home() {
           )}
         </div>
 
-        {/* MIC BUTTON (FIXED SVG) */}
+        {/* MIC */}
         <button
-          onClick={() => {
-            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SR) return alert("Voice search not supported");
-            const recog = new SR();
-            recog.lang = "en-IN";
-            recog.onresult = (e) => setSearch(e.results[0][0].transcript);
-            recog.start();
-          }}
+          onClick={startVoiceSearch}
           style={{
             width: 42,
             height: 42,
@@ -230,178 +206,140 @@ export default function Home() {
             boxShadow: "0 0 10px rgba(0,200,255,0.6)",
           }}
         >
-          <svg
-            width="20"
-            height="20"
-            fill="white"
-            viewBox="0 0 24 24"
-          >
-            <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3z" />
-            <path d="M19 11a1 1 0 10-2 0 5 5 0 01-10 0 1 1 0 10-2 0 7 7 0 006 6.92V21H9a1 1 0 100 2h6a1 1 0 100-2h-2v-3.08A7 7 0 0019 11z" />
-          </svg>
+          🎤
         </button>
       </div>
 
-      {/* BANNERS */}
+      {/* Banner Ads */}
       <div className="mt-3 px-1">
         <BannerAd ads={ads} />
       </div>
 
-      {/* TRENDING */}
+      {/* Trending */}
       <h2 className="section-title">Trending Today</h2>
-      <div ref={trendingRef} className="slider-row no-scrollbar">
+      <div ref={trendingRef} className="slider-row no-scrollbar" style={{ marginBottom: 10 }}>
         <InfiniteSlider items={trending} cardStyle="rounded-img" />
       </div>
 
-      {/* RECENTLY VIEWED */}
+      {/* Recently Viewed */}
       {recent.length > 0 && (
         <>
           <h2 className="section-title">Recently Viewed</h2>
-          <div ref={recentRef} className="slider-row no-scrollbar">
+          <div ref={recentRef} className="slider-row no-scrollbar" style={{ marginBottom: 10 }}>
             <InfiniteSlider items={recent} cardStyle="rounded-img" />
           </div>
         </>
       )}
 
-      {/* CATEGORY PILLS */}
-      <h2 className="section-title" style={{ marginTop: 16 }}>
-        Categories
-      </h2>
-      <div className="cat-pills-row no-scrollbar">
-        <div
-          className={`cat-pill ${selectedCat === "all" ? "active" : ""}`}
-          onClick={() => filterByCategory("all")}
+      {/* NEW CATEGORY + FILTER BUTTONS */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginTop: "12px",
+          marginBottom: "16px",
+        }}
+      >
+        {/* CATEGORY BUTTON */}
+        <button
+          onClick={() => setCatDrawer(true)}
+          style={{
+            flex: 1,
+            height: "38px",
+            marginRight: "8px",
+            background: "linear-gradient(90deg,#0094ff,#00e0ff)",
+            border: "none",
+            color: "white",
+            borderRadius: "12px",
+            fontWeight: "700",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
-          All
-        </div>
+          Categories →
+        </button>
 
-        {categories.map(c => (
-          <div
-            key={c.id}
-            className={`cat-pill ${selectedCat === c.slug ? "active" : ""}`}
-            onClick={() => filterByCategory(c.slug)}
-          >
-            {c.icon} {c.name}
-          </div>
-        ))}
+        {/* FILTER BUTTON */}
+        <button
+          onClick={() => setDrawerOpen(true)}
+          style={{
+            flex: 1,
+            height: "38px",
+            marginLeft: "8px",
+            background: "linear-gradient(90deg,#00c85f,#00f7a0)",
+            border: "none",
+            color: "white",
+            borderRadius: "12px",
+            fontWeight: "700",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          Filters →
+        </button>
       </div>
 
-      {/* CATEGORY + FILTER BUTTON ROW */}
-<div
-  style={{
-    display: "flex",
-    justifyContent: "space-between",
-    marginTop: "20px",
-    marginBottom: "16px",
-    padding: "0 4px",
-  }}
->
-  {/* CATEGORY BUTTON (LEFT) */}
-  <button
-    onClick={() => setCatDrawer(true)}
-    style={{
-      flex: 1,
-      marginRight: "8px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "10px 12px",
-      fontWeight: "700",
-      borderRadius: "14px",
-      color: "white",
-      border: "none",
-      cursor: "pointer",
-      background: "linear-gradient(90deg,#0094ff,#00e0ff)",
-      boxShadow: "0 3px 10px rgba(0,150,255,0.35)",
-    }}
-  >
-    Categories
-    <svg width="18" height="18" fill="white" viewBox="0 0 24 24" style={{ marginLeft: 6 }}>
-      <path d="M9 18l6-6-6-6" />
-    </svg>
-  </button>
+      {/* PRODUCTS */}
+      <h2 className="section-title" style={{ marginTop: 6 }}>
+        Products
+      </h2>
 
-  {/* FILTER BUTTON (RIGHT) */}
-  <button
-    onClick={() => setDrawerOpen(true)}
-    style={{
-      flex: 1,
-      marginLeft: "8px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "10px 12px",
-      fontWeight: "700",
-      borderRadius: "14px",
-      color: "white",
-      border: "none",
-      cursor: "pointer",
-      background: "linear-gradient(90deg,#00c85f,#00f7a0)",
-      boxShadow: "0 3px 10px rgba(0,200,120,0.35)",
-    }}
-  >
-    Filters
-    <svg width="18" height="18" fill="white" viewBox="0 0 24 24" style={{ marginLeft: 6 }}>
-      <path d="M9 18l6-6-6-6" />
-    </svg>
-  </button>
-</div>
-      {/* PRODUCTS GRID */}
       <div className="products-grid">
-        {filtered.map(product => (
+        {filtered.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
 
       {/* CATEGORY DRAWER */}
       <CategoryDrawer
-        isOpen={openCategory}
-        onClose={() => setOpenCategory(false)}
+        isOpen={catDrawer}
+        onClose={() => setCatDrawer(false)}
         categories={categories}
         selectedCat={selectedCat}
-        onSelect={filterByCategory}
+        onSelect={(slug) => filterByCategory(slug)}
       />
 
       {/* FILTER DRAWER */}
       <FilterDrawer
-        isOpen={openFilter}
-        onClose={() => setOpenFilter(false)}
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
         products={products}
-        categories={categories}
         initial={{
           min: 0,
-          max: Math.max(...products.map(p => lowestPrice(p))),
+          max: Math.max(
+            ...products.map((p) =>
+              p.store?.length ? Math.max(...p.store.map((s) => s.price)) : 0
+            )
+          ),
           sort: "none",
-          discountOnly: false,
         }}
         onApply={(filters) => {
           let items = [...products];
 
           if (filters.min != null)
-            items = items.filter(p => lowestPrice(p) >= filters.min);
+            items = items.filter((p) => getLowest(p) >= Number(filters.min));
 
           if (filters.max != null)
-            items = items.filter(p => lowestPrice(p) <= filters.max);
-
-          if (filters.discountOnly)
-            items = items.filter(p =>
-              p.store?.some(s => (s.offer || "").trim())
-            );
+            items = items.filter((p) => getLowest(p) <= Number(filters.max));
 
           if (filters.sort === "price-asc")
-            items.sort((a, b) => lowestPrice(a) - lowestPrice(b));
+            items.sort((a, b) => getLowest(a) - getLowest(b));
 
           if (filters.sort === "price-desc")
-            items.sort((a, b) => lowestPrice(b) - lowestPrice(a));
+            items.sort((a, b) => getLowest(b) - getLowest(a));
 
           if (filters.sort === "trending")
-            items.sort((a, b) => (b.impressions || 0) - (a.impressions || 0));
+            items.sort(
+              (a, b) => Number(b.impressions || 0) - Number(a.impressions || 0)
+            );
 
           setFiltered(items);
-          setOpenFilter(false);
+          setDrawerOpen(false);
         }}
       />
     </main>
   );
-    }
-                
+              }
+              
