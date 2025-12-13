@@ -50,7 +50,7 @@ export default function InfiniteSlider({ items = [] }) {
         >
           {/* inner wrapper fixes height illusion */}
           <div style={{ width: "100%" }}>
-            <ProductCard product={item} />
+            <ProductCard product={item} compact />
           </div>
         </div>
       ))}
