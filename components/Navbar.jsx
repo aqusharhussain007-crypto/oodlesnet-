@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
-export default function Navbar() {
+export default function Navbar({ openCategory, openFilter }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -29,7 +29,7 @@ export default function Navbar() {
         />
       </Link>
 
-      {/* Hamburger Button */}
+      {/* Hamburger */}
       <button
         onClick={() => setOpen(!open)}
         style={{
@@ -50,7 +50,7 @@ export default function Navbar() {
         ☰
       </button>
 
-      {/* Dropdown Menu */}
+      {/* Menu */}
       {open && (
         <div
           style={{
@@ -59,19 +59,43 @@ export default function Navbar() {
             right: "12px",
             background: "#00172A",
             borderRadius: "10px",
-            padding: "12px",
+            padding: "14px",
             boxShadow: "0 0 12px rgba(0,255,255,0.3)",
             display: "flex",
             flexDirection: "column",
             gap: "12px",
             zIndex: 200,
+            width: "160px",
           }}
         >
-          <Link href="/" className="nav-link">Home</Link>
-          <Link href="/products" className="nav-link">Products</Link>
-          <Link href="/contact" className="nav-link">Contact</Link>
+          <button
+            className="nav-link"
+            onClick={() => {
+              openCategory();
+              setOpen(false);
+            }}
+            style={{ color: "white", textAlign: "left" }}
+          >
+            Categories
+          </button>
+
+          <button
+            className="nav-link"
+            onClick={() => {
+              openFilter();
+              setOpen(false);
+            }}
+            style={{ color: "white", textAlign: "left" }}
+          >
+            Filters
+          </button>
+
+          <Link href="/contact" className="nav-link" style={{ color: "white" }}>
+            Contact
+          </Link>
         </div>
       )}
     </nav>
   );
             }
+              
