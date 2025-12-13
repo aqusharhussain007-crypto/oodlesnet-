@@ -6,15 +6,21 @@ import { useRouter } from "next/navigation";
 export default function ProductCard({ product, compact = false }) {
   const router = useRouter();
 
+  // ------------------------------
+  // Save to Recently Viewed
+  // ------------------------------
   function saveRecent() {
     if (typeof window === "undefined") return;
+
     let recent = JSON.parse(localStorage.getItem("recent") || "[]");
     recent = recent.filter((p) => p.id !== product.id);
+
     recent.unshift({
       id: product.id,
       name: product.name,
       imageUrl: product.imageUrl,
     });
+
     if (recent.length > 12) recent = recent.slice(0, 12);
     localStorage.setItem("recent", JSON.stringify(recent));
   }
@@ -24,6 +30,9 @@ export default function ProductCard({ product, compact = false }) {
     router.push(`/product/${product.id}`);
   }
 
+  // ------------------------------
+  // Price calculations
+  // ------------------------------
   const prices = product.store?.map((s) => Number(s.price)) || [];
   const lowest = prices.length ? Math.min(...prices) : null;
   const highest = prices.length ? Math.max(...prices) : null;
@@ -39,13 +48,16 @@ export default function ProductCard({ product, compact = false }) {
       onClick={openProduct}
       style={{
         width: "100%",
-        maxWidth: compact ? 220 : 420,              // 🔽 smaller cards
+        maxWidth: compact ? 220 : 420,
         margin: compact ? 0 : "0 auto 18px auto",
-        minHeight: compact ? 330 : "auto",          // 🔽 reduced height
-        padding: 14,
-        borderRadius: 24,
-        background: "linear-gradient(135deg,#00c6ff,#00ff99)", // 🌈 gradient border
-        boxShadow: "0 6px 18px rgba(0,200,255,0.25)",
+        minHeight: compact ? 330 : "auto",
+        borderRadius: 22,
+
+        /* 🌈 thin gradient border */
+        background: "linear-gradient(135deg,#00c6ff,#00ff99)",
+        padding: "1.5px",
+        boxShadow: "0 4px 12px rgba(0,200,255,0.18)",
+        cursor: "pointer",
       }}
     >
       {/* INNER CARD */}
@@ -57,7 +69,6 @@ export default function ProductCard({ product, compact = false }) {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          cursor: "pointer",
         }}
       >
         {/* IMAGE */}
@@ -150,5 +161,5 @@ function Badge({ text, bg, color }) {
       {text}
     </span>
   );
-}
+    }
   
