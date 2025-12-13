@@ -38,7 +38,6 @@ export default function Home() {
       setProducts(items);
       setFiltered(items);
 
-      // trending top 10 by impressions
       const trendingList = [...items]
         .sort((a, b) => (b.impressions || 0) - (a.impressions || 0))
         .slice(0, 10);
@@ -99,12 +98,51 @@ export default function Home() {
     else setFiltered(products.filter(p => p.categorySlug === slug));
   }
 
+  /* ----------------------------------------------- */
+  /* AUTO-SCROLL (Trending + Recent Very Slow Loop)  */
+  /* ----------------------------------------------- */
+  useEffect(() => {
+    const speed = 0.25;
+    let rafId;
+
+    function loop() {
+      // Trending
+      if (trendingRef.current) {
+        trendingRef.current.scrollLeft += speed;
+        if (
+          trendingRef.current.scrollLeft + trendingRef.current.clientWidth >=
+          trendingRef.current.scrollWidth
+        ) {
+          trendingRef.current.scrollLeft = 0;
+        }
+      }
+
+      // Recently viewed
+      if (recentRef.current) {
+        recentRef.current.scrollLeft += speed;
+        if (
+          recentRef.current.scrollLeft + recentRef.current.clientWidth >=
+          recentRef.current.scrollWidth
+        ) {
+          recentRef.current.scrollLeft = 0;
+        }
+      }
+
+      rafId = requestAnimationFrame(loop);
+    }
+
+    rafId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafId);
+  }, [trending, recent]);
+
+  /* ----------------------------------------------- */
+
   return (
     <main className="page-container" style={{ padding: 12 }}>
 
       {/* SEARCH BAR */}
-      <div style={{ marginTop: 8 }}>
-        <div style={{ position: "relative" }}>
+      <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+        <div style={{ position: "relative", flex: 1 }}>
           <input
             type="text"
             placeholder="Search products..."
@@ -112,15 +150,15 @@ export default function Home() {
             onChange={(e) => setSearch(e.target.value)}
             className="search-bar compact"
             style={{
-              width: "100%",
               height: 40,
               paddingLeft: 12,
               paddingRight: 42,
-              borderRadius: 12
+              borderRadius: 12,
+              width: "100%",
             }}
           />
 
-          {/* Search icon */}
+          {/* Search Icon */}
           <svg
             width="20"
             height="20"
@@ -137,7 +175,7 @@ export default function Home() {
             <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z" />
           </svg>
 
-          {/* SUGGESTIONS */}
+          {/* SEARCH SUGGESTIONS */}
           {suggestions.length > 0 && (
             <div className="autocomplete-box" style={{ top: 48 }}>
               {suggestions.map((item) => (
@@ -146,8 +184,8 @@ export default function Home() {
                   onClick={() => (window.location = `/product/${item.id}`)}
                   style={{
                     display: "flex",
-                    padding: 8,
                     gap: 8,
+                    padding: 8,
                     alignItems: "center",
                     cursor: "pointer",
                   }}
@@ -161,7 +199,7 @@ export default function Home() {
                   />
                   <div>
                     <div style={{ fontWeight: 700 }}>{item.name}</div>
-                    <div style={{ fontWeight: 800, color: "#0077b6" }}>
+                    <div style={{ color: "#0077b6", fontWeight: 800 }}>
                       ₹{lowestPrice(item).toLocaleString("en-IN")}
                     </div>
                   </div>
@@ -170,34 +208,41 @@ export default function Home() {
             </div>
           )}
         </div>
+
+        {/* MIC BUTTON (FIXED SVG) */}
+        <button
+          onClick={() => {
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SR) return alert("Voice search not supported");
+            const recog = new SR();
+            recog.lang = "en-IN";
+            recog.onresult = (e) => setSearch(e.results[0][0].transcript);
+            recog.start();
+          }}
+          style={{
+            width: 42,
+            height: 42,
+            borderRadius: 10,
+            background: "rgba(0,200,255,0.85)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 0 10px rgba(0,200,255,0.6)",
+          }}
+        >
+          <svg
+            width="20"
+            height="20"
+            fill="white"
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3z" />
+            <path d="M19 11a1 1 0 10-2 0 5 5 0 01-10 0 1 1 0 10-2 0 7 7 0 006 6.92V21H9a1 1 0 100 2h6a1 1 0 100-2h-2v-3.08A7 7 0 0019 11z" />
+          </svg>
+        </button>
       </div>
-            
-<button
-  onClick={startVoiceSearch}
-  style={{
-    width: 42,
-    height: 42,
-    borderRadius: 10,
-    background: "rgba(0,200,255,0.85)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "0 0 10px rgba(0,200,255,0.6)",
-  }}
->
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="white"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3z" />
-    <path d="M19 11a1 1 0 10-2 0 5 5 0 01-10 0 1 1 0 10-2 0 7 7 0 006 6.92V21H9a1 1 0 100 2h6a1 1 0 100-2h-2v-3.08A7 7 0 0019 11z" />
-  </svg>
-</button>
-                      
-      {/* ADS */}
+
+      {/* BANNERS */}
       <div className="mt-3 px-1">
         <BannerAd ads={ads} />
       </div>
@@ -218,15 +263,11 @@ export default function Home() {
         </>
       )}
 
-      {/* CATEGORIES */}
+      {/* CATEGORY PILLS */}
       <h2 className="section-title" style={{ marginTop: 16 }}>
         Categories
       </h2>
-
-      <div
-        className="cat-pills-row no-scrollbar"
-        style={{ display: "flex", overflowX: "auto", gap: 10, padding: 4 }}
-      >
+      <div className="cat-pills-row no-scrollbar">
         <div
           className={`cat-pill ${selectedCat === "all" ? "active" : ""}`}
           onClick={() => filterByCategory("all")}
@@ -234,7 +275,7 @@ export default function Home() {
           All
         </div>
 
-        {categories.map((c) => (
+        {categories.map(c => (
           <div
             key={c.id}
             className={`cat-pill ${selectedCat === c.slug ? "active" : ""}`}
@@ -246,13 +287,10 @@ export default function Home() {
       </div>
 
       {/* PRODUCTS GRID */}
-      <h2 className="section-title" style={{ marginTop: 12 }}>
-        Products
-      </h2>
-
+      <h2 className="section-title" style={{ marginTop: 12 }}>Products</h2>
       <div className="products-grid">
-        {filtered.map((p) => (
-          <ProductCard key={p.id} product={p} />
+        {filtered.map(product => (
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
 
@@ -273,7 +311,7 @@ export default function Home() {
         categories={categories}
         initial={{
           min: 0,
-          max: Math.max(...products.map((p) => lowestPrice(p))),
+          max: Math.max(...products.map(p => lowestPrice(p))),
           sort: "none",
           discountOnly: false,
         }}
@@ -281,14 +319,14 @@ export default function Home() {
           let items = [...products];
 
           if (filters.min != null)
-            items = items.filter((p) => lowestPrice(p) >= filters.min);
+            items = items.filter(p => lowestPrice(p) >= filters.min);
 
           if (filters.max != null)
-            items = items.filter((p) => lowestPrice(p) <= filters.max);
+            items = items.filter(p => lowestPrice(p) <= filters.max);
 
           if (filters.discountOnly)
-            items = items.filter((p) =>
-              p.store?.some((s) => (s.offer || "").trim())
+            items = items.filter(p =>
+              p.store?.some(s => (s.offer || "").trim())
             );
 
           if (filters.sort === "price-asc")
@@ -307,4 +345,4 @@ export default function Home() {
     </main>
   );
     }
-                                            
+                
