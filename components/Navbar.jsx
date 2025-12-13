@@ -96,42 +96,6 @@ export default function Navbar({ onOpenFilter, onOpenCategory }) {
               Home
             </Link>
 
-            {/* OPEN CATEGORY DRAWER */}
-            <button
-              onClick={() => {
-                onOpenCategory();
-                setOpen(false);
-              }}
-              style={{
-                color: "white",
-                background: "none",
-                border: "none",
-                textAlign: "left",
-                fontSize: "15px",
-                cursor: "pointer",
-              }}
-            >
-              Categories
-            </button>
-
-            {/* OPEN FILTER DRAWER */}
-            <button
-              onClick={() => {
-                onOpenFilter();
-                setOpen(false);
-              }}
-              style={{
-                color: "white",
-                background: "none",
-                border: "none",
-                textAlign: "left",
-                fontSize: "15px",
-                cursor: "pointer",
-              }}
-            >
-              Filters
-            </button>
-
             {/* LANGUAGE */}
             <div style={{ color: "white" }}>
               <strong>Language</strong>
