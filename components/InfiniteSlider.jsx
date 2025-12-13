@@ -1,46 +1,19 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import ProductCard from "./ProductCard";
 
 export default function InfiniteSlider({ items = [] }) {
-  const sliderRef = useRef(null);
-
-  // Duplicate items for infinite illusion
+  // duplicate for infinite loop (already working)
   const loopItems = [...items, ...items];
-
-  // Slow infinite auto-scroll
-  useEffect(() => {
-    const el = sliderRef.current;
-    if (!el) return;
-
-    let animation;
-
-    const scroll = () => {
-      el.scrollLeft += 0.35; // 🔥 very slow speed
-
-      // Reset seamlessly at halfway
-      if (el.scrollLeft >= el.scrollWidth / 2) {
-        el.scrollLeft = 0;
-      }
-
-      animation = requestAnimationFrame(scroll);
-    };
-
-    animation = requestAnimationFrame(scroll);
-
-    return () => cancelAnimationFrame(animation);
-  }, []);
 
   return (
     <div
-      ref={sliderRef}
       className="no-scrollbar"
       style={{
         display: "flex",
         overflowX: "auto",
-        gap: 14,
-        paddingBottom: 6,
+        gap: 12,
+        paddingBottom: 8,
         WebkitOverflowScrolling: "touch",
       }}
     >
@@ -48,8 +21,7 @@ export default function InfiniteSlider({ items = [] }) {
         <div
           key={i}
           style={{
-            minWidth: 220,     // ✅ fixed card width
-            maxWidth: 220,
+            width: 210,          // ✅ FIXED card size
             flexShrink: 0,
           }}
         >
@@ -58,4 +30,5 @@ export default function InfiniteSlider({ items = [] }) {
       ))}
     </div>
   );
-}
+      }
+          
