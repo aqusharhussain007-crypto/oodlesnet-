@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useContext } from "react";
-import { DrawerContext } from "@/app/layout";
+import { DrawerContext } from "@/components/DrawerProvider";
 import ProductCard from "@/components/ProductCard";
 import BannerAd from "@/components/ads/BannerAd";
 import FilterDrawer from "@/components/FilterDrawer";
@@ -12,11 +12,11 @@ import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
 
 export default function Home() {
-  const { 
+  const {
     openFilter,
     setOpenFilter,
     openCategory,
-    setOpenCategory 
+    setOpenCategory
   } = useContext(DrawerContext);
 
   const [products, setProducts] = useState([]);
@@ -99,6 +99,11 @@ export default function Home() {
     else setFiltered(products.filter((p) => p.categorySlug === slug));
   }
 
+  const lowest = (p) =>
+    p.store?.length
+      ? Math.min(...p.store.map((s) => Number(s.price)))
+      : Infinity;
+
   /* ---------- UI ---------- */
   return (
     <main className="page-container" style={{ padding: 12 }}>
@@ -114,10 +119,46 @@ export default function Home() {
             className="search-bar compact"
             style={{ height: 40, borderRadius: 12 }}
           />
+
+          {/* AUTOCOMPLETE */}
+          {suggestions.length > 0 && (
+            <div className="autocomplete-box" style={{ top: 48 }}>
+              {suggestions.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() => (window.location = `/product/${item.id}`)}
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    padding: 8,
+                    alignItems: "center",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Image
+                    src={item.imageUrl}
+                    width={42}
+                    height={42}
+                    alt={item.name}
+                    style={{ borderRadius: 8, objectFit: "cover" }}
+                  />
+
+                  <div>
+                    <div style={{ fontWeight: 700, color: "#0077aa" }}>
+                      {item.name}
+                    </div>
+                    <div style={{ color: "#0097cc", fontWeight: 800 }}>
+                      ₹{lowest(item).toLocaleString("en-IN")}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Banner Ads */}
+      {/* Banner */}
       <div className="mt-3 px-1">
         <BannerAd ads={ads} />
       </div>
@@ -141,8 +182,8 @@ export default function Home() {
       {/* Products */}
       <h2 className="section-title">Products</h2>
       <div className="products-grid">
-        {filtered.map((product) => (
-          <ProductCard key={product.id} product={product} />
+        {filtered.map((p) => (
+          <ProductCard key={p.id} product={p} />
         ))}
       </div>
 
@@ -152,7 +193,7 @@ export default function Home() {
         onClose={() => setOpenCategory(false)}
         categories={categories}
         selectedCat={selectedCat}
-        onSelect={(slug) => filterByCategory(slug)}
+        onSelect={filterByCategory}
       />
 
       {/* FILTER DRAWER */}
@@ -163,21 +204,12 @@ export default function Home() {
         categories={categories}
         initial={{
           min: 0,
-          max: Math.max(
-            ...products.map((p) =>
-              p.store?.length ? Math.max(...p.store.map((s) => s.price)) : 0
-            )
-          ),
+          max: Math.max(...products.map((p) => lowest(p))),
           sort: "none",
           discountOnly: false,
         }}
         onApply={(filters) => {
           let items = [...products];
-
-          const lowest = (p) =>
-            p.store?.length
-              ? Math.min(...p.store.map((s) => Number(s.price)))
-              : Infinity;
 
           if (filters.min != null)
             items = items.filter((p) => lowest(p) >= Number(filters.min));
@@ -187,7 +219,7 @@ export default function Home() {
 
           if (filters.discountOnly)
             items = items.filter((p) =>
-              p.store?.some((s) => (s.offer || "").trim().length)
+              p.store?.some((s) => (s.offer || "").trim())
             );
 
           if (filters.sort === "price-asc")
@@ -205,4 +237,5 @@ export default function Home() {
       />
     </main>
   );
-    }
+}
+  
