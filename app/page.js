@@ -231,14 +231,21 @@ export default function Home() {
         </div>
 
         {/* category pill that opens drawer */}
+
         <button
-          onClick={() => setDrawerOpen(true)}
-          aria-label="Open filters"
-          className="pill-button"
-          style={{ minWidth: 100, height: 40 }}
-        >
-          <span style={{ fontWeight: 700, color: "#0077aa" }}>Filter ▾</span>
-        </button>
+  onClick={() => setCatDrawer(true)}
+  className="pill-button"
+  style={{
+    padding: "10px 16px",
+    borderRadius: "14px",
+    background: "#fff",
+    border: "2px solid #00c6ff",
+    fontWeight: 700,
+    color: "#0077b6",
+  }}
+>
+  Categories ▾
+</button>
 
         {/* mic */}
         <button
