@@ -33,35 +33,31 @@ export default function CategoryDrawer({
           borderTopLeftRadius: "22px",
           borderTopRightRadius: "22px",
           padding: "20px",
-          boxShadow: "0 -4px 20px rgba(0,0,0,0.15)",
-          animation: "slideUp 0.28s ease",
+          animation: "slideUp 0.25s ease",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: 14,
-          }}
-        >
-          <h3 style={{ fontWeight: 700, color: "#0077b6" }}>Categories</h3>
+        {/* HEADER */}
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <h3 style={{ color: "#0077b6", fontWeight: 700 }}>Categories</h3>
           <button
             onClick={onClose}
             style={{
               padding: "6px 10px",
               background: "#eee",
-              borderRadius: 10,
+              borderRadius: "10px",
             }}
           >
             ✕
           </button>
         </div>
 
+        {/* CATEGORY PILLS */}
         <div
           style={{
             display: "flex",
             flexWrap: "wrap",
-            gap: "12px",
+            gap: "10px",
+            marginTop: "14px",
           }}
         >
           {/* ALL */}
@@ -71,12 +67,13 @@ export default function CategoryDrawer({
               onClose();
             }}
             style={{
-              padding: "10px 16px",
-              borderRadius: "14px",
-              border: selectedCat === "all" ? "2px solid #00c6ff" : "1px solid #ddd",
+              padding: "6px 12px",
+              borderRadius: "10px",
+              border: selectedCat === "all" ? "2px solid #00c6ff" : "1px solid #ccc",
               background: selectedCat === "all" ? "#e6faff" : "#fff",
-              fontWeight: 600,
               cursor: "pointer",
+              fontWeight: 600,
+              fontSize: "0.88rem",
             }}
           >
             All
@@ -90,13 +87,14 @@ export default function CategoryDrawer({
                 onClose();
               }}
               style={{
-                padding: "10px 16px",
-                borderRadius: "14px",
+                padding: "6px 12px",
+                borderRadius: "10px",
                 border:
-                  selectedCat === c.slug ? "2px solid #00c6ff" : "1px solid #ddd",
+                  selectedCat === c.slug ? "2px solid #00c6ff" : "1px solid #ccc",
                 background: selectedCat === c.slug ? "#e6faff" : "#fff",
-                fontWeight: 600,
                 cursor: "pointer",
+                fontWeight: 600,
+                fontSize: "0.88rem",
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
@@ -111,11 +109,11 @@ export default function CategoryDrawer({
 
       <style>{`
         @keyframes slideUp {
-          from { transform: translateY(100%); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
         }
       `}</style>
     </div>
   );
-          }
-          
+                }
+              
