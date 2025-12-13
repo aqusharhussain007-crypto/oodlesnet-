@@ -6,21 +6,15 @@ import { useRouter } from "next/navigation";
 export default function ProductCard({ product, compact = false }) {
   const router = useRouter();
 
-  // ------------------------------
-  // Save to Recently Viewed
-  // ------------------------------
   function saveRecent() {
     if (typeof window === "undefined") return;
-
     let recent = JSON.parse(localStorage.getItem("recent") || "[]");
     recent = recent.filter((p) => p.id !== product.id);
-
     recent.unshift({
       id: product.id,
       name: product.name,
       imageUrl: product.imageUrl,
     });
-
     if (recent.length > 12) recent = recent.slice(0, 12);
     localStorage.setItem("recent", JSON.stringify(recent));
   }
@@ -30,9 +24,6 @@ export default function ProductCard({ product, compact = false }) {
     router.push(`/product/${product.id}`);
   }
 
-  // ------------------------------
-  // Price calculations
-  // ------------------------------
   const prices = product.store?.map((s) => Number(s.price)) || [];
   const lowest = prices.length ? Math.min(...prices) : null;
   const highest = prices.length ? Math.max(...prices) : null;
@@ -50,10 +41,9 @@ export default function ProductCard({ product, compact = false }) {
         width: "100%",
         maxWidth: compact ? 220 : 420,
         margin: compact ? 0 : "0 auto 18px auto",
-        minHeight: compact ? 330 : "auto",
         borderRadius: 22,
 
-        /* 🌈 thin gradient border */
+        /* thin gradient border */
         background: "linear-gradient(135deg,#00c6ff,#00ff99)",
         padding: "1.5px",
         boxShadow: "0 4px 12px rgba(0,200,255,0.18)",
@@ -66,15 +56,12 @@ export default function ProductCard({ product, compact = false }) {
           background: "#f0fffb",
           borderRadius: 20,
           padding: 12,
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
         }}
       >
         {/* IMAGE */}
         <div
           style={{
-            height: compact ? 135 : "auto",
+            height: compact ? 135 : 180,
             borderRadius: 16,
             overflow: "hidden",
             background: "#e6faff",
@@ -82,7 +69,7 @@ export default function ProductCard({ product, compact = false }) {
         >
           <Image
             src={product.imageUrl || "/placeholder.png"}
-            alt={`${product.name} price comparison`}
+            alt={product.name}
             width={500}
             height={350}
             style={{
@@ -100,11 +87,11 @@ export default function ProductCard({ product, compact = false }) {
             fontSize: "0.95rem",
             fontWeight: 700,
             color: "#0077b6",
+            lineHeight: "1.25rem",
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
-            minHeight: 42,
           }}
         >
           {product.name}
@@ -161,5 +148,5 @@ function Badge({ text, bg, color }) {
       {text}
     </span>
   );
-    }
-  
+        }
+        
