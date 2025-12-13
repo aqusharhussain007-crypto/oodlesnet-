@@ -122,3 +122,10 @@ export default function CategoryDrawer({
   );
         }
           
+<CategoryDrawer
+  isOpen={catDrawer}
+  onClose={() => setCatDrawer(false)}
+  categories={categories}
+  selectedCat={selectedCat}
+  onSelect={(slug) => filterByCategory(slug)}
+/>
