@@ -258,3 +258,27 @@ body {
   100% { transform: rotateX(0deg); opacity: 1; }
   }
   
+/* DARK MODE GLOBALS */
+html.dark body {
+  background: #0b0b0b !important;
+  color: white !important;
+}
+
+/* Cards / common backgrounds */
+html.dark .page-container {
+  color: white;
+}
+
+html.dark .products-grid > div {
+  background: #1a1a1a !important;
+}
+
+html.dark input,
+html.dark .search-bar {
+  background: #222 !important;
+  color: white !important;
+}
+
+html.dark .autocomplete-box {
+  background: #1b1b1b !important;
+  }
