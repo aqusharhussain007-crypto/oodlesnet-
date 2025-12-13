@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useContext } from "react";
 import Link from "next/link";
+import { DrawerContext } from "@/app/layout";
 
-export default function Navbar({ openCategory, openFilter }) {
-  const [open, setOpen] = useState(false);
+export default function Navbar() {
+  const {
+    setOpenFilter,
+    setOpenCategory,
+  } = useContext(DrawerContext);
 
   return (
     <nav
@@ -17,7 +21,7 @@ export default function Navbar({ openCategory, openFilter }) {
         justifyContent: "space-between",
         position: "sticky",
         top: 0,
-        zIndex: 100,
+        zIndex: 1000,
       }}
     >
       {/* Logo */}
@@ -29,63 +33,67 @@ export default function Navbar({ openCategory, openFilter }) {
         />
       </Link>
 
-      {/* Hamburger */}
-      <button
-        onClick={() => setOpen(!open)}
-        style={{
-          width: "40px",
-          height: "40px",
-          borderRadius: "10px",
-          background: "#00c3ff",
-          border: "none",
-          boxShadow: "0 0 12px #00c3ff",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-          fontSize: "22px",
-          color: "white",
-        }}
-      >
-        ☰
-      </button>
+      {/* Hamburger Menu */}
+      <div style={{ position: "relative" }}>
+        <button
+          onClick={(e) => {
+            const menu = e.currentTarget.nextElementSibling;
+            menu.style.display =
+              menu.style.display === "flex" ? "none" : "flex";
+          }}
+          style={{
+            width: "40px",
+            height: "40px",
+            borderRadius: "10px",
+            background: "#00c3ff",
+            border: "none",
+            boxShadow: "0 0 12px #00c3ff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            fontSize: "22px",
+            color: "white",
+          }}
+        >
+          ☰
+        </button>
 
-      {/* Menu */}
-      {open && (
+        {/* Dropdown */}
         <div
           style={{
             position: "absolute",
-            top: "50px",
-            right: "12px",
-            background: "#00172A",
-            borderRadius: "10px",
-            padding: "14px",
-            boxShadow: "0 0 12px rgba(0,255,255,0.3)",
-            display: "flex",
+            top: "48px",
+            right: 0,
+            display: "none",
             flexDirection: "column",
-            gap: "12px",
-            zIndex: 200,
-            width: "160px",
+            background: "#00172A",
+            padding: "12px",
+            borderRadius: "10px",
+            boxShadow: "0 0 12px rgba(0,255,255,0.3)",
+            minWidth: "150px",
+            gap: "10px",
+            zIndex: 2000,
           }}
         >
           <button
             className="nav-link"
-            onClick={() => {
-              openCategory();
-              setOpen(false);
+            style={{
+              color: "white",
+              textAlign: "left",
             }}
-            style={{ color: "white", textAlign: "left" }}
+            onClick={() => setOpenCategory(true)}
           >
             Categories
           </button>
 
           <button
             className="nav-link"
-            onClick={() => {
-              openFilter();
-              setOpen(false);
+            style={{
+              color: "white",
+              textAlign: "left",
             }}
-            style={{ color: "white", textAlign: "left" }}
+            onClick={() => setOpenFilter(true)}
           >
             Filters
           </button>
@@ -94,8 +102,7 @@ export default function Navbar({ openCategory, openFilter }) {
             Contact
           </Link>
         </div>
-      )}
+      </div>
     </nav>
   );
-            }
-              
+              }
