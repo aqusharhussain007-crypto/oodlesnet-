@@ -5,26 +5,20 @@ import ProductCard from "./ProductCard";
 
 export default function InfiniteSlider({ items = [] }) {
   const ref = useRef(null);
+  const list = [...items, ...items];
 
-  // duplicate for infinite loop
-  const loopItems = [...items, ...items];
-
-  // slow infinite auto scroll
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
     let raf;
-    const scroll = () => {
-      el.scrollLeft += 0.3; // very slow
-
-      if (el.scrollLeft >= el.scrollWidth / 2) {
-        el.scrollLeft = 0;
-      }
-      raf = requestAnimationFrame(scroll);
+    const loop = () => {
+      el.scrollLeft += 0.25; // slow
+      if (el.scrollLeft >= el.scrollWidth / 2) el.scrollLeft = 0;
+      raf = requestAnimationFrame(loop);
     };
 
-    raf = requestAnimationFrame(scroll);
+    raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
   }, []);
 
@@ -36,24 +30,15 @@ export default function InfiniteSlider({ items = [] }) {
         display: "flex",
         gap: 14,
         overflowX: "auto",
-        WebkitOverflowScrolling: "touch",
         paddingBottom: 10,
+        WebkitOverflowScrolling: "touch",
       }}
     >
-      {loopItems.map((item, i) => (
-        <div
-          key={i}
-          style={{
-            width: 240,          // ✅ FORCE SAME CARD WIDTH
-            flexShrink: 0,
-          }}
-        >
-          {/* inner wrapper fixes height illusion */}
-          <div style={{ width: "100%" }}>
-            <ProductCard product={item} compact />
-          </div>
+      {list.map((item, i) => (
+        <div key={i} style={{ width: 240, flexShrink: 0 }}>
+          <ProductCard product={item} compact />
         </div>
       ))}
     </div>
   );
-          }
+}
