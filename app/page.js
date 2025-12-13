@@ -171,7 +171,32 @@ export default function Home() {
           )}
         </div>
       </div>
-
+            
+<button
+  onClick={startVoiceSearch}
+  style={{
+    width: 42,
+    height: 42,
+    borderRadius: 10,
+    background: "rgba(0,200,255,0.85)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 0 10px rgba(0,200,255,0.6)",
+  }}
+>
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="white"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3z" />
+    <path d="M19 11a1 1 0 10-2 0 5 5 0 01-10 0 1 1 0 10-2 0 7 7 0 006 6.92V21H9a1 1 0 100 2h6a1 1 0 100-2h-2v-3.08A7 7 0 0019 11z" />
+  </svg>
+</button>
+                      
       {/* ADS */}
       <div className="mt-3 px-1">
         <BannerAd ads={ads} />
