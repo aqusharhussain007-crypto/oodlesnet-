@@ -1,11 +1,10 @@
 "use client";
 
-import { useContext } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { DrawerContext } from "@/components/DrawerProvider";
 
 export default function Navbar() {
-  const { setOpenFilter, setOpenCategory } = useContext(DrawerContext);
+  const [open, setOpen] = useState(false);
 
   return (
     <nav
@@ -18,10 +17,9 @@ export default function Navbar() {
         justifyContent: "space-between",
         position: "sticky",
         top: 0,
-        zIndex: 1000,
+        zIndex: 100,
       }}
     >
-      {/* Logo */}
       <Link href="/">
         <img
           src="/logo.png"
@@ -30,70 +28,48 @@ export default function Navbar() {
         />
       </Link>
 
-      {/* Hamburger Menu */}
-      <div style={{ position: "relative" }}>
-        <button
-          onClick={(e) => {
-            const menu = e.currentTarget.nextElementSibling;
-            menu.style.display =
-              menu.style.display === "flex" ? "none" : "flex";
-          }}
-          style={{
-            width: "40px",
-            height: "40px",
-            borderRadius: "10px",
-            background: "#00c3ff",
-            border: "none",
-            boxShadow: "0 0 12px #00c3ff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            fontSize: "22px",
-            color: "white",
-          }}
-        >
-          ☰
-        </button>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          width: "40px",
+          height: "40px",
+          borderRadius: "10px",
+          background: "#00c3ff",
+          border: "none",
+          boxShadow: "0 0 12px #00c3ff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+          fontSize: "22px",
+          color: "white",
+        }}
+      >
+        ☰
+      </button>
 
-        {/* Dropdown */}
+      {open && (
         <div
           style={{
             position: "absolute",
-            top: "48px",
-            right: 0,
-            display: "none",
-            flexDirection: "column",
+            top: "50px",
+            right: "12px",
             background: "#00172A",
-            padding: "12px",
             borderRadius: "10px",
+            padding: "12px",
             boxShadow: "0 0 12px rgba(0,255,255,0.3)",
-            minWidth: "150px",
-            gap: "10px",
-            zIndex: 2000,
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
+            zIndex: 200,
           }}
         >
-          <button
-            className="nav-link"
-            style={{ color: "white", textAlign: "left" }}
-            onClick={() => setOpenCategory(true)}
-          >
-            Categories
-          </button>
-
-          <button
-            className="nav-link"
-            style={{ color: "white", textAlign: "left" }}
-            onClick={() => setOpenFilter(true)}
-          >
-            Filters
-          </button>
-
-          <Link href="/contact" className="nav-link" style={{ color: "white" }}>
-            Contact
-          </Link>
+          <Link href="/" className="nav-link">Home</Link>
+          <Link href="/products" className="nav-link">Products</Link>
+          <Link href="/contact" className="nav-link">Contact</Link>
         </div>
-      </div>
+      )}
     </nav>
   );
-}
+              }
+          
