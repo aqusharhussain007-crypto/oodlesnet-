@@ -13,7 +13,7 @@ export default function CategoryDrawer({
     <div
       className="category-drawer-backdrop"
       onClick={(e) => {
-        if (e.target.className === "category-drawer-backdrop") onClose();
+        if (e.target.classList.contains("category-drawer-backdrop")) onClose();
       }}
       style={{
         position: "fixed",
@@ -37,7 +37,6 @@ export default function CategoryDrawer({
           animation: "slideUp 0.28s ease",
         }}
       >
-        {/* HEADER */}
         <div
           style={{
             display: "flex",
@@ -58,7 +57,6 @@ export default function CategoryDrawer({
           </button>
         </div>
 
-        {/* CATEGORY OPTIONS */}
         <div
           style={{
             display: "flex",
@@ -111,7 +109,6 @@ export default function CategoryDrawer({
         </div>
       </div>
 
-      {/* ANIMATION CSS */}
       <style>{`
         @keyframes slideUp {
           from { transform: translateY(100%); opacity: 0; }
@@ -120,12 +117,5 @@ export default function CategoryDrawer({
       `}</style>
     </div>
   );
-        }
+          }
           
-<CategoryDrawer
-  isOpen={catDrawer}
-  onClose={() => setCatDrawer(false)}
-  categories={categories}
-  selectedCat={selectedCat}
-  onSelect={(slug) => filterByCategory(slug)}
-/>
