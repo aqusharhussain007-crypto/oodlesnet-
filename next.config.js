@@ -3,17 +3,13 @@ const nextConfig = {
   reactStrictMode: true,
 
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "**",   // allow ALL https image sources
-      },
-      {
-        protocol: "http",
-        hostname: "**",   // allow http images if any
-      },
+    domains: [
+      "firebasestorage.googleapis.com",
+      "lh3.googleusercontent.com",
     ],
   },
+
+  compress: true,
 };
 
 module.exports = nextConfig;
