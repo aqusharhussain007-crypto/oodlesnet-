@@ -1,91 +1,71 @@
-import { doc, getDoc, increment, updateDoc } from "firebase/firestore";
+"use client";
+
+import { useEffect, useState } from "react";
+import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 import Image from "next/image";
 import Link from "next/link";
 
-/* ---------------- SEO METADATA (SERVER) ---------------- */
-export async function generateMetadata({ params }) {
-  const ref = doc(db, "products", params.id);
-  const snap = await getDoc(ref);
+export default function ProductPage({ params }) {
+  const { id } = params;
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!snap.exists()) {
-    return {
-      title: "Product not found | OodlesNet",
-    };
-  }
+  useEffect(() => {
+    async function loadProduct() {
+      try {
+        const ref = doc(db, "products", id);
+        const snap = await getDoc(ref);
 
-  const product = snap.data();
-  const prices =
-    product.store?.map((s) => Number(s.price)).filter(Boolean) || [];
+        if (snap.exists()) {
+          setProduct({ id: snap.id, ...snap.data() });
 
-  const low = prices.length ? Math.min(...prices) : null;
-  const high = prices.length ? Math.max(...prices) : null;
+          // increment views
+          updateDoc(ref, { views: increment(1) });
+        }
+      } catch (err) {
+        console.error(err);
+      }
+      setLoading(false);
+    }
 
-  return {
-    title: `${product.name} – Best Price Comparison`,
-    description: `Compare prices of ${product.name}. Lowest price ₹${low}. Updated offers from multiple stores.`,
-    openGraph: {
-      title: product.name,
-      description: `Compare prices of ${product.name} across stores`,
-      images: [product.imageUrl],
-    },
-  };
-}
+    loadProduct();
+  }, [id]);
 
-/* ---------------- PAGE (SERVER) ---------------- */
-export default async function ProductPage({ params }) {
-  const ref = doc(db, "products", params.id);
-  const snap = await getDoc(ref);
+  if (loading) return <div className="p-4">Loading…</div>;
+  if (!product) return <div className="p-4">Product not found.</div>;
 
-  if (!snap.exists()) {
-    return <div className="p-4">Product not found</div>;
-  }
-
-  const product = { id: snap.id, ...snap.data() };
   const stores = product.store || [];
 
-  const prices = stores.map((s) => Number(s.price)).filter(Boolean);
-  const low = Math.min(...prices);
-  const high = Math.max(...prices);
+  // 🔥 CLICK TRACK + REDIRECT
+  function handleBuy(store) {
+    // track click (background)
+    fetch("/api/track-click", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        productId: product.id,
+        store: store.name.toLowerCase(),
+      }),
+    });
 
-  // Increment views (fire & forget)
-  updateDoc(ref, { views: increment(1) }).catch(() => {});
-
-  /* -------- PRODUCT SCHEMA (JSON-LD) -------- */
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: product.name,
-    image: [product.imageUrl],
-    description: product.description,
-    offers: {
-      "@type": "AggregateOffer",
-      priceCurrency: "INR",
-      lowPrice: low,
-      highPrice: high,
-      offerCount: stores.length,
-      availability: "https://schema.org/InStock",
-    },
-  };
+    // redirect
+    window.location.href = store.url;
+  }
 
   return (
     <div className="p-4 pb-24 max-w-[700px] mx-auto">
-      {/* JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-      />
-
       {/* Breadcrumb */}
       <div className="text-sm mb-3">
-        <Link href="/" className="text-blue-500">
-          Home
-        </Link>{" "}
+        <Link href="/" className="text-blue-500">Home</Link> /{" "}
+        <span className="text-blue-600 font-semibold">
+          {product.categorySlug}
+        </span>{" "}
         / <span className="font-bold">{product.name}</span>
       </div>
 
       {/* Image */}
-      <div className="rounded-2xl overflow-hidden mb-4 bg-white">
+      <div className="rounded-2xl overflow-hidden shadow mb-4 bg-white">
         <Image
           src={product.imageUrl}
           alt={product.name}
@@ -96,31 +76,58 @@ export default async function ProductPage({ params }) {
       </div>
 
       {/* Title */}
-      <h1 className="text-2xl font-bold text-blue-700">{product.name}</h1>
+      <h1 className="text-2xl font-bold text-blue-700">
+        {product.name}
+      </h1>
 
       {/* Description */}
-      <p className="mt-2 text-gray-700">{product.description}</p>
+      <p className="mt-2 text-gray-700">
+        {product.description}
+      </p>
 
-      {/* Prices */}
+      {/* Compare Prices */}
       <h3 className="mt-6 text-xl font-bold text-blue-600">
         Compare Prices
       </h3>
 
-      <div className="flex gap-4 overflow-x-auto py-3 no-scrollbar">
-        {stores.map((store, i) => (
-          <a
-            key={i}
-            href={store.url}
-            target="_blank"
-            className="min-w-[240px] bg-white p-4 rounded-2xl shadow border"
+      <div className="flex gap-4 overflow-x-auto py-4 no-scrollbar">
+        {stores.map((store, index) => (
+          <div
+            key={index}
+            className="min-w-[260px] bg-white p-4 rounded-2xl shadow border flex-shrink-0"
           >
-            <div className="font-bold text-lg">
-              {store.name} – ₹{store.price}
+            <div className="text-lg font-bold">
+              {store.name}
             </div>
-            <div className="text-sm text-gray-600">{store.offer}</div>
-          </a>
+
+            <div className="text-xl font-extrabold text-blue-700 my-1">
+              ₹ {Number(store.price).toLocaleString("en-IN")}
+            </div>
+
+            <div className="text-sm text-gray-600 mb-3">
+              {store.offer}
+            </div>
+
+            <button
+              onClick={() => handleBuy(store)}
+              className="w-full text-white font-bold py-3 rounded-xl shadow"
+              style={{
+                background:
+                  store.name === "Amazon"
+                    ? "linear-gradient(90deg,#ff9900,#ff6600)"
+                    : store.name === "Meesho"
+                    ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
+                    : store.name === "Ajio"
+                    ? "linear-gradient(90deg,#005bea,#00c6fb)"
+                    : "linear-gradient(90deg,#00c6ff,#00ff99)",
+              }}
+            >
+              Buy on {store.name}
+            </button>
+          </div>
         ))}
       </div>
     </div>
   );
-}
+        }
+        
