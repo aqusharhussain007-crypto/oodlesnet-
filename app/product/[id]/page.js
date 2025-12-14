@@ -5,7 +5,44 @@ import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 import Image from "next/image";
 import Link from "next/link";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase-app";
 
+export async function generateMetadata({ params }) {
+  const ref = doc(db, "products", params.id);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    return {
+      title: "Product not found | OodlesNet",
+      robots: { index: false },
+    };
+  }
+
+  const product = snap.data();
+
+  const lowestPrice =
+    product.store?.length
+      ? Math.min(...product.store.map((s) => Number(s.price)))
+      : null;
+
+  return {
+    title: `${product.name} – Best Price ₹${lowestPrice ?? ""}`,
+    description: `Compare prices of ${product.name} across top online stores. Find the lowest price, best offers and deals on OodlesNet.`,
+    keywords: [
+      product.name,
+      "price comparison",
+      "best price India",
+      "online shopping",
+      "compare prices",
+    ],
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+                  }
+                 
 export default function ProductPage({ params }) {
   const { id } = params;
   const [product, setProduct] = useState(null);
