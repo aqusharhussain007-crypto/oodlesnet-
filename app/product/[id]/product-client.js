@@ -64,18 +64,6 @@ export default function ProductClient({ id }) {
       <h3 className="mt-4 text-lg font-bold text-blue-600">Description</h3>
       <p className="text-gray-700">{product.description}</p>
 
-      <button
-        onClick={() =>
-          navigator.share?.({
-            title: product.name,
-            url: window.location.href,
-          })
-        }
-        className="mt-4 px-4 py-2 bg-gradient-to-r from-blue-400 to-cyan-400 text-white font-bold rounded-xl shadow"
-      >
-        Share
-      </button>
-
       <h3 className="mt-6 text-xl font-bold text-blue-600">Compare Prices</h3>
 
       <div className="flex gap-4 overflow-x-auto py-3 no-scrollbar">
@@ -111,5 +99,5 @@ export default function ProductClient({ id }) {
       </div>
     </div>
   );
-    }
-    
+          }
+  
