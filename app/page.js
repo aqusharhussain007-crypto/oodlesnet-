@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
 import InfiniteSlider from "@/components/InfiniteSlider";
@@ -28,9 +28,9 @@ export default function Home() {
   const trendingRef = useRef(null);
   const recentRef = useRef(null);
 
-  /* ---------------- LOAD DATA ---------------- */
+  /* ---------------- LOAD PRODUCTS ---------------- */
   useEffect(() => {
-    async function loadAll() {
+    async function load() {
       const snap = await getDocs(collection(db, "products"));
       const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
@@ -42,18 +42,24 @@ export default function Home() {
           .sort((a, b) => (b.impressions || 0) - (a.impressions || 0))
           .slice(0, 10)
       );
-
-      const adsSnap = await getDocs(collection(db, "ads"));
-      setAds(adsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
     }
-    loadAll();
+    load();
+  }, []);
+
+  /* ---------------- LOAD ADS ---------------- */
+  useEffect(() => {
+    async function loadAds() {
+      const snap = await getDocs(collection(db, "ads"));
+      setAds(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    }
+    loadAds();
   }, []);
 
   /* ---------------- RECENTLY VIEWED ---------------- */
   useEffect(() => {
     if (typeof window === "undefined") return;
     const r = JSON.parse(localStorage.getItem("recent") || "[]");
-    if (Array.isArray(r) && r.length) setRecent(r);
+    if (Array.isArray(r)) setRecent(r);
   }, []);
 
   /* ---------------- SEARCH ---------------- */
@@ -89,43 +95,47 @@ export default function Home() {
   }
 
   return (
-    <main className="page-container">
+    <main className="page-container" style={{ padding: 12 }}>
 
-      {/* HERO IMAGE (NO OVERLAY ISSUE) */}
-      <div style={{ position: "relative", width: "100%", height: 220 }}>
-        <Image
-          src="/hero.jpg"
-          alt="OodlesNet"
-          fill
-          style={{ objectFit: "cover" }}
-          priority
+      {/* SEARCH BAR */}
+      <div style={{ position: "relative", marginBottom: 12 }}>
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search products…"
+          className="search-bar"
         />
       </div>
 
-      {/* SEARCH BAR */}
-      <div style={{ padding: 12, marginTop: 8 }}>
-        <div style={{ position: "relative" }}>
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search products…"
-            className="search-bar"
-          />
-
-          {/* SEARCH ICON */}
-          <svg width="18" height="18" viewBox="0 0 24 24"
-            style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)" }}>
-            <path fill="#00c3ff" d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2z"/>
-          </svg>
-        </div>
-      </div>
-
       {/* CATEGORY + FILTER BUTTONS */}
-      <div style={{ display: "flex", gap: 10, padding: "0 12px" }}>
-        <button className="drawer-btn blue" onClick={() => setCatDrawer(true)}>
+      <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+        <button
+          onClick={() => setCatDrawer(true)}
+          style={{
+            flex: 1,
+            height: 38,
+            borderRadius: 12,
+            background: "linear-gradient(90deg,#0094ff,#00e0ff)",
+            color: "#fff",
+            border: "none",
+            fontWeight: 700,
+          }}
+        >
           Categories →
         </button>
-        <button className="drawer-btn green" onClick={() => setFilterDrawer(true)}>
+
+        <button
+          onClick={() => setFilterDrawer(true)}
+          style={{
+            flex: 1,
+            height: 38,
+            borderRadius: 12,
+            background: "linear-gradient(90deg,#00c85f,#00f7a0)",
+            color: "#fff",
+            border: "none",
+            fontWeight: 700,
+          }}
+        >
           Filters →
         </button>
       </div>
@@ -135,7 +145,7 @@ export default function Home() {
 
       {/* TRENDING */}
       <h2 className="section-title">Trending Today</h2>
-      <div ref={trendingRef} className="slider-row">
+      <div ref={trendingRef} className="slider-row no-scrollbar">
         <InfiniteSlider items={trending} />
       </div>
 
@@ -143,7 +153,7 @@ export default function Home() {
       {recent.length > 0 && (
         <>
           <h2 className="section-title">Recently Viewed</h2>
-          <div ref={recentRef} className="slider-row">
+          <div ref={recentRef} className="slider-row no-scrollbar">
             <InfiniteSlider items={recent} />
           </div>
         </>
@@ -177,8 +187,7 @@ export default function Home() {
         products={products}
         onApply={items => setFiltered(items)}
       />
-
     </main>
   );
-      }
+    }
     
