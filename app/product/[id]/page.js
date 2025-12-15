@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { doc, getDoc, updateDoc, increment, collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function ProductPage({ params }) {
   const { id } = params;
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // ---------------- LOAD PRODUCT ----------------
   useEffect(() => {
     async function loadProduct() {
       try {
@@ -20,12 +22,15 @@ export default function ProductPage({ params }) {
         if (snap.exists()) {
           setProduct({ id: snap.id, ...snap.data() });
 
-          // increment views
-          updateDoc(ref, { views: increment(1) });
+          // increment product views
+          await updateDoc(ref, {
+            views: increment(1),
+          });
         }
-      } catch (err) {
-        console.error(err);
+      } catch (e) {
+        console.error("Product load error:", e);
       }
+
       setLoading(false);
     }
 
@@ -33,28 +38,29 @@ export default function ProductPage({ params }) {
   }, [id]);
 
   if (loading) return <div className="p-4">Loading…</div>;
-  if (!product) return <div className="p-4">Product not found.</div>;
+  if (!product) return <div className="p-4 text-red-600">Product not found</div>;
 
   const stores = product.store || [];
 
-  // 🔥 CLICK TRACK + REDIRECT
-  function handleBuy(store) {
-    // track click (background)
-    fetch("/api/track-click", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+  // ---------------- BUY HANDLER (TRACK + REDIRECT) ----------------
+  async function handleBuy(store) {
+    try {
+      // Track click (CLIENT SIDE – SAFE)
+      await addDoc(collection(db, "clicks"), {
         productId: product.id,
         store: store.name.toLowerCase(),
-      }),
-    });
+        createdAt: serverTimestamp(),
+      });
+    } catch (e) {
+      console.error("Click tracking failed:", e);
+    }
 
-    // redirect
+    // Redirect (always happens)
     window.location.href = store.url;
   }
 
   return (
-    <div className="p-4 pb-24 max-w-[700px] mx-auto">
+    <div className="p-4 pb-24 max-w-[720px] mx-auto">
       {/* Breadcrumb */}
       <div className="text-sm mb-3">
         <Link href="/" className="text-blue-500">Home</Link> /{" "}
@@ -64,24 +70,24 @@ export default function ProductPage({ params }) {
         / <span className="font-bold">{product.name}</span>
       </div>
 
-      {/* Image */}
-      <div className="rounded-2xl overflow-hidden shadow mb-4 bg-white">
+      {/* Product Image */}
+      <div className="rounded-2xl overflow-hidden shadow-md mb-4 bg-white">
         <Image
           src={product.imageUrl}
           alt={product.name}
-          width={800}
+          width={900}
           height={600}
           className="w-full object-cover"
         />
       </div>
 
-      {/* Title */}
+      {/* Product Title */}
       <h1 className="text-2xl font-bold text-blue-700">
         {product.name}
       </h1>
 
       {/* Description */}
-      <p className="mt-2 text-gray-700">
+      <p className="mt-3 text-gray-700">
         {product.description}
       </p>
 
@@ -94,7 +100,7 @@ export default function ProductPage({ params }) {
         {stores.map((store, index) => (
           <div
             key={index}
-            className="min-w-[260px] bg-white p-4 rounded-2xl shadow border flex-shrink-0"
+            className="min-w-[260px] bg-white p-4 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
           >
             <div className="text-lg font-bold">
               {store.name}
@@ -110,7 +116,7 @@ export default function ProductPage({ params }) {
 
             <button
               onClick={() => handleBuy(store)}
-              className="w-full text-white font-bold py-3 rounded-xl shadow"
+              className="w-full text-white font-bold py-3 rounded-xl shadow-md"
               style={{
                 background:
                   store.name === "Amazon"
@@ -129,5 +135,4 @@ export default function ProductPage({ params }) {
       </div>
     </div>
   );
-        }
-        
+}
