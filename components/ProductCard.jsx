@@ -4,102 +4,62 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function ProductCard({ product }) {
-  if (!product) return null;
-
-  const prices =
-    product.store?.map((s) => Number(s.price)).filter(Boolean) || [];
-
-  const lowest = prices.length ? Math.min(...prices) : null;
-  const highest = prices.length ? Math.max(...prices) : null;
-  const medium =
-    prices.length >= 3
-      ? prices.sort((a, b) => a - b)[Math.floor(prices.length / 2)]
-      : null;
+  const prices = product.store?.map((s) => Number(s.price)) || [];
+  const lowest = Math.min(...prices);
+  const highest = Math.max(...prices);
+  const medium = prices[Math.floor(prices.length / 2)] || lowest;
 
   return (
-    <Link
-      href={`/product/${product.id}`}
-      style={{ textDecoration: "none" }}
-    >
+    <Link href={`/product/${product.id}`} style={{ textDecoration: "none" }}>
       <div
         style={{
-          background: "#f6fffc",
-          borderRadius: 20,
-          padding: 12,
-          border: "1.5px solid #6fe7dd",
-          boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
+          borderRadius: 18,
+          padding: 10,
+          background: "#ecfffb",
+          border: "1px solid #6ee7d8",
         }}
       >
-        {/* IMAGE */}
+        {/* IMAGE – FIXED HEIGHT */}
         <div
           style={{
-            background: "#eee",
+            height: 180,
             borderRadius: 14,
             overflow: "hidden",
+            background: "#eee",
           }}
         >
           <Image
             src={product.imageUrl || "/placeholder.png"}
             alt={product.name}
-            width={400}
-            height={300}
-            style={{
-              width: "100%",
-              height: "auto",
-              objectFit: "cover",
-            }}
+            fill
+            style={{ objectFit: "cover" }}
           />
         </div>
 
-        {/* NAME */}
-        <div
-          style={{
-            marginTop: 10,
-            fontWeight: 700,
-            color: "#0077aa",
-            fontSize: 15,
-          }}
-        >
-          {product.name || product.brand}
-        </div>
+        <h3 style={{ color: "#0077aa", margin: "8px 0" }}>
+          {product.name}
+        </h3>
 
         {/* PRICES */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginTop: 10,
-            fontSize: 14,
-            fontWeight: 800,
-          }}
-        >
-          <span style={{ color: "#16a34a" }}>
-            ₹{lowest?.toLocaleString("en-IN")}
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <span style={{ color: "#16a34a", fontWeight: 700 }}>
+            ₹{lowest.toLocaleString("en-IN")}
           </span>
-          <span style={{ color: "#2563eb" }}>
-            ₹{medium?.toLocaleString("en-IN")}
+          <span style={{ color: "#2563eb", fontWeight: 700 }}>
+            ₹{medium.toLocaleString("en-IN")}
           </span>
-          <span style={{ color: "#dc2626" }}>
-            ₹{highest?.toLocaleString("en-IN")}
+          <span style={{ color: "#dc2626", fontWeight: 700 }}>
+            ₹{highest.toLocaleString("en-IN")}
           </span>
         </div>
 
         {/* LABELS */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginTop: 6,
-            fontSize: 12,
-            fontWeight: 600,
-          }}
-        >
-          <span style={{ color: "#16a34a" }}>Lowest</span>
-          <span style={{ color: "#2563eb" }}>Medium</span>
-          <span style={{ color: "#dc2626" }}>Highest</span>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+          <span className="pill green">Lowest</span>
+          <span className="pill blue">Medium</span>
+          <span className="pill red">Highest</span>
         </div>
       </div>
     </Link>
   );
-      }
-          
+    }
