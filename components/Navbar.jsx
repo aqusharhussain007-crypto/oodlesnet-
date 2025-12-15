@@ -6,193 +6,104 @@ import Link from "next/link";
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
-  const [lang, setLang] = useState("en");
+  const [lang, setLang] = useState("EN");
 
-  /* ---------------- DARK MODE ---------------- */
+  /* DARK MODE */
   useEffect(() => {
-    const saved = localStorage.getItem("dark");
-    if (saved === "true") {
+    if (dark) {
       document.documentElement.classList.add("dark");
-      setDark(true);
+    } else {
+      document.documentElement.classList.remove("dark");
     }
-  }, []);
-
-  function toggleDark() {
-    const next = !dark;
-    setDark(next);
-    localStorage.setItem("dark", String(next));
-    document.documentElement.classList.toggle("dark", next);
-  }
+  }, [dark]);
 
   return (
-    <header
+    <nav
       style={{
+        background: "#000D1A",
+        height: 52,
+        padding: "0 12px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
         position: "sticky",
         top: 0,
-        zIndex: 3000,
-        background: "linear-gradient(90deg,#020024,#090979,#00d4ff)",
-        padding: "12px 14px",
+        zIndex: 1000,
       }}
     >
-      <div
+      {/* LOGO */}
+      <Link href="/">
+        <img
+          src="/logo.png"
+          alt="OodlesNet"
+          style={{ height: 34 }}
+        />
+      </Link>
+
+      {/* MENU BUTTON */}
+      <button
+        onClick={() => setOpen(!open)}
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
+          width: 40,
+          height: 40,
+          borderRadius: 10,
+          background: "#00c6ff",
+          border: "none",
+          color: "white",
+          fontSize: 22,
+          cursor: "pointer",
         }}
       >
-        {/* LOGO */}
-        <Link href="/" style={{ textDecoration: "none" }}>
-          <div
-            style={{
-              fontSize: 22,
-              fontWeight: 900,
-              color: "#00e5ff",
-              textShadow: "0 0 12px rgba(0,229,255,0.8)",
-            }}
-          >
-            OodlesNet
-          </div>
-        </Link>
-
-        {/* MENU BUTTON */}
-        <button
-          onClick={() => setOpen(!open)}
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: 12,
-            background: "#0bbcff",
-            border: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
-            <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z" />
-          </svg>
-        </button>
-      </div>
+        ☰
+      </button>
 
       {/* DROPDOWN */}
       {open && (
         <div
           style={{
             position: "absolute",
+            top: 56,
             right: 12,
-            top: 64,
-            width: 220,
-            background: "#111",
-            borderRadius: 16,
-            padding: 14,
-            boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
-            color: "white",
+            background: "#00172A",
+            borderRadius: 12,
+            padding: 12,
+            width: 180,
+            boxShadow: "0 8px 20px rgba(0,0,0,0.4)",
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
           }}
         >
-          <Link
-            href="/"
-            onClick={() => setOpen(false)}
-            style={{
-              display: "block",
-              padding: "10px 8px",
-              fontWeight: 700,
-              color: "white",
-              textDecoration: "none",
-            }}
-          >
-            Home
-          </Link>
+          <Link href="/" style={linkStyle}>Home</Link>
 
           {/* LANGUAGE */}
-          <div style={{ marginTop: 10 }}>
-            <div style={{ fontWeight: 800, marginBottom: 6 }}>Language</div>
-            <div style={{ display: "flex", gap: 8 }}>
-              <button
-                onClick={() => setLang("en")}
-                style={{
-                  flex: 1,
-                  padding: 8,
-                  borderRadius: 10,
-                  background: lang === "en" ? "#00c6ff" : "#333",
-                  color: "white",
-                  border: "none",
-                  fontWeight: 700,
-                }}
-              >
-                English
-              </button>
-              <button
-                onClick={() => setLang("hi")}
-                style={{
-                  flex: 1,
-                  padding: 8,
-                  borderRadius: 10,
-                  background: lang === "hi" ? "#00c6ff" : "#333",
-                  color: "white",
-                  border: "none",
-                  fontWeight: 700,
-                }}
-              >
-                हिंदी
-              </button>
-            </div>
+          <div
+            onClick={() => setLang(lang === "EN" ? "HI" : "EN")}
+            style={linkStyle}
+          >
+            Language: {lang}
           </div>
 
           {/* DARK MODE */}
           <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginTop: 14,
-            }}
+            onClick={() => setDark(!dark)}
+            style={linkStyle}
           >
-            <span style={{ fontWeight: 800 }}>Dark Mode</span>
-            <button
-              onClick={toggleDark}
-              style={{
-                width: 46,
-                height: 26,
-                borderRadius: 20,
-                background: dark ? "#00c6ff" : "#555",
-                border: "none",
-                position: "relative",
-              }}
-            >
-              <span
-                style={{
-                  position: "absolute",
-                  top: 3,
-                  left: dark ? 24 : 4,
-                  width: 20,
-                  height: 20,
-                  borderRadius: "50%",
-                  background: "white",
-                  transition: "0.2s",
-                }}
-              />
-            </button>
+            Dark Mode: {dark ? "ON" : "OFF"}
           </div>
 
-          {/* CONTACT */}
-          <div style={{ marginTop: 14 }}>
-            <a
-              href="mailto:contact@oodlesnet.com"
-              style={{
-                display: "block",
-                padding: "10px 8px",
-                fontWeight: 700,
-                color: "white",
-                textDecoration: "none",
-              }}
-            >
-              Contact
-            </a>
-          </div>
+          <Link href="/about" style={linkStyle}>About</Link>
+          <Link href="/contact" style={linkStyle}>Contact</Link>
         </div>
       )}
-    </header>
+    </nav>
   );
 }
-  
+
+const linkStyle = {
+  color: "white",
+  fontWeight: 600,
+  cursor: "pointer",
+  textDecoration: "none",
+};
+    
