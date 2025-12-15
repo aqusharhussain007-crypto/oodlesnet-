@@ -1,24 +1,26 @@
 "use client";
-import { useState, useEffect } from "react";
 
-export default function BannerAd({ ads }) {
-  if (!ads || ads.length === 0) {
+import { useState, useEffect } from "react";
+import Image from "next/image";
+
+export default function BannerAd({ ads = [] }) {
+  if (!ads.length) {
     return (
       <div
         style={{
           width: "100%",
-          height: "150px",
-          backgroundColor: "#ccc",
-          borderRadius: "10px",
+          height: 110,
+          borderRadius: 14,
+          background: "#f4fefe",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color: "black",
-          fontSize: "14px",
-          border: "2px solid #39FF14",
+          fontWeight: 700,
+          color: "#0077aa",
+          margin: "12px 0",
         }}
       >
-        No ads yet
+        Ad space
       </div>
     );
   }
@@ -26,10 +28,11 @@ export default function BannerAd({ ads }) {
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % ads.length);
-    }, 5000);
-    return () => clearInterval(interval);
+    const i = setInterval(
+      () => setCurrent((p) => (p + 1) % ads.length),
+      5000
+    );
+    return () => clearInterval(i);
   }, [ads.length]);
 
   const ad = ads[current];
@@ -38,18 +41,33 @@ export default function BannerAd({ ads }) {
     <a
       href={ad.link}
       target="_blank"
+      rel="noopener noreferrer"
       style={{
         display: "block",
         width: "100%",
-        height: "150px",
-        borderRadius: "10px",
-        backgroundImage: `url(${ad.imageUrl})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        border: "3px solid #39FF14",
-        boxShadow: "0 0 10px #39FF14",
+        margin: "12px 0",
       }}
-    ></a>
+    >
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          height: 110,                 // ✅ smaller height
+          borderRadius: 14,
+          overflow: "hidden",
+          background: "#e9faff",
+          border: "1px solid rgba(0,198,255,0.35)", // ✅ thin border
+        }}
+      >
+        <Image
+          src={ad.imageUrl}
+          alt={ad.title || "Advertisement"}
+          fill
+          sizes="100vw"
+          style={{ objectFit: "cover" }}
+          priority={false}
+        />
+      </div>
+    </a>
   );
-            }
-  
+}
