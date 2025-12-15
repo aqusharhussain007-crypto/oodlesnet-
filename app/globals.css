@@ -105,3 +105,33 @@ body {
 /* dark mode safety */
 html.dark body { background:#0b0b0b; color:white; }
   
+/* DARK MODE FIX – FULL PAGE */
+html.dark {
+  background: #0b0b0b;
+}
+
+html.dark body {
+  background: #0b0b0b !important;
+}
+
+/* cards */
+html.dark .products-grid > div,
+html.dark .slider-card-inner,
+html.dark .filter-drawer,
+html.dark .category-drawer {
+  background: #151515 !important;
+  color: #ffffff !important;
+}
+
+/* inputs & search */
+html.dark input,
+html.dark .search-bar {
+  background: #1f1f1f !important;
+  color: white !important;
+  border-color: #00c6ff;
+}
+
+/* dropdown menu */
+html.dark nav div {
+  background: #001a2f !important;
+}
