@@ -3,8 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import ProductCard from "@/components/ProductCard";
 import BannerAd from "@/components/ads/BannerAd";
-import FilterDrawer from "@/components/FilterDrawer";
-import CategoryDrawer from "@/components/CategoryDrawer";
 import InfiniteSlider from "@/components/InfiniteSlider";
 import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
@@ -17,14 +15,8 @@ export default function Home() {
   const [suggestions, setSuggestions] = useState([]);
 
   const [ads, setAds] = useState([]);
-  const [categories, setCategories] = useState([]);
-
-  const [selectedCat, setSelectedCat] = useState("all");
   const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
-
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [catDrawer, setCatDrawer] = useState(false);
 
   const trendingRef = useRef(null);
   const recentRef = useRef(null);
@@ -52,15 +44,6 @@ export default function Home() {
     async function load() {
       const snap = await getDocs(collection(db, "ads"));
       setAds(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-    }
-    load();
-  }, []);
-
-  /* ---------------- LOAD CATEGORIES ---------------- */
-  useEffect(() => {
-    async function load() {
-      const snap = await getDocs(collection(db, "categories"));
-      setCategories(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     }
     load();
   }, []);
@@ -99,21 +82,8 @@ export default function Home() {
     recog.start();
   }
 
-  /* ---------------- FILTER BY CATEGORY ---------------- */
-  function filterByCategory(slug) {
-    setSelectedCat(slug);
-    if (slug === "all") return setFiltered(products);
-    setFiltered(products.filter((p) => p.categorySlug === slug));
-  }
-
-  /* ---------------- LOWEST PRICE ---------------- */
-  const getLowest = (p) =>
-    p.store?.length
-      ? Math.min(...p.store.map((s) => Number(s.price)))
-      : Infinity;
-
   return (
-    <main className="page-container" style={{ padding: 12 }}>
+    <main className="page-container" style={{ padding: 12, overflow: "hidden" }}>
       {/* SEARCH BAR */}
       <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
         <div style={{ position: "relative", flex: 1 }}>
@@ -144,7 +114,18 @@ export default function Home() {
 
           {/* AUTOCOMPLETE */}
           {suggestions.length > 0 && (
-            <div className="autocomplete-box">
+            <div
+              className="autocomplete-box"
+              style={{
+                position: "absolute",
+                top: 48,
+                width: "100%",
+                zIndex: 2000,
+                background: "white",
+                borderRadius: 10,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              }}
+            >
               {suggestions.map((item) => (
                 <div
                   key={item.id}
@@ -208,50 +189,14 @@ export default function Home() {
         </>
       )}
 
-      {/* CATEGORY + FILTER BUTTONS */}
-      <div style={{ display: "flex", gap: 8, margin: "14px 0" }}>
-        <button
-          onClick={() => setCatDrawer(true)}
-          className="pill-button"
-          style={{ flex: 1 }}
-        >
-          Categories →
-        </button>
-
-        <button
-          onClick={() => setDrawerOpen(true)}
-          className="pill-button"
-          style={{ flex: 1 }}
-        >
-          Filters →
-        </button>
-      </div>
-
       {/* PRODUCTS */}
       <h2 className="section-title">Products</h2>
-
       <div className="products-grid">
         {filtered.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
-
-      {/* DRAWERS */}
-      <CategoryDrawer
-        isOpen={catDrawer}
-        onClose={() => setCatDrawer(false)}
-        categories={categories}
-        selectedCat={selectedCat}
-        onSelect={filterByCategory}
-      />
-
-      <FilterDrawer
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        products={products}
-        onApply={(items) => setFiltered(items)}
-      />
     </main>
   );
-         }
-         
+                                            }
+    
