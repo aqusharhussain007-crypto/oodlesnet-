@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import ProductCard from "@/components/ProductCard";
 import BannerAd from "@/components/ads/BannerAd";
 import InfiniteSlider from "@/components/InfiniteSlider";
@@ -34,9 +34,7 @@ export default function Home() {
       setFiltered(items);
 
       const top = [...items]
-        .sort(
-          (a, b) => Number(b.impressions || 0) - Number(a.impressions || 0)
-        )
+        .sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0))
         .slice(0, 10);
 
       setTrending(top);
@@ -60,14 +58,12 @@ export default function Home() {
     setRecent(Array.isArray(data) ? data : []);
   }, []);
 
-  /* ---------------- SEARCH ---------------- */
+  /* ---------------- SEARCH + CATEGORY ---------------- */
   useEffect(() => {
     let list = products;
 
     if (activeCategory !== "all") {
-      list = list.filter(
-        (p) => p.categorySlug === activeCategory
-      );
+      list = list.filter((p) => p.categorySlug === activeCategory);
     }
 
     if (search) {
@@ -96,24 +92,6 @@ export default function Home() {
 
   return (
     <main className="page-container" style={{ padding: 12 }}>
-      {/* CATEGORY + FILTER BUTTONS */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 8 }}>
-        <button
-          className="pill-button"
-          style={{ flex: 1 }}
-          onClick={() => setShowCategory(true)}
-        >
-          Categories
-        </button>
-        <button
-          className="pill-button"
-          style={{ flex: 1, background: "linear-gradient(90deg,#00ff99,#00c6ff)" }}
-          onClick={() => setShowFilter(true)}
-        >
-          Filters
-        </button>
-      </div>
-
       {/* SEARCH */}
       <div style={{ display: "flex", gap: 8 }}>
         <div style={{ position: "relative", flex: 1 }}>
@@ -218,6 +196,27 @@ export default function Home() {
         </>
       )}
 
+      {/* ✅ CATEGORY + FILTER (CORRECT POSITION) */}
+      <div style={{ display: "flex", gap: 10, margin: "14px 0" }}>
+        <button
+          className="pill-button"
+          style={{ flex: 1 }}
+          onClick={() => setShowCategory(true)}
+        >
+          Categories
+        </button>
+        <button
+          className="pill-button"
+          style={{
+            flex: 1,
+            background: "linear-gradient(90deg,#00ff99,#00c6ff)",
+          }}
+          onClick={() => setShowFilter(true)}
+        >
+          Filters
+        </button>
+      </div>
+
       {/* PRODUCTS */}
       <h2 className="section-title">Products</h2>
       <div className="products-grid">
@@ -243,5 +242,4 @@ export default function Home() {
       )}
     </main>
   );
-        }
-               
+}
