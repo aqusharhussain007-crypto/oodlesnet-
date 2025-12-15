@@ -1,39 +1,37 @@
 "use client";
-
-import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 
-export default function BannerAd({ ads = [] }) {
-  if (!ads.length) {
+export default function BannerAd({ ads }) {
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    if (!ads || ads.length === 0) return;
+    const t = setInterval(
+      () => setCurrent((c) => (c + 1) % ads.length),
+      5000
+    );
+    return () => clearInterval(t);
+  }, [ads]);
+
+  if (!ads || ads.length === 0) {
     return (
       <div
         style={{
           width: "100%",
-          height: 110,
-          borderRadius: 14,
-          background: "#f4fefe",
+          height: 160,
+          borderRadius: 16,
+          background: "#e5e7eb",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           fontWeight: 700,
-          color: "#0077aa",
-          margin: "12px 0",
         }}
       >
-        Ad space
+        No ads yet
       </div>
     );
   }
-
-  const [current, setCurrent] = useState(0);
-
-  useEffect(() => {
-    const i = setInterval(
-      () => setCurrent((p) => (p + 1) % ads.length),
-      5000
-    );
-    return () => clearInterval(i);
-  }, [ads.length]);
 
   const ad = ads[current];
 
@@ -45,29 +43,21 @@ export default function BannerAd({ ads = [] }) {
       style={{
         display: "block",
         width: "100%",
-        margin: "12px 0",
+        height: 160,
+        borderRadius: 16,
+        overflow: "hidden",
+        position: "relative",   // 🔴 KEY FIX
       }}
     >
-      <div
-        style={{
-          position: "relative",
-          width: "100%",
-          height: 110,                 // ✅ smaller height
-          borderRadius: 14,
-          overflow: "hidden",
-          background: "#e9faff",
-          border: "1px solid rgba(0,198,255,0.35)", // ✅ thin border
-        }}
-      >
-        <Image
-          src={ad.imageUrl}
-          alt={ad.title || "Advertisement"}
-          fill
-          sizes="100vw"
-          style={{ objectFit: "cover" }}
-          priority={false}
-        />
-      </div>
+      <Image
+        src={ad.imageUrl}
+        alt="Ad"
+        fill
+        sizes="100vw"
+        style={{ objectFit: "cover" }}
+        priority
+      />
     </a>
   );
-}
+  }
+        
