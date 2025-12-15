@@ -3,9 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import ProductCard from "@/components/ProductCard";
 import BannerAd from "@/components/ads/BannerAd";
-import CategoryDrawer from "@/components/CategoryDrawer";
-import FilterDrawer from "@/components/FilterDrawer";
 import InfiniteSlider from "@/components/InfiniteSlider";
+import FilterDrawer from "@/components/FilterDrawer";
+import CategoryDrawer from "@/components/CategoryDrawer";
 import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
@@ -20,11 +20,9 @@ export default function Home() {
   const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
 
-  const [catDrawer, setCatDrawer] = useState(false);
-  const [filterDrawer, setFilterDrawer] = useState(false);
-
-  const trendingRef = useRef(null);
-  const recentRef = useRef(null);
+  const [showFilter, setShowFilter] = useState(false);
+  const [showCategory, setShowCategory] = useState(false);
+  const [activeCategory, setActiveCategory] = useState("all");
 
   /* ---------------- LOAD PRODUCTS ---------------- */
   useEffect(() => {
@@ -36,7 +34,9 @@ export default function Home() {
       setFiltered(items);
 
       const top = [...items]
-        .sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0))
+        .sort(
+          (a, b) => Number(b.impressions || 0) - Number(a.impressions || 0)
+        )
         .slice(0, 10);
 
       setTrending(top);
@@ -62,91 +62,75 @@ export default function Home() {
 
   /* ---------------- SEARCH ---------------- */
   useEffect(() => {
-    if (!search) {
-      setSuggestions([]);
-      setFiltered(products);
-      return;
+    let list = products;
+
+    if (activeCategory !== "all") {
+      list = list.filter(
+        (p) => p.categorySlug === activeCategory
+      );
     }
 
-    const match = products.filter((p) =>
-      (p.name || "").toLowerCase().includes(search.toLowerCase())
-    );
+    if (search) {
+      list = list.filter((p) =>
+        (p.name || "").toLowerCase().includes(search.toLowerCase())
+      );
+      setSuggestions(list.slice(0, 5));
+    } else {
+      setSuggestions([]);
+    }
 
-    setSuggestions(match.slice(0, 5));
-    setFiltered(match);
-  }, [search, products]);
+    setFiltered(list);
+  }, [search, products, activeCategory]);
 
   /* ---------------- VOICE SEARCH ---------------- */
   function startVoiceSearch() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) return alert("Voice search not supported.");
+    if (!SR) return alert("Voice search not supported");
 
     const recog = new SR();
     recog.lang = "en-IN";
-    recog.onresult = (e) => setSearch(e.results[0][0].transcript || "");
+    recog.onresult = (e) =>
+      setSearch(e.results[0][0].transcript || "");
     recog.start();
   }
 
-  /* ---------------- FILTER BY CATEGORY ---------------- */
-  function filterByCategory(slug) {
-    if (slug === "all") return setFiltered(products);
-    setFiltered(products.filter((p) => p.categorySlug === slug));
-  }
-
   return (
-    <main className="page-container" style={{ padding: 12, overflow: "hidden" }}>
-      
-      {/* TOP BUTTONS — CATEGORY + FILTER */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+    <main className="page-container" style={{ padding: 12 }}>
+      {/* CATEGORY + FILTER BUTTONS */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 8 }}>
         <button
-          onClick={() => setCatDrawer(true)}
-          style={{
-            flex: 1,
-            height: 38,
-            background: "linear-gradient(90deg,#0094ff,#00e0ff)",
-            borderRadius: 12,
-            fontWeight: 700,
-            border: "none",
-            color: "#fff",
-          }}
+          className="pill-button"
+          style={{ flex: 1 }}
+          onClick={() => setShowCategory(true)}
         >
           Categories
         </button>
-
         <button
-          onClick={() => setFilterDrawer(true)}
-          style={{
-            flex: 1,
-            height: 38,
-            background: "linear-gradient(90deg,#00c85f,#00f7a0)",
-            borderRadius: 12,
-            fontWeight: 700,
-            border: "none",
-            color: "#fff",
-          }}
+          className="pill-button"
+          style={{ flex: 1, background: "linear-gradient(90deg,#00ff99,#00c6ff)" }}
+          onClick={() => setShowFilter(true)}
         >
           Filters
         </button>
       </div>
 
-      {/* SEARCH BAR */}
+      {/* SEARCH */}
       <div style={{ display: "flex", gap: 8 }}>
         <div style={{ position: "relative", flex: 1 }}>
           <input
-            type="text"
+            className="search-bar compact"
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="search-bar compact"
             style={{ paddingRight: 44 }}
           />
 
           {/* SEARCH ICON */}
           <svg
-            width="20"
-            height="20"
-            fill="#00c3ff"
+            width="18"
+            height="18"
             viewBox="0 0 24 24"
+            fill="#00c3ff"
             style={{
               position: "absolute",
               right: 12,
@@ -165,16 +149,17 @@ export default function Home() {
                 position: "absolute",
                 top: 48,
                 width: "100%",
-                zIndex: 2000,
                 background: "white",
                 borderRadius: 10,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                zIndex: 1000,
               }}
             >
               {suggestions.map((item) => (
                 <div
                   key={item.id}
-                  onClick={() => (window.location = `/product/${item.id}`)}
+                  onClick={() =>
+                    (window.location.href = `/product/${item.id}`)
+                  }
                   style={{ display: "flex", gap: 8, padding: 8 }}
                 >
                   <Image
@@ -186,12 +171,6 @@ export default function Home() {
                   />
                   <div>
                     <strong>{item.name}</strong>
-                    <div style={{ color: "#0077aa" }}>
-                      ₹
-                      {Math.min(...item.store.map((s) => Number(s.price))).toLocaleString(
-                        "en-IN"
-                      )}
-                    </div>
                   </div>
                 </div>
               ))}
@@ -199,7 +178,7 @@ export default function Home() {
           )}
         </div>
 
-        {/* MIC BUTTON — Restored SVG */}
+        {/* SVG MIC */}
         <button
           onClick={startVoiceSearch}
           style={{
@@ -212,8 +191,8 @@ export default function Home() {
             justifyContent: "center",
           }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-            <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zM11 19.93V23h2v-3.07A9 9 0 0021 12h-2a7 7 0 01-14 0H3a9 9 0 008 7.93z"/>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+            <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 9a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7z" />
           </svg>
         </button>
       </div>
@@ -225,16 +204,16 @@ export default function Home() {
 
       {/* TRENDING */}
       <h2 className="section-title">Trending Today</h2>
-      <div ref={trendingRef} className="slider-row">
-        <InfiniteSlider items={trending} small />
+      <div className="slider-row">
+        <InfiniteSlider items={trending} size="small" />
       </div>
 
-      {/* RECENTLY VIEWED */}
+      {/* RECENT */}
       {recent.length > 0 && (
         <>
           <h2 className="section-title">Recently Viewed</h2>
-          <div ref={recentRef} className="slider-row">
-            <InfiniteSlider items={recent} small />
+          <div className="slider-row">
+            <InfiniteSlider items={recent} size="small" />
           </div>
         </>
       )}
@@ -247,46 +226,22 @@ export default function Home() {
         ))}
       </div>
 
-      {/* CATEGORY DRAWER */}
-      <CategoryDrawer
-        isOpen={catDrawer}
-        onClose={() => setCatDrawer(false)}
-        onSelect={(slug) => {
-          filterByCategory(slug);
-          setCatDrawer(false);
-        }}
-      />
+      {/* DRAWERS */}
+      {showCategory && (
+        <CategoryDrawer
+          active={activeCategory}
+          onSelect={(c) => {
+            setActiveCategory(c);
+            setShowCategory(false);
+          }}
+          onClose={() => setShowCategory(false)}
+        />
+      )}
 
-      {/* FILTER DRAWER */}
-      <FilterDrawer
-        isOpen={filterDrawer}
-        onClose={() => setFilterDrawer(false)}
-        products={products}
-        onApply={(filters) => {
-          let items = [...products];
-
-          const getLowest = (p) =>
-            p.store?.length
-              ? Math.min(...p.store.map((s) => Number(s.price)))
-              : Infinity;
-
-          if (filters.min != null)
-            items = items.filter((p) => getLowest(p) >= Number(filters.min));
-
-          if (filters.max != null)
-            items = items.filter((p) => getLowest(p) <= Number(filters.max));
-
-          if (filters.sort === "price-asc")
-            items.sort((a, b) => getLowest(a) - getLowest(b));
-
-          if (filters.sort === "price-desc")
-            items.sort((a, b) => getLowest(b) - getLowest(a));
-
-          setFiltered(items);
-          setFilterDrawer(false);
-        }}
-      />
+      {showFilter && (
+        <FilterDrawer onClose={() => setShowFilter(false)} />
+      )}
     </main>
   );
-              }
-    
+        }
+               
