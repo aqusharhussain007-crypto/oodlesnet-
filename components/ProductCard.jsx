@@ -111,16 +111,17 @@ export default function ProductCard({ product, compact = false }) {
             fontSize: 14,
           }}
         >
-          {lowest !== null && (
-            <span style={{ color: "#1faa59" }}>₹{lowest}</span>
-          )}
-          {medium !== null && (
-            <span style={{ color: "#0077b6" }}>₹{medium}</span>
-          )}
-          {highest !== null && (
-            <span style={{ color: "#d62828" }}>₹{highest}</span>
-          )}
-        </div>
+          <div className="flex gap-2 mt-2">
+  <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-700 font-semibold">
+    Lowest
+  </span>
+  <span className="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-700 font-semibold">
+    Medium
+  </span>
+  <span className="px-3 py-1 text-xs rounded-full bg-red-100 text-red-700 font-semibold">
+    Highest
+  </span>
+</div>
 
         {/* BADGES */}
         <div
