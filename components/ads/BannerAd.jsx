@@ -1,26 +1,13 @@
 "use client";
-import Image from "next/image";
-import { useState, useEffect } from "react";
 
 export default function BannerAd({ ads }) {
-  const [current, setCurrent] = useState(0);
-
-  useEffect(() => {
-    if (!ads || ads.length === 0) return;
-    const t = setInterval(
-      () => setCurrent((c) => (c + 1) % ads.length),
-      5000
-    );
-    return () => clearInterval(t);
-  }, [ads]);
-
   if (!ads || ads.length === 0) {
     return (
       <div
         style={{
           width: "100%",
-          height: 160,
-          borderRadius: 16,
+          height: 150,
+          borderRadius: 12,
           background: "#e5e7eb",
           display: "flex",
           alignItems: "center",
@@ -33,7 +20,7 @@ export default function BannerAd({ ads }) {
     );
   }
 
-  const ad = ads[current];
+  const ad = ads[0];
 
   return (
     <a
@@ -43,21 +30,21 @@ export default function BannerAd({ ads }) {
       style={{
         display: "block",
         width: "100%",
-        height: 160,
-        borderRadius: 16,
+        height: 150,
+        borderRadius: 12,
         overflow: "hidden",
-        position: "relative",   // 🔴 KEY FIX
       }}
     >
-      <Image
+      <img
         src={ad.imageUrl}
         alt="Ad"
-        fill
-        sizes="100vw"
-        style={{ objectFit: "cover" }}
-        priority
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          display: "block",
+        }}
       />
     </a>
   );
-  }
-        
+}
