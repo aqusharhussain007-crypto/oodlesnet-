@@ -3,20 +3,6 @@ const nextConfig = {
   reactStrictMode: true,
 
   images: {
-    domains: [
-      "firebasestorage.googleapis.com",
-      "lh3.googleusercontent.com",
-    ],
-  },
-
-  compress: true,
-};
-
-module.exports = nextConfig;
-
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  images: {
     remotePatterns: [
       {
         protocol: "https",
@@ -24,7 +10,11 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "www.pexels.com",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**",
       },
     ],
   },
