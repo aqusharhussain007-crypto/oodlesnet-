@@ -3,16 +3,17 @@
 import { useState } from "react";
 
 export default function Navbar() {
-  const [showMenu, setShowMenu] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <header
       style={{
-        background: "linear-gradient(90deg,#020024,#020024,#020024)",
-        padding: "10px 12px",
+        background: "linear-gradient(90deg,#020024,#090979,#00d4ff)",
+        padding: "12px 14px",
+        position: "relative",
+        zIndex: 1000,
       }}
     >
-      {/* TOP ROW */}
       <div
         style={{
           display: "flex",
@@ -20,94 +21,64 @@ export default function Navbar() {
           justifyContent: "space-between",
         }}
       >
+        {/* LOGO */}
         <div
           style={{
-            fontSize: 22,
+            fontSize: 24,
             fontWeight: 900,
             color: "#00e5ff",
+            letterSpacing: 0.5,
           }}
         >
           OodlesNet
         </div>
 
+        {/* MENU BUTTON */}
         <button
-          onClick={() => setShowMenu(!showMenu)}
+          onClick={() => setOpen(!open)}
           style={{
-            width: 42,
-            height: 42,
-            borderRadius: 10,
+            width: 44,
+            height: 44,
+            borderRadius: 12,
             background: "#0bbcff",
+            border: "none",
             color: "white",
             fontSize: 20,
-            border: "none",
           }}
         >
           ☰
         </button>
       </div>
 
-      {/* SEARCH BAR */}
-      <div style={{ marginTop: 10 }}>
-        <input
-          placeholder="Search products..."
-          className="search-bar compact"
-        />
-      </div>
-
-      {/* CATEGORY + FILTER (⬅️ MOVED HERE) */}
-      <div
-        style={{
-          display: "flex",
-          gap: 10,
-          marginTop: 10,
-        }}
-      >
-        <button
-          style={{
-            flex: 1,
-            padding: "12px",
-            borderRadius: 14,
-            fontWeight: 800,
-            color: "white",
-            background: "linear-gradient(90deg,#00c6ff,#00ff99)",
-            border: "none",
-          }}
-        >
-          Categories
-        </button>
-
-        <button
-          style={{
-            flex: 1,
-            padding: "12px",
-            borderRadius: 14,
-            fontWeight: 800,
-            color: "white",
-            background: "linear-gradient(90deg,#00c6ff,#00ff99)",
-            border: "none",
-          }}
-        >
-          Filters
-        </button>
-      </div>
-
-      {/* MENU */}
-      {showMenu && (
+      {/* DROPDOWN MENU */}
+      {open && (
         <div
           style={{
             position: "absolute",
-            right: 12,
-            top: 60,
+            top: 64,
+            right: 14,
             background: "#111",
-            padding: 16,
             borderRadius: 14,
-            color: "white",
-            zIndex: 2000,
+            padding: 16,
+            minWidth: 180,
+            boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
           }}
         >
-          <div style={{ marginBottom: 10 }}>Home</div>
-          <div style={{ marginBottom: 10 }}>Contact</div>
-          <div>Dark Mode</div>
+          <div style={{ color: "white", marginBottom: 12 }}>Home</div>
+
+          <div style={{ color: "white", marginBottom: 12 }}>
+            Language
+            <div style={{ marginTop: 6, display: "flex", gap: 8 }}>
+              <button className="btn-small">English</button>
+              <button className="btn-small">हिंदी</button>
+            </div>
+          </div>
+
+          <div style={{ color: "white", marginBottom: 12 }}>
+            Dark Mode
+          </div>
+
+          <div style={{ color: "white" }}>Contact</div>
         </div>
       )}
     </header>
