@@ -9,8 +9,35 @@ export default function ProductCard({ product }) {
   const highest = Math.max(...prices);
   const medium = prices[Math.floor(prices.length / 2)] || lowest;
 
+  // ✅ ADD: save to Recently Viewed
+  function saveRecent() {
+    if (typeof window === "undefined") return;
+
+    let recent = JSON.parse(localStorage.getItem("recent") || "[]");
+
+    // remove duplicate
+    recent = recent.filter((p) => p.id !== product.id);
+
+    // add to top
+    recent.unshift({
+      id: product.id,
+      name: product.name,
+      imageUrl: product.imageUrl,
+      store: product.store || [],
+    });
+
+    // limit to 10
+    if (recent.length > 10) recent = recent.slice(0, 10);
+
+    localStorage.setItem("recent", JSON.stringify(recent));
+  }
+
   return (
-    <Link href={`/product/${product.id}`} style={{ textDecoration: "none" }}>
+    <Link
+      href={`/product/${product.id}`}
+      onClick={saveRecent}   // ✅ IMPORTANT
+      style={{ textDecoration: "none" }}
+    >
       <div
         style={{
           borderRadius: 18,
@@ -19,12 +46,12 @@ export default function ProductCard({ product }) {
           border: "1px solid #6ee7d8",
         }}
       >
-        {/* ⭐ FIXED IMAGE WRAPPER (IMPORTANT) */}
+        {/* ⭐ FIXED IMAGE WRAPPER */}
         <div
           style={{
             width: "100%",
             height: 180,
-            position: "relative", // REQUIRED FOR Image + fill
+            position: "relative",
             borderRadius: 14,
             overflow: "hidden",
             background: "#f3f4f6",
@@ -35,9 +62,7 @@ export default function ProductCard({ product }) {
             alt={product.name}
             fill
             sizes="100%"
-            style={{
-              objectFit: "cover",
-            }}
+            style={{ objectFit: "cover" }}
           />
         </div>
 
@@ -83,3 +108,4 @@ export default function ProductCard({ product }) {
     </Link>
   );
           }
+              
