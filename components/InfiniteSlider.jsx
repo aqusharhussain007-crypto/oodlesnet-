@@ -6,30 +6,29 @@ import Link from "next/link";
 
 export default function InfiniteSlider({ items = [] }) {
   const rowRef = useRef(null);
-  const isTouching = useRef(false);
 
-  // duplicate items for seamless loop
-  const list = [...items, ...items];
+  // duplicate items for infinite effect
+  const data = [...items, ...items];
 
+  /* -------- AUTO SCROLL (SLOW & INFINITE) -------- */
   useEffect(() => {
     const el = rowRef.current;
     if (!el) return;
 
     let raf;
-    const speed = 0.35; // ⭐ very slow
+    const speed = 0.35; // 👈 slow speed
 
-    function loop() {
-      if (!isTouching.current) {
-        el.scrollLeft += speed;
+    function scroll() {
+      el.scrollLeft += speed;
 
-        if (el.scrollLeft >= el.scrollWidth / 2) {
-          el.scrollLeft = 0;
-        }
+      // reset seamlessly
+      if (el.scrollLeft >= el.scrollWidth / 2) {
+        el.scrollLeft = 0;
       }
-      raf = requestAnimationFrame(loop);
+      raf = requestAnimationFrame(scroll);
     }
 
-    raf = requestAnimationFrame(loop);
+    raf = requestAnimationFrame(scroll);
     return () => cancelAnimationFrame(raf);
   }, []);
 
@@ -37,36 +36,77 @@ export default function InfiniteSlider({ items = [] }) {
     <div
       ref={rowRef}
       className="slider-row no-scrollbar"
-      onTouchStart={() => (isTouching.current = true)}
-      onTouchEnd={() => (isTouching.current = false)}
-      onMouseEnter={() => (isTouching.current = true)}
-      onMouseLeave={() => (isTouching.current = false)}
       style={{
         display: "flex",
         gap: 12,
         overflowX: "auto",
-        paddingBottom: 6,
+        scrollBehavior: "smooth",
       }}
     >
-      {list.map((item, i) => (
+      {data.map((item, i) => (
         <Link
-          key={`${item.id}-${i}`}
+          key={i}
           href={`/product/${item.id}`}
-          style={{ textDecoration: "none" }}
+          style={{ textDecoration: "none", flex: "0 0 auto" }}
         >
-          <div className="slider-card-frame">
-            <div className="slider-card-inner">
-              <div className="slider-image-wrap">
+          {/* OUTER GRADIENT FRAME */}
+          <div
+            className="slider-card-frame"
+            style={{
+              padding: 2,               // 👈 thin border
+              borderRadius: 16,
+              background:
+                "linear-gradient(135deg,#00c6ff,#00ff99)",
+            }}
+          >
+            {/* INNER CARD */}
+            <div
+              className="slider-card-inner"
+              style={{
+                width: 140,             // 👈 smaller card
+                height: 190,
+                background: "#fff",
+                borderRadius: 14,
+                padding: 8,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              {/* IMAGE */}
+              <div
+                style={{
+                  width: "100%",
+                  height: 110,
+                  borderRadius: 10,
+                  overflow: "hidden",
+                  background: "#f2f2f2",
+                }}
+              >
                 <Image
                   src={item.imageUrl || "/placeholder.png"}
-                  alt={item.name || "product"}
-                  fill
-                  sizes="150px"
-                  style={{ objectFit: "cover" }}
+                  alt={item.name}
+                  width={200}
+                  height={200}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
                 />
               </div>
 
-              <div className="slider-title">
+              {/* TITLE */}
+              <div
+                style={{
+                  marginTop: 8,
+                  fontSize: "0.85rem",
+                  fontWeight: 700,
+                  color: "#0077b6",
+                  textAlign: "center",
+                  lineHeight: 1.2,
+                }}
+              >
                 {item.name}
               </div>
             </div>
@@ -75,5 +115,5 @@ export default function InfiniteSlider({ items = [] }) {
       ))}
     </div>
   );
-            }
-                
+    }
+            
