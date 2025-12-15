@@ -1,149 +1,122 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-export default function ProductCard({ product, compact = false }) {
-  const router = useRouter();
+export default function ProductCard({ product }) {
+  if (!product) return null;
 
-  // ------------------------------
-  // Save to Recently Viewed
-  // ------------------------------
-  function saveRecent() {
-    if (typeof window === "undefined") return;
+  const prices =
+    product.store?.map((s) => Number(s.price)).filter(Boolean) || [];
 
-    let recent = JSON.parse(localStorage.getItem("recent") || "[]");
-    recent = recent.filter((p) => p.id !== product.id);
-
-    recent.unshift({
-      id: product.id,
-      name: product.name,
-      imageUrl: product.imageUrl,
-    });
-
-    if (recent.length > 12) recent = recent.slice(0, 12);
-    localStorage.setItem("recent", JSON.stringify(recent));
-  }
-
-  function openProduct() {
-    saveRecent();
-    router.push(`/product/${product.id}`);
-  }
-
-  // ------------------------------
-  // Price helpers
-  // ------------------------------
-  const prices = product.store?.map((s) => Number(s.price)) || [];
   const lowest = prices.length ? Math.min(...prices) : null;
   const highest = prices.length ? Math.max(...prices) : null;
   const medium =
-    prices.length >= 2
-      ? prices.slice().sort((a, b) => a - b)[Math.floor(prices.length / 2)]
-      : null;
+    prices.length === 3 ? prices.sort((a, b) => a - b)[1] : null;
 
   return (
     <div
-      onClick={openProduct}
+      className="product-card"
       style={{
-        width: compact ? 220 : "100%",
-        maxWidth: compact ? 220 : 420,
-        borderRadius: 22,
-
-        /* ✅ THIN GRADIENT BORDER */
-        background: "linear-gradient(135deg,#00c6ff,#00ff99)",
-        padding: "1.5px",
-        boxShadow: "0 4px 12px rgba(0,200,255,0.18)",
-        cursor: "pointer",
-        flexShrink: 0,
+        borderRadius: 16,
+        padding: 12,
+        background: "#f6fffd",
+        border: "1px solid #9ef0e6",
+        boxShadow: "0 6px 16px rgba(0,0,0,0.06)",
       }}
     >
-      {/* INNER CARD */}
-      <div
-        style={{
-          background: "#f0fffb",
-          borderRadius: 20,
-          padding: 12,
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          flex: 1, // ✅ IMPORTANT: prevents thick bottom block
-        }}
-      >
-        {/* IMAGE */}
-        <div
-          style={{
-            width: "100%",
-            aspectRatio: "4 / 3",
-            borderRadius: 14,
-            overflow: "hidden",
-            background: "#fff",
-          }}
-        >
+      {/* IMAGE */}
+      <Link href={`/product/${product.id}`}>
+        <div style={{ borderRadius: 12, overflow: "hidden" }}>
           <Image
             src={product.imageUrl || "/placeholder.png"}
             alt={product.name}
             width={400}
             height={300}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            style={{
+              width: "100%",
+              height: 180,
+              objectFit: "cover",
+            }}
           />
         </div>
+      </Link>
 
-        {/* NAME */}
-        <div
-          style={{
-            marginTop: 8,
-            fontWeight: 700,
-            fontSize: compact ? 14 : 16,
-            color: "#0077b6",
-            lineHeight: 1.3,
-          }}
-        >
-          {product.name}
-        </div>
+      {/* TITLE */}
+      <h3
+        style={{
+          fontSize: 15,
+          fontWeight: 700,
+          marginTop: 10,
+          color: "#0077aa",
+        }}
+      >
+        {product.name}
+      </h3>
 
-        {/* PRICES */}
+      {/* PRICE ROW */}
+      {prices.length > 0 && (
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
-            marginTop: 6,
-            fontWeight: 700,
-            fontSize: 14,
+            marginTop: 8,
+            fontWeight: 800,
           }}
         >
-          <div className="flex gap-2 mt-2">
-  <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-700 font-semibold">
-    Lowest
-  </span>
-  <span className="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-700 font-semibold">
-    Medium
-  </span>
-  <span className="px-3 py-1 text-xs rounded-full bg-red-100 text-red-700 font-semibold">
-    Highest
-  </span>
-</div>
-
-        {/* BADGES */}
-        <div
-          style={{
-            display: "flex",
-            gap: 6,
-            marginTop: 6,
-            flexWrap: "wrap",
-          }}
-        >
-          {lowest !== null && (
-            <span className="badge badge-low">Lowest</span>
-          )}
-          {medium !== null && (
-            <span className="badge badge-mid">Medium</span>
-          )}
-          {highest !== null && (
-            <span className="badge badge-high">Highest</span>
-          )}
+          <span style={{ color: "#1aa64b" }}>
+            ₹{lowest?.toLocaleString("en-IN")}
+          </span>
+          <span style={{ color: "#0077cc" }}>
+            ₹{medium?.toLocaleString("en-IN")}
+          </span>
+          <span style={{ color: "#d9534f" }}>
+            ₹{highest?.toLocaleString("en-IN")}
+          </span>
         </div>
+      )}
+
+      {/* BADGES */}
+      <div className="flex gap-2 mt-2">
+        <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-700 font-semibold">
+          Lowest
+        </span>
+        <span className="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-700 font-semibold">
+          Medium
+        </span>
+        <span className="px-3 py-1 text-xs rounded-full bg-red-100 text-red-700 font-semibold">
+          Highest
+        </span>
+      </div>
+
+      {/* BUY BUTTONS */}
+      <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
+        {product.store?.map((s, i) => (
+          <a
+            key={i}
+            href={s.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              textAlign: "center",
+              padding: "10px 12px",
+              borderRadius: 10,
+              fontWeight: 700,
+              background:
+                s.name === "Amazon"
+                  ? "#ff9900"
+                  : s.name === "Meesho"
+                  ? "#ff4da6"
+                  : "#1769ff",
+              color: "#fff",
+              textDecoration: "none",
+            }}
+          >
+            Buy on {s.name}
+          </a>
+        ))}
       </div>
     </div>
   );
         }
-            
+        
