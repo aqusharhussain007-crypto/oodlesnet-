@@ -2,177 +2,194 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
-  const [lang, setLang] = useState("en");
 
-  /* ---------- DARK MODE ---------- */
+  /* ---------------- DARK MODE ---------------- */
   useEffect(() => {
-    if (dark) {
+    const saved = localStorage.getItem("darkMode");
+    if (saved === "true") {
       document.documentElement.classList.add("dark");
+      setDark(true);
+    }
+  }, []);
+
+  function toggleDark() {
+    const next = !dark;
+    setDark(next);
+
+    if (next) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("darkMode", "true");
     } else {
       document.documentElement.classList.remove("dark");
+      localStorage.setItem("darkMode", "false");
     }
-  }, [dark]);
+  }
 
   return (
-    <nav
-      style={{
-        background: "#020617",
-        padding: "6px 14px",
-        height: 52,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        position: "sticky",
-        top: 0,
-        zIndex: 2000,
-        boxShadow: "0 4px 14px rgba(0,0,0,0.35)",
-      }}
-    >
-      {/* LOGO */}
-      <Link href="/">
-        <img
-          src="/logo.png"
-          alt="OodlesNet"
-          style={{ height: 34 }}
-        />
-      </Link>
-
-      {/* HAMBURGER */}
-      <button
-        onClick={() => setOpen(!open)}
+    <>
+      {/* NAVBAR */}
+      <header
         style={{
-          width: 40,
-          height: 40,
-          borderRadius: 12,
-          background:
-            "linear-gradient(135deg,#0f4c81,#0bbcff)",
-          border: "none",
-          color: "#fff",
-          fontSize: 22,
-          fontWeight: 700,
-          boxShadow: "0 6px 18px rgba(15,76,129,0.6)",
+          height: 56,
+          padding: "0 14px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          background: "linear-gradient(90deg,#021526,#052b4f)",
+          position: "sticky",
+          top: 0,
+          zIndex: 2000,
         }}
       >
-        ☰
-      </button>
+        {/* LOGO */}
+        <Link href="/">
+          <Image
+            src="/logo.png"
+            alt="OodlesNet"
+            width={140}
+            height={32}
+            priority
+          />
+        </Link>
 
-      {/* MENU DRAWER */}
+        {/* MENU BUTTON */}
+        <button
+          onClick={() => setOpen(true)}
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 12,
+            background: "linear-gradient(135deg,#00c6ff,#00ff99)",
+            border: "none",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+            <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z" />
+          </svg>
+        </button>
+      </header>
+
+      {/* BACKDROP */}
       {open && (
         <div
           onClick={() => setOpen(false)}
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.55)",
-            zIndex: 3000,
+            background: "rgba(0,0,0,0.45)",
+            zIndex: 2100,
+          }}
+        />
+      )}
+
+      {/* MENU PANEL */}
+      {open && (
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%,-50%)",
+            width: "85%",
+            maxWidth: 320,
+            padding: 20,
+            borderRadius: 20,
+            background: "linear-gradient(180deg,#031c30,#052b4f)",
+            color: "#e6f7ff",
+            zIndex: 2200,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
           }}
         >
-          <div
-            onClick={(e) => e.stopPropagation()}
+          <h3
             style={{
-              position: "absolute",
-              top: 60,
-              right: 12,
-              width: 260,
-              background: "#020617",
-              borderRadius: 18,
-              padding: 16,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.6)",
-              display: "flex",
-              flexDirection: "column",
-              gap: 14,
+              fontSize: 20,
+              fontWeight: 800,
+              marginBottom: 16,
+              color: "#7dd3fc",
             }}
           >
-            {/* HEADER */}
-            <div style={{ color: "#7dd3fc", fontWeight: 800 }}>
-              OodlesNet Menu
-            </div>
+            OodlesNet Menu
+          </h3>
 
-            {/* LINKS */}
-            <Link className="nav-link" href="/">Home</Link>
-            <Link className="nav-link" href="/about">About</Link>
-            <Link className="nav-link" href="/contact">Contact</Link>
+          {/* LINKS */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <Link href="/" onClick={() => setOpen(false)}>Home</Link>
+            <Link href="/about" onClick={() => setOpen(false)}>About</Link>
+            <Link href="/contact" onClick={() => setOpen(false)}>Contact</Link>
+          </div>
 
-            {/* LANGUAGE */}
-            <div style={{ marginTop: 8 }}>
-              <div style={{ color: "#94a3b8", fontSize: 13 }}>
-                Language
-              </div>
-              <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
-                <button
-                  onClick={() => setLang("en")}
-                  style={{
-                    flex: 1,
-                    padding: "6px 0",
-                    borderRadius: 10,
-                    border: "none",
-                    fontWeight: 700,
-                    background:
-                      lang === "en"
-                        ? "linear-gradient(90deg,#0bbcff,#22d3ee)"
-                        : "#020617",
-                    color: "#fff",
-                    borderColor: "#0bbcff",
-                  }}
-                >
-                  English
-                </button>
-                <button
-                  onClick={() => setLang("hi")}
-                  style={{
-                    flex: 1,
-                    padding: "6px 0",
-                    borderRadius: 10,
-                    border: "none",
-                    fontWeight: 700,
-                    background:
-                      lang === "hi"
-                        ? "linear-gradient(90deg,#0bbcff,#22d3ee)"
-                        : "#020617",
-                    color: "#fff",
-                  }}
-                >
-                  हिंदी
-                </button>
-              </div>
+          {/* LANGUAGE */}
+          <div style={{ marginTop: 20 }}>
+            <div style={{ fontSize: 14, opacity: 0.8 }}>Language</div>
+            <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+              <button
+                style={{
+                  flex: 1,
+                  padding: "8px 0",
+                  borderRadius: 10,
+                  background: "#00c6ff",
+                  color: "white",
+                  border: "none",
+                  fontWeight: 700,
+                }}
+              >
+                English
+              </button>
+              <button
+                style={{
+                  flex: 1,
+                  padding: "8px 0",
+                  borderRadius: 10,
+                  background: "#020617",
+                  color: "white",
+                  border: "1px solid #1e293b",
+                  fontWeight: 700,
+                }}
+              >
+                हिंदी
+              </button>
             </div>
+          </div>
 
-            {/* DARK MODE */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginTop: 6,
-              }}
-            >
-              <span style={{ color: "#94a3b8" }}>Dark Mode</span>
-              <input
-                type="checkbox"
-                checked={dark}
-                onChange={() => setDark(!dark)}
-              />
-            </div>
+          {/* DARK MODE */}
+          <div
+            style={{
+              marginTop: 18,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <span style={{ opacity: 0.85 }}>Dark Mode</span>
+            <input
+              type="checkbox"
+              checked={dark}
+              onChange={toggleDark}
+              style={{ width: 20, height: 20 }}
+            />
+          </div>
 
-            {/* FOOTER */}
-            <div
-              style={{
-                marginTop: 12,
-                fontSize: 12,
-                color: "#64748b",
-                textAlign: "center",
-              }}
-            >
-              © OodlesNet
-            </div>
+          <div
+            style={{
+              textAlign: "center",
+              marginTop: 18,
+              fontSize: 12,
+              opacity: 0.6,
+            }}
+          >
+            © OodlesNet
           </div>
         </div>
       )}
-    </nav>
+    </>
   );
-        }
-      
+  }
+    
