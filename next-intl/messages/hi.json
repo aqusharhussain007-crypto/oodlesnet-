@@ -1,1 +1,18 @@
+{
+  "menu": {
+    "home": "होम",
+    "about": "हमारे बारे में",
+    "contact": "संपर्क करें",
+    "language": "भाषा",
+    "darkMode": "डार्क मोड"
+  },
+  "search": {
+    "placeholder": "प्रोडक्ट खोजें..."
+  },
+  "sections": {
+    "trending": "आज के ट्रेंडिंग",
+    "recent": "हाल ही में देखे गए",
+    "products": "प्रोडक्ट्स"
+  }
+}
 
