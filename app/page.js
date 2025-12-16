@@ -196,26 +196,44 @@ export default function Home() {
         </>
       )}
 
-      {/* ✅ CATEGORY + FILTER (CORRECT POSITION) */}
-      <div style={{ display: "flex", gap: 10, margin: "14px 0" }}>
-        <button
-          className="pill-button"
-          style={{ flex: 1 }}
-          onClick={() => setShowCategory(true)}
-        >
-          Categories
-        </button>
-        <button
-          className="pill-button"
-          style={{
-            flex: 1,
-            background: "linear-gradient(90deg,#00ff99,#00c6ff)",
-          }}
-          onClick={() => setShowFilter(true)}
-        >
-          Filters
-        </button>
-      </div>
+      {/* CATEGORY + FILTER BUTTONS */}
+<div style={{ display: "flex", gap: 12, marginBottom: 10 }}>
+  <button
+    onClick={() => setShowCategory(true)}
+    style={{
+      flex: 1,
+      padding: "14px 0",
+      borderRadius: 16,
+      border: "none",
+      fontWeight: 800,
+      fontSize: 16,
+      color: "#fff",
+      background:
+        "linear-gradient(135deg,#0f4c81,#0bbcff)",
+      boxShadow: "0 8px 20px rgba(15,76,129,0.35)",
+    }}
+  >
+    Categories
+  </button>
+
+  <button
+    onClick={() => setShowFilter(true)}
+    style={{
+      flex: 1,
+      padding: "14px 0",
+      borderRadius: 16,
+      border: "none",
+      fontWeight: 800,
+      fontSize: 16,
+      color: "#fff",
+      background:
+        "linear-gradient(135deg,#0f4c81,#0bbcff)",
+      boxShadow: "0 8px 20px rgba(15,76,129,0.35)",
+    }}
+  >
+    Filters
+  </button>
+</div>
 
       {/* PRODUCTS */}
       <h2 className="section-title">Products</h2>
