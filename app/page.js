@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
 import ProductCard from "@/components/ProductCard";
 import BannerAd from "@/components/ads/BannerAd";
 import InfiniteSlider from "@/components/InfiniteSlider";
@@ -12,9 +11,6 @@ import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
 
 export default function Home() {
-  const tSections = useTranslations("sections");
-  const tSearch = useTranslations("search");
-
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
@@ -101,7 +97,7 @@ export default function Home() {
         <div style={{ position: "relative", flex: 1 }}>
           <input
             className="search-bar compact"
-            placeholder={tSearch("placeholder")}
+            placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{ paddingRight: 44 }}
@@ -185,7 +181,7 @@ export default function Home() {
       </div>
 
       {/* TRENDING */}
-      <h2 className="section-title">{tSections("trending")}</h2>
+      <h2 className="section-title">Trending Today</h2>
       <div className="slider-row">
         <InfiniteSlider items={trending} size="small" />
       </div>
@@ -193,7 +189,7 @@ export default function Home() {
       {/* RECENT */}
       {recent.length > 0 && (
         <>
-          <h2 className="section-title">{tSections("recent")}</h2>
+          <h2 className="section-title">Recently Viewed</h2>
           <div className="slider-row">
             <InfiniteSlider items={recent} size="small" />
           </div>
@@ -201,44 +197,46 @@ export default function Home() {
       )}
 
       {/* CATEGORY + FILTER BUTTONS */}
-      <div style={{ display: "flex", gap: 12, marginBottom: 10 }}>
-        <button
-          onClick={() => setShowCategory(true)}
-          style={{
-            flex: 1,
-            padding: "14px 0",
-            borderRadius: 16,
-            border: "none",
-            fontWeight: 800,
-            fontSize: 16,
-            color: "#fff",
-            background: "linear-gradient(135deg,#0f4c81,#0bbcff)",
-            boxShadow: "0 8px 20px rgba(15,76,129,0.35)",
-          }}
-        >
-          Categories
-        </button>
+<div style={{ display: "flex", gap: 12, marginBottom: 10 }}>
+  <button
+    onClick={() => setShowCategory(true)}
+    style={{
+      flex: 1,
+      padding: "14px 0",
+      borderRadius: 16,
+      border: "none",
+      fontWeight: 800,
+      fontSize: 16,
+      color: "#fff",
+      background:
+        "linear-gradient(135deg,#0f4c81,#0bbcff)",
+      boxShadow: "0 8px 20px rgba(15,76,129,0.35)",
+    }}
+  >
+    Categories
+  </button>
 
-        <button
-          onClick={() => setShowFilter(true)}
-          style={{
-            flex: 1,
-            padding: "14px 0",
-            borderRadius: 16,
-            border: "none",
-            fontWeight: 800,
-            fontSize: 16,
-            color: "#fff",
-            background: "linear-gradient(135deg,#0f4c81,#0bbcff)",
-            boxShadow: "0 8px 20px rgba(15,76,129,0.35)",
-          }}
-        >
-          Filters
-        </button>
-      </div>
+  <button
+    onClick={() => setShowFilter(true)}
+    style={{
+      flex: 1,
+      padding: "14px 0",
+      borderRadius: 16,
+      border: "none",
+      fontWeight: 800,
+      fontSize: 16,
+      color: "#fff",
+      background:
+        "linear-gradient(135deg,#0f4c81,#0bbcff)",
+      boxShadow: "0 8px 20px rgba(15,76,129,0.35)",
+    }}
+  >
+    Filters
+  </button>
+</div>
 
       {/* PRODUCTS */}
-      <h2 className="section-title">{tSections("products")}</h2>
+      <h2 className="section-title">Products</h2>
       <div className="products-grid">
         {filtered.map((product) => (
           <ProductCard key={product.id} product={product} />
@@ -262,5 +260,4 @@ export default function Home() {
       )}
     </main>
   );
-    }
-      
+        }
