@@ -6,9 +6,9 @@ import Link from "next/link";
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
-  const [lang, setLang] = useState("EN");
+  const [lang, setLang] = useState("en");
 
-  /* DARK MODE */
+  /* ---------- DARK MODE ---------- */
   useEffect(() => {
     if (dark) {
       document.documentElement.classList.add("dark");
@@ -20,15 +20,16 @@ export default function Navbar() {
   return (
     <nav
       style={{
-        background: "#000D1A",
+        background: "#020617",
+        padding: "6px 14px",
         height: 52,
-        padding: "0 12px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         position: "sticky",
         top: 0,
-        zIndex: 1000,
+        zIndex: 2000,
+        boxShadow: "0 4px 14px rgba(0,0,0,0.35)",
       }}
     >
       {/* LOGO */}
@@ -40,70 +41,138 @@ export default function Navbar() {
         />
       </Link>
 
-      {/* MENU BUTTON */}
+      {/* HAMBURGER */}
       <button
         onClick={() => setOpen(!open)}
         style={{
           width: 40,
           height: 40,
-          borderRadius: 10,
-          background: "#00c6ff",
+          borderRadius: 12,
+          background:
+            "linear-gradient(135deg,#0f4c81,#0bbcff)",
           border: "none",
-          color: "white",
+          color: "#fff",
           fontSize: 22,
-          cursor: "pointer",
+          fontWeight: 700,
+          boxShadow: "0 6px 18px rgba(15,76,129,0.6)",
         }}
       >
         ☰
       </button>
 
-      {/* DROPDOWN */}
+      {/* MENU DRAWER */}
       {open && (
         <div
+          onClick={() => setOpen(false)}
           style={{
-            position: "absolute",
-            top: 56,
-            right: 12,
-            background: "#00172A",
-            borderRadius: 12,
-            padding: 12,
-            width: 180,
-            boxShadow: "0 8px 20px rgba(0,0,0,0.4)",
-            display: "flex",
-            flexDirection: "column",
-            gap: 10,
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.55)",
+            zIndex: 3000,
           }}
         >
-          <Link href="/" style={linkStyle}>Home</Link>
-
-          {/* LANGUAGE */}
           <div
-            onClick={() => setLang(lang === "EN" ? "HI" : "EN")}
-            style={linkStyle}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "absolute",
+              top: 60,
+              right: 12,
+              width: 260,
+              background: "#020617",
+              borderRadius: 18,
+              padding: 16,
+              boxShadow: "0 10px 30px rgba(0,0,0,0.6)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 14,
+            }}
           >
-            Language: {lang}
-          </div>
+            {/* HEADER */}
+            <div style={{ color: "#7dd3fc", fontWeight: 800 }}>
+              OodlesNet Menu
+            </div>
 
-          {/* DARK MODE */}
-          <div
-            onClick={() => setDark(!dark)}
-            style={linkStyle}
-          >
-            Dark Mode: {dark ? "ON" : "OFF"}
-          </div>
+            {/* LINKS */}
+            <Link className="nav-link" href="/">Home</Link>
+            <Link className="nav-link" href="/about">About</Link>
+            <Link className="nav-link" href="/contact">Contact</Link>
 
-          <Link href="/about" style={linkStyle}>About</Link>
-          <Link href="/contact" style={linkStyle}>Contact</Link>
+            {/* LANGUAGE */}
+            <div style={{ marginTop: 8 }}>
+              <div style={{ color: "#94a3b8", fontSize: 13 }}>
+                Language
+              </div>
+              <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+                <button
+                  onClick={() => setLang("en")}
+                  style={{
+                    flex: 1,
+                    padding: "6px 0",
+                    borderRadius: 10,
+                    border: "none",
+                    fontWeight: 700,
+                    background:
+                      lang === "en"
+                        ? "linear-gradient(90deg,#0bbcff,#22d3ee)"
+                        : "#020617",
+                    color: "#fff",
+                    borderColor: "#0bbcff",
+                  }}
+                >
+                  English
+                </button>
+                <button
+                  onClick={() => setLang("hi")}
+                  style={{
+                    flex: 1,
+                    padding: "6px 0",
+                    borderRadius: 10,
+                    border: "none",
+                    fontWeight: 700,
+                    background:
+                      lang === "hi"
+                        ? "linear-gradient(90deg,#0bbcff,#22d3ee)"
+                        : "#020617",
+                    color: "#fff",
+                  }}
+                >
+                  हिंदी
+                </button>
+              </div>
+            </div>
+
+            {/* DARK MODE */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginTop: 6,
+              }}
+            >
+              <span style={{ color: "#94a3b8" }}>Dark Mode</span>
+              <input
+                type="checkbox"
+                checked={dark}
+                onChange={() => setDark(!dark)}
+              />
+            </div>
+
+            {/* FOOTER */}
+            <div
+              style={{
+                marginTop: 12,
+                fontSize: 12,
+                color: "#64748b",
+                textAlign: "center",
+              }}
+            >
+              © OodlesNet
+            </div>
+          </div>
         </div>
       )}
     </nav>
   );
-}
-
-const linkStyle = {
-  color: "white",
-  fontWeight: 600,
-  cursor: "pointer",
-  textDecoration: "none",
-};
-    
+        }
+      
