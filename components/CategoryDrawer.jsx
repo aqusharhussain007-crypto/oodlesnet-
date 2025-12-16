@@ -14,29 +14,57 @@ export default function CategoryDrawer({
 
   return (
     <div
-      className="filter-drawer-backdrop"
+      className="category-drawer-backdrop"
       onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.35)",
+        zIndex: 1200,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "flex-end",
+      }}
     >
       <div
-        className="filter-drawer"
         onClick={(e) => e.stopPropagation()}
+        style={{
+          width: "100%",
+          maxWidth: 600,
+          background: "#fff",
+          borderTopLeftRadius: 22,
+          borderTopRightRadius: 22,
+          padding: 18,
+          animation: "slideUp 0.25s ease",
+        }}
       >
-        {/* HEADER */}
-        <div className="filter-header">
-          <h3>Categories</h3>
-          <button className="btn-small" onClick={onClose}>
+        {/* Header */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: 12,
+          }}
+        >
+          <h3 style={{ fontWeight: 800, color: "#0077b6" }}>
+            Categories
+          </h3>
+          <button
+            onClick={onClose}
+            style={{
+              border: "none",
+              background: "#eee",
+              borderRadius: 10,
+              padding: "6px 10px",
+              fontWeight: 700,
+            }}
+          >
             ✕
           </button>
         </div>
 
-        {/* CATEGORY PILLS */}
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 10,
-          }}
-        >
+        {/* Pills */}
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {categories.map((c) => (
             <button
               key={c.slug}
@@ -47,7 +75,7 @@ export default function CategoryDrawer({
                 border:
                   active === c.slug
                     ? "2px solid #00c6ff"
-                    : "1px solid #cceeff",
+                    : "1px solid #ddd",
                 background:
                   active === c.slug
                     ? "linear-gradient(90deg,#eafffb,#e9fff0)"
@@ -62,7 +90,14 @@ export default function CategoryDrawer({
           ))}
         </div>
       </div>
+
+      <style>{`
+        @keyframes slideUp {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
-    }
-          
+            }
+            
