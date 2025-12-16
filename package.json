@@ -6,17 +6,19 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "postinstall": "next telemetry disable",
-    "vercel-build": "next build"
+    "vercel-build": "next build",
+    "postinstall": "next telemetry disable"
   },
   "dependencies": {
     "next": "14.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "next-intl": "^3.6.0",
+    "firebase": "^10.7.1"
+  },
+  "devDependencies": {
     "tailwindcss": "^3.4.0",
     "postcss": "^8.4.31",
-    "autoprefixer": "^10.4.16",
-    "firebase": "^10.7.1",
-    "next-intl": "^3.6.0"
+    "autoprefixer": "^10.4.16"
   }
 }
