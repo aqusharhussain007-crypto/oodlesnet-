@@ -8,7 +8,6 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
 
-  /* ---------------- DARK MODE ---------------- */
   useEffect(() => {
     const saved = localStorage.getItem("darkMode");
     if (saved === "true") {
@@ -40,31 +39,24 @@ export default function Navbar() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          background: "linear-gradient(90deg,#021526,#052b4f)",
+          background: "linear-gradient(90deg,#021526,#041f3a)",
           position: "sticky",
           top: 0,
           zIndex: 2000,
         }}
       >
-        {/* LOGO */}
         <Link href="/">
-          <Image
-            src="/logo.png"
-            alt="OodlesNet"
-            width={140}
-            height={32}
-            priority
-          />
+          <Image src="/logo.png" alt="OodlesNet" width={140} height={32} priority />
         </Link>
 
-        {/* MENU BUTTON */}
+        {/* MENU BUTTON – darker premium gradient */}
         <button
           onClick={() => setOpen(true)}
           style={{
             width: 44,
             height: 44,
             borderRadius: 12,
-            background: "linear-gradient(135deg,#00c6ff,#00ff99)",
+            background: "linear-gradient(135deg,#0ea5e9,#10b981)",
             border: "none",
             display: "flex",
             alignItems: "center",
@@ -90,7 +82,7 @@ export default function Navbar() {
         />
       )}
 
-      {/* MENU PANEL */}
+      {/* MENU PANEL – WIDTH REDUCED */}
       {open && (
         <div
           style={{
@@ -98,14 +90,14 @@ export default function Navbar() {
             top: "50%",
             left: "50%",
             transform: "translate(-50%,-50%)",
-            width: "85%",
-            maxWidth: 320,
+            width: "60%",          // ✅ reduced by ~40%
+            maxWidth: 300,
             padding: 20,
             borderRadius: 20,
-            background: "linear-gradient(180deg,#031c30,#052b4f)",
+            background: "linear-gradient(180deg,#041f3a,#052a4f)",
             color: "#e6f7ff",
             zIndex: 2200,
-            boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.45)",
           }}
         >
           <h3
@@ -119,14 +111,12 @@ export default function Navbar() {
             OodlesNet Menu
           </h3>
 
-          {/* LINKS */}
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <Link href="/" onClick={() => setOpen(false)}>Home</Link>
             <Link href="/about" onClick={() => setOpen(false)}>About</Link>
             <Link href="/contact" onClick={() => setOpen(false)}>Contact</Link>
           </div>
 
-          {/* LANGUAGE */}
           <div style={{ marginTop: 20 }}>
             <div style={{ fontSize: 14, opacity: 0.8 }}>Language</div>
             <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
@@ -135,7 +125,7 @@ export default function Navbar() {
                   flex: 1,
                   padding: "8px 0",
                   borderRadius: 10,
-                  background: "#00c6ff",
+                  background: "#0ea5e9",
                   color: "white",
                   border: "none",
                   fontWeight: 700,
@@ -159,7 +149,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* DARK MODE */}
           <div
             style={{
               marginTop: 18,
@@ -169,12 +158,7 @@ export default function Navbar() {
             }}
           >
             <span style={{ opacity: 0.85 }}>Dark Mode</span>
-            <input
-              type="checkbox"
-              checked={dark}
-              onChange={toggleDark}
-              style={{ width: 20, height: 20 }}
-            />
+            <input type="checkbox" checked={dark} onChange={toggleDark} />
           </div>
 
           <div
@@ -191,5 +175,5 @@ export default function Navbar() {
       )}
     </>
   );
-  }
-    
+            }
+                
