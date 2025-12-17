@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function FilterDrawer({ onClose }) {
+export default function FilterDrawer({ onClose, onApply }) {
   const [min, setMin] = useState("");
   const [max, setMax] = useState("");
   const [sort, setSort] = useState("none");
@@ -20,7 +20,7 @@ export default function FilterDrawer({ onClose }) {
   };
 
   const STORE_LIST = ["Amazon", "Flipkart", "Meesho", "Croma", "Reliance"];
-  const GRADIENT = "linear-gradient(135deg, #023e8a, #0096c7, #00b4a8)";
+  const GRADIENT = "linear-gradient(135deg,#023e8a,#0096c7,#00b4a8)";
 
   return (
     <div
@@ -45,7 +45,6 @@ export default function FilterDrawer({ onClose }) {
           borderTopRightRadius: 24,
           padding: 14,
           animation: "slideUp 0.25s ease",
-          boxShadow: "0 -8px 24px rgba(0,0,0,0.18)",
         }}
       >
         {/* Header */}
@@ -81,45 +80,39 @@ export default function FilterDrawer({ onClose }) {
           </button>
         </div>
 
-        {/* Price Range (WIDTH FIX ONLY) */}
+        {/* Price */}
         <div style={{ marginBottom: 14 }}>
           <div style={{ fontWeight: 800, marginBottom: 6 }}>
             Price Range
           </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
             <input
               placeholder="Min"
               value={min}
               onChange={(e) => setMin(e.target.value)}
               style={{
-                width: "48%",              // ✅ FIXED
+                width: "48%",
                 padding: "8px 12px",
                 borderRadius: 12,
                 border: "0.6px solid transparent",
                 background:
-                  "linear-gradient(#fff, #fff) padding-box, " +
+                  "linear-gradient(#fff,#fff) padding-box," +
                   GRADIENT +
                   " border-box",
                 fontWeight: 700,
               }}
             />
-
             <input
               placeholder="Max"
               value={max}
               onChange={(e) => setMax(e.target.value)}
               style={{
-                width: "48%",              // ✅ FIXED
+                width: "48%",
                 padding: "8px 12px",
                 borderRadius: 12,
                 border: "0.6px solid transparent",
                 background:
-                  "linear-gradient(#fff, #fff) padding-box, " +
+                  "linear-gradient(#fff,#fff) padding-box," +
                   GRADIENT +
                   " border-box",
                 fontWeight: 700,
@@ -133,14 +126,7 @@ export default function FilterDrawer({ onClose }) {
           <div style={{ fontWeight: 800, marginBottom: 8 }}>
             Stores
           </div>
-          <div
-            style={{
-              display: "flex",
-              gap: 8,
-              overflowX: "auto",
-              paddingBottom: 4,
-            }}
-          >
+          <div style={{ display: "flex", gap: 8, overflowX: "auto" }}>
             {STORE_LIST.map((store) => {
               const active = stores.includes(store);
               return (
@@ -148,13 +134,12 @@ export default function FilterDrawer({ onClose }) {
                   key={store}
                   onClick={() => toggleStore(store)}
                   style={{
-                    whiteSpace: "nowrap",
                     padding: "7px 14px",
                     borderRadius: 999,
                     border: "1px solid transparent",
                     background: active
                       ? GRADIENT
-                      : "linear-gradient(#fff,#fff) padding-box, " +
+                      : "linear-gradient(#fff,#fff) padding-box," +
                         GRADIENT +
                         " border-box",
                     color: active ? "#fff" : "#023e8a",
@@ -201,16 +186,10 @@ export default function FilterDrawer({ onClose }) {
             ["none", "None"],
             ["price-asc", "Price ↑"],
             ["price-desc", "Price ↓"],
-            ["trending", "Trending"],
           ].map(([v, label]) => (
             <label
               key={v}
-              style={{
-                display: "flex",
-                gap: 8,
-                marginBottom: 6,
-                fontWeight: 600,
-              }}
+              style={{ display: "flex", gap: 8, marginBottom: 6 }}
             >
               <input
                 type="radio"
@@ -235,7 +214,17 @@ export default function FilterDrawer({ onClose }) {
           </button>
 
           <button
-            onClick={onClose}
+            onClick={() => {
+              onApply({
+                min,
+                max,
+                sort,
+                stores,
+                inStockOnly,
+                discountOnly,
+              });
+              onClose();
+            }}
             style={{
               padding: "10px 18px",
               borderRadius: 14,
@@ -258,5 +247,5 @@ export default function FilterDrawer({ onClose }) {
       `}</style>
     </div>
   );
-              }
-  
+                }
+            
