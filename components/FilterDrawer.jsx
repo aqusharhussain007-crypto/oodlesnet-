@@ -7,7 +7,6 @@ export default function FilterDrawer({ onClose }) {
   const [max, setMax] = useState("");
   const [sort, setSort] = useState("none");
 
-  // Store filter
   const [stores, setStores] = useState([]);
   const [inStockOnly, setInStockOnly] = useState(false);
   const [discountOnly, setDiscountOnly] = useState(false);
@@ -22,13 +21,15 @@ export default function FilterDrawer({ onClose }) {
 
   const STORE_LIST = ["Amazon", "Flipkart", "Meesho", "Croma", "Reliance"];
 
+  const GRADIENT = "linear-gradient(135deg, #023e8a, #0096c7, #00b4a8)";
+
   return (
     <div
       onClick={onClose}
       style={{
         position: "fixed",
         inset: 0,
-        background: "rgba(0,0,0,0.35)",
+        background: "rgba(0,0,0,0.45)",
         zIndex: 1200,
         display: "flex",
         justifyContent: "center",
@@ -41,10 +42,11 @@ export default function FilterDrawer({ onClose }) {
           width: "100%",
           maxWidth: 600,
           background: "#fff",
-          borderTopLeftRadius: 22,
-          borderTopRightRadius: 22,
+          borderTopLeftRadius: 26,
+          borderTopRightRadius: 26,
           padding: 18,
           animation: "slideUp 0.25s ease",
+          boxShadow: "0 -10px 30px rgba(0,0,0,0.2)",
         }}
       >
         {/* Header */}
@@ -52,59 +54,85 @@ export default function FilterDrawer({ onClose }) {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            marginBottom: 14,
+            marginBottom: 18,
           }}
         >
-          <h3 style={{ fontWeight: 800, color: "#0077b6" }}>
+          <h3
+            style={{
+              fontWeight: 900,
+              background: GRADIENT,
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
             Filters
           </h3>
           <button
             onClick={onClose}
             style={{
               border: "none",
-              background: "#eee",
-              borderRadius: 10,
-              padding: "6px 10px",
-              fontWeight: 700,
+              background: "#f1f5f9",
+              borderRadius: 12,
+              padding: "6px 12px",
+              fontWeight: 800,
             }}
           >
             ✕
           </button>
         </div>
 
-        {/* Price (UNCHANGED) */}
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontWeight: 800, marginBottom: 6 }}>
+        {/* Price */}
+        <div style={{ marginBottom: 18 }}>
+          <div style={{ fontWeight: 800, marginBottom: 8 }}>
             Price Range
           </div>
-          <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ display: "flex", gap: 12 }}>
             <input
               placeholder="Min"
               value={min}
               onChange={(e) => setMin(e.target.value)}
-              className="pill-number"
+              style={{
+                flex: 1,
+                padding: "10px 14px",
+                borderRadius: 14,
+                border: "2px solid transparent",
+                background:
+                  "linear-gradient(#fff, #fff) padding-box, " +
+                  GRADIENT +
+                  " border-box",
+                fontWeight: 700,
+              }}
             />
             <input
               placeholder="Max"
               value={max}
               onChange={(e) => setMax(e.target.value)}
-              className="pill-number"
+              style={{
+                flex: 1,
+                padding: "10px 14px",
+                borderRadius: 14,
+                border: "2px solid transparent",
+                background:
+                  "linear-gradient(#fff, #fff) padding-box, " +
+                  GRADIENT +
+                  " border-box",
+                fontWeight: 700,
+              }}
             />
           </div>
         </div>
 
-        {/* ✅ Store Filter – Horizontal Chips */}
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontWeight: 800, marginBottom: 8 }}>
+        {/* Store Chips */}
+        <div style={{ marginBottom: 18 }}>
+          <div style={{ fontWeight: 800, marginBottom: 10 }}>
             Stores
           </div>
-
           <div
             style={{
               display: "flex",
               gap: 10,
               overflowX: "auto",
-              paddingBottom: 4,
+              paddingBottom: 6,
             }}
           >
             {STORE_LIST.map((store) => {
@@ -115,15 +143,19 @@ export default function FilterDrawer({ onClose }) {
                   onClick={() => toggleStore(store)}
                   style={{
                     whiteSpace: "nowrap",
-                    padding: "8px 14px",
+                    padding: "9px 16px",
                     borderRadius: 999,
-                    border: active
-                      ? "2px solid #0077b6"
-                      : "2px solid #ddd",
-                    background: active ? "#e6f4fb" : "#fff",
-                    color: active ? "#0077b6" : "#333",
-                    fontWeight: 700,
-                    cursor: "pointer",
+                    border: "2px solid transparent",
+                    background: active
+                      ? GRADIENT
+                      : "linear-gradient(#fff,#fff) padding-box, " +
+                        GRADIENT +
+                        " border-box",
+                    color: active ? "#fff" : "#023e8a",
+                    fontWeight: 800,
+                    boxShadow: active
+                      ? "0 4px 12px rgba(0,150,199,0.35)"
+                      : "none",
                   }}
                 >
                   {store}
@@ -133,7 +165,7 @@ export default function FilterDrawer({ onClose }) {
           </div>
         </div>
 
-        {/* Availability */}
+        {/* Toggles */}
         <div style={{ marginBottom: 16 }}>
           <label
             style={{
@@ -152,7 +184,6 @@ export default function FilterDrawer({ onClose }) {
           </label>
         </div>
 
-        {/* Discount */}
         <div style={{ marginBottom: 16 }}>
           <label
             style={{
@@ -171,12 +202,11 @@ export default function FilterDrawer({ onClose }) {
           </label>
         </div>
 
-        {/* Sort (UNCHANGED) */}
+        {/* Sort */}
         <div>
           <div style={{ fontWeight: 800, marginBottom: 6 }}>
             Sort By
           </div>
-
           {[
             ["none", "None"],
             ["price-asc", "Price ↑"],
@@ -203,19 +233,30 @@ export default function FilterDrawer({ onClose }) {
           ))}
         </div>
 
-        {/* Actions (UNCHANGED) */}
+        {/* Actions */}
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
-            marginTop: 18,
+            marginTop: 22,
           }}
         >
           <button onClick={onClose} className="btn-ghost">
             Cancel
           </button>
 
-          <button onClick={onClose} className="btn-primary">
+          <button
+            onClick={onClose}
+            style={{
+              padding: "12px 20px",
+              borderRadius: 16,
+              border: "none",
+              background: GRADIENT,
+              color: "#fff",
+              fontWeight: 900,
+              boxShadow: "0 6px 18px rgba(0,150,199,0.45)",
+            }}
+          >
             Apply
           </button>
         </div>
@@ -229,5 +270,5 @@ export default function FilterDrawer({ onClose }) {
       `}</style>
     </div>
   );
-          }
-      
+    }
+        
