@@ -39,18 +39,18 @@ export default function CategoryDrawer({
         background: "rgba(0,0,0,0.35)",
         zIndex: 1200,
         display: "flex",
-        justifyContent: "center",
+        justifyContent: "flex-end",   // ✅ move drawer to right
         alignItems: "flex-end",
       }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          width: "100%",
-          maxWidth: 600,
+          width: "82%",               // ✅ reduced width
+          maxWidth: 420,
           background: "#fff",
           borderTopLeftRadius: 22,
-          borderTopRightRadius: 22,
+          borderTopRightRadius: 0,
           padding: 18,
           animation: "slideUp 0.25s ease",
         }}
@@ -80,7 +80,7 @@ export default function CategoryDrawer({
           </button>
         </div>
 
-        {/* SINGLE COLUMN + SCROLL (CLEAN CHANGE) */}
+        {/* SINGLE COLUMN + SCROLL (UNCHANGED LOGIC) */}
         <div
           style={{
             display: "flex",
@@ -95,8 +95,8 @@ export default function CategoryDrawer({
               key={c.slug}
               onClick={() => onSelect(c.slug)}
               style={{
-                width: "100%",
-                padding: "12px 16px",
+                width: "100%",        // fills drawer, not screen
+                padding: "12px 14px", // ✅ tighter padding
                 borderRadius: 14,
                 border:
                   active === c.slug
@@ -126,5 +126,5 @@ export default function CategoryDrawer({
       `}</style>
     </div>
   );
-        }
-    
+          }
+              
