@@ -81,21 +81,26 @@ export default function FilterDrawer({ onClose }) {
           </button>
         </div>
 
-        {/* Price Range (FIXED BORDER ONLY) */}
+        {/* Price Range (WIDTH FIX ONLY) */}
         <div style={{ marginBottom: 14 }}>
           <div style={{ fontWeight: 800, marginBottom: 6 }}>
             Price Range
           </div>
-          <div style={{ display: "flex", gap: 10 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
             <input
               placeholder="Min"
               value={min}
               onChange={(e) => setMin(e.target.value)}
               style={{
-                flex: 1,
+                width: "48%",              // ✅ FIXED
                 padding: "8px 12px",
                 borderRadius: 12,
-                border: "0.6px solid transparent", // ✅ thinner border
+                border: "0.6px solid transparent",
                 background:
                   "linear-gradient(#fff, #fff) padding-box, " +
                   GRADIENT +
@@ -103,15 +108,16 @@ export default function FilterDrawer({ onClose }) {
                 fontWeight: 700,
               }}
             />
+
             <input
               placeholder="Max"
               value={max}
               onChange={(e) => setMax(e.target.value)}
               style={{
-                flex: 1,
+                width: "48%",              // ✅ FIXED
                 padding: "8px 12px",
                 borderRadius: 12,
-                border: "0.6px solid transparent", // ✅ thinner border
+                border: "0.6px solid transparent",
                 background:
                   "linear-gradient(#fff, #fff) padding-box, " +
                   GRADIENT +
@@ -154,9 +160,6 @@ export default function FilterDrawer({ onClose }) {
                     color: active ? "#fff" : "#023e8a",
                     fontWeight: 800,
                     fontSize: 13,
-                    boxShadow: active
-                      ? "0 3px 10px rgba(0,150,199,0.3)"
-                      : "none",
                   }}
                 >
                   {store}
@@ -240,7 +243,6 @@ export default function FilterDrawer({ onClose }) {
               background: GRADIENT,
               color: "#fff",
               fontWeight: 900,
-              boxShadow: "0 5px 14px rgba(0,150,199,0.4)",
             }}
           >
             Apply
@@ -256,5 +258,5 @@ export default function FilterDrawer({ onClose }) {
       `}</style>
     </div>
   );
-            }
-                         
+              }
+  
