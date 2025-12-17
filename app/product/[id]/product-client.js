@@ -20,6 +20,7 @@ export default function ProductClient({ params }) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // ---------------- LOAD PRODUCT ----------------
   useEffect(() => {
     async function loadProduct() {
       try {
@@ -29,6 +30,7 @@ export default function ProductClient({ params }) {
         if (snap.exists()) {
           setProduct({ id: snap.id, ...snap.data() });
 
+          // increment product views
           await updateDoc(ref, {
             views: increment(1),
           });
@@ -49,6 +51,7 @@ export default function ProductClient({ params }) {
 
   const stores = product.store || [];
 
+  // ---------------- BUY HANDLER (TRACK + REDIRECT) ----------------
   async function handleBuy(store) {
     try {
       await addDoc(collection(db, "clicks"), {
@@ -65,13 +68,19 @@ export default function ProductClient({ params }) {
 
   return (
     <div className="p-4 pb-24 max-w-[720px] mx-auto">
+      {/* Breadcrumb */}
       <div className="text-sm mb-3">
         <Link href="/" className="text-blue-500">
           Home
         </Link>{" "}
+        /{" "}
+        <span className="text-blue-600 font-semibold">
+          {product.categorySlug}
+        </span>{" "}
         / <span className="font-bold">{product.name}</span>
       </div>
 
+      {/* Product Image */}
       <div className="rounded-2xl overflow-hidden shadow-md mb-4 bg-white">
         <Image
           src={product.imageUrl}
@@ -82,10 +91,17 @@ export default function ProductClient({ params }) {
         />
       </div>
 
-      <h1 className="text-2xl font-bold text-blue-700">{product.name}</h1>
+      {/* Product Title */}
+      <h1 className="text-2xl font-bold text-blue-700">
+        {product.name}
+      </h1>
 
-      <p className="mt-3 text-gray-700">{product.description}</p>
+      {/* Description */}
+      <p className="mt-3 text-gray-700">
+        {product.description}
+      </p>
 
+      {/* Compare Prices */}
       <h3 className="mt-6 text-xl font-bold text-blue-600">
         Compare Prices
       </h3>
@@ -94,9 +110,11 @@ export default function ProductClient({ params }) {
         {stores.map((store, index) => (
           <div
             key={index}
-            className="min-w-[260px] bg-white p-4 rounded-2xl shadow-md border"
+            className="min-w-[260px] bg-white p-4 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
           >
-            <div className="text-lg font-bold">{store.name}</div>
+            <div className="text-lg font-bold">
+              {store.name}
+            </div>
 
             <div className="text-xl font-extrabold text-blue-700 my-1">
               ₹ {Number(store.price).toLocaleString("en-IN")}
@@ -106,9 +124,20 @@ export default function ProductClient({ params }) {
               {store.offer}
             </div>
 
+            {/* ✅ RESTORED GRADIENT BUY BUTTON */}
             <button
               onClick={() => handleBuy(store)}
-              className="w-full text-white font-bold py-3 rounded-xl"
+              className="w-full text-white font-bold py-3 rounded-xl shadow-md"
+              style={{
+                background:
+                  store.name === "Amazon"
+                    ? "linear-gradient(90deg,#ff9900,#ff6600)"
+                    : store.name === "Meesho"
+                    ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
+                    : store.name === "Ajio"
+                    ? "linear-gradient(90deg,#005bea,#00c6fb)"
+                    : "linear-gradient(90deg,#00c6ff,#00ff99)",
+              }}
             >
               Buy on {store.name}
             </button>
@@ -118,4 +147,4 @@ export default function ProductClient({ params }) {
     </div>
   );
     }
-        
+    
