@@ -1,112 +1,157 @@
-'use client';
-import React from 'react';
+"use client";
 
-/**
- * CompareDrawer
- * Props:
- *  - open: boolean
- *  - product: product object (with store[] array)
- *  - onClose: () => void
- */
-export default function CompareDrawer({ open, product, onClose }) {
-  if (!open || !product) return null;
+export default function CategoryDrawer({
+  active = "all",
+  onSelect,
+  onClose,
+}) {
+  const categories = [
+    { slug: "all", name: "All", icon: "grid" },
+    { slug: "mobile", name: "Mobile", icon: "mobile" },
+    { slug: "laptop", name: "Laptop", icon: "laptop" },
+    { slug: "electronics", name: "Electronics", icon: "cpu" },
+    { slug: "fashion", name: "Fashion", icon: "tshirt" },
+    { slug: "appliances", name: "Appliances", icon: "fridge" },
+    { slug: "beauty", name: "Beauty", icon: "sparkle" },
+    { slug: "home", name: "Home & Kitchen", icon: "home" },
+    { slug: "grocery", name: "Grocery", icon: "cart" },
+    { slug: "accessories", name: "Accessories", icon: "watch" },
+  ];
+
+  const GRADIENT = "linear-gradient(135deg,#023e8a,#0096c7,#00b4a8)";
+
+  const Icon = ({ type }) => {
+    const props = { width: 18, height: 18, stroke: "currentColor", fill: "none", strokeWidth: 2 };
+    switch (type) {
+      case "mobile":
+        return <svg {...props} viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2" /></svg>;
+      case "laptop":
+        return <svg {...props} viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="10" rx="2" /><path d="M2 19h20" /></svg>;
+      case "cpu":
+        return <svg {...props} viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>;
+      case "tshirt":
+        return <svg {...props} viewBox="0 0 24 24"><path d="M4 4l4-2 4 2 4-2 4 2v4l-2 2v10H6V8L4 6z" /></svg>;
+      case "fridge":
+        return <svg {...props} viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2" /><line x1="7" y1="12" x2="17" y2="12" /></svg>;
+      case "sparkle":
+        return <svg {...props} viewBox="0 0 24 24"><path d="M12 2l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" /></svg>;
+      case "home":
+        return <svg {...props} viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg>;
+      case "cart":
+        return <svg {...props} viewBox="0 0 24 24"><circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" /><path d="M1 1h4l3 12h11l3-8H6" /></svg>;
+      case "watch":
+        return <svg {...props} viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" /><path d="M8 2h8M8 22h8" /></svg>;
+      default:
+        return <svg {...props} viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg>;
+    }
+  };
 
   return (
-    // overlay
-    <div className="fixed inset-0 z-50 flex items-end">
-      {/* semi-transparent backdrop */}
+    <div
+      className="category-drawer-backdrop"
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.35)",
+        zIndex: 1200,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "flex-end",
+      }}
+    >
       <div
-        className="absolute inset-0 bg-black/40"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
-      {/* Drawer panel */}
-      <div className="relative w-full max-w-3xl mx-auto p-4 bg-white rounded-t-2xl shadow-2xl">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <h3 className="text-lg font-semibold text-[#0077b6] truncate">{product.name}</h3>
-            <p className="text-sm text-gray-600">{product.description}</p>
-          </div>
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: "100%",
+          maxWidth: 600,
+          background: "#fff",
+          borderTopLeftRadius: 22,
+          borderTopRightRadius: 22,
+          padding: 18,
+          animation: "slideUp 0.25s ease",
+        }}
+      >
+        {/* Header */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: 12,
+          }}
+        >
+          <h3
+            style={{
+              fontWeight: 800,
+              background: GRADIENT,
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            Categories
+          </h3>
           <button
             onClick={onClose}
-            className="px-3 py-1 rounded-full bg-gray-100 text-sm"
-            aria-label="Close"
+            style={{
+              border: "none",
+              background: "#eee",
+              borderRadius: 10,
+              padding: "6px 10px",
+              fontWeight: 700,
+            }}
           >
-            Close
+            ✕
           </button>
         </div>
 
-        <div className="mb-2 text-sm text-gray-700">Compare prices</div>
-
-        {/* horizontal list of store cards */}
-        <div className="flex gap-3 overflow-x-auto pb-3 -mx-1">
-          {product.store && product.store.length ? (
-            product.store.map((s, idx) => (
-              <div
-                key={idx}
-                className="min-w-[220px] bg-gradient-to-br from-white to-white/90 rounded-xl p-3 shadow-md border"
+        {/* Vertical list */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+            maxHeight: "60vh",
+            overflowY: "auto",
+          }}
+        >
+          {categories.map((c) => {
+            const activeState = active === c.slug;
+            return (
+              <button
+                key={c.slug}
+                onClick={() => onSelect(c.slug)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  padding: "12px 14px",
+                  borderRadius: 14,
+                  border: "1px solid transparent",
+                  background: activeState
+                    ? GRADIENT
+                    : "linear-gradient(#fff,#fff) padding-box, " +
+                      GRADIENT +
+                      " border-box",
+                  fontWeight: 700,
+                  color: activeState ? "#fff" : "#023e8a",
+                  cursor: "pointer",
+                }}
               >
-                <div className="flex items-start gap-2">
-                  <div className="flex-1">
-                    <div className="text-xs font-semibold">{s.name}</div>
-                    <div className="text-lg font-bold mt-1">₹{Number(s.price).toLocaleString('en-IN')}</div>
-                    {s.offer && <div className="text-xs mt-1 text-green-600">{s.offer}</div>}
-                  </div>
-
-                  <div className="flex flex-col items-end gap-2">
-                    <a
-                      href={s.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-3 py-1 rounded-full text-xs font-medium"
-                      style={{
-                        background: getStoreGradient(s.name),
-                        color: '#fff'
-                      }}
-                    >
-                      Buy
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-sm text-gray-500 px-3">No stores available</div>
-          )}
-        </div>
-
-        {/* optional footer: go to product page or close */}
-        <div className="mt-3 flex justify-between items-center">
-          <div className="text-sm text-gray-600">
-            Lowest price:{' '}
-            <span className="font-semibold">
-              {product.store && product.store.length
-                ? `₹${Math.min(...product.store.map(s => Number(s.price))).toLocaleString('en-IN')}`
-                : 'N/A'}
-            </span>
-          </div>
-
-          <div className="flex gap-2">
-            <button
-              onClick={onClose}
-              className="px-3 py-2 rounded-full bg-gray-100 text-sm"
-            >
-              Close
-            </button>
-          </div>
+                <Icon type={c.icon} />
+                {c.name}
+              </button>
+            );
+          })}
         </div>
       </div>
+
+      <style>{`
+        @keyframes slideUp {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
-
-// Helper gradient mapping (same as ProductCard)
-function getStoreGradient(name = '') {
-  const n = name.toLowerCase();
-  if (n.includes('amazon')) return 'linear-gradient(90deg,#ff7a00,#ffd199)';
-  if (n.includes('meesho')) return 'linear-gradient(90deg,#ff6eb4,#d66cff)';
-  if (n.includes('ajio')) return 'linear-gradient(90deg,#00c6a7,#0072ff)';
-  return 'linear-gradient(90deg,#6a11cb,#2575fc)';
-        }
-          
+  
