@@ -43,7 +43,7 @@ export default function FilterDrawer({ onClose }) {
           background: "#fff",
           borderTopLeftRadius: 24,
           borderTopRightRadius: 24,
-          padding: 14,                 // ⬇ reduced
+          padding: 14,
           animation: "slideUp 0.25s ease",
           boxShadow: "0 -8px 24px rgba(0,0,0,0.18)",
         }}
@@ -53,7 +53,7 @@ export default function FilterDrawer({ onClose }) {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            marginBottom: 12,          // ⬇ reduced
+            marginBottom: 12,
           }}
         >
           <h3
@@ -73,7 +73,7 @@ export default function FilterDrawer({ onClose }) {
               border: "none",
               background: "#f1f5f9",
               borderRadius: 10,
-              padding: "4px 10px",     // ⬇ reduced
+              padding: "4px 10px",
               fontWeight: 800,
             }}
           >
@@ -81,7 +81,7 @@ export default function FilterDrawer({ onClose }) {
           </button>
         </div>
 
-        {/* Price */}
+        {/* Price Range (FIXED BORDER ONLY) */}
         <div style={{ marginBottom: 14 }}>
           <div style={{ fontWeight: 800, marginBottom: 6 }}>
             Price Range
@@ -93,9 +93,9 @@ export default function FilterDrawer({ onClose }) {
               onChange={(e) => setMin(e.target.value)}
               style={{
                 flex: 1,
-                padding: "8px 12px",    // ⬇ reduced
+                padding: "8px 12px",
                 borderRadius: 12,
-                border: "0.8px solid transparent",
+                border: "0.6px solid transparent", // ✅ thinner border
                 background:
                   "linear-gradient(#fff, #fff) padding-box, " +
                   GRADIENT +
@@ -111,7 +111,7 @@ export default function FilterDrawer({ onClose }) {
                 flex: 1,
                 padding: "8px 12px",
                 borderRadius: 12,
-                border: "0.8px solid transparent",
+                border: "0.6px solid transparent", // ✅ thinner border
                 background:
                   "linear-gradient(#fff, #fff) padding-box, " +
                   GRADIENT +
@@ -130,7 +130,7 @@ export default function FilterDrawer({ onClose }) {
           <div
             style={{
               display: "flex",
-              gap: 8,                  // ⬇ reduced
+              gap: 8,
               overflowX: "auto",
               paddingBottom: 4,
             }}
@@ -143,7 +143,7 @@ export default function FilterDrawer({ onClose }) {
                   onClick={() => toggleStore(store)}
                   style={{
                     whiteSpace: "nowrap",
-                    padding: "7px 14px", // ⬇ reduced
+                    padding: "7px 14px",
                     borderRadius: 999,
                     border: "1px solid transparent",
                     background: active
@@ -168,14 +168,7 @@ export default function FilterDrawer({ onClose }) {
 
         {/* Toggles */}
         <div style={{ marginBottom: 10 }}>
-          <label
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              fontWeight: 700,
-            }}
-          >
+          <label style={{ display: "flex", gap: 8, fontWeight: 700 }}>
             <input
               type="checkbox"
               checked={inStockOnly}
@@ -186,14 +179,7 @@ export default function FilterDrawer({ onClose }) {
         </div>
 
         <div style={{ marginBottom: 14 }}>
-          <label
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              fontWeight: 700,
-            }}
-          >
+          <label style={{ display: "flex", gap: 8, fontWeight: 700 }}>
             <input
               type="checkbox"
               checked={discountOnly}
@@ -218,9 +204,8 @@ export default function FilterDrawer({ onClose }) {
               key={v}
               style={{
                 display: "flex",
-                alignItems: "center",
                 gap: 8,
-                marginBottom: 6,       // ⬇ reduced
+                marginBottom: 6,
                 fontWeight: 600,
               }}
             >
@@ -239,7 +224,7 @@ export default function FilterDrawer({ onClose }) {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            marginTop: 16,            // ⬇ reduced
+            marginTop: 16,
           }}
         >
           <button onClick={onClose} className="btn-ghost">
@@ -249,7 +234,7 @@ export default function FilterDrawer({ onClose }) {
           <button
             onClick={onClose}
             style={{
-              padding: "10px 18px",   // ⬇ reduced
+              padding: "10px 18px",
               borderRadius: 14,
               border: "none",
               background: GRADIENT,
@@ -271,5 +256,5 @@ export default function FilterDrawer({ onClose }) {
       `}</style>
     </div>
   );
-      }
-          
+            }
+                         
