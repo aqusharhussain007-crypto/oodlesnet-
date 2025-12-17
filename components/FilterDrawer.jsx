@@ -7,6 +7,19 @@ export default function FilterDrawer({ onClose }) {
   const [max, setMax] = useState("");
   const [sort, setSort] = useState("none");
 
+  // ✅ NEW STATES (additive)
+  const [stores, setStores] = useState([]);
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [discountOnly, setDiscountOnly] = useState(false);
+
+  const toggleStore = (store) => {
+    setStores((prev) =>
+      prev.includes(store)
+        ? prev.filter((s) => s !== store)
+        : [...prev, store]
+    );
+  };
+
   return (
     <div
       onClick={onClose}
@@ -57,7 +70,7 @@ export default function FilterDrawer({ onClose }) {
           </button>
         </div>
 
-        {/* Price */}
+        {/* Price (UNCHANGED) */}
         <div style={{ marginBottom: 16 }}>
           <div style={{ fontWeight: 800, marginBottom: 6 }}>
             Price Range
@@ -78,7 +91,71 @@ export default function FilterDrawer({ onClose }) {
           </div>
         </div>
 
-        {/* Sort */}
+        {/* ✅ Store Filter */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontWeight: 800, marginBottom: 6 }}>
+            Stores
+          </div>
+          {["Amazon", "Flipkart", "Meesho"].map((store) => (
+            <label
+              key={store}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 6,
+                fontWeight: 600,
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={stores.includes(store)}
+                onChange={() => toggleStore(store)}
+              />
+              {store}
+            </label>
+          ))}
+        </div>
+
+        {/* ✅ Availability */}
+        <div style={{ marginBottom: 16 }}>
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              fontWeight: 700,
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={inStockOnly}
+              onChange={() => setInStockOnly(!inStockOnly)}
+            />
+            In stock only
+          </label>
+        </div>
+
+        {/* ✅ Discount */}
+        <div style={{ marginBottom: 16 }}>
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              fontWeight: 700,
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={discountOnly}
+              onChange={() => setDiscountOnly(!discountOnly)}
+            />
+            Discounted only
+          </label>
+        </div>
+
+        {/* Sort (UNCHANGED) */}
         <div>
           <div style={{ fontWeight: 800, marginBottom: 6 }}>
             Sort By
@@ -110,7 +187,7 @@ export default function FilterDrawer({ onClose }) {
           ))}
         </div>
 
-        {/* Actions */}
+        {/* Actions (UNCHANGED) */}
         <div
           style={{
             display: "flex",
@@ -118,17 +195,11 @@ export default function FilterDrawer({ onClose }) {
             marginTop: 18,
           }}
         >
-          <button
-            onClick={onClose}
-            className="btn-ghost"
-          >
+          <button onClick={onClose} className="btn-ghost">
             Cancel
           </button>
 
-          <button
-            onClick={onClose}
-            className="btn-primary"
-          >
+          <button onClick={onClose} className="btn-primary">
             Apply
           </button>
         </div>
@@ -142,5 +213,5 @@ export default function FilterDrawer({ onClose }) {
       `}</style>
     </div>
   );
-    }
+        }
           
