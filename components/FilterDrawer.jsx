@@ -7,7 +7,7 @@ export default function FilterDrawer({ onClose }) {
   const [max, setMax] = useState("");
   const [sort, setSort] = useState("none");
 
-  // ✅ NEW STATES (additive)
+  // Store filter
   const [stores, setStores] = useState([]);
   const [inStockOnly, setInStockOnly] = useState(false);
   const [discountOnly, setDiscountOnly] = useState(false);
@@ -19,6 +19,8 @@ export default function FilterDrawer({ onClose }) {
         : [...prev, store]
     );
   };
+
+  const STORE_LIST = ["Amazon", "Flipkart", "Meesho", "Croma", "Reliance"];
 
   return (
     <div
@@ -91,33 +93,47 @@ export default function FilterDrawer({ onClose }) {
           </div>
         </div>
 
-        {/* ✅ Store Filter */}
+        {/* ✅ Store Filter – Horizontal Chips */}
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontWeight: 800, marginBottom: 6 }}>
+          <div style={{ fontWeight: 800, marginBottom: 8 }}>
             Stores
           </div>
-          {["Amazon", "Flipkart", "Meesho"].map((store) => (
-            <label
-              key={store}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                marginBottom: 6,
-                fontWeight: 600,
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={stores.includes(store)}
-                onChange={() => toggleStore(store)}
-              />
-              {store}
-            </label>
-          ))}
+
+          <div
+            style={{
+              display: "flex",
+              gap: 10,
+              overflowX: "auto",
+              paddingBottom: 4,
+            }}
+          >
+            {STORE_LIST.map((store) => {
+              const active = stores.includes(store);
+              return (
+                <button
+                  key={store}
+                  onClick={() => toggleStore(store)}
+                  style={{
+                    whiteSpace: "nowrap",
+                    padding: "8px 14px",
+                    borderRadius: 999,
+                    border: active
+                      ? "2px solid #0077b6"
+                      : "2px solid #ddd",
+                    background: active ? "#e6f4fb" : "#fff",
+                    color: active ? "#0077b6" : "#333",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  {store}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* ✅ Availability */}
+        {/* Availability */}
         <div style={{ marginBottom: 16 }}>
           <label
             style={{
@@ -136,7 +152,7 @@ export default function FilterDrawer({ onClose }) {
           </label>
         </div>
 
-        {/* ✅ Discount */}
+        {/* Discount */}
         <div style={{ marginBottom: 16 }}>
           <label
             style={{
@@ -213,5 +229,5 @@ export default function FilterDrawer({ onClose }) {
       `}</style>
     </div>
   );
-        }
-          
+          }
+      
