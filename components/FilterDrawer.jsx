@@ -20,7 +20,6 @@ export default function FilterDrawer({ onClose }) {
   };
 
   const STORE_LIST = ["Amazon", "Flipkart", "Meesho", "Croma", "Reliance"];
-
   const GRADIENT = "linear-gradient(135deg, #023e8a, #0096c7, #00b4a8)";
 
   return (
@@ -42,11 +41,11 @@ export default function FilterDrawer({ onClose }) {
           width: "100%",
           maxWidth: 600,
           background: "#fff",
-          borderTopLeftRadius: 26,
-          borderTopRightRadius: 26,
-          padding: 18,
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
+          padding: 14,                 // ⬇ reduced
           animation: "slideUp 0.25s ease",
-          boxShadow: "0 -10px 30px rgba(0,0,0,0.2)",
+          boxShadow: "0 -8px 24px rgba(0,0,0,0.18)",
         }}
       >
         {/* Header */}
@@ -54,12 +53,13 @@ export default function FilterDrawer({ onClose }) {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            marginBottom: 18,
+            marginBottom: 12,          // ⬇ reduced
           }}
         >
           <h3
             style={{
               fontWeight: 900,
+              fontSize: 18,
               background: GRADIENT,
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
@@ -72,8 +72,8 @@ export default function FilterDrawer({ onClose }) {
             style={{
               border: "none",
               background: "#f1f5f9",
-              borderRadius: 12,
-              padding: "6px 12px",
+              borderRadius: 10,
+              padding: "4px 10px",     // ⬇ reduced
               fontWeight: 800,
             }}
           >
@@ -82,20 +82,20 @@ export default function FilterDrawer({ onClose }) {
         </div>
 
         {/* Price */}
-        <div style={{ marginBottom: 18 }}>
-          <div style={{ fontWeight: 800, marginBottom: 8 }}>
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontWeight: 800, marginBottom: 6 }}>
             Price Range
           </div>
-          <div style={{ display: "flex", gap: 12 }}>
+          <div style={{ display: "flex", gap: 10 }}>
             <input
               placeholder="Min"
               value={min}
               onChange={(e) => setMin(e.target.value)}
               style={{
                 flex: 1,
-                padding: "10px 14px",
-                borderRadius: 14,
-                border: "2px solid transparent",
+                padding: "8px 12px",    // ⬇ reduced
+                borderRadius: 12,
+                border: "0.8px solid transparent",
                 background:
                   "linear-gradient(#fff, #fff) padding-box, " +
                   GRADIENT +
@@ -109,9 +109,9 @@ export default function FilterDrawer({ onClose }) {
               onChange={(e) => setMax(e.target.value)}
               style={{
                 flex: 1,
-                padding: "10px 14px",
-                borderRadius: 14,
-                border: "2px solid transparent",
+                padding: "8px 12px",
+                borderRadius: 12,
+                border: "0.8px solid transparent",
                 background:
                   "linear-gradient(#fff, #fff) padding-box, " +
                   GRADIENT +
@@ -122,17 +122,17 @@ export default function FilterDrawer({ onClose }) {
           </div>
         </div>
 
-        {/* Store Chips */}
-        <div style={{ marginBottom: 18 }}>
-          <div style={{ fontWeight: 800, marginBottom: 10 }}>
+        {/* Stores */}
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontWeight: 800, marginBottom: 8 }}>
             Stores
           </div>
           <div
             style={{
               display: "flex",
-              gap: 10,
+              gap: 8,                  // ⬇ reduced
               overflowX: "auto",
-              paddingBottom: 6,
+              paddingBottom: 4,
             }}
           >
             {STORE_LIST.map((store) => {
@@ -143,9 +143,9 @@ export default function FilterDrawer({ onClose }) {
                   onClick={() => toggleStore(store)}
                   style={{
                     whiteSpace: "nowrap",
-                    padding: "9px 16px",
+                    padding: "7px 14px", // ⬇ reduced
                     borderRadius: 999,
-                    border: "2px solid transparent",
+                    border: "1px solid transparent",
                     background: active
                       ? GRADIENT
                       : "linear-gradient(#fff,#fff) padding-box, " +
@@ -153,8 +153,9 @@ export default function FilterDrawer({ onClose }) {
                         " border-box",
                     color: active ? "#fff" : "#023e8a",
                     fontWeight: 800,
+                    fontSize: 13,
                     boxShadow: active
-                      ? "0 4px 12px rgba(0,150,199,0.35)"
+                      ? "0 3px 10px rgba(0,150,199,0.3)"
                       : "none",
                   }}
                 >
@@ -166,12 +167,12 @@ export default function FilterDrawer({ onClose }) {
         </div>
 
         {/* Toggles */}
-        <div style={{ marginBottom: 16 }}>
+        <div style={{ marginBottom: 10 }}>
           <label
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 10,
+              gap: 8,
               fontWeight: 700,
             }}
           >
@@ -184,12 +185,12 @@ export default function FilterDrawer({ onClose }) {
           </label>
         </div>
 
-        <div style={{ marginBottom: 16 }}>
+        <div style={{ marginBottom: 14 }}>
           <label
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 10,
+              gap: 8,
               fontWeight: 700,
             }}
           >
@@ -218,8 +219,8 @@ export default function FilterDrawer({ onClose }) {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 10,
-                marginBottom: 8,
+                gap: 8,
+                marginBottom: 6,       // ⬇ reduced
                 fontWeight: 600,
               }}
             >
@@ -238,7 +239,7 @@ export default function FilterDrawer({ onClose }) {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            marginTop: 22,
+            marginTop: 16,            // ⬇ reduced
           }}
         >
           <button onClick={onClose} className="btn-ghost">
@@ -248,13 +249,13 @@ export default function FilterDrawer({ onClose }) {
           <button
             onClick={onClose}
             style={{
-              padding: "12px 20px",
-              borderRadius: 16,
+              padding: "10px 18px",   // ⬇ reduced
+              borderRadius: 14,
               border: "none",
               background: GRADIENT,
               color: "#fff",
               fontWeight: 900,
-              boxShadow: "0 6px 18px rgba(0,150,199,0.45)",
+              boxShadow: "0 5px 14px rgba(0,150,199,0.4)",
             }}
           >
             Apply
@@ -270,5 +271,5 @@ export default function FilterDrawer({ onClose }) {
       `}</style>
     </div>
   );
-    }
-        
+      }
+          
