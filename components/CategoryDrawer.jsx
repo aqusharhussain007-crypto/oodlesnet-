@@ -10,7 +10,17 @@ export default function CategoryDrawer({
     { slug: "mobile", name: "Mobile" },
     { slug: "laptop", name: "Laptop" },
     { slug: "electronics", name: "Electronics" },
+
+    // ✅ NEW (necessary categories)
+    { slug: "fashion", name: "Fashion" },
+    { slug: "appliances", name: "Appliances" },
+    { slug: "beauty", name: "Beauty" },
+    { slug: "home", name: "Home & Kitchen" },
+    { slug: "grocery", name: "Grocery" },
+    { slug: "accessories", name: "Accessories" },
   ];
+
+  const GRADIENT = "linear-gradient(135deg,#023e8a,#0096c7,#00b4a8)";
 
   return (
     <div
@@ -46,7 +56,14 @@ export default function CategoryDrawer({
             marginBottom: 12,
           }}
         >
-          <h3 style={{ fontWeight: 800, color: "#0077b6" }}>
+          <h3
+            style={{
+              fontWeight: 800,
+              background: GRADIENT,
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
             Categories
           </h3>
           <button
@@ -65,29 +82,30 @@ export default function CategoryDrawer({
 
         {/* Pills */}
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          {categories.map((c) => (
-            <button
-              key={c.slug}
-              onClick={() => onSelect(c.slug)}
-              style={{
-                padding: "10px 16px",
-                borderRadius: 999,
-                border:
-                  active === c.slug
-                    ? "2px solid #00c6ff"
-                    : "1px solid #ddd",
-                background:
-                  active === c.slug
-                    ? "linear-gradient(90deg,#eafffb,#e9fff0)"
-                    : "#fff",
-                fontWeight: 700,
-                color: "#0077aa",
-                cursor: "pointer",
-              }}
-            >
-              {c.name}
-            </button>
-          ))}
+          {categories.map((c) => {
+            const activeState = active === c.slug;
+            return (
+              <button
+                key={c.slug}
+                onClick={() => onSelect(c.slug)}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: 999,
+                  border: "1px solid transparent",
+                  background: activeState
+                    ? GRADIENT
+                    : "linear-gradient(#fff,#fff) padding-box, " +
+                      GRADIENT +
+                      " border-box",
+                  fontWeight: 700,
+                  color: activeState ? "#fff" : "#023e8a",
+                  cursor: "pointer",
+                }}
+              >
+                {c.name}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -99,5 +117,4 @@ export default function CategoryDrawer({
       `}</style>
     </div>
   );
-            }
-            
+                  }
