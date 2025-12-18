@@ -10,27 +10,29 @@ export default function InfiniteSlider({ items = [], size = "small" }) {
   // duplicate items for infinite feel
   const loopItems = [...items, ...items];
 
-  /* AUTO SCROLL – very slow */
+  /* AUTO SCROLL – smooth & infinite */
   useEffect(() => {
     const el = rowRef.current;
-    if (!el) return;
+    if (!el || items.length === 0) return;
 
     let rafId;
-    let speed = 0.35; // 👈 slow speed
+    const speed = 0.35;
 
     const step = () => {
+      // allow natural vertical scroll — do NOT block
       el.scrollLeft += speed;
 
-      // reset seamlessly
+      // seamless loop reset
       if (el.scrollLeft >= el.scrollWidth / 2) {
         el.scrollLeft = 0;
       }
+
       rafId = requestAnimationFrame(step);
     };
 
     rafId = requestAnimationFrame(step);
     return () => cancelAnimationFrame(rafId);
-  }, []);
+  }, [items]);
 
   return (
     <div
@@ -40,8 +42,9 @@ export default function InfiniteSlider({ items = [], size = "small" }) {
         display: "flex",
         gap: 12,
         overflowX: "auto",
+        overflowY: "hidden",
         WebkitOverflowScrolling: "touch",
-        touchAction: "pan-x", // ✅ finger swipe
+        touchAction: "pan-y pan-x", // ✅ allow vertical + horizontal
         paddingBottom: 6,
       }}
     >
@@ -56,7 +59,7 @@ export default function InfiniteSlider({ items = [], size = "small" }) {
             style={{
               width: size === "small" ? 140 : 180,
               borderRadius: 14,
-              padding: 2, // thin gradient border
+              padding: 2,
               background:
                 "linear-gradient(180deg,#00c6ff,#00ff99)",
             }}
@@ -111,5 +114,5 @@ export default function InfiniteSlider({ items = [], size = "small" }) {
       ))}
     </div>
   );
-          }
-            
+                }
+      
