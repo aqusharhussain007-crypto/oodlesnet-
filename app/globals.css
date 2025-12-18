@@ -23,12 +23,20 @@ body {
 /* 🔥 PREMIUM SECTION TITLES */
 /* ========================= */
 
-/* existing selector – enhanced safely */
 .section-title {
   font-size: 1.25rem;
   font-weight: 800;
   margin-top: 12px;
   margin-bottom: 6px;
+
+  background: linear-gradient(90deg, #0284c7, #10b981);
+  background-size: 100%;
+  background-repeat: repeat;
+
+  display: inline-block;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
   /* premium gradient text */
   background: linear-gradient(90deg, #0ea5e9, #10b981);
