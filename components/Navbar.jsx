@@ -46,12 +46,18 @@ export default function Navbar() {
         }}
       >
         <Link href="/">
-          <Image src="/logo.png" alt="OodlesNet" width={140} height={32} priority />
+          <Image
+            src="/logo.png"
+            alt="OodlesNet"
+            width={140}
+            height={32}
+            priority
+          />
         </Link>
 
-        {/* MENU BUTTON – darker premium gradient */}
+        {/* MENU BUTTON */}
         <button
-          onClick={() => setOpen(true)}
+          onClick={() => setOpen((v) => !v)}
           style={{
             width: 44,
             height: 44,
@@ -82,15 +88,14 @@ export default function Navbar() {
         />
       )}
 
-      {/* MENU PANEL – WIDTH REDUCED */}
+      {/* MENU PANEL – RIGHT ANCHORED */}
       {open && (
         <div
           style={{
             position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%,-50%)",
-            width: "60%",          // ✅ reduced by ~40%
+            top: 66,              // 👈 below navbar
+            right: 14,            // 👈 aligned with button
+            width: "60%",
             maxWidth: 300,
             padding: 20,
             borderRadius: 20,
@@ -175,5 +180,4 @@ export default function Navbar() {
       )}
     </>
   );
-            }
-                
+}
