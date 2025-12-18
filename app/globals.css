@@ -20,7 +20,7 @@ body {
 }
 
 /* ========================= */
-/* 🔥 PREMIUM SECTION TITLES */
+/* 🔥 SECTION TITLES */
 /* ========================= */
 
 .section-title {
@@ -29,6 +29,7 @@ body {
   margin-top: 12px;
   margin-bottom: 6px;
 
+  /* premium blue → green gradient text */
   background: linear-gradient(90deg, #0284c7, #10b981);
   background-size: 100%;
   background-repeat: repeat;
@@ -36,22 +37,6 @@ body {
   display: inline-block;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-  /* premium gradient text */
-  background: linear-gradient(90deg, #0ea5e9, #10b981);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* OPTIONAL reusable premium heading (no usage required now) */
-.gradient-heading {
-  font-weight: 800;
-  background: linear-gradient(90deg, #0ea5e9, #10b981);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 /* search bar */
@@ -161,3 +146,4 @@ html.dark .search-bar {
 html.dark nav div {
   background: #001a2f !important;
   }
+  
