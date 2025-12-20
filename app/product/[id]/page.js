@@ -15,7 +15,6 @@ import { db } from "@/lib/firebase-app";
 import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
-
 import {
   getTopPrices,
   excludeProductById,
@@ -28,7 +27,6 @@ export default function ProductPage({ params }) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // related products
   const [relatedCategory, setRelatedCategory] = useState([]);
   const [relatedBrand, setRelatedBrand] = useState([]);
   const [relatedPrice, setRelatedPrice] = useState([]);
@@ -66,12 +64,9 @@ export default function ProductPage({ params }) {
         const snap = await getDocs(collection(db, "products"));
         let all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
-        // exclude current product
         all = excludeProductById(all, product.id);
-
         const usedIds = new Set([product.id]);
 
-        // ---- SAME CATEGORY (4)
         const categoryItems = all
           .filter(
             (p) =>
@@ -79,11 +74,9 @@ export default function ProductPage({ params }) {
               !usedIds.has(p.id)
           )
           .slice(0, 4);
-
         categoryItems.forEach((p) => usedIds.add(p.id));
         setRelatedCategory(categoryItems);
 
-        // ---- SAME BRAND (4)
         const brandItems = all
           .filter(
             (p) =>
@@ -91,20 +84,16 @@ export default function ProductPage({ params }) {
               !usedIds.has(p.id)
           )
           .slice(0, 4);
-
         brandItems.forEach((p) => usedIds.add(p.id));
         setRelatedBrand(brandItems);
 
-        // ---- SIMILAR PRICE (4)
         const { lowest } = getTopPrices(product.store);
-
         if (lowest) {
           const priceItems = filterByPriceRange(
             all.filter((p) => !usedIds.has(p.id)),
             lowest.price,
             15
           ).slice(0, 4);
-
           priceItems.forEach((p) => usedIds.add(p.id));
           setRelatedPrice(priceItems);
         }
@@ -117,9 +106,26 @@ export default function ProductPage({ params }) {
   }, [product]);
 
   if (loading) return <div className="p-4">Loading…</div>;
-  if (!product) return <div className="p-4 text-red-600">Product not found</div>;
+  if (!product)
+    return <div className="p-4 text-red-600">Product not found</div>;
 
   const { lowest, second, third } = getTopPrices(product.store);
+
+  /* ---------------- SHARE HANDLER ---------------- */
+  function handleShare() {
+    const shareData = {
+      title: product.name,
+      text: `Compare prices for ${product.name} on OodlesNet`,
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      navigator.share(shareData).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert("Link copied to clipboard");
+    }
+  }
 
   /* ---------------- BUY HANDLER ---------------- */
   async function handleBuy(store) {
@@ -138,8 +144,7 @@ export default function ProductPage({ params }) {
 
   return (
     <div className="p-4 pb-24 max-w-[720px] mx-auto">
-      {/* ---------- EXISTING PRODUCT UI (UNCHANGED) ---------- */}
-
+      {/* Breadcrumb */}
       <div className="text-sm mb-3">
         <Link href="/" className="text-blue-500">Home</Link> /{" "}
         <span className="text-blue-600 font-semibold">
@@ -148,6 +153,7 @@ export default function ProductPage({ params }) {
         / <span className="font-bold">{product.name}</span>
       </div>
 
+      {/* Product Image */}
       <div className="rounded-2xl overflow-hidden shadow-md mb-4 bg-white">
         <Image
           src={product.imageUrl}
@@ -158,12 +164,43 @@ export default function ProductPage({ params }) {
         />
       </div>
 
-      <h1 className="text-2xl font-bold text-blue-700">
-        {product.name}
-      </h1>
+      {/* Title + Share */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+        }}
+      >
+        <h1 className="text-2xl font-bold text-blue-700">
+          {product.name}
+        </h1>
 
-      <p className="mt-3 text-gray-700">{product.description}</p>
+        <button
+          onClick={handleShare}
+          style={{
+            padding: "8px 14px",
+            borderRadius: 999,
+            border: "none",
+            fontWeight: 700,
+            color: "#fff",
+            background:
+              "linear-gradient(135deg,#0f4c81,#10b981)",
+            boxShadow: "0 6px 16px rgba(16,185,129,0.35)",
+            cursor: "pointer",
+          }}
+        >
+          Share
+        </button>
+      </div>
 
+      {/* Description */}
+      <p className="mt-3 text-gray-700">
+        {product.description}
+      </p>
+
+      {/* Compare Prices */}
       <h3 className="mt-6 text-xl font-bold text-blue-600">
         Compare Prices
       </h3>
@@ -176,12 +213,15 @@ export default function ProductPage({ params }) {
               key={index}
               className="min-w-[260px] bg-white p-4 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
             >
-              <div className="text-lg font-bold">{store.name}</div>
+              <div className="text-lg font-bold">
+                {store.name}
+              </div>
 
               <div
                 className="text-xl font-extrabold my-1"
                 style={{
-                  color: index === 0 ? "#16a34a" : "#2563eb",
+                  color:
+                    index === 0 ? "#16a34a" : "#2563eb",
                 }}
               >
                 ₹ {store.price.toLocaleString("en-IN")}
@@ -211,8 +251,7 @@ export default function ProductPage({ params }) {
           ))}
       </div>
 
-      {/* ---------- RELATED PRODUCTS ---------- */}
-
+      {/* RELATED SECTIONS (unchanged, already implemented) */}
       {relatedCategory.length > 0 && (
         <>
           <h3 className="section-title">
@@ -259,5 +298,4 @@ export default function ProductPage({ params }) {
       )}
     </div>
   );
-                 }
-        
+}
