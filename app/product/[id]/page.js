@@ -120,7 +120,7 @@ export default function ProductPage({ params }) {
   }
 
   return (
-    <div className="p-4 pb-24 max-w-[720px] mx-auto">
+    <div className="p-4 pb-24 max-w-[1100px] mx-auto">
       {/* Breadcrumb */}
       <div className="text-sm mb-3">
         <Link href="/" className="text-blue-500">Home</Link> /{" "}
@@ -130,103 +130,126 @@ export default function ProductPage({ params }) {
         / <span className="font-bold">{product.name}</span>
       </div>
 
-      {/* Product Image (balanced height) */}
-      <div className="rounded-2xl overflow-hidden shadow-md mb-3 bg-white">
-        <Image
-          src={product.imageUrl}
-          alt={product.name}
-          width={900}
-          height={520}
-          className="w-full object-cover"
-        />
-      </div>
-
-      {/* Title */}
-      <h1 className="text-2xl font-bold text-blue-700">
-        {product.name}
-      </h1>
-
-      {/* Description (collapsed) */}
-      <div style={{ marginTop: 10 }}>
-        <p
-          className="text-gray-700"
+      {/* ================= MAIN PRODUCT LAYOUT ================= */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 20,
+        }}
+        className="desktop-split"
+      >
+        {/* IMAGE */}
+        <div
           style={{
-            display: "-webkit-box",
-            WebkitLineClamp: expanded ? "unset" : 3,
-            WebkitBoxOrient: "vertical",
+            flex: "0 0 45%",
+            borderRadius: 16,
             overflow: "hidden",
+            background: "#fff",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
           }}
         >
-          {product.description}
-        </p>
+          <Image
+            src={product.imageUrl}
+            alt={product.name}
+            width={900}
+            height={520}
+            className="w-full object-cover"
+          />
+        </div>
 
-        {product.description?.length > 120 && (
-          <button
-            onClick={() => setExpanded((v) => !v)}
-            style={{
-              marginTop: 6,
-              color: "#0bbcff",
-              fontWeight: 700,
-              fontSize: 14,
-              background: "none",
-              border: "none",
-              padding: 0,
-            }}
-          >
-            {expanded ? "Show less" : "Read more"}
-          </button>
-        )}
-      </div>
+        {/* DETAILS */}
+        <div style={{ flex: "1" }}>
+          <h1 className="text-2xl font-bold text-blue-700">
+            {product.name}
+          </h1>
 
-      {/* Compare Prices */}
-      <h3 className="mt-6 text-xl font-bold text-blue-600">
-        Compare Prices
-      </h3>
-
-      <div className="flex gap-4 overflow-x-auto py-4 no-scrollbar">
-        {[lowest, second, third]
-          .filter(Boolean)
-          .map((store, index) => (
-            <div
-              key={index}
-              className="min-w-[260px] bg-white p-5 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
+          {/* Description */}
+          <div style={{ marginTop: 10 }}>
+            <p
+              className="text-gray-700"
+              style={{
+                display: "-webkit-box",
+                WebkitLineClamp: expanded ? "unset" : 3,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }}
             >
-              <div className="text-lg font-bold">{store.name}</div>
+              {product.description}
+            </p>
 
-              <div
-                className="text-2xl font-extrabold my-2"
-                style={{
-                  color: index === 0 ? "#16a34a" : "#2563eb",
-                }}
-              >
-                ₹ {store.price.toLocaleString("en-IN")}
-              </div>
-
-              <div className="text-sm text-gray-600 mb-4">
-                {store.offer}
-              </div>
-
+            {product.description?.length > 120 && (
               <button
-                onClick={() => handleBuy(store)}
-                className="w-full text-white font-bold py-3 rounded-xl shadow-md"
+                onClick={() => setExpanded((v) => !v)}
                 style={{
-                  background:
-                    store.name === "Amazon"
-                      ? "linear-gradient(90deg,#ff9900,#ff6600)"
-                      : store.name === "Meesho"
-                      ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
-                      : store.name === "Ajio"
-                      ? "linear-gradient(90deg,#005bea,#00c6fb)"
-                      : "linear-gradient(90deg,#00c6ff,#00ff99)",
+                  marginTop: 6,
+                  color: "#0bbcff",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  background: "none",
+                  border: "none",
+                  padding: 0,
                 }}
               >
-                Buy on {store.name}
+                {expanded ? "Show less" : "Read more"}
               </button>
-            </div>
-          ))}
+            )}
+          </div>
+
+          {/* Compare Prices */}
+          <h3 className="mt-6 text-xl font-bold text-blue-600">
+            Compare Prices
+          </h3>
+
+          <div className="flex gap-4 overflow-x-auto py-4 no-scrollbar">
+            {[lowest, second, third]
+              .filter(Boolean)
+              .map((store, index) => (
+                <div
+                  key={index}
+                  className="min-w-[260px] bg-white p-5 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
+                >
+                  <div className="text-lg font-bold">
+                    {store.name}
+                  </div>
+
+                  <div
+                    className="text-2xl font-extrabold my-2"
+                    style={{
+                      color:
+                        index === 0 ? "#16a34a" : "#2563eb",
+                    }}
+                  >
+                    ₹ {store.price.toLocaleString("en-IN")}
+                  </div>
+
+                  <div className="text-sm text-gray-600 mb-4">
+                    {store.offer}
+                  </div>
+
+                  <button
+                    onClick={() => handleBuy(store)}
+                    className="w-full text-white font-bold py-3 rounded-xl shadow-md"
+                    style={{
+                      background:
+                        store.name === "Amazon"
+                          ? "linear-gradient(90deg,#ff9900,#ff6600)"
+                          : store.name === "Meesho"
+                          ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
+                          : store.name === "Ajio"
+                          ? "linear-gradient(90deg,#005bea,#00c6fb)"
+                          : "linear-gradient(90deg,#00c6ff,#00ff99)",
+                    }}
+                  >
+                    Buy on {store.name}
+                  </button>
+                </div>
+              ))}
+          </div>
+        </div>
       </div>
 
-      {/* Related Products (unchanged) */}
+      {/* ================= RELATED PRODUCTS ================= */}
       {relatedCategory.length > 0 && (
         <>
           <h3 className="section-title">
@@ -271,7 +294,17 @@ export default function ProductPage({ params }) {
           </div>
         </>
       )}
+
+      {/* Desktop-only split */}
+      <style>{`
+        @media (min-width: 1024px) {
+          .desktop-split {
+            flex-direction: row;
+            align-items: flex-start;
+          }
+        }
+      `}</style>
     </div>
   );
-                          }
+    }
     
