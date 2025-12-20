@@ -4,16 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function ProductCard({ product }) {
-  // extract & sort prices safely
-  const prices =
-    product.store?.map((s) => Number(s.price)).filter(Boolean) || [];
-
+  const prices = product.store?.map((s) => Number(s.price)) || [];
   const sorted = [...prices].sort((a, b) => a - b);
+
   const lowest = sorted[0];
   const second = sorted[1];
   const third = sorted[2];
 
-  // save to Recently Viewed
   function saveRecent() {
     if (typeof window === "undefined") return;
 
@@ -39,63 +36,56 @@ export default function ProductCard({ product }) {
     >
       <div
         style={{
-          display: "flex",
-          gap: 14,
           borderRadius: 18,
-          padding: 12,
+          padding: 14,
           background: "#ecfffb",
           border: "1px solid #6ee7d8",
-          alignItems: "stretch",
+          display: "flex",
+          gap: 14,
+          alignItems: "center",
         }}
       >
-        {/* LEFT: IMAGE */}
+        {/* IMAGE – HEIGHT INCREASED */}
         <div
           style={{
-            width: 120,
-            minWidth: 120,
-            height: 120,
+            width: 140,
+            height: 170,              // ✅ increased
             position: "relative",
             borderRadius: 14,
             overflow: "hidden",
             background: "#f3f4f6",
+            flexShrink: 0,
           }}
         >
           <Image
             src={product.imageUrl || "/placeholder.png"}
             alt={product.name}
             fill
-            sizes="120px"
+            sizes="140px"
             style={{ objectFit: "cover" }}
           />
         </div>
 
-        {/* RIGHT: DETAILS */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          {/* NAME */}
+        {/* DETAILS */}
+        <div style={{ flex: 1 }}>
           <h3
             style={{
               color: "#0077aa",
-              fontWeight: 700,
+              fontWeight: 800,
               fontSize: "1rem",
-              lineHeight: 1.3,
               marginBottom: 6,
             }}
           >
             {product.name}
           </h3>
 
-          {/* DESCRIPTION (short) */}
           {product.description && (
             <div
               style={{
                 fontSize: "0.85rem",
-                color: "#334155",
-                lineHeight: 1.4,
+                color: "#555",
                 marginBottom: 8,
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-                overflow: "hidden",
+                lineHeight: 1.3,
               }}
             >
               {product.description}
@@ -103,57 +93,31 @@ export default function ProductCard({ product }) {
           )}
 
           {/* PRICES */}
-          <div
-            style={{
-              display: "flex",
-              gap: 14,
-              marginTop: "auto",
-              alignItems: "center",
-              flexWrap: "wrap",
-            }}
-          >
-            {lowest !== undefined && (
-              <span style={{ color: "#16a34a", fontWeight: 800 }}>
+          <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+            {lowest && (
+              <div style={{ color: "#16a34a", fontWeight: 800 }}>
                 ₹{lowest.toLocaleString("en-IN")}
-              </span>
+                <div style={{ fontSize: 12 }}>Lowest</div>
+              </div>
             )}
 
-            {second !== undefined && (
-              <span style={{ color: "#2563eb", fontWeight: 700 }}>
+            {second && (
+              <div style={{ color: "#2563eb", fontWeight: 700 }}>
                 ₹{second.toLocaleString("en-IN")}
-              </span>
+                <div style={{ fontSize: 12 }}>2nd</div>
+              </div>
             )}
 
-            {third !== undefined && (
-              <span style={{ color: "#2563eb", fontWeight: 700 }}>
+            {third && (
+              <div style={{ color: "#2563eb", fontWeight: 700 }}>
                 ₹{third.toLocaleString("en-IN")}
-              </span>
-            )}
-          </div>
-
-          {/* LABELS */}
-          <div
-            style={{
-              display: "flex",
-              gap: 14,
-              marginTop: 4,
-              fontSize: 11,
-              fontWeight: 700,
-            }}
-          >
-            {lowest !== undefined && (
-              <span style={{ color: "#16a34a" }}>Lowest</span>
-            )}
-            {second !== undefined && (
-              <span style={{ color: "#2563eb" }}>2nd</span>
-            )}
-            {third !== undefined && (
-              <span style={{ color: "#2563eb" }}>3rd</span>
+                <div style={{ fontSize: 12 }}>3rd</div>
+              </div>
             )}
           </div>
         </div>
       </div>
     </Link>
   );
-            }
-          
+        }
+                           
