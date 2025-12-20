@@ -16,7 +16,6 @@ import Image from "next/image";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import {
-  getTopPrices,
   excludeProductById,
   filterByPriceRange,
 } from "@/lib/productUtils";
@@ -84,11 +83,14 @@ export default function ProductPage({ params }) {
       brandItems.forEach((p) => usedIds.add(p.id));
       setRelatedBrand(brandItems);
 
-      const { lowest } = getTopPrices(product.store);
-      if (lowest) {
+      // similar price (±15%)
+      const prices = product.store?.map((s) => s.price) || [];
+      const base = Math.min(...prices);
+
+      if (base) {
         const priceItems = filterByPriceRange(
           all.filter((p) => !usedIds.has(p.id)),
-          lowest.price,
+          base,
           15
         ).slice(0, 4);
         setRelatedPrice(priceItems);
@@ -102,9 +104,23 @@ export default function ProductPage({ params }) {
   if (!product)
     return <div className="p-4 text-red-600">Product not found</div>;
 
-  const { lowest, second, third } = getTopPrices(product.store);
+  /* ---------------- SHARE ---------------- */
+  function handleShare() {
+    const data = {
+      title: product.name,
+      text: `Compare prices for ${product.name} on OodlesNet`,
+      url: window.location.href,
+    };
 
-  /* ---------------- BUY HANDLER ---------------- */
+    if (navigator.share) {
+      navigator.share(data).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert("Link copied");
+    }
+  }
+
+  /* ---------------- BUY ---------------- */
   async function handleBuy(store) {
     try {
       await addDoc(collection(db, "clicks"), {
@@ -115,7 +131,6 @@ export default function ProductPage({ params }) {
     } catch (e) {
       console.error("Click tracking failed:", e);
     }
-
     window.location.href = store.url;
   }
 
@@ -130,23 +145,19 @@ export default function ProductPage({ params }) {
         / <span className="font-bold">{product.name}</span>
       </div>
 
-      {/* ================= MAIN PRODUCT LAYOUT ================= */}
+      {/* MAIN LAYOUT */}
       <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 20,
-        }}
         className="desktop-split"
+        style={{ display: "flex", flexDirection: "column", gap: 22 }}
       >
         {/* IMAGE */}
         <div
           style={{
             flex: "0 0 45%",
-            borderRadius: 16,
+            borderRadius: 18,
             overflow: "hidden",
             background: "#fff",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.08)",
+            boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
           }}
         >
           <Image
@@ -159,13 +170,40 @@ export default function ProductPage({ params }) {
         </div>
 
         {/* DETAILS */}
-        <div style={{ flex: "1" }}>
-          <h1 className="text-2xl font-bold text-blue-700">
-            {product.name}
-          </h1>
+        <div style={{ flex: 1 }}>
+          {/* TITLE + SHARE */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 12,
+            }}
+          >
+            <h1 className="text-2xl font-bold text-blue-700">
+              {product.name}
+            </h1>
 
-          {/* Description */}
-          <div style={{ marginTop: 10 }}>
+            <button
+              onClick={handleShare}
+              style={{
+                padding: "8px 16px",
+                borderRadius: 999,
+                border: "none",
+                fontWeight: 800,
+                color: "#fff",
+                background:
+                  "linear-gradient(135deg,#0f4c81,#10b981)",
+                boxShadow:
+                  "0 8px 18px rgba(16,185,129,0.45)",
+              }}
+            >
+              Share
+            </button>
+          </div>
+
+          {/* DESCRIPTION */}
+          <div style={{ marginTop: 12 }}>
             <p
               className="text-gray-700"
               style={{
@@ -185,7 +223,6 @@ export default function ProductPage({ params }) {
                   marginTop: 6,
                   color: "#0bbcff",
                   fontWeight: 700,
-                  fontSize: 14,
                   background: "none",
                   border: "none",
                   padding: 0,
@@ -196,60 +233,65 @@ export default function ProductPage({ params }) {
             )}
           </div>
 
-          {/* Compare Prices */}
+          {/* ALL STORE PRICES */}
           <h3 className="mt-6 text-xl font-bold text-blue-600">
             Compare Prices
           </h3>
 
           <div className="flex gap-4 overflow-x-auto py-4 no-scrollbar">
-            {[lowest, second, third]
-              .filter(Boolean)
-              .map((store, index) => (
-                <div
-                  key={index}
-                  className="min-w-[260px] bg-white p-5 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
-                >
-                  <div className="text-lg font-bold">
-                    {store.name}
-                  </div>
-
-                  <div
-                    className="text-2xl font-extrabold my-2"
-                    style={{
-                      color:
-                        index === 0 ? "#16a34a" : "#2563eb",
-                    }}
-                  >
-                    ₹ {store.price.toLocaleString("en-IN")}
-                  </div>
-
-                  <div className="text-sm text-gray-600 mb-4">
-                    {store.offer}
-                  </div>
-
-                  <button
-                    onClick={() => handleBuy(store)}
-                    className="w-full text-white font-bold py-3 rounded-xl shadow-md"
-                    style={{
-                      background:
-                        store.name === "Amazon"
-                          ? "linear-gradient(90deg,#ff9900,#ff6600)"
-                          : store.name === "Meesho"
-                          ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
-                          : store.name === "Ajio"
-                          ? "linear-gradient(90deg,#005bea,#00c6fb)"
-                          : "linear-gradient(90deg,#00c6ff,#00ff99)",
-                    }}
-                  >
-                    Buy on {store.name}
-                  </button>
+            {(product.store || []).map((store, index) => (
+              <div
+                key={index}
+                className="min-w-[260px] bg-white p-5 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
+              >
+                <div className="text-lg font-bold">
+                  {store.name}
                 </div>
-              ))}
+
+                <div
+                  className="text-2xl font-extrabold my-2"
+                  style={{
+                    color:
+                      store.price ===
+                      Math.min(
+                        ...(product.store || []).map(
+                          (s) => s.price
+                        )
+                      )
+                        ? "#16a34a"
+                        : "#2563eb",
+                  }}
+                >
+                  ₹ {store.price.toLocaleString("en-IN")}
+                </div>
+
+                <div className="text-sm text-gray-600 mb-4">
+                  {store.offer}
+                </div>
+
+                <button
+                  onClick={() => handleBuy(store)}
+                  className="w-full text-white font-bold py-3 rounded-xl shadow-md"
+                  style={{
+                    background:
+                      store.name === "Amazon"
+                        ? "linear-gradient(90deg,#ff9900,#ff6600)"
+                        : store.name === "Meesho"
+                        ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
+                        : store.name === "Ajio"
+                        ? "linear-gradient(90deg,#005bea,#00c6fb)"
+                        : "linear-gradient(90deg,#00c6ff,#00ff99)",
+                  }}
+                >
+                  Buy on {store.name}
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* ================= RELATED PRODUCTS ================= */}
+      {/* RELATED PRODUCTS (unchanged) */}
       {relatedCategory.length > 0 && (
         <>
           <h3 className="section-title">
@@ -295,7 +337,6 @@ export default function ProductPage({ params }) {
         </>
       )}
 
-      {/* Desktop-only split */}
       <style>{`
         @media (min-width: 1024px) {
           .desktop-split {
@@ -306,5 +347,5 @@ export default function ProductPage({ params }) {
       `}</style>
     </div>
   );
-    }
-    
+        }
+      
