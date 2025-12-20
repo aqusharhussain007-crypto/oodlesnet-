@@ -14,6 +14,9 @@ import { db } from "@/lib/firebase-app";
 import Image from "next/image";
 import Link from "next/link";
 
+// ✅ NEW: helper import
+import { getTopPrices } from "@/lib/productUtils";
+
 export default function ProductPage({ params }) {
   const { id } = params;
 
@@ -51,11 +54,8 @@ export default function ProductPage({ params }) {
 
   const stores = product.store || [];
 
-  // ✅ SORT PRICES (LOWEST → THIRD)
-  const sortedStores = [...stores]
-    .filter((s) => s && typeof s.price === "number")
-    .sort((a, b) => a.price - b.price)
-    .slice(0, 3);
+  // ✅ PRICE LOGIC VIA HELPER (ONLY CHANGE)
+  const { lowest, second, third } = getTopPrices(stores);
 
   // ---------------- BUY HANDLER (TRACK + REDIRECT) ----------------
   async function handleBuy(store) {
@@ -103,7 +103,9 @@ export default function ProductPage({ params }) {
       </h1>
 
       {/* Description */}
-      <p className="mt-3 text-gray-700">{product.description}</p>
+      <p className="mt-3 text-gray-700">
+        {product.description}
+      </p>
 
       {/* Compare Prices */}
       <h3 className="mt-6 text-xl font-bold text-blue-600">
@@ -111,68 +113,68 @@ export default function ProductPage({ params }) {
       </h3>
 
       <div className="flex gap-4 overflow-x-auto py-4 no-scrollbar">
-        {sortedStores.map((store, index) => (
-          <div
-            key={index}
-            className="min-w-[260px] bg-white p-4 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
-          >
-            <div className="text-lg font-bold">
-              {store.name}
-            </div>
-
-            {/* PRICE WITH COLOR LOGIC */}
+        {[lowest, second, third]
+          .filter(Boolean)
+          .map((store, index) => (
             <div
-              className="text-xl font-extrabold my-1"
-              style={{
-                color:
-                  index === 0
-                    ? "#16a34a" // lowest
-                    : "#2563eb", // others
-              }}
+              key={index}
+              className="min-w-[260px] bg-white p-4 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
             >
-              ₹ {Number(store.price).toLocaleString("en-IN")}
-            </div>
+              <div className="text-lg font-bold">
+                {store.name}
+              </div>
 
-            {/* LABEL */}
-            <div
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                color: index === 0 ? "#16a34a" : "#2563eb",
-                marginBottom: 6,
-              }}
-            >
-              {index === 0
-                ? "Lowest price"
-                : index === 1
-                ? "2nd lowest"
-                : "3rd lowest"}
-            </div>
+              <div
+                className="text-xl font-extrabold my-1"
+                style={{
+                  color:
+                    index === 0
+                      ? "#16a34a" // lowest
+                      : "#2563eb", // 2nd / 3rd
+                }}
+              >
+                ₹ {Number(store.price).toLocaleString("en-IN")}
+              </div>
 
-            <div className="text-sm text-gray-600 mb-3">
-              {store.offer}
-            </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: index === 0 ? "#16a34a" : "#2563eb",
+                  marginBottom: 6,
+                }}
+              >
+                {index === 0
+                  ? "Lowest price"
+                  : index === 1
+                  ? "2nd lowest"
+                  : "3rd lowest"}
+              </div>
 
-            <button
-              onClick={() => handleBuy(store)}
-              className="w-full text-white font-bold py-3 rounded-xl shadow-md"
-              style={{
-                background:
-                  store.name === "Amazon"
-                    ? "linear-gradient(90deg,#ff9900,#ff6600)"
-                    : store.name === "Meesho"
-                    ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
-                    : store.name === "Ajio"
-                    ? "linear-gradient(90deg,#005bea,#00c6fb)"
-                    : "linear-gradient(90deg,#00c6ff,#00ff99)",
-              }}
-            >
-              Buy on {store.name}
-            </button>
-          </div>
-        ))}
+              <div className="text-sm text-gray-600 mb-3">
+                {store.offer}
+              </div>
+
+              <button
+                onClick={() => handleBuy(store)}
+                className="w-full text-white font-bold py-3 rounded-xl shadow-md"
+                style={{
+                  background:
+                    store.name === "Amazon"
+                      ? "linear-gradient(90deg,#ff9900,#ff6600)"
+                      : store.name === "Meesho"
+                      ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
+                      : store.name === "Ajio"
+                      ? "linear-gradient(90deg,#005bea,#00c6fb)"
+                      : "linear-gradient(90deg,#00c6ff,#00ff99)",
+                }}
+              >
+                Buy on {store.name}
+              </button>
+            </div>
+          ))}
       </div>
     </div>
   );
-      }
-          
+    }
+    
