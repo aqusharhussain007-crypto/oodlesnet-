@@ -4,10 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function ProductCard({ product }) {
-  const prices = product.store?.map((s) => Number(s.price)) || [];
-  const lowest = Math.min(...prices);
-  const highest = Math.max(...prices);
-  const medium = prices[Math.floor(prices.length / 2)] || lowest;
+  // extract & sort prices safely
+  const prices =
+    product.store?.map((s) => Number(s.price)).filter(Boolean) || [];
+
+  const sorted = [...prices].sort((a, b) => a - b);
+
+  const lowest = sorted[0];
+  const second = sorted[1];
+  const third = sorted[2];
 
   // ✅ ADD: save to Recently Viewed
   function saveRecent() {
@@ -35,7 +40,7 @@ export default function ProductCard({ product }) {
   return (
     <Link
       href={`/product/${product.id}`}
-      onClick={saveRecent}   // ✅ IMPORTANT
+      onClick={saveRecent}
       style={{ textDecoration: "none" }}
     >
       <div
@@ -46,7 +51,7 @@ export default function ProductCard({ product }) {
           border: "1px solid #6ee7d8",
         }}
       >
-        {/* ⭐ FIXED IMAGE WRAPPER */}
+        {/* IMAGE */}
         <div
           style={{
             width: "100%",
@@ -76,20 +81,26 @@ export default function ProductCard({ product }) {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            marginTop: 4,
+            marginTop: 6,
           }}
         >
-          <span style={{ color: "#16a34a", fontWeight: 700 }}>
-            ₹{lowest.toLocaleString("en-IN")}
-          </span>
+          {lowest !== undefined && (
+            <span style={{ color: "#16a34a", fontWeight: 700 }}>
+              ₹{lowest.toLocaleString("en-IN")}
+            </span>
+          )}
 
-          <span style={{ color: "#2563eb", fontWeight: 700 }}>
-            ₹{medium.toLocaleString("en-IN")}
-          </span>
+          {second !== undefined && (
+            <span style={{ color: "#2563eb", fontWeight: 700 }}>
+              ₹{second.toLocaleString("en-IN")}
+            </span>
+          )}
 
-          <span style={{ color: "#dc2626", fontWeight: 700 }}>
-            ₹{highest.toLocaleString("en-IN")}
-          </span>
+          {third !== undefined && (
+            <span style={{ color: "#2563eb", fontWeight: 700 }}>
+              ₹{third.toLocaleString("en-IN")}
+            </span>
+          )}
         </div>
 
         {/* LABELS */}
@@ -98,14 +109,21 @@ export default function ProductCard({ product }) {
             display: "flex",
             justifyContent: "space-between",
             marginTop: 6,
+            fontSize: 12,
+            fontWeight: 700,
           }}
         >
-          <span className="pill green">Lowest</span>
-          <span className="pill blue">Medium</span>
-          <span className="pill red">Highest</span>
+          {lowest !== undefined && (
+            <span className="pill green">Lowest</span>
+          )}
+          {second !== undefined && (
+            <span className="pill blue">2nd</span>
+          )}
+          {third !== undefined && (
+            <span className="pill blue">3rd</span>
+          )}
         </div>
       </div>
     </Link>
   );
-          }
-              
+}
