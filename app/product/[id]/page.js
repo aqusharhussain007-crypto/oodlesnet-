@@ -31,6 +31,8 @@ export default function ProductPage({ params }) {
   const [relatedBrand, setRelatedBrand] = useState([]);
   const [relatedPrice, setRelatedPrice] = useState([]);
 
+  const [expanded, setExpanded] = useState(false);
+
   /* ---------------- LOAD PRODUCT ---------------- */
   useEffect(() => {
     async function loadProduct() {
@@ -40,15 +42,11 @@ export default function ProductPage({ params }) {
 
         if (snap.exists()) {
           setProduct({ id: snap.id, ...snap.data() });
-
-          await updateDoc(ref, {
-            views: increment(1),
-          });
+          await updateDoc(ref, { views: increment(1) });
         }
       } catch (e) {
         console.error("Product load error:", e);
       }
-
       setLoading(false);
     }
 
@@ -60,45 +58,40 @@ export default function ProductPage({ params }) {
     if (!product) return;
 
     async function loadRelated() {
-      try {
-        const snap = await getDocs(collection(db, "products"));
-        let all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const snap = await getDocs(collection(db, "products"));
+      let all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      all = excludeProductById(all, product.id);
 
-        all = excludeProductById(all, product.id);
-        const usedIds = new Set([product.id]);
+      const usedIds = new Set([product.id]);
 
-        const categoryItems = all
-          .filter(
-            (p) =>
-              p.categorySlug === product.categorySlug &&
-              !usedIds.has(p.id)
-          )
-          .slice(0, 4);
-        categoryItems.forEach((p) => usedIds.add(p.id));
-        setRelatedCategory(categoryItems);
+      const categoryItems = all
+        .filter(
+          (p) =>
+            p.categorySlug === product.categorySlug &&
+            !usedIds.has(p.id)
+        )
+        .slice(0, 4);
+      categoryItems.forEach((p) => usedIds.add(p.id));
+      setRelatedCategory(categoryItems);
 
-        const brandItems = all
-          .filter(
-            (p) =>
-              p.brand === product.brand &&
-              !usedIds.has(p.id)
-          )
-          .slice(0, 4);
-        brandItems.forEach((p) => usedIds.add(p.id));
-        setRelatedBrand(brandItems);
+      const brandItems = all
+        .filter(
+          (p) =>
+            p.brand === product.brand &&
+            !usedIds.has(p.id)
+        )
+        .slice(0, 4);
+      brandItems.forEach((p) => usedIds.add(p.id));
+      setRelatedBrand(brandItems);
 
-        const { lowest } = getTopPrices(product.store);
-        if (lowest) {
-          const priceItems = filterByPriceRange(
-            all.filter((p) => !usedIds.has(p.id)),
-            lowest.price,
-            15
-          ).slice(0, 4);
-          priceItems.forEach((p) => usedIds.add(p.id));
-          setRelatedPrice(priceItems);
-        }
-      } catch (e) {
-        console.error("Related products load error:", e);
+      const { lowest } = getTopPrices(product.store);
+      if (lowest) {
+        const priceItems = filterByPriceRange(
+          all.filter((p) => !usedIds.has(p.id)),
+          lowest.price,
+          15
+        ).slice(0, 4);
+        setRelatedPrice(priceItems);
       }
     }
 
@@ -110,22 +103,6 @@ export default function ProductPage({ params }) {
     return <div className="p-4 text-red-600">Product not found</div>;
 
   const { lowest, second, third } = getTopPrices(product.store);
-
-  /* ---------------- SHARE HANDLER ---------------- */
-  function handleShare() {
-    const shareData = {
-      title: product.name,
-      text: `Compare prices for ${product.name} on OodlesNet`,
-      url: window.location.href,
-    };
-
-    if (navigator.share) {
-      navigator.share(shareData).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert("Link copied to clipboard");
-    }
-  }
 
   /* ---------------- BUY HANDLER ---------------- */
   async function handleBuy(store) {
@@ -153,52 +130,53 @@ export default function ProductPage({ params }) {
         / <span className="font-bold">{product.name}</span>
       </div>
 
-      {/* Product Image */}
-      <div className="rounded-2xl overflow-hidden shadow-md mb-4 bg-white">
+      {/* Product Image (balanced height) */}
+      <div className="rounded-2xl overflow-hidden shadow-md mb-3 bg-white">
         <Image
           src={product.imageUrl}
           alt={product.name}
           width={900}
-          height={600}
+          height={520}
           className="w-full object-cover"
         />
       </div>
 
-      {/* Title + Share */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 12,
-        }}
-      >
-        <h1 className="text-2xl font-bold text-blue-700">
-          {product.name}
-        </h1>
+      {/* Title */}
+      <h1 className="text-2xl font-bold text-blue-700">
+        {product.name}
+      </h1>
 
-        <button
-          onClick={handleShare}
+      {/* Description (collapsed) */}
+      <div style={{ marginTop: 10 }}>
+        <p
+          className="text-gray-700"
           style={{
-            padding: "8px 14px",
-            borderRadius: 999,
-            border: "none",
-            fontWeight: 700,
-            color: "#fff",
-            background:
-              "linear-gradient(135deg,#0f4c81,#10b981)",
-            boxShadow: "0 6px 16px rgba(16,185,129,0.35)",
-            cursor: "pointer",
+            display: "-webkit-box",
+            WebkitLineClamp: expanded ? "unset" : 3,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
           }}
         >
-          Share
-        </button>
-      </div>
+          {product.description}
+        </p>
 
-      {/* Description */}
-      <p className="mt-3 text-gray-700">
-        {product.description}
-      </p>
+        {product.description?.length > 120 && (
+          <button
+            onClick={() => setExpanded((v) => !v)}
+            style={{
+              marginTop: 6,
+              color: "#0bbcff",
+              fontWeight: 700,
+              fontSize: 14,
+              background: "none",
+              border: "none",
+              padding: 0,
+            }}
+          >
+            {expanded ? "Show less" : "Read more"}
+          </button>
+        )}
+      </div>
 
       {/* Compare Prices */}
       <h3 className="mt-6 text-xl font-bold text-blue-600">
@@ -211,23 +189,20 @@ export default function ProductPage({ params }) {
           .map((store, index) => (
             <div
               key={index}
-              className="min-w-[260px] bg-white p-4 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
+              className="min-w-[260px] bg-white p-5 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
             >
-              <div className="text-lg font-bold">
-                {store.name}
-              </div>
+              <div className="text-lg font-bold">{store.name}</div>
 
               <div
-                className="text-xl font-extrabold my-1"
+                className="text-2xl font-extrabold my-2"
                 style={{
-                  color:
-                    index === 0 ? "#16a34a" : "#2563eb",
+                  color: index === 0 ? "#16a34a" : "#2563eb",
                 }}
               >
                 ₹ {store.price.toLocaleString("en-IN")}
               </div>
 
-              <div className="text-sm text-gray-600 mb-3">
+              <div className="text-sm text-gray-600 mb-4">
                 {store.offer}
               </div>
 
@@ -251,7 +226,7 @@ export default function ProductPage({ params }) {
           ))}
       </div>
 
-      {/* RELATED SECTIONS (unchanged, already implemented) */}
+      {/* Related Products (unchanged) */}
       {relatedCategory.length > 0 && (
         <>
           <h3 className="section-title">
@@ -298,4 +273,5 @@ export default function ProductPage({ params }) {
       )}
     </div>
   );
-}
+                          }
+    
