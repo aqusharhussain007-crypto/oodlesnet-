@@ -4,6 +4,23 @@ const nextConfig = {
 
   images: {
     remotePatterns: [
+      // Amazon CDN
+      {
+        protocol: "https",
+        hostname: "m.media-amazon.com",
+      },
+
+      // Meesho / Ajio / Flipkart / generic CDNs
+      {
+        protocol: "https",
+        hostname: "*.amazonaws.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.cloudfront.net",
+      },
+
+      // Stock image providers (already used)
       {
         protocol: "https",
         hostname: "images.pexels.com",
@@ -12,9 +29,11 @@ const nextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+
+      // Any future CDN you may add
       {
         protocol: "https",
-        hostname: "**",
+        hostname: "*.googleusercontent.com",
       },
     ],
   },
