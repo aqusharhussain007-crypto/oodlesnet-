@@ -103,7 +103,6 @@ export default function ProductPage({ params }) {
   if (!product)
     return <div className="p-4 text-red-600">Product not found</div>;
 
-  /* ---------------- SHARE ---------------- */
   function handleShare() {
     const data = {
       title: product.name,
@@ -119,7 +118,6 @@ export default function ProductPage({ params }) {
     }
   }
 
-  /* ---------------- BUY ---------------- */
   async function handleBuy(store) {
     try {
       await addDoc(collection(db, "clicks"), {
@@ -134,12 +132,7 @@ export default function ProductPage({ params }) {
   }
 
   return (
-    <div
-  className="p-4 pb-24 max-w-[1100px] mx-auto"
-  style={{
-    paddingTop: "calc(env(safe-area-inset-top, 0px) + 12px)",
-  }}
->
+    <div className="p-4 pb-24 max-w-[1100px] mx-auto">
       {/* Breadcrumb */}
       <div className="text-sm mb-3">
         <Link href="/" className="text-blue-500">Home</Link> /{" "}
@@ -149,12 +142,11 @@ export default function ProductPage({ params }) {
         / <span className="font-bold">{product.name}</span>
       </div>
 
-      {/* MAIN LAYOUT */}
       <div
         className="desktop-split"
         style={{ display: "flex", flexDirection: "column", gap: 22 }}
       >
-        {/* IMAGE */}
+        {/* ✅ FIXED IMAGE CONTAINER */}
         <div
           style={{
             flex: "0 0 45%",
@@ -162,20 +154,23 @@ export default function ProductPage({ params }) {
             overflow: "hidden",
             background: "#fff",
             boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
+            position: "relative",
+            width: "100%",
+            aspectRatio: "16 / 9",
           }}
         >
           <Image
             src={product.imageUrl}
             alt={product.name}
-            width={900}
-            height={520}
-            className="w-full object-contain"
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            style={{ objectFit: "contain" }}
+            priority
           />
         </div>
 
         {/* DETAILS */}
         <div style={{ flex: 1 }}>
-          {/* TITLE + SHARE */}
           <div
             style={{
               display: "flex",
@@ -206,7 +201,6 @@ export default function ProductPage({ params }) {
             </button>
           </div>
 
-          {/* DESCRIPTION */}
           <div style={{ marginTop: 12 }}>
             <p
               className="text-gray-700"
@@ -237,7 +231,6 @@ export default function ProductPage({ params }) {
             )}
           </div>
 
-          {/* ALL STORE PRICES */}
           <h3 className="mt-6 text-xl font-bold text-blue-600">
             Compare Prices
           </h3>
@@ -255,11 +248,7 @@ export default function ProductPage({ params }) {
                   style={{
                     color:
                       store.price ===
-                      Math.min(
-                        ...(product.store || []).map(
-                          (s) => s.price
-                        )
-                      )
+                      Math.min(...product.store.map((s) => s.price))
                         ? "#16a34a"
                         : "#2563eb",
                   }}
@@ -293,52 +282,6 @@ export default function ProductPage({ params }) {
         </div>
       </div>
 
-      {/* RELATED PRODUCTS (unchanged) */}
-      {relatedCategory.length > 0 && (
-        <>
-          <h3 className="section-title">
-            More in {product.categorySlug}
-          </h3>
-          <div className="slider-row">
-            <div className="flex gap-4 overflow-x-auto no-scrollbar">
-              {relatedCategory.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
-      {relatedBrand.length > 0 && (
-        <>
-          <h3 className="section-title">
-            More from {product.brand}
-          </h3>
-          <div className="slider-row">
-            <div className="flex gap-4 overflow-x-auto no-scrollbar">
-              {relatedBrand.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
-      {relatedPrice.length > 0 && (
-        <>
-          <h3 className="section-title">
-            Similar Price Range
-          </h3>
-          <div className="slider-row">
-            <div className="flex gap-4 overflow-x-auto no-scrollbar">
-              {relatedPrice.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
       <style>{`
         @media (min-width: 1024px) {
           .desktop-split {
@@ -349,4 +292,5 @@ export default function ProductPage({ params }) {
       `}</style>
     </div>
   );
-      }
+    }
+        
