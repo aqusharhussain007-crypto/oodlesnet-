@@ -52,7 +52,7 @@ export default function ProductPage({ params }) {
     loadProduct();
   }, [id]);
 
-  /* ---------------- LOAD RELATED ---------------- */
+  /* ---------------- LOAD RELATED PRODUCTS ---------------- */
   useEffect(() => {
     if (!product) return;
 
@@ -75,12 +75,15 @@ export default function ProductPage({ params }) {
 
       const brandItems = all
         .filter(
-          (p) => p.brand === product.brand && !usedIds.has(p.id)
+          (p) =>
+            p.brand === product.brand &&
+            !usedIds.has(p.id)
         )
         .slice(0, 4);
       brandItems.forEach((p) => usedIds.add(p.id));
       setRelatedBrand(brandItems);
 
+      // similar price (±15%)
       const prices = product.store?.map((s) => s.price) || [];
       const base = Math.min(...prices);
 
@@ -101,13 +104,6 @@ export default function ProductPage({ params }) {
   if (!product)
     return <div className="p-4 text-red-600">Product not found</div>;
 
-  /* ---------------- IMAGE SAFE FALLBACK ---------------- */
-  const imageSrc =
-    product.imageUrl ||
-    product.image ||
-    product.images?.[0] ||
-    "/placeholder.png";
-
   /* ---------------- SHARE ---------------- */
   function handleShare() {
     const data = {
@@ -124,6 +120,7 @@ export default function ProductPage({ params }) {
     }
   }
 
+  /* ---------------- BUY ---------------- */
   async function handleBuy(store) {
     try {
       await addDoc(collection(db, "clicks"), {
@@ -149,33 +146,56 @@ export default function ProductPage({ params }) {
       </div>
 
       {/* MAIN LAYOUT */}
-      <div className="desktop-split flex flex-col lg:flex-row gap-6">
+      <div
+        className="desktop-split"
+        style={{ display: "flex", flexDirection: "column", gap: 22 }}
+      >
         {/* IMAGE */}
-        <div className="lg:w-[45%] bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div
+          style={{
+            flex: "0 0 45%",
+            borderRadius: 18,
+            overflow: "hidden",
+            background: "#fff",
+            boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
+          }}
+        >
           <Image
-            src={imageSrc}
+            src={product.imageUrl}
             alt={product.name}
             width={900}
             height={520}
-            className="w-full h-auto object-contain"
-            priority
+            className="w-full object-cover"
           />
         </div>
 
         {/* DETAILS */}
-        <div className="flex-1">
+        <div style={{ flex: 1 }}>
           {/* TITLE + SHARE */}
-          <div className="flex justify-between items-center gap-3">
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 12,
+            }}
+          >
             <h1 className="text-2xl font-bold text-blue-700">
               {product.name}
             </h1>
 
             <button
               onClick={handleShare}
-              className="px-5 py-2 rounded-full font-bold text-white shadow-lg"
               style={{
+                padding: "8px 16px",
+                borderRadius: 999,
+                border: "none",
+                fontWeight: 800,
+                color: "#fff",
                 background:
                   "linear-gradient(135deg,#0f4c81,#10b981)",
+                boxShadow:
+                  "0 8px 18px rgba(16,185,129,0.45)",
               }}
             >
               Share
@@ -183,7 +203,7 @@ export default function ProductPage({ params }) {
           </div>
 
           {/* DESCRIPTION */}
-          <div className="mt-3">
+          <div style={{ marginTop: 12 }}>
             <p
               className="text-gray-700"
               style={{
@@ -199,14 +219,21 @@ export default function ProductPage({ params }) {
             {product.description?.length > 120 && (
               <button
                 onClick={() => setExpanded((v) => !v)}
-                className="mt-2 text-blue-500 font-semibold"
+                style={{
+                  marginTop: 6,
+                  color: "#0bbcff",
+                  fontWeight: 700,
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                }}
               >
                 {expanded ? "Show less" : "Read more"}
               </button>
             )}
           </div>
 
-          {/* STORES */}
+          {/* ALL STORE PRICES */}
           <h3 className="mt-6 text-xl font-bold text-blue-600">
             Compare Prices
           </h3>
@@ -215,16 +242,22 @@ export default function ProductPage({ params }) {
             {(product.store || []).map((store, index) => (
               <div
                 key={index}
-                className="min-w-[260px] bg-white p-5 rounded-2xl shadow-md border"
+                className="min-w-[260px] bg-white p-5 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
               >
-                <div className="text-lg font-bold">{store.name}</div>
+                <div className="text-lg font-bold">
+                  {store.name}
+                </div>
 
                 <div
                   className="text-2xl font-extrabold my-2"
                   style={{
                     color:
                       store.price ===
-                      Math.min(...product.store.map((s) => s.price))
+                      Math.min(
+                        ...(product.store || []).map(
+                          (s) => s.price
+                        )
+                      )
                         ? "#16a34a"
                         : "#2563eb",
                   }}
@@ -258,46 +291,61 @@ export default function ProductPage({ params }) {
         </div>
       </div>
 
-      {/* RELATED PRODUCTS */}
+      {/* RELATED PRODUCTS (unchanged) */}
       {relatedCategory.length > 0 && (
         <>
-          <h3 className="section-title mt-10">
+          <h3 className="section-title">
             More in {product.categorySlug}
           </h3>
-          <div className="flex gap-4 overflow-x-auto no-scrollbar">
-            {relatedCategory.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
+          <div className="slider-row">
+            <div className="flex gap-4 overflow-x-auto no-scrollbar">
+              {relatedCategory.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
           </div>
         </>
       )}
 
       {relatedBrand.length > 0 && (
         <>
-          <h3 className="section-title mt-10">
+          <h3 className="section-title">
             More from {product.brand}
           </h3>
-          <div className="flex gap-4 overflow-x-auto no-scrollbar">
-            {relatedBrand.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
+          <div className="slider-row">
+            <div className="flex gap-4 overflow-x-auto no-scrollbar">
+              {relatedBrand.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
           </div>
         </>
       )}
 
       {relatedPrice.length > 0 && (
         <>
-          <h3 className="section-title mt-10">
+          <h3 className="section-title">
             Similar Price Range
           </h3>
-          <div className="flex gap-4 overflow-x-auto no-scrollbar">
-            {relatedPrice.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
+          <div className="slider-row">
+            <div className="flex gap-4 overflow-x-auto no-scrollbar">
+              {relatedPrice.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
           </div>
         </>
       )}
+
+      <style>{`
+        @media (min-width: 1024px) {
+          .desktop-split {
+            flex-direction: row;
+            align-items: flex-start;
+          }
+        }
+      `}</style>
     </div>
   );
     }
-        
+    
