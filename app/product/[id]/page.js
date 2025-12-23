@@ -83,7 +83,6 @@ export default function ProductPage({ params }) {
       brandItems.forEach((p) => usedIds.add(p.id));
       setRelatedBrand(brandItems);
 
-      // similar price (±15%)
       const prices = product.store?.map((s) => s.price) || [];
       const base = Math.min(...prices);
 
@@ -135,7 +134,7 @@ export default function ProductPage({ params }) {
   }
 
   return (
-    <div className="p-4 pb-24 max-w-[1100px] mx-auto">
+    <div className="p-4 pt-[72px] pb-24 max-w-[1100px] mx-auto">
       {/* Breadcrumb */}
       <div className="text-sm mb-3">
         <Link href="/" className="text-blue-500">Home</Link> /{" "}
@@ -244,9 +243,7 @@ export default function ProductPage({ params }) {
                 key={index}
                 className="min-w-[260px] bg-white p-5 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
               >
-                <div className="text-lg font-bold">
-                  {store.name}
-                </div>
+                <div className="text-lg font-bold">{store.name}</div>
 
                 <div
                   className="text-2xl font-extrabold my-2"
@@ -347,5 +344,4 @@ export default function ProductPage({ params }) {
       `}</style>
     </div>
   );
-        }
-      
+      }
