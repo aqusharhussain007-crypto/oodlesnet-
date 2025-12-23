@@ -134,7 +134,12 @@ export default function ProductPage({ params }) {
   }
 
   return (
-    <div className="p-4 pt-[72px] pb-24 max-w-[1100px] mx-auto">
+    <div
+  className="p-4 pb-24 max-w-[1100px] mx-auto"
+  style={{
+    paddingTop: "calc(env(safe-area-inset-top, 0px) + 12px)",
+  }}
+>
       {/* Breadcrumb */}
       <div className="text-sm mb-3">
         <Link href="/" className="text-blue-500">Home</Link> /{" "}
