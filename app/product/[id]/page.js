@@ -169,7 +169,7 @@ export default function ProductPage({ params }) {
             alt={product.name}
             width={900}
             height={520}
-            className="w-full object-cover"
+            className="w-full object-contain"
           />
         </div>
 
