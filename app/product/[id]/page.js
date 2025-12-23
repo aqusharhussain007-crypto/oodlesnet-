@@ -48,6 +48,7 @@ export default function ProductPage({ params }) {
       }
       setLoading(false);
     }
+
     loadProduct();
   }, [id]);
 
@@ -62,28 +63,34 @@ export default function ProductPage({ params }) {
 
       const usedIds = new Set([product.id]);
 
-      const cat = all
-        .filter((p) => p.categorySlug === product.categorySlug && !usedIds.has(p.id))
+      const categoryItems = all
+        .filter(
+          (p) =>
+            p.categorySlug === product.categorySlug &&
+            !usedIds.has(p.id)
+        )
         .slice(0, 4);
-      cat.forEach((p) => usedIds.add(p.id));
-      setRelatedCategory(cat);
+      categoryItems.forEach((p) => usedIds.add(p.id));
+      setRelatedCategory(categoryItems);
 
-      const brand = all
-        .filter((p) => p.brand === product.brand && !usedIds.has(p.id))
+      const brandItems = all
+        .filter(
+          (p) => p.brand === product.brand && !usedIds.has(p.id)
+        )
         .slice(0, 4);
-      brand.forEach((p) => usedIds.add(p.id));
-      setRelatedBrand(brand);
+      brandItems.forEach((p) => usedIds.add(p.id));
+      setRelatedBrand(brandItems);
 
       const prices = product.store?.map((s) => s.price) || [];
       const base = Math.min(...prices);
 
       if (base) {
-        const price = filterByPriceRange(
+        const priceItems = filterByPriceRange(
           all.filter((p) => !usedIds.has(p.id)),
           base,
           15
         ).slice(0, 4);
-        setRelatedPrice(price);
+        setRelatedPrice(priceItems);
       }
     }
 
@@ -91,7 +98,15 @@ export default function ProductPage({ params }) {
   }, [product]);
 
   if (loading) return <div className="p-4">Loading…</div>;
-  if (!product) return <div className="p-4 text-red-600">Product not found</div>;
+  if (!product)
+    return <div className="p-4 text-red-600">Product not found</div>;
+
+  /* ---------------- IMAGE SAFE FALLBACK ---------------- */
+  const imageSrc =
+    product.imageUrl ||
+    product.image ||
+    product.images?.[0] ||
+    "/placeholder.png";
 
   /* ---------------- SHARE ---------------- */
   function handleShare() {
@@ -100,14 +115,15 @@ export default function ProductPage({ params }) {
       text: `Compare prices for ${product.name} on OodlesNet`,
       url: window.location.href,
     };
-    if (navigator.share) navigator.share(data).catch(() => {});
-    else {
+
+    if (navigator.share) {
+      navigator.share(data).catch(() => {});
+    } else {
       navigator.clipboard.writeText(window.location.href);
       alert("Link copied");
     }
   }
 
-  /* ---------------- BUY ---------------- */
   async function handleBuy(store) {
     try {
       await addDoc(collection(db, "clicks"), {
@@ -115,7 +131,9 @@ export default function ProductPage({ params }) {
         store: store.name.toLowerCase(),
         createdAt: serverTimestamp(),
       });
-    } catch {}
+    } catch (e) {
+      console.error("Click tracking failed:", e);
+    }
     window.location.href = store.url;
   }
 
@@ -124,48 +142,40 @@ export default function ProductPage({ params }) {
       {/* Breadcrumb */}
       <div className="text-sm mb-3">
         <Link href="/" className="text-blue-500">Home</Link> /{" "}
-        <span className="text-blue-600 font-semibold">{product.categorySlug}</span> /{" "}
-        <span className="font-bold">{product.name}</span>
+        <span className="text-blue-600 font-semibold">
+          {product.categorySlug}
+        </span>{" "}
+        / <span className="font-bold">{product.name}</span>
       </div>
 
-      {/* MAIN */}
-      <div className="desktop-split" style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-        {/* IMAGE (FIXED, BUT SAME POSITION AS BEFORE) */}
-        <div
-          style={{
-            width: "100%",
-            borderRadius: 18,
-            background: "#fff",
-            overflow: "hidden",
-            position: "relative",
-            aspectRatio: "16 / 9",
-            boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
-          }}
-        >
+      {/* MAIN LAYOUT */}
+      <div className="desktop-split flex flex-col lg:flex-row gap-6">
+        {/* IMAGE */}
+        <div className="lg:w-[45%] bg-white rounded-2xl shadow-lg overflow-hidden">
           <Image
-            src={product.imageUrl}
+            src={imageSrc}
             alt={product.name}
-            fill
+            width={900}
+            height={520}
+            className="w-full h-auto object-contain"
             priority
-            sizes="100vw"
-            style={{ objectFit: "contain" }}
           />
         </div>
 
         {/* DETAILS */}
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-            <h1 className="text-2xl font-bold text-blue-700">{product.name}</h1>
+        <div className="flex-1">
+          {/* TITLE + SHARE */}
+          <div className="flex justify-between items-center gap-3">
+            <h1 className="text-2xl font-bold text-blue-700">
+              {product.name}
+            </h1>
 
             <button
               onClick={handleShare}
+              className="px-5 py-2 rounded-full font-bold text-white shadow-lg"
               style={{
-                padding: "8px 16px",
-                borderRadius: 999,
-                border: "none",
-                fontWeight: 800,
-                color: "#fff",
-                background: "linear-gradient(135deg,#0f4c81,#10b981)",
+                background:
+                  "linear-gradient(135deg,#0f4c81,#10b981)",
               }}
             >
               Share
@@ -173,14 +183,14 @@ export default function ProductPage({ params }) {
           </div>
 
           {/* DESCRIPTION */}
-          <div style={{ marginTop: 12 }}>
+          <div className="mt-3">
             <p
+              className="text-gray-700"
               style={{
                 display: "-webkit-box",
                 WebkitLineClamp: expanded ? "unset" : 3,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
-                color: "#374151",
               }}
             >
               {product.description}
@@ -189,31 +199,46 @@ export default function ProductPage({ params }) {
             {product.description?.length > 120 && (
               <button
                 onClick={() => setExpanded((v) => !v)}
-                style={{ marginTop: 6, color: "#0bbcff", fontWeight: 700, border: "none", background: "none" }}
+                className="mt-2 text-blue-500 font-semibold"
               >
                 {expanded ? "Show less" : "Read more"}
               </button>
             )}
           </div>
 
-          {/* STORE COMPARISON (RESTORED EXACTLY) */}
-          <h3 className="mt-6 text-xl font-bold text-blue-600">Compare Prices</h3>
+          {/* STORES */}
+          <h3 className="mt-6 text-xl font-bold text-blue-600">
+            Compare Prices
+          </h3>
 
           <div className="flex gap-4 overflow-x-auto py-4 no-scrollbar">
-            {(product.store || []).map((store, i) => (
+            {(product.store || []).map((store, index) => (
               <div
-                key={i}
-                className="min-w-[260px] bg-white p-5 rounded-2xl shadow-md border border-gray-200"
+                key={index}
+                className="min-w-[260px] bg-white p-5 rounded-2xl shadow-md border"
               >
                 <div className="text-lg font-bold">{store.name}</div>
-                <div className="text-2xl font-extrabold my-2">
+
+                <div
+                  className="text-2xl font-extrabold my-2"
+                  style={{
+                    color:
+                      store.price ===
+                      Math.min(...product.store.map((s) => s.price))
+                        ? "#16a34a"
+                        : "#2563eb",
+                  }}
+                >
                   ₹ {store.price.toLocaleString("en-IN")}
                 </div>
-                <div className="text-sm text-gray-600 mb-4">{store.offer}</div>
+
+                <div className="text-sm text-gray-600 mb-4">
+                  {store.offer}
+                </div>
 
                 <button
                   onClick={() => handleBuy(store)}
-                  className="w-full text-white font-bold py-3 rounded-xl"
+                  className="w-full text-white font-bold py-3 rounded-xl shadow-md"
                   style={{
                     background:
                       store.name === "Amazon"
@@ -233,49 +258,46 @@ export default function ProductPage({ params }) {
         </div>
       </div>
 
-      {/* RELATED (UNCHANGED) */}
+      {/* RELATED PRODUCTS */}
       {relatedCategory.length > 0 && (
         <>
-          <h3 className="section-title">More in {product.categorySlug}</h3>
-          <div className="slider-row">
-            <div className="flex gap-4 overflow-x-auto no-scrollbar">
-              {relatedCategory.map((p) => <ProductCard key={p.id} product={p} />)}
-            </div>
+          <h3 className="section-title mt-10">
+            More in {product.categorySlug}
+          </h3>
+          <div className="flex gap-4 overflow-x-auto no-scrollbar">
+            {relatedCategory.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
           </div>
         </>
       )}
 
       {relatedBrand.length > 0 && (
         <>
-          <h3 className="section-title">More from {product.brand}</h3>
-          <div className="slider-row">
-            <div className="flex gap-4 overflow-x-auto no-scrollbar">
-              {relatedBrand.map((p) => <ProductCard key={p.id} product={p} />)}
-            </div>
+          <h3 className="section-title mt-10">
+            More from {product.brand}
+          </h3>
+          <div className="flex gap-4 overflow-x-auto no-scrollbar">
+            {relatedBrand.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
           </div>
         </>
       )}
 
       {relatedPrice.length > 0 && (
         <>
-          <h3 className="section-title">Similar Price Range</h3>
-          <div className="slider-row">
-            <div className="flex gap-4 overflow-x-auto no-scrollbar">
-              {relatedPrice.map((p) => <ProductCard key={p.id} product={p} />)}
-            </div>
+          <h3 className="section-title mt-10">
+            Similar Price Range
+          </h3>
+          <div className="flex gap-4 overflow-x-auto no-scrollbar">
+            {relatedPrice.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
           </div>
         </>
       )}
-
-      <style>{`
-        @media (min-width: 1024px) {
-          .desktop-split {
-            flex-direction: row;
-            align-items: flex-start;
-          }
-        }
-      `}</style>
     </div>
   );
-        }
-                
+    }
+        
