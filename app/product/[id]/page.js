@@ -83,6 +83,7 @@ export default function ProductPage({ params }) {
       brandItems.forEach((p) => usedIds.add(p.id));
       setRelatedBrand(brandItems);
 
+      // similar price (±15%)
       const prices = product.store?.map((s) => s.price) || [];
       const base = Math.min(...prices);
 
@@ -232,70 +233,65 @@ export default function ProductPage({ params }) {
             )}
           </div>
 
-          {/* PRICE CARDS */}
+          {/* ALL STORE PRICES */}
           <h3 className="mt-6 text-xl font-bold text-blue-600">
             Compare Prices
           </h3>
 
-          {/* ✅ ONLY ADDED WRAPPER */}
-          <div style={{ width: "100%", overflowX: "auto" }}>
-            <div className="flex gap-4 py-4 no-scrollbar">
-              {(product.store || []).map((store, index) => (
-                <div
-                  key={index}
-                  className="min-w-[260px] bg-white rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
-                  style={{ padding: 20 }}
-                >
-                  <div className="text-lg font-bold">
-                    {store.name}
-                  </div>
-
-                  <div
-                    className="text-2xl font-extrabold my-2"
-                    style={{
-                      color:
-                        store.price ===
-                        Math.min(
-                          ...(product.store || []).map(
-                            (s) => s.price
-                          )
-                        )
-                          ? "#16a34a"
-                          : "#2563eb",
-                    }}
-                  >
-                    ₹ {store.price.toLocaleString("en-IN")}
-                  </div>
-
-                  <div className="text-sm text-gray-600 mb-4">
-                    {store.offer}
-                  </div>
-
-                  <button
-                    onClick={() => handleBuy(store)}
-                    className="w-full text-white font-bold py-3 rounded-xl shadow-md"
-                    style={{
-                      background:
-                        store.name === "Amazon"
-                          ? "linear-gradient(90deg,#ff9900,#ff6600)"
-                          : store.name === "Meesho"
-                          ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
-                          : store.name === "Ajio"
-                          ? "linear-gradient(90deg,#005bea,#00c6fb)"
-                          : "linear-gradient(90deg,#00c6ff,#00ff99)",
-                    }}
-                  >
-                    Buy on {store.name}
-                  </button>
+          <div className="flex gap-4 overflow-x-auto py-4 no-scrollbar">
+            {(product.store || []).map((store, index) => (
+              <div
+                key={index}
+                className="min-w-[260px] bg-white p-5 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
+              >
+                <div className="text-lg font-bold">
+                  {store.name}
                 </div>
-              ))}
-            </div>
+
+                <div
+                  className="text-2xl font-extrabold my-2"
+                  style={{
+                    color:
+                      store.price ===
+                      Math.min(
+                        ...(product.store || []).map(
+                          (s) => s.price
+                        )
+                      )
+                        ? "#16a34a"
+                        : "#2563eb",
+                  }}
+                >
+                  ₹ {store.price.toLocaleString("en-IN")}
+                </div>
+
+                <div className="text-sm text-gray-600 mb-4">
+                  {store.offer}
+                </div>
+
+                <button
+                  onClick={() => handleBuy(store)}
+                  className="w-full text-white font-bold py-3 rounded-xl shadow-md"
+                  style={{
+                    background:
+                      store.name === "Amazon"
+                        ? "linear-gradient(90deg,#ff9900,#ff6600)"
+                        : store.name === "Meesho"
+                        ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
+                        : store.name === "Ajio"
+                        ? "linear-gradient(90deg,#005bea,#00c6fb)"
+                        : "linear-gradient(90deg,#00c6ff,#00ff99)",
+                  }}
+                >
+                  Buy on {store.name}
+                </button>
+              </div>
+            ))}
           </div>
-          {/* ========================= */}
         </div>
       </div>
 
-      {/* RELATED PRODUCTS (UNCHANGED) */}
+      {/* RELATED PRODUCTS (unchanged) */}
       {relatedCategory.length > 0 && (
         <>
           <h3 className="section-title">
@@ -351,4 +347,4 @@ export default function ProductPage({ params }) {
       `}</style>
     </div>
   );
-}
+          }
