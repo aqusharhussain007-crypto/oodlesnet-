@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* reset */
 * { margin:0; padding:0; box-sizing:border-box; }
 
@@ -141,42 +145,4 @@ html.dark .search-bar {
 /* dropdown menu */
 html.dark nav div {
   background: #001a2f !important;
-}
-
-/* ================================================= */
-/* ✅ SAFE APPENDED FIXES — DO NOT REMOVE BELOW THIS */
-/* ================================================= */
-
-/* 1️⃣ Prevent logo arch getting clipped */
-nav img {
-  object-fit: contain !important;
-  height: 42px;
-  width: auto;
-  max-height: none;
-}
-
-/* 2️⃣ Global image safety (Next/Image edge cases) */
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-/* 3️⃣ Product image container safety (used in page.js) */
-.product-image-wrapper {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-}
-
-/* 4️⃣ Store card layout safety */
-.store-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-/* 5️⃣ Ensure buy buttons never collapse */
-.store-card button {
-  margin-top: auto;
   }
-  
