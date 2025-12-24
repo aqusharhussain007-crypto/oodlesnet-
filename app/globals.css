@@ -144,33 +144,39 @@ html.dark nav div {
 }
 
 /* ================================================= */
-/* ✅ SAFE FIXES — DO NOT REMOVE (PRODUCT PAGE ONLY) */
+/* ✅ SAFE APPENDED FIXES — DO NOT REMOVE BELOW THIS */
 /* ================================================= */
 
-/* Prevent Next/Image stretching */
+/* 1️⃣ Prevent logo arch getting clipped */
+nav img {
+  object-fit: contain !important;
+  height: 42px;
+  width: auto;
+  max-height: none;
+}
+
+/* 2️⃣ Global image safety (Next/Image edge cases) */
 img {
   max-width: 100%;
   height: auto;
-  object-fit: cover;
 }
 
-/* Fix product image container collapse */
+/* 3️⃣ Product image container safety (used in page.js) */
 .product-image-wrapper {
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: 18px;
 }
 
-/* Prevent store cards breaking layout */
+/* 4️⃣ Store card layout safety */
 .store-card {
-  min-height: 220px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-/* Ensure buttons never collapse */
+/* 5️⃣ Ensure buy buttons never collapse */
 .store-card button {
   margin-top: auto;
-}
+  }
+  
