@@ -159,16 +159,13 @@ export default function ProductPage({ params }) {
             boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
           }}
         >
-          {/* ✅ FIX: prevent image stretch */}
-          <div style={{ width: "100%", aspectRatio: "16 / 9" }}>
-            <Image
-              src={product.imageUrl}
-              alt={product.name}
-              width={900}
-              height={520}
-              className="w-full object-cover"
-            />
-          </div>
+          <Image
+            src={product.imageUrl}
+            alt={product.name}
+            width={900}
+            height={520}
+            className="w-full object-cover"
+          />
         </div>
 
         {/* DETAILS */}
@@ -235,7 +232,7 @@ export default function ProductPage({ params }) {
             )}
           </div>
 
-          {/* ALL STORE PRICES */}
+          {/* PRICE CARDS – restored to earlier working structure */}
           <h3 className="mt-6 text-xl font-bold text-blue-600">
             Compare Prices
           </h3>
@@ -244,45 +241,24 @@ export default function ProductPage({ params }) {
             {(product.store || []).map((store, index) => (
               <div
                 key={index}
-                className="min-w-[260px] bg-white p-5 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                }}
+                className="min-w-[260px] bg-white p-4 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
               >
-                <div>
-                  <div className="text-lg font-bold">
-                    {store.name}
-                  </div>
+                <div className="text-lg font-bold">
+                  {store.name}
+                </div>
 
-                  <div
-                    className="text-2xl font-extrabold my-2"
-                    style={{
-                      color:
-                        store.price ===
-                        Math.min(
-                          ...(product.store || []).map(
-                            (s) => s.price
-                          )
-                        )
-                          ? "#16a34a"
-                          : "#2563eb",
-                    }}
-                  >
-                    ₹ {store.price.toLocaleString("en-IN")}
-                  </div>
+                <div className="text-xl font-extrabold text-blue-700 my-1">
+                  ₹ {Number(store.price).toLocaleString("en-IN")}
+                </div>
 
-                  <div className="text-sm text-gray-600">
-                    {store.offer}
-                  </div>
+                <div className="text-sm text-gray-600 mb-3">
+                  {store.offer}
                 </div>
 
                 <button
                   onClick={() => handleBuy(store)}
                   className="w-full text-white font-bold py-3 rounded-xl shadow-md"
                   style={{
-                    marginTop: 14,
                     background:
                       store.name === "Amazon"
                         ? "linear-gradient(90deg,#ff9900,#ff6600)"
@@ -357,5 +333,5 @@ export default function ProductPage({ params }) {
       `}</style>
     </div>
   );
-        }
-    
+         }
+        
