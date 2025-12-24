@@ -135,7 +135,8 @@ export default function ProductPage({ params }) {
   }
 
   return (
-    <div className="p-4 pb-24 max-w-[1100px] mx-auto">
+    <div className="p-4 pb-24 max-w-[720px] lg:max-w-[1100px] mx-auto"
+>
       {/* Breadcrumb */}
       <div className="text-sm mb-3">
         <Link href="/" className="text-blue-500">Home</Link> /{" "}
@@ -148,7 +149,7 @@ export default function ProductPage({ params }) {
       {/* MAIN LAYOUT */}
       <div
         className="desktop-split"
-        style={{ display: "flex", flexDirection: "column", gap: 22 }}
+        style={{ display: "flex", flexDirection: "column", gap: 22, width: "100%" }}
       >
         {/* IMAGE */}
         <div
