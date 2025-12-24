@@ -141,5 +141,36 @@ html.dark .search-bar {
 /* dropdown menu */
 html.dark nav div {
   background: #001a2f !important;
-  }
-  
+}
+
+/* ================================================= */
+/* ✅ SAFE FIXES — DO NOT REMOVE (PRODUCT PAGE ONLY) */
+/* ================================================= */
+
+/* Prevent Next/Image stretching */
+img {
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* Fix product image container collapse */
+.product-image-wrapper {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 18px;
+}
+
+/* Prevent store cards breaking layout */
+.store-card {
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Ensure buttons never collapse */
+.store-card button {
+  margin-top: auto;
+}
