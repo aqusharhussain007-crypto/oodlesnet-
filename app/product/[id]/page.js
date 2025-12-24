@@ -232,7 +232,7 @@ export default function ProductPage({ params }) {
             )}
           </div>
 
-          {/* PRICE CARDS – restored to earlier working structure */}
+          {/* ================= RESTORED PRICE CARDS ================= */}
           <h3 className="mt-6 text-xl font-bold text-blue-600">
             Compare Prices
           </h3>
@@ -241,17 +241,31 @@ export default function ProductPage({ params }) {
             {(product.store || []).map((store, index) => (
               <div
                 key={index}
-                className="min-w-[260px] bg-white p-4 rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
+                className="min-w-[260px] bg-white rounded-2xl shadow-md border border-gray-200 flex-shrink-0"
+                style={{ padding: 20 }}
               >
                 <div className="text-lg font-bold">
                   {store.name}
                 </div>
 
-                <div className="text-xl font-extrabold text-blue-700 my-1">
-                  ₹ {Number(store.price).toLocaleString("en-IN")}
+                <div
+                  className="text-2xl font-extrabold my-2"
+                  style={{
+                    color:
+                      store.price ===
+                      Math.min(
+                        ...(product.store || []).map(
+                          (s) => s.price
+                        )
+                      )
+                        ? "#16a34a"
+                        : "#2563eb",
+                  }}
+                >
+                  ₹ {store.price.toLocaleString("en-IN")}
                 </div>
 
-                <div className="text-sm text-gray-600 mb-3">
+                <div className="text-sm text-gray-600 mb-4">
                   {store.offer}
                 </div>
 
@@ -274,6 +288,7 @@ export default function ProductPage({ params }) {
               </div>
             ))}
           </div>
+          {/* ======================================================== */}
         </div>
       </div>
 
@@ -333,5 +348,5 @@ export default function ProductPage({ params }) {
       `}</style>
     </div>
   );
-         }
-        
+      }
+  
