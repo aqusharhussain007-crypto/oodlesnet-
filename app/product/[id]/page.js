@@ -32,7 +32,6 @@ export default function ProductPage({ params }) {
 
   const [expanded, setExpanded] = useState(false);
 
-  /* ---------------- LOAD PRODUCT ---------------- */
   useEffect(() => {
     async function loadProduct() {
       try {
@@ -52,7 +51,6 @@ export default function ProductPage({ params }) {
     loadProduct();
   }, [id]);
 
-  /* ---------------- LOAD RELATED PRODUCTS ---------------- */
   useEffect(() => {
     if (!product) return;
 
@@ -103,7 +101,6 @@ export default function ProductPage({ params }) {
   if (!product)
     return <div className="p-4 text-red-600">Product not found</div>;
 
-  /* ---------------- SHARE ---------------- */
   function handleShare() {
     const data = {
       title: product.name,
@@ -119,7 +116,6 @@ export default function ProductPage({ params }) {
     }
   }
 
-  /* ---------------- BUY ---------------- */
   async function handleBuy(store) {
     try {
       await addDoc(collection(db, "clicks"), {
@@ -135,6 +131,10 @@ export default function ProductPage({ params }) {
 
   const cheapest =
     Math.min(...(product.store || []).map((s) => s.price)) || 0;
+
+  const sortedStores = [...(product.store || [])].sort(
+    (a, b) => Number(a.price) - Number(b.price)
+  );
 
   return (
     <div
@@ -264,7 +264,7 @@ export default function ProductPage({ params }) {
           padding: "16px 0",
         }}
       >
-        {(product.store || []).map((store, index) => (
+        {sortedStores.map((store, index) => (
           <div
             key={index}
             style={{
@@ -332,7 +332,7 @@ export default function ProductPage({ params }) {
         ))}
       </div>
 
-      {/* RELATED PRODUCTS (UNCHANGED) */}
+      {/* RELATED PRODUCTS */}
       {relatedCategory.length > 0 && (
         <>
           <h3 className="section-title">
@@ -379,5 +379,5 @@ export default function ProductPage({ params }) {
       )}
     </div>
   );
-    }
-    
+  }
+                              
