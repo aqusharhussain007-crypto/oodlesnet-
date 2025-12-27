@@ -45,11 +45,11 @@ export default function ProductCard({ product }) {
           alignItems: "center",
         }}
       >
-        {/* IMAGE – HEIGHT INCREASED */}
+        {/* IMAGE */}
         <div
           style={{
             width: 140,
-            height: 170,              // ✅ increased
+            height: 170,
             position: "relative",
             borderRadius: 14,
             overflow: "hidden",
@@ -92,25 +92,37 @@ export default function ProductCard({ product }) {
             </div>
           )}
 
-          {/* PRICES */}
-          <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+          {/* PRICES – FIXED HORIZONTAL ALIGNMENT */}
+          <div
+            style={{
+              display: "flex",
+              gap: 16,
+              overflowX: "auto",
+            }}
+          >
             {lowest && (
-              <div style={{ color: "#16a34a", fontWeight: 800 }}>
-                ₹{lowest.toLocaleString("en-IN")}
+              <div style={{ minWidth: 80, textAlign: "center" }}>
+                <div style={{ color: "#16a34a", fontWeight: 800 }}>
+                  ₹{lowest.toLocaleString("en-IN")}
+                </div>
                 <div style={{ fontSize: 12 }}>Lowest</div>
               </div>
             )}
 
             {second && (
-              <div style={{ color: "#2563eb", fontWeight: 700 }}>
-                ₹{second.toLocaleString("en-IN")}
+              <div style={{ minWidth: 80, textAlign: "center" }}>
+                <div style={{ color: "#2563eb", fontWeight: 700 }}>
+                  ₹{second.toLocaleString("en-IN")}
+                </div>
                 <div style={{ fontSize: 12 }}>2nd</div>
               </div>
             )}
 
             {third && (
-              <div style={{ color: "#2563eb", fontWeight: 700 }}>
-                ₹{third.toLocaleString("en-IN")}
+              <div style={{ minWidth: 80, textAlign: "center" }}>
+                <div style={{ color: "#2563eb", fontWeight: 700 }}>
+                  ₹{third.toLocaleString("en-IN")}
+                </div>
                 <div style={{ fontSize: 12 }}>3rd</div>
               </div>
             )}
@@ -119,5 +131,5 @@ export default function ProductCard({ product }) {
       </div>
     </Link>
   );
-        }
-                           
+                }
+              
