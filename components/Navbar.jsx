@@ -34,7 +34,7 @@ export default function Navbar() {
       {/* NAVBAR */}
       <header
         style={{
-          height: 56,
+          height: 54,
           padding: "0 14px",
           display: "flex",
           alignItems: "center",
@@ -50,8 +50,8 @@ export default function Navbar() {
             src="/logo.png"
             alt="OodlesNet"
             width={170}
-            height={45}
-            style={{ maxHeight: 40, width: "auto" }}
+            height={50}
+            style={{ maxHeight: 45, width: "auto" }}
             priority
           />
         </Link>
