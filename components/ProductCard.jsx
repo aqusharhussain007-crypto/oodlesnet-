@@ -42,7 +42,7 @@ export default function ProductCard({ product }) {
           border: "1px solid #6ee7d8",
           display: "flex",
           gap: 14,
-          alignItems: "center",
+          alignItems: "stretch",
         }}
       >
         {/* IMAGE */}
@@ -67,37 +67,45 @@ export default function ProductCard({ product }) {
         </div>
 
         {/* DETAILS */}
-        <div style={{ flex: 1 }}>
-          <h3
-            style={{
-              color: "#0077aa",
-              fontWeight: 800,
-              fontSize: "1rem",
-              marginBottom: 6,
-            }}
-          >
-            {product.name}
-          </h3>
-
-          {product.description && (
-            <div
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <div>
+            <h3
               style={{
-                fontSize: "0.85rem",
-                color: "#555",
-                marginBottom: 8,
-                lineHeight: 1.3,
+                color: "#0077aa",
+                fontWeight: 800,
+                fontSize: "1rem",
+                marginBottom: 6,
               }}
             >
-              {product.description}
-            </div>
-          )}
+              {product.name}
+            </h3>
 
-          {/* PRICES – FIXED HORIZONTAL ALIGNMENT */}
+            {product.description && (
+              <div
+                style={{
+                  fontSize: "0.85rem",
+                  color: "#555",
+                  marginBottom: 8,
+                  lineHeight: 1.3,
+                }}
+              >
+                {product.description}
+              </div>
+            )}
+          </div>
+
+          {/* PRICES – FIXED AT BOTTOM */}
           <div
             style={{
               display: "flex",
               gap: 16,
-              overflowX: "auto",
+              marginTop: "auto",
             }}
           >
             {lowest && (
@@ -131,5 +139,4 @@ export default function ProductCard({ product }) {
       </div>
     </Link>
   );
-                }
-              
+}
