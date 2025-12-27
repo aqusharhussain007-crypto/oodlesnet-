@@ -93,8 +93,8 @@ export default function Navbar() {
         <div
           style={{
             position: "fixed",
-            top: 66,              // 👈 below navbar
-            right: 14,            // 👈 aligned with button
+            top: 66,
+            right: 14,
             width: "60%",
             maxWidth: 300,
             padding: 20,
@@ -122,41 +122,10 @@ export default function Navbar() {
             <Link href="/contact" onClick={() => setOpen(false)}>Contact</Link>
           </div>
 
-          <div style={{ marginTop: 20 }}>
-            <div style={{ fontSize: 14, opacity: 0.8 }}>Language</div>
-            <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
-              <button
-                style={{
-                  flex: 1,
-                  padding: "8px 0",
-                  borderRadius: 10,
-                  background: "#0ea5e9",
-                  color: "white",
-                  border: "none",
-                  fontWeight: 700,
-                }}
-              >
-                English
-              </button>
-              <button
-                style={{
-                  flex: 1,
-                  padding: "8px 0",
-                  borderRadius: 10,
-                  background: "#020617",
-                  color: "white",
-                  border: "1px solid #1e293b",
-                  fontWeight: 700,
-                }}
-              >
-                हिंदी
-              </button>
-            </div>
-          </div>
-
+          {/* DARK MODE TOGGLE */}
           <div
             style={{
-              marginTop: 18,
+              marginTop: 20,
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
@@ -180,4 +149,5 @@ export default function Navbar() {
       )}
     </>
   );
-}
+        }
+    
