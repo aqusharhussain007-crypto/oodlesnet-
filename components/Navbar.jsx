@@ -49,8 +49,9 @@ export default function Navbar() {
           <Image
             src="/logo.png"
             alt="OodlesNet"
-            width={140}
-            height={32}
+            width={170}
+            height={45}
+            style={{ maxHeight: 32, width: "auto" }}
             priority
           />
         </Link>
@@ -88,7 +89,7 @@ export default function Navbar() {
         />
       )}
 
-      {/* MENU PANEL – RIGHT ANCHORED */}
+      {/* MENU PANEL */}
       {open && (
         <div
           style={{
@@ -122,7 +123,7 @@ export default function Navbar() {
             <Link href="/contact" onClick={() => setOpen(false)}>Contact</Link>
           </div>
 
-          {/* DARK MODE GRADIENT SWITCH */}
+          {/* DARK MODE SWITCH */}
           <div
             style={{
               marginTop: 20,
@@ -159,7 +160,6 @@ export default function Navbar() {
                   borderRadius: "50%",
                   background: "#ffffff",
                   boxShadow: "0 2px 6px rgba(0,0,0,0.35)",
-                  transition: "all 0.25s ease",
                 }}
               />
             </button>
@@ -179,5 +179,5 @@ export default function Navbar() {
       )}
     </>
   );
-            }
+      }
       
