@@ -51,7 +51,7 @@ export default function Navbar() {
             alt="OodlesNet"
             width={170}
             height={45}
-            style={{ maxHeight: 32, width: "auto" }}
+            style={{ maxHeight: 40, width: "auto" }}
             priority
           />
         </Link>
