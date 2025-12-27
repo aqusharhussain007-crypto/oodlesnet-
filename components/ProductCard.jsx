@@ -41,40 +41,41 @@ export default function ProductCard({ product }) {
           background: "#ecfffb",
           border: "1px solid #6ee7d8",
           display: "flex",
-          gap: 14,
-          alignItems: "stretch",
+          flexDirection: "column",
+          gap: 12,
         }}
       >
-        {/* IMAGE */}
+        {/* TOP ROW */}
         <div
           style={{
-            width: 140,
-            height: 170,
-            position: "relative",
-            borderRadius: 14,
-            overflow: "hidden",
-            background: "#f3f4f6",
-            flexShrink: 0,
-          }}
-        >
-          <Image
-            src={product.imageUrl || "/placeholder.png"}
-            alt={product.name}
-            fill
-            sizes="140px"
-            style={{ objectFit: "cover" }}
-          />
-        </div>
-
-        {/* DETAILS */}
-        <div
-          style={{
-            flex: 1,
             display: "flex",
-            flexDirection: "column",
+            gap: 14,
+            alignItems: "center",
           }}
         >
-          <div>
+          {/* IMAGE */}
+          <div
+            style={{
+              width: 140,
+              height: 170,
+              position: "relative",
+              borderRadius: 14,
+              overflow: "hidden",
+              background: "#f3f4f6",
+              flexShrink: 0,
+            }}
+          >
+            <Image
+              src={product.imageUrl || "/placeholder.png"}
+              alt={product.name}
+              fill
+              sizes="140px"
+              style={{ objectFit: "cover" }}
+            />
+          </div>
+
+          {/* DETAILS */}
+          <div style={{ flex: 1 }}>
             <h3
               style={{
                 color: "#0077aa",
@@ -91,7 +92,6 @@ export default function ProductCard({ product }) {
                 style={{
                   fontSize: "0.85rem",
                   color: "#555",
-                  marginBottom: 8,
                   lineHeight: 1.3,
                 }}
               >
@@ -99,44 +99,45 @@ export default function ProductCard({ product }) {
               </div>
             )}
           </div>
+        </div>
 
-          {/* PRICES – FIXED AT BOTTOM */}
-          <div
-            style={{
-              display: "flex",
-              gap: 16,
-              marginTop: "auto",
-            }}
-          >
-            {lowest && (
-              <div style={{ minWidth: 80, textAlign: "center" }}>
-                <div style={{ color: "#16a34a", fontWeight: 800 }}>
-                  ₹{lowest.toLocaleString("en-IN")}
-                </div>
-                <div style={{ fontSize: 12 }}>Lowest</div>
+        {/* PRICES – BOTTOM, FULL WIDTH */}
+        <div
+          style={{
+            display: "flex",
+            gap: 18,
+            paddingLeft: 4,
+          }}
+        >
+          {lowest && (
+            <div style={{ minWidth: 90 }}>
+              <div style={{ color: "#16a34a", fontWeight: 800 }}>
+                ₹{lowest.toLocaleString("en-IN")}
               </div>
-            )}
+              <div style={{ fontSize: 12 }}>Lowest</div>
+            </div>
+          )}
 
-            {second && (
-              <div style={{ minWidth: 80, textAlign: "center" }}>
-                <div style={{ color: "#2563eb", fontWeight: 700 }}>
-                  ₹{second.toLocaleString("en-IN")}
-                </div>
-                <div style={{ fontSize: 12 }}>2nd</div>
+          {second && (
+            <div style={{ minWidth: 90 }}>
+              <div style={{ color: "#2563eb", fontWeight: 700 }}>
+                ₹{second.toLocaleString("en-IN")}
               </div>
-            )}
+              <div style={{ fontSize: 12 }}>2nd</div>
+            </div>
+          )}
 
-            {third && (
-              <div style={{ minWidth: 80, textAlign: "center" }}>
-                <div style={{ color: "#2563eb", fontWeight: 700 }}>
-                  ₹{third.toLocaleString("en-IN")}
-                </div>
-                <div style={{ fontSize: 12 }}>3rd</div>
+          {third && (
+            <div style={{ minWidth: 90 }}>
+              <div style={{ color: "#2563eb", fontWeight: 700 }}>
+                ₹{third.toLocaleString("en-IN")}
               </div>
-            )}
-          </div>
+              <div style={{ fontSize: 12 }}>3rd</div>
+            </div>
+          )}
         </div>
       </div>
     </Link>
   );
-}
+    }
+    
