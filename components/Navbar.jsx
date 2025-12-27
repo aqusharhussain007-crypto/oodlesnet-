@@ -122,7 +122,7 @@ export default function Navbar() {
             <Link href="/contact" onClick={() => setOpen(false)}>Contact</Link>
           </div>
 
-          {/* DARK MODE TOGGLE */}
+          {/* DARK MODE GRADIENT SWITCH */}
           <div
             style={{
               marginTop: 20,
@@ -132,7 +132,37 @@ export default function Navbar() {
             }}
           >
             <span style={{ opacity: 0.85 }}>Dark Mode</span>
-            <input type="checkbox" checked={dark} onChange={toggleDark} />
+
+            <button
+              onClick={toggleDark}
+              aria-label="Toggle dark mode"
+              style={{
+                width: 52,
+                height: 28,
+                borderRadius: 999,
+                border: "none",
+                cursor: "pointer",
+                padding: 3,
+                background: dark
+                  ? "linear-gradient(135deg,#0ea5e9,#10b981)"
+                  : "#020617",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: dark ? "flex-end" : "flex-start",
+                transition: "all 0.25s ease",
+              }}
+            >
+              <span
+                style={{
+                  width: 22,
+                  height: 22,
+                  borderRadius: "50%",
+                  background: "#ffffff",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.35)",
+                  transition: "all 0.25s ease",
+                }}
+              />
+            </button>
           </div>
 
           <div
@@ -149,5 +179,5 @@ export default function Navbar() {
       )}
     </>
   );
-        }
-    
+            }
+      
