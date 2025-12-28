@@ -4,7 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function ProductCard({ product }) {
-  const prices = product.store?.map((s) => Number(s.price)) || [];
+  const prices =
+    product.store
+      ?.map((s) => Number(s.price))
+      .filter((p) => Number.isFinite(p)) || [];
+
   const sorted = [...prices].sort((a, b) => a - b);
 
   const lowest = sorted[0];
@@ -109,7 +113,7 @@ export default function ProductCard({ product }) {
             paddingLeft: 4,
           }}
         >
-          {lowest && (
+          {typeof lowest === "number" && (
             <div style={{ minWidth: 90 }}>
               <div style={{ color: "#16a34a", fontWeight: 800 }}>
                 ₹{lowest.toLocaleString("en-IN")}
@@ -118,7 +122,7 @@ export default function ProductCard({ product }) {
             </div>
           )}
 
-          {second && (
+          {typeof second === "number" && (
             <div style={{ minWidth: 90 }}>
               <div style={{ color: "#2563eb", fontWeight: 700 }}>
                 ₹{second.toLocaleString("en-IN")}
@@ -127,7 +131,7 @@ export default function ProductCard({ product }) {
             </div>
           )}
 
-          {third && (
+          {typeof third === "number" && (
             <div style={{ minWidth: 90 }}>
               <div style={{ color: "#2563eb", fontWeight: 700 }}>
                 ₹{third.toLocaleString("en-IN")}
@@ -139,5 +143,5 @@ export default function ProductCard({ product }) {
       </div>
     </Link>
   );
-    }
-    
+        }
+                           
