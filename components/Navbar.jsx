@@ -50,7 +50,7 @@ export default function Navbar() {
             src="/logo.png"
             alt="OodlesNet"
             width={170}
-            height={50}
+            height={56}
             style={{ maxHeight: 45, width: "auto" }}
             priority
           />
