@@ -2,17 +2,24 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase-app";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 
+const AFFILIATE_MAP = {
+  amazon: "https://www.amazon.in/?tag=YOUR_TAG",
+  ajio: "https://www.ajio.com/",
+  meesho: "https://www.meesho.com/",
+};
+
 export async function GET(req, { params }) {
   const { searchParams } = new URL(req.url);
-  const targetUrl = searchParams.get("url");
   const productId = searchParams.get("pid");
   const store = params.store;
 
-  if (!targetUrl || !productId) {
+  const targetUrl = AFFILIATE_MAP[store];
+
+  if (!productId || !targetUrl) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  // Log click
+  // log click
   await addDoc(collection(db, "clicks"), {
     productId,
     store,
@@ -20,4 +27,4 @@ export async function GET(req, { params }) {
   });
 
   return NextResponse.redirect(targetUrl);
-      }
+}
