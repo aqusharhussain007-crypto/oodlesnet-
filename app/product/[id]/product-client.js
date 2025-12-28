@@ -6,9 +6,6 @@ import {
   getDoc,
   updateDoc,
   increment,
-  collection,
-  addDoc,
-  serverTimestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 import Image from "next/image";
@@ -30,7 +27,6 @@ export default function ProductClient({ params }) {
         if (snap.exists()) {
           setProduct({ id: snap.id, ...snap.data() });
 
-          // increment product views
           await updateDoc(ref, {
             views: increment(1),
           });
@@ -51,18 +47,8 @@ export default function ProductClient({ params }) {
 
   const stores = product.store || [];
 
-  // ---------------- BUY HANDLER (TRACK + REDIRECT) ----------------
-  async function handleBuy(store) {
-    try {
-      await addDoc(collection(db, "clicks"), {
-        productId: product.id,
-        store: store.name.toLowerCase(),
-        createdAt: serverTimestamp(),
-      });
-    } catch (e) {
-      console.error("Click tracking failed:", e);
-    }
-
+  // ---------------- BUY HANDLER ----------------
+  function handleBuy(store) {
     window.location.href = store.url;
   }
 
@@ -116,25 +102,26 @@ export default function ProductClient({ params }) {
               {store.name}
             </div>
 
-            <div className="text-xl font-extrabold text-blue-700 my-1">
-              ₹ {Number(store.price).toLocaleString("en-IN")}
-            </div>
+            {typeof store.price === "number" && (
+              <div className="text-xl font-extrabold text-blue-700 my-1">
+                ₹ {store.price.toLocaleString("en-IN")}
+              </div>
+            )}
 
             <div className="text-sm text-gray-600 mb-3">
               {store.offer}
             </div>
 
-            {/* ✅ RESTORED GRADIENT BUY BUTTON */}
             <button
               onClick={() => handleBuy(store)}
               className="w-full text-white font-bold py-3 rounded-xl shadow-md"
               style={{
                 background:
-                  store.name === "Amazon"
+                  store.name.toLowerCase() === "amazon"
                     ? "linear-gradient(90deg,#ff9900,#ff6600)"
-                    : store.name === "Meesho"
+                    : store.name.toLowerCase() === "meesho"
                     ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
-                    : store.name === "Ajio"
+                    : store.name.toLowerCase() === "ajio"
                     ? "linear-gradient(90deg,#005bea,#00c6fb)"
                     : "linear-gradient(90deg,#00c6ff,#00ff99)",
               }}
@@ -146,5 +133,4 @@ export default function ProductClient({ params }) {
       </div>
     </div>
   );
-    }
-    
+}
