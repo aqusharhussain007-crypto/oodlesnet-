@@ -32,7 +32,6 @@ export default function ProductPage({ params }) {
 
       const usedIds = new Set([product.id]);
 
-      // --- SAME CATEGORY ---
       const categoryItems = all
         .filter(
           (p) =>
@@ -43,7 +42,6 @@ export default function ProductPage({ params }) {
       categoryItems.forEach((p) => usedIds.add(p.id));
       setRelatedCategory(categoryItems);
 
-      // --- SAME BRAND ---
       const brandItems = all
         .filter(
           (p) =>
@@ -54,7 +52,6 @@ export default function ProductPage({ params }) {
       brandItems.forEach((p) => usedIds.add(p.id));
       setRelatedBrand(brandItems);
 
-      // --- SIMILAR PRICE ---
       const prices =
         product.store
           ?.map((s) => Number(s.price))
@@ -80,7 +77,12 @@ export default function ProductPage({ params }) {
 
   const stores = product.store || [];
 
-  const prices = stores
+  // ✅ FIX: SORT STORES BY PRICE (ASCENDING)
+  const sortedStores = [...stores].sort(
+    (a, b) => Number(a.price) - Number(b.price)
+  );
+
+  const prices = sortedStores
     .map((s) => Number(s.price))
     .filter((p) => Number.isFinite(p));
 
@@ -113,7 +115,7 @@ export default function ProductPage({ params }) {
         margin: "0 auto",
       }}
     >
-      {/* BREADCRUMB */}
+      {/* Breadcrumb */}
       <div style={{ fontSize: 14, marginBottom: 12 }}>
         <Link href="/" style={{ color: "#3b82f6" }}>
           Home
@@ -125,7 +127,7 @@ export default function ProductPage({ params }) {
         / <strong>{product.name}</strong>
       </div>
 
-      {/* IMAGE */}
+      {/* Image */}
       <div
         style={{
           borderRadius: 18,
@@ -144,7 +146,7 @@ export default function ProductPage({ params }) {
         />
       </div>
 
-      {/* TITLE + SHARE */}
+      {/* Title + Share */}
       <div
         style={{
           display: "flex",
@@ -173,7 +175,7 @@ export default function ProductPage({ params }) {
         </button>
       </div>
 
-      {/* DESCRIPTION */}
+      {/* Description */}
       <div style={{ marginTop: 12 }}>
         <p
           style={{
@@ -204,7 +206,7 @@ export default function ProductPage({ params }) {
         )}
       </div>
 
-      {/* COMPARE PRICES */}
+      {/* Compare Prices */}
       <h3
         style={{
           marginTop: 24,
@@ -224,7 +226,7 @@ export default function ProductPage({ params }) {
           padding: "16px 0",
         }}
       >
-        {stores.map((store, index) => (
+        {sortedStores.map((store, index) => (
           <div
             key={index}
             style={{
@@ -241,21 +243,19 @@ export default function ProductPage({ params }) {
               {store.name}
             </div>
 
-            {Number.isFinite(Number(store.price)) && (
-              <div
-                style={{
-                  fontSize: 22,
-                  fontWeight: 900,
-                  margin: "8px 0",
-                  color:
-                    Number(store.price) === cheapest
-                      ? "#16a34a"
-                      : "#2563eb",
-                }}
-              >
-                ₹ {Number(store.price).toLocaleString("en-IN")}
-              </div>
-            )}
+            <div
+              style={{
+                fontSize: 22,
+                fontWeight: 900,
+                margin: "8px 0",
+                color:
+                  Number(store.price) === cheapest
+                    ? "#16a34a"
+                    : "#2563eb",
+              }}
+            >
+              ₹ {Number(store.price).toLocaleString("en-IN")}
+            </div>
 
             <div
               style={{
@@ -293,7 +293,7 @@ export default function ProductPage({ params }) {
         ))}
       </div>
 
-      {/* RELATED: SAME CATEGORY */}
+      {/* RELATED SECTIONS */}
       {relatedCategory.length > 0 && (
         <>
           <h3 className="section-title">
@@ -309,7 +309,6 @@ export default function ProductPage({ params }) {
         </>
       )}
 
-      {/* RELATED: SAME BRAND */}
       {relatedBrand.length > 0 && (
         <>
           <h3 className="section-title">
@@ -325,7 +324,6 @@ export default function ProductPage({ params }) {
         </>
       )}
 
-      {/* RELATED: SIMILAR PRICE */}
       {relatedPrice.length > 0 && (
         <>
           <h3 className="section-title">
@@ -343,3 +341,4 @@ export default function ProductPage({ params }) {
     </div>
   );
 }
+  
