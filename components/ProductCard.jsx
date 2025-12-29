@@ -49,15 +49,7 @@ export default function ProductCard({ product }) {
           gap: 12,
         }}
       >
-        {/* TOP ROW */}
-        <div
-          style={{
-            display: "flex",
-            gap: 14,
-            alignItems: "center",
-          }}
-        >
-          {/* IMAGE */}
+        <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
           <div
             style={{
               width: 140,
@@ -78,7 +70,6 @@ export default function ProductCard({ product }) {
             />
           </div>
 
-          {/* DETAILS */}
           <div style={{ flex: 1 }}>
             <h3
               style={{
@@ -92,29 +83,16 @@ export default function ProductCard({ product }) {
             </h3>
 
             {product.description && (
-              <div
-                style={{
-                  fontSize: "0.85rem",
-                  color: "#555",
-                  lineHeight: 1.3,
-                }}
-              >
+              <div style={{ fontSize: "0.85rem", color: "#555" }}>
                 {product.description}
               </div>
             )}
           </div>
         </div>
 
-        {/* PRICES – BOTTOM, FULL WIDTH */}
-        <div
-          style={{
-            display: "flex",
-            gap: 18,
-            paddingLeft: 4,
-          }}
-        >
-          {typeof lowest === "number" && (
-            <div style={{ minWidth: 90 }}>
+        <div style={{ display: "flex", gap: 18, paddingLeft: 4 }}>
+          {Number.isFinite(lowest) && (
+            <div>
               <div style={{ color: "#16a34a", fontWeight: 800 }}>
                 ₹{lowest.toLocaleString("en-IN")}
               </div>
@@ -122,8 +100,8 @@ export default function ProductCard({ product }) {
             </div>
           )}
 
-          {typeof second === "number" && (
-            <div style={{ minWidth: 90 }}>
+          {Number.isFinite(second) && (
+            <div>
               <div style={{ color: "#2563eb", fontWeight: 700 }}>
                 ₹{second.toLocaleString("en-IN")}
               </div>
@@ -131,8 +109,8 @@ export default function ProductCard({ product }) {
             </div>
           )}
 
-          {typeof third === "number" && (
-            <div style={{ minWidth: 90 }}>
+          {Number.isFinite(third) && (
+            <div>
               <div style={{ color: "#2563eb", fontWeight: 700 }}>
                 ₹{third.toLocaleString("en-IN")}
               </div>
@@ -143,5 +121,4 @@ export default function ProductCard({ product }) {
       </div>
     </Link>
   );
-        }
-                           
+}
