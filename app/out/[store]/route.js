@@ -1,93 +1,77 @@
 import { NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebase-admin";
-import { serverTimestamp } from "firebase-admin/firestore";
-import crypto from "crypto";
+import { initializeApp, getApps, cert } from "firebase-admin/app";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
 
-const RATE_LIMIT_SECONDS = 5;
-
-function hash(input) {
-  return crypto.createHash("sha256").update(input).digest("hex");
+// ---------- INIT ADMIN SDK (SAFE SINGLETON) ----------
+if (!getApps().length) {
+  initializeApp({
+    credential: cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    }),
+  });
 }
 
+const db = getFirestore();
+
+// ---------- CONFIG ----------
+const RATE_LIMIT_SECONDS = 5;
+
+// ---------- ROUTE ----------
 export async function GET(req, { params }) {
   const { store } = params;
   const { searchParams } = new URL(req.url);
 
   const productId = searchParams.get("pid");
+  const targetUrl = searchParams.get("url");
 
-  if (!productId || !store) {
+  if (!productId || !store || !targetUrl) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  // Get IP (works on Vercel)
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0] ||
     req.headers.get("x-real-ip") ||
     "unknown";
 
-  const ipHash = hash(ip);
-  const rateLimitId = `${store}_${productId}_${ipHash}`;
+  const rateRef = db
+    .collection("rate_limits")
+    .doc(`${ip}_${productId}_${store}`);
+
+  const now = Date.now();
 
   try {
-    if (adminDb) {
-      const ref = adminDb.collection("rate_limits").doc(rateLimitId);
-      const snap = await ref.get();
+    // ---------- RATE LIMIT CHECK ----------
+    const snap = await rateRef.get();
 
-      const now = Date.now();
-      let allowLog = true;
-
-      if (snap.exists) {
-        const last = snap.data().lastClickAt?.toMillis?.();
-        if (last && now - last < RATE_LIMIT_SECONDS * 1000) {
-          allowLog = false; // ⛔ too soon
-        }
-      }
-
-      if (allowLog) {
-        // log click
-        await adminDb.collection("clicks").add({
-          productId,
-          store: store.toLowerCase(),
-          createdAt: serverTimestamp(),
-          ua: req.headers.get("user-agent") || null,
-        });
-
-        // update rate limit
-        await ref.set(
-          {
-            productId,
-            store: store.toLowerCase(),
-            lastClickAt: serverTimestamp(),
-          },
-          { merge: true }
-        );
+    if (snap.exists) {
+      const last = snap.data().ts?.toMillis?.() || 0;
+      if (now - last < RATE_LIMIT_SECONDS * 1000) {
+        return NextResponse.redirect(new URL("/", req.url));
       }
     }
-  } catch (e) {
-    // never block redirect
-    console.error("Rate limit / click log error:", e);
+
+    // ---------- WRITE RATE LIMIT (ALWAYS FIRST) ----------
+    await rateRef.set({
+      ip,
+      productId,
+      store,
+      ts: FieldValue.serverTimestamp(),
+    });
+
+    // ---------- WRITE CLICK ----------
+    await db.collection("clicks").add({
+      productId,
+      store,
+      ip,
+      createdAt: FieldValue.serverTimestamp(),
+    });
+
+    // ---------- REDIRECT ----------
+    return NextResponse.redirect(targetUrl);
+  } catch (err) {
+    console.error("OUT ROUTE ERROR:", err);
+    return NextResponse.redirect(new URL("/", req.url));
   }
-
-  // 🔁 fetch product & redirect to store URL
-  try {
-    const productSnap = await adminDb
-      .collection("products")
-      .doc(productId)
-      .get();
-
-    if (productSnap.exists) {
-      const product = productSnap.data();
-      const match = (product.store || []).find(
-        (s) => s.name?.toLowerCase() === store.toLowerCase()
-      );
-      if (match?.url) {
-        return NextResponse.redirect(match.url);
-      }
-    }
-  } catch (e) {
-    console.error("Redirect fetch error:", e);
-  }
-
-  return NextResponse.redirect(new URL("/", req.url));
-    }
-          
+}
