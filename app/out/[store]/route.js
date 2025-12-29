@@ -1,19 +1,32 @@
 import { NextResponse } from "next/server";
-
-const AFFILIATE_MAP = {
-  amazon: "https://www.amazon.in/",
-  flipkart: "https://www.flipkart.com/",
-  ajio: "https://www.ajio.com/",
-  meesho: "https://www.meesho.com/",
-};
+import { adminDb } from "@/lib/firebase-admin";
+import { serverTimestamp } from "firebase-admin/firestore";
 
 export async function GET(req, { params }) {
-  const store = params.store?.toLowerCase();
-  const targetUrl = AFFILIATE_MAP[store];
+  const { store } = params;
+  const { searchParams } = new URL(req.url);
 
-  if (!targetUrl) {
+  const productId = searchParams.get("pid");
+  const targetUrl = searchParams.get("url");
+
+  // Safety checks
+  if (!productId || !store || !targetUrl) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
+  try {
+    // ✅ Admin-safe click log
+    await adminDb.collection("clicks").add({
+      productId,
+      store: store.toLowerCase(),
+      createdAt: serverTimestamp(),
+      ua: req.headers.get("user-agent") || null,
+    });
+  } catch (e) {
+    // Fail silently (never block redirect)
+    console.error("Click log failed:", e);
+  }
+
+  // ✅ Always redirect user
   return NextResponse.redirect(targetUrl);
 }
