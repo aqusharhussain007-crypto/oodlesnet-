@@ -9,24 +9,22 @@ export async function GET(req, { params }) {
   const productId = searchParams.get("pid");
   const targetUrl = searchParams.get("url");
 
-  // Safety checks
   if (!productId || !store || !targetUrl) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
   try {
-    // ✅ Admin-safe click log
-    await adminDb.collection("clicks").add({
-      productId,
-      store: store.toLowerCase(),
-      createdAt: serverTimestamp(),
-      ua: req.headers.get("user-agent") || null,
-    });
+    if (adminDb) {
+      await adminDb.collection("clicks").add({
+        productId,
+        store: store.toLowerCase(),
+        createdAt: serverTimestamp(),
+        ua: req.headers.get("user-agent") || null,
+      });
+    }
   } catch (e) {
-    // Fail silently (never block redirect)
     console.error("Click log failed:", e);
   }
 
-  // ✅ Always redirect user
   return NextResponse.redirect(targetUrl);
 }
