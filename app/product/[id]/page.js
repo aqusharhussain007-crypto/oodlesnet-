@@ -2,7 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase-app";
+import ProductCard from "@/components/ProductCard";
+import {
+  excludeProductById,
+  filterByPriceRange,
+} from "@/lib/productUtils";
 import { useProduct } from "./product-client";
 
 export default function ProductPage({ params }) {
@@ -10,6 +17,62 @@ export default function ProductPage({ params }) {
   const { product, loading } = useProduct(id);
 
   const [expanded, setExpanded] = useState(false);
+
+  const [relatedCategory, setRelatedCategory] = useState([]);
+  const [relatedBrand, setRelatedBrand] = useState([]);
+  const [relatedPrice, setRelatedPrice] = useState([]);
+
+  useEffect(() => {
+    if (!product) return;
+
+    async function loadRelated() {
+      const snap = await getDocs(collection(db, "products"));
+      let all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      all = excludeProductById(all, product.id);
+
+      const usedIds = new Set([product.id]);
+
+      // --- SAME CATEGORY ---
+      const categoryItems = all
+        .filter(
+          (p) =>
+            p.categorySlug === product.categorySlug &&
+            !usedIds.has(p.id)
+        )
+        .slice(0, 4);
+      categoryItems.forEach((p) => usedIds.add(p.id));
+      setRelatedCategory(categoryItems);
+
+      // --- SAME BRAND ---
+      const brandItems = all
+        .filter(
+          (p) =>
+            p.brand === product.brand &&
+            !usedIds.has(p.id)
+        )
+        .slice(0, 4);
+      brandItems.forEach((p) => usedIds.add(p.id));
+      setRelatedBrand(brandItems);
+
+      // --- SIMILAR PRICE ---
+      const prices =
+        product.store
+          ?.map((s) => Number(s.price))
+          .filter((p) => Number.isFinite(p)) || [];
+
+      if (prices.length) {
+        const base = Math.min(...prices);
+        const priceItems = filterByPriceRange(
+          all.filter((p) => !usedIds.has(p.id)),
+          base,
+          15
+        ).slice(0, 4);
+        setRelatedPrice(priceItems);
+      }
+    }
+
+    loadRelated();
+  }, [product]);
 
   if (loading) return <div style={{ padding: 16 }}>Loading…</div>;
   if (!product)
@@ -50,7 +113,7 @@ export default function ProductPage({ params }) {
         margin: "0 auto",
       }}
     >
-      {/* Breadcrumb */}
+      {/* BREADCRUMB */}
       <div style={{ fontSize: 14, marginBottom: 12 }}>
         <Link href="/" style={{ color: "#3b82f6" }}>
           Home
@@ -62,7 +125,7 @@ export default function ProductPage({ params }) {
         / <strong>{product.name}</strong>
       </div>
 
-      {/* Image */}
+      {/* IMAGE */}
       <div
         style={{
           borderRadius: 18,
@@ -81,7 +144,7 @@ export default function ProductPage({ params }) {
         />
       </div>
 
-      {/* Title + Share */}
+      {/* TITLE + SHARE */}
       <div
         style={{
           display: "flex",
@@ -110,7 +173,7 @@ export default function ProductPage({ params }) {
         </button>
       </div>
 
-      {/* Description */}
+      {/* DESCRIPTION */}
       <div style={{ marginTop: 12 }}>
         <p
           style={{
@@ -141,7 +204,7 @@ export default function ProductPage({ params }) {
         )}
       </div>
 
-      {/* Compare Prices */}
+      {/* COMPARE PRICES */}
       <h3
         style={{
           marginTop: 24,
@@ -229,7 +292,54 @@ export default function ProductPage({ params }) {
           </div>
         ))}
       </div>
+
+      {/* RELATED: SAME CATEGORY */}
+      {relatedCategory.length > 0 && (
+        <>
+          <h3 className="section-title">
+            More in {product.categorySlug}
+          </h3>
+          <div className="slider-row">
+            <div className="flex gap-4 overflow-x-auto no-scrollbar">
+              {relatedCategory.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* RELATED: SAME BRAND */}
+      {relatedBrand.length > 0 && (
+        <>
+          <h3 className="section-title">
+            More from {product.brand}
+          </h3>
+          <div className="slider-row">
+            <div className="flex gap-4 overflow-x-auto no-scrollbar">
+              {relatedBrand.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* RELATED: SIMILAR PRICE */}
+      {relatedPrice.length > 0 && (
+        <>
+          <h3 className="section-title">
+            Similar Price Range
+          </h3>
+          <div className="slider-row">
+            <div className="flex gap-4 overflow-x-auto no-scrollbar">
+              {relatedPrice.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
-                       }
-    
+}
