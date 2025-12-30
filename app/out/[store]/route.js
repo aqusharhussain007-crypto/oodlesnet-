@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import admin from "firebase-admin";
 import crypto from "crypto";
 
-// --------------------
-// FIREBASE ADMIN INIT
-// --------------------
+/* ---------------------------------------
+   Firebase Admin – SAFE singleton init
+---------------------------------------- */
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert({
@@ -18,14 +18,14 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 const { FieldValue } = admin.firestore;
 
-// --------------------
-// RATE LIMIT CONFIG
-// --------------------
-const RATE_LIMIT_SECONDS = 15; // temporary for testing
+/* ---------------------------------------
+   Rate limit config (TEMP for testing)
+---------------------------------------- */
+const RATE_LIMIT_SECONDS = 15;
 
-// --------------------
-// FINGERPRINT HELPER
-// --------------------
+/* ---------------------------------------
+   Fingerprint helper (stable on Vercel)
+---------------------------------------- */
 function getClientFingerprint(request) {
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
@@ -40,23 +40,32 @@ function getClientFingerprint(request) {
     .slice(0, 32);
 }
 
-// --------------------
-// ROUTE HANDLER
-// --------------------
+/* ---------------------------------------
+   GET handler
+---------------------------------------- */
 export async function GET(request, { params }) {
   const store = params.store;
   const { searchParams } = new URL(request.url);
   const productId = searchParams.get("pid");
 
-  if (!productId || !store) {
+  if (!store || !productId) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
+  /* ---------------------------------------
+     🔴 PROOF WRITE (TEMPORARY)
+     This MUST create rate_limits collection
+  ---------------------------------------- */
+  await db.collection("rate_limits").doc("PROOF_VISIBLE").set({
+    ok: true,
+    createdAt: FieldValue.serverTimestamp(),
+  });
+
+  /* ---------------------------------------
+     Rate limiting logic
+  ---------------------------------------- */
   const fingerprint = getClientFingerprint(request);
 
-  // --------------------
-  // RATE LIMIT CHECK
-  // --------------------
   const rateLimitRef = db
     .collection("rate_limits")
     .doc(`${fingerprint}_${productId}_${store}`);
@@ -67,17 +76,15 @@ export async function GET(request, { params }) {
   let allowed = true;
 
   if (rateSnap.exists) {
-    const last =
-      rateSnap.data().lastClick?.toMillis?.() || 0;
-
+    const last = rateSnap.data().lastClick?.toMillis?.() || 0;
     if (now - last < RATE_LIMIT_SECONDS * 1000) {
       allowed = false;
     }
   }
 
-  // --------------------
-  // WRITE CLICK (SERVER ONLY)
-  // --------------------
+  /* ---------------------------------------
+     Click tracking (server only)
+  ---------------------------------------- */
   if (allowed) {
     await Promise.all([
       db.collection("clicks").add({
@@ -94,9 +101,9 @@ export async function GET(request, { params }) {
     ]);
   }
 
-  // --------------------
-  // REDIRECT TO STORE
-  // --------------------
+  /* ---------------------------------------
+     Resolve store URL
+  ---------------------------------------- */
   const productSnap = await db
     .collection("products")
     .doc(productId)
@@ -115,6 +122,9 @@ export async function GET(request, { params }) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
+  /* ---------------------------------------
+     Final redirect
+  ---------------------------------------- */
   return NextResponse.redirect(storeData.url);
-         }
+      }
   
