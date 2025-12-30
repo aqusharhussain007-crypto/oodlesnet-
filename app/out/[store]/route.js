@@ -20,7 +20,7 @@ const db = getFirestore();
 // --------------------
 // Config
 // --------------------
-const RATE_LIMIT_SECONDS = 5;
+const RATE_LIMIT_SECONDS = 15;
 
 // --------------------
 // GET handler
