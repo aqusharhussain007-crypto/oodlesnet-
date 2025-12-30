@@ -1,51 +1,65 @@
 import { NextResponse } from "next/server";
-import { initializeApp, getApps, cert } from "firebase-admin/app";
-import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import admin from "firebase-admin";
+import crypto from "crypto";
 
 // --------------------
-// Firebase Admin Init
+// FIREBASE ADMIN INIT
 // --------------------
-if (!getApps().length) {
-  initializeApp({
-    credential: cert({
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
     }),
   });
 }
 
-const db = getFirestore();
+const db = admin.firestore();
+const { FieldValue } = admin.firestore;
 
 // --------------------
-// Config
+// RATE LIMIT CONFIG
 // --------------------
-const RATE_LIMIT_SECONDS = 15;
+const RATE_LIMIT_SECONDS = 15; // temporary for testing
 
 // --------------------
-// GET handler
+// FINGERPRINT HELPER
+// --------------------
+function getClientFingerprint(request) {
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    "no-ip";
+
+  const ua = request.headers.get("user-agent") || "no-ua";
+
+  return crypto
+    .createHash("sha256")
+    .update(ip + ua)
+    .digest("hex")
+    .slice(0, 32);
+}
+
+// --------------------
+// ROUTE HANDLER
 // --------------------
 export async function GET(request, { params }) {
   const store = params.store;
   const { searchParams } = new URL(request.url);
   const productId = searchParams.get("pid");
 
-  if (!store || !productId) {
+  if (!productId || !store) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  // Get client IP (Vercel-safe)
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0] ||
-    request.headers.get("x-real-ip") ||
-    "unknown";
+  const fingerprint = getClientFingerprint(request);
 
   // --------------------
   // RATE LIMIT CHECK
   // --------------------
   const rateLimitRef = db
     .collection("rate_limits")
-    .doc(`${ip}_${productId}_${store}`);
+    .doc(`${fingerprint}_${productId}_${store}`);
 
   const rateSnap = await rateLimitRef.get();
   const now = Date.now();
@@ -53,21 +67,22 @@ export async function GET(request, { params }) {
   let allowed = true;
 
   if (rateSnap.exists) {
-    const last = rateSnap.data().lastClick?.toMillis?.() || 0;
+    const last =
+      rateSnap.data().lastClick?.toMillis?.() || 0;
+
     if (now - last < RATE_LIMIT_SECONDS * 1000) {
       allowed = false;
     }
   }
 
   // --------------------
-  // WRITE CLICK (server only)
+  // WRITE CLICK (SERVER ONLY)
   // --------------------
   if (allowed) {
     await Promise.all([
       db.collection("clicks").add({
         productId,
         store,
-        ip,
         createdAt: FieldValue.serverTimestamp(),
       }),
       rateLimitRef.set(
@@ -80,28 +95,26 @@ export async function GET(request, { params }) {
   }
 
   // --------------------
-  // FETCH PRODUCT URL
+  // REDIRECT TO STORE
   // --------------------
-  let redirectUrl = "/";
+  const productSnap = await db
+    .collection("products")
+    .doc(productId)
+    .get();
 
-  try {
-    const productSnap = await db
-      .collection("products")
-      .doc(productId)
-      .get();
-
-    if (productSnap.exists) {
-      const data = productSnap.data();
-      const storeEntry = data.store?.find(
-        (s) => s.name === store
-      );
-      if (storeEntry?.url) {
-        redirectUrl = storeEntry.url;
-      }
-    }
-  } catch (e) {
-    console.error("Redirect fetch error:", e);
+  if (!productSnap.exists) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
-  return NextResponse.redirect(redirectUrl);
-        }
+  const product = productSnap.data();
+  const storeData = product.store?.find(
+    (s) => s.name === store
+  );
+
+  if (!storeData?.url) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  return NextResponse.redirect(storeData.url);
+         }
+  
