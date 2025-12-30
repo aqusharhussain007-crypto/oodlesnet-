@@ -28,6 +28,16 @@ export async function GET(request, { params }) {
     return NextResponse.json({ error: "Invalid params" }, { status: 400 });
   }
 
+  // ============================
+// PATCH TEST MODE (TEMPORARY)
+// ============================
+await db.collection("rate_limits").add({
+  test: true,
+  store,
+  productId,
+  createdAt: FieldValue.serverTimestamp(),
+});
+  
   // Get IP (Vercel-safe)
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0] ||
