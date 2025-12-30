@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 import admin from "firebase-admin";
-import crypto from "crypto";
 
-/* ---------------------------------------
-   Firebase Admin – SAFE singleton init
----------------------------------------- */
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert({
@@ -16,59 +12,28 @@ if (!admin.apps.length) {
 }
 
 const db = admin.firestore();
-const { FieldValue } = admin.firestore;
+const FieldValue = admin.firestore.FieldValue;
 
-/* ---------------------------------------
-   Rate limit config (TEMP for testing)
----------------------------------------- */
 const RATE_LIMIT_SECONDS = 15;
 
-/* ---------------------------------------
-   Fingerprint helper (stable on Vercel)
----------------------------------------- */
-function getClientFingerprint(request) {
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    "no-ip";
-
-  const ua = request.headers.get("user-agent") || "no-ua";
-
-  return crypto
-    .createHash("sha256")
-    .update(ip + ua)
-    .digest("hex")
-    .slice(0, 32);
-}
-
-/* ---------------------------------------
-   GET handler
----------------------------------------- */
 export async function GET(request, { params }) {
   const store = params.store;
   const { searchParams } = new URL(request.url);
   const productId = searchParams.get("pid");
+  const redirectUrl = searchParams.get("url");
 
-  if (!store || !productId) {
-    return NextResponse.redirect(new URL("/", request.url));
+  if (!productId || !redirectUrl) {
+    return NextResponse.redirect("/");
   }
 
-  /* ---------------------------------------
-     🔴 PROOF WRITE (TEMPORARY)
-     This MUST create rate_limits collection
-  ---------------------------------------- */
-  await db.collection("rate_limits").doc("PROOF_VISIBLE").set({
-    ok: true,
-    createdAt: FieldValue.serverTimestamp(),
-  });
-
-  /* ---------------------------------------
-     Rate limiting logic
-  ---------------------------------------- */
-  const fingerprint = getClientFingerprint(request);
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0] ||
+    request.headers.get("x-real-ip") ||
+    "unknown";
 
   const rateLimitRef = db
     .collection("rate_limits")
-    .doc(`${fingerprint}_${productId}_${store}`);
+    .doc(`${ip}_${productId}_${store}`);
 
   const rateSnap = await rateLimitRef.get();
   const now = Date.now();
@@ -82,49 +47,20 @@ export async function GET(request, { params }) {
     }
   }
 
-  /* ---------------------------------------
-     Click tracking (server only)
-  ---------------------------------------- */
+  // ✅ WRITE RATE LIMIT FIRST (CRITICAL)
   if (allowed) {
-    await Promise.all([
-      db.collection("clicks").add({
-        productId,
-        store,
-        createdAt: FieldValue.serverTimestamp(),
-      }),
-      rateLimitRef.set(
-        {
-          lastClick: FieldValue.serverTimestamp(),
-        },
-        { merge: true }
-      ),
-    ]);
+    await rateLimitRef.set(
+      { lastClick: FieldValue.serverTimestamp() },
+      { merge: true }
+    );
+
+    await db.collection("clicks").add({
+      productId,
+      store,
+      ip,
+      createdAt: FieldValue.serverTimestamp(),
+    });
   }
 
-  /* ---------------------------------------
-     Resolve store URL
-  ---------------------------------------- */
-  const productSnap = await db
-    .collection("products")
-    .doc(productId)
-    .get();
-
-  if (!productSnap.exists) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  const product = productSnap.data();
-  const storeData = product.store?.find(
-    (s) => s.name === store
-  );
-
-  if (!storeData?.url) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  /* ---------------------------------------
-     Final redirect
-  ---------------------------------------- */
-  return NextResponse.redirect(storeData.url);
-      }
-  
+  return NextResponse.redirect(redirectUrl);
+}
