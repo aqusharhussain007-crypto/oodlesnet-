@@ -51,7 +51,12 @@ export async function GET(req, { params }) {
         return NextResponse.redirect(new URL("/", req.url));
       }
     }
-
+    
+await db.collection("rate_limits").add({
+  test: true,
+  createdAt: admin.firestore.FieldValue.serverTimestamp(),
+});
+    
     // ---------- WRITE RATE LIMIT (ALWAYS FIRST) ----------
     await rateRef.set({
       ip,
