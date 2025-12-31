@@ -1,20 +1,6 @@
 import { NextResponse } from "next/server";
-import admin from "firebase-admin";
-
-/* --------------------
-   Firebase Admin Init
--------------------- */
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-    }),
-  });
-}
-
-const db = admin.firestore();
+import { adminDb } from "@/lib/firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 
 /* --------------------
    CONFIG
@@ -26,6 +12,13 @@ const RATE_LIMIT_SECONDS = 5;
 -------------------- */
 export async function GET(request, { params }) {
   try {
+    if (!adminDb) {
+      return NextResponse.json(
+        { error: "Firestore not initialized" },
+        { status: 500 }
+      );
+    }
+
     const { store } = params;
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get("pid");
@@ -37,8 +30,14 @@ export async function GET(request, { params }) {
       );
     }
 
-    // Fetch product
-    const doc = await db.collection("products").doc(productId).get();
+    /* --------------------
+       FETCH PRODUCT
+    -------------------- */
+    const doc = await adminDb
+      .collection("products")
+      .doc(productId)
+      .get();
+
     if (!doc.exists) {
       return NextResponse.json(
         { error: "Product not found" },
@@ -47,8 +46,9 @@ export async function GET(request, { params }) {
     }
 
     const product = doc.data();
+
     const storeData = product.store?.find(
-      (s) => s.name === store
+      (s) => s.name?.toLowerCase() === store.toLowerCase()
     );
 
     if (!storeData?.url) {
@@ -61,6 +61,16 @@ export async function GET(request, { params }) {
     const redirectUrl = storeData.url;
 
     /* --------------------
+       SAFETY CHECK
+    -------------------- */
+    if (!redirectUrl.startsWith("http")) {
+      return NextResponse.json(
+        { error: "Invalid redirect URL" },
+        { status: 400 }
+      );
+    }
+
+    /* --------------------
        FIRE & FORGET TRACKING
     -------------------- */
     (async () => {
@@ -70,7 +80,7 @@ export async function GET(request, { params }) {
           request.headers.get("x-real-ip") ||
           "unknown";
 
-        const rateRef = db
+        const rateRef = adminDb
           .collection("rate_limits")
           .doc(`${ip}_${productId}_${store}`);
 
@@ -88,16 +98,15 @@ export async function GET(request, { params }) {
 
         if (allowed) {
           await Promise.all([
-            db.collection("clicks").add({
+            adminDb.collection("clicks").add({
               productId,
               store,
               ip,
-              createdAt: admin.firestore.FieldValue.serverTimestamp(),
+              createdAt: FieldValue.serverTimestamp(),
             }),
             rateRef.set(
               {
-                lastClick:
-                  admin.firestore.FieldValue.serverTimestamp(),
+                lastClick: FieldValue.serverTimestamp(),
               },
               { merge: true }
             ),
@@ -108,7 +117,9 @@ export async function GET(request, { params }) {
       }
     })();
 
-    // Redirect
+    /* --------------------
+       REDIRECT
+    -------------------- */
     return NextResponse.redirect(redirectUrl, 302);
   } catch (err) {
     console.error("OUT ROUTE ERROR:", err);
@@ -118,3 +129,4 @@ export async function GET(request, { params }) {
     );
   }
                }
+               
