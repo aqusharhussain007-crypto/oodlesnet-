@@ -1,24 +1,35 @@
-import { NextResponse } from "next/server";
-
-export const runtime = "nodejs"; // IMPORTANT for Vercel stability
-
-export async function GET(req) {
+export async function GET(request, { params }) {
   try {
-    const url = new URL(req.url);
-    const targetUrl = url.searchParams.get("url");
+    const { store } = params;
+    const { searchParams } = new URL(request.url);
+    const productId = searchParams.get("pid");
 
-    // Absolute safety check
-    if (
-      !targetUrl ||
-      typeof targetUrl !== "string" ||
-      !/^https?:\/\//i.test(targetUrl)
-    ) {
-      return NextResponse.redirect(new URL("/", url.origin), 302);
+    if (!productId || !store) {
+      return NextResponse.json({ error: "Invalid params" }, { status: 400 });
     }
 
-    return NextResponse.redirect(targetUrl, 302);
-  } catch (err) {
-    // Never allow Vercel to throw
-    return NextResponse.redirect(new URL("/", "https://example.com"), 302);
+    const doc = await db.collection("products").doc(productId).get();
+    if (!doc.exists) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
+    const product = doc.data();
+    const storeData = product.store?.find(
+      (s) => s.name === store
+    );
+
+    if (!storeData?.externalUrl) {
+      return NextResponse.json({ error: "Store URL missing" }, { status: 404 });
+    }
+
+    const response = NextResponse.redirect(storeData.externalUrl, 302);
+
+    // fire & forget tracking (unchanged)
+    trackClick({ request, productId, store });
+
+    return response;
+  } catch (e) {
+    console.error("OUT ERROR", e);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
-}
+  }
