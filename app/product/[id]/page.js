@@ -1,4 +1,5 @@
-"use client";
+This is my app/product/[id]/page.jsx check only first and reply short 
+ "use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -77,7 +78,7 @@ export default function ProductPage({ params }) {
 
   const stores = product.store || [];
 
-  // SORT STORES BY PRICE (ASC)
+  // ✅ FIX: SORT STORES BY PRICE (ASCENDING)
   const sortedStores = [...stores].sort(
     (a, b) => Number(a.price) - Number(b.price)
   );
@@ -88,11 +89,8 @@ export default function ProductPage({ params }) {
 
   const cheapest = prices.length ? Math.min(...prices) : null;
 
-  // ✅ FIXED BUY HANDLER (ONLY CHANGE)
   function handleBuy(store) {
-    window.location.href = `/out/${store.name.toLowerCase()}?pid=${product.id}&url=${encodeURIComponent(
-      store.url
-    )}`;
+    window.location.href = store.url;
   }
 
   function handleShare() {
@@ -344,3 +342,4 @@ export default function ProductPage({ params }) {
     </div>
   );
 }
+  
