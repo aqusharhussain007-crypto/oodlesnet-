@@ -88,11 +88,9 @@ export default function ProductPage({ params }) {
 
   const cheapest = prices.length ? Math.min(...prices) : null;
 
-  // ✅ FIXED BUY HANDLER (ONLY CHANGE)
+  /* ✅ FIXED BUY HANDLER */
   function handleBuy(store) {
-    window.location.href = `/out/${store.name.toLowerCase()}?pid=${product.id}&url=${encodeURIComponent(
-      store.url
-    )}`;
+    window.location.href = `/out/${store.name.toLowerCase()}?pid=${product.id}`;
   }
 
   function handleShare() {
@@ -344,4 +342,4 @@ export default function ProductPage({ params }) {
     </div>
   );
     }
-        
+    
