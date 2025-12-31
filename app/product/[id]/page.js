@@ -1,5 +1,4 @@
-This is my app/product/[id]/page.jsx check only first and reply short 
- "use client";
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
