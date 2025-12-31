@@ -77,7 +77,7 @@ export default function ProductPage({ params }) {
 
   const stores = product.store || [];
 
-  // ✅ FIX: SORT STORES BY PRICE (ASCENDING)
+  // SORT STORES BY PRICE (ASC)
   const sortedStores = [...stores].sort(
     (a, b) => Number(a.price) - Number(b.price)
   );
@@ -88,8 +88,11 @@ export default function ProductPage({ params }) {
 
   const cheapest = prices.length ? Math.min(...prices) : null;
 
+  // ✅ FIXED BUY HANDLER (ONLY CHANGE)
   function handleBuy(store) {
-    window.location.href = store.url;
+    window.location.href = `/out/${store.name.toLowerCase()}?pid=${product.id}&url=${encodeURIComponent(
+      store.url
+    )}`;
   }
 
   function handleShare() {
@@ -340,5 +343,5 @@ export default function ProductPage({ params }) {
       )}
     </div>
   );
-}
-  
+    }
+        
