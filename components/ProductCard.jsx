@@ -60,6 +60,20 @@ export default function ProductCard({ product }) {
               flexShrink: 0,
             }}
           >
+            <img
+              src={product.imageUrl || "/placeholder.png"}
+              alt={product.name}
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+              onError={(e) => {
+                e.currentTarget.src = "/placeholder.png";
+              }}
+            />
           </div>
 
           <div style={{ flex: 1 }}>
@@ -113,4 +127,4 @@ export default function ProductCard({ product }) {
       </div>
     </Link>
   );
-              }
+}
