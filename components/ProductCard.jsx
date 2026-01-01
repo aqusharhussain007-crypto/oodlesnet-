@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 
 export default function ProductCard({ product }) {
@@ -61,12 +60,19 @@ export default function ProductCard({ product }) {
               flexShrink: 0,
             }}
           >
-            <Image
+            <img
               src={product.imageUrl || "/placeholder.png"}
               alt={product.name}
-              fill
-              sizes="140px"
-              style={{ objectFit: "cover" }}
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+              onError={(e) => {
+                e.currentTarget.src = "/placeholder.png";
+              }}
             />
           </div>
 
@@ -121,4 +127,4 @@ export default function ProductCard({ product }) {
       </div>
     </Link>
   );
-}
+              }
