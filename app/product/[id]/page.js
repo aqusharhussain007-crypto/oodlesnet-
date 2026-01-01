@@ -143,7 +143,7 @@ export default function ProductPage({ params }) {
   alt={product.name}
   width={900}
   height={520}
-  unoptimized
+  style={{ width: "100%", objectFit: "cover" }}
 />
       </div>
 
