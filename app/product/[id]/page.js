@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
@@ -77,7 +76,6 @@ export default function ProductPage({ params }) {
 
   const stores = product.store || [];
 
-  // SORT STORES BY PRICE (ASC)
   const sortedStores = [...stores].sort(
     (a, b) => Number(a.price) - Number(b.price)
   );
@@ -88,7 +86,6 @@ export default function ProductPage({ params }) {
 
   const cheapest = prices.length ? Math.min(...prices) : null;
 
-  /* ✅ FIXED BUY HANDLER */
   function handleBuy(store) {
     window.location.href = `/out/${store.name.toLowerCase()}?pid=${product.id}`;
   }
@@ -96,11 +93,13 @@ export default function ProductPage({ params }) {
   function handleShare() {
     const url = window.location.href;
     if (navigator.share) {
-      navigator.share({
-        title: product.name,
-        text: `Compare prices for ${product.name}`,
-        url,
-      }).catch(() => {});
+      navigator
+        .share({
+          title: product.name,
+          text: `Compare prices for ${product.name}`,
+          url,
+        })
+        .catch(() => {});
     } else {
       navigator.clipboard.writeText(url);
       alert("Link copied");
@@ -138,13 +137,16 @@ export default function ProductPage({ params }) {
           marginBottom: 16,
         }}
       >
-        <Image
-  src={product.imageUrl}
-  alt={product.name}
-  width={900}
-  height={520}
-  style={{ width: "100%", objectFit: "cover" }}
-/>
+        <img
+          src={product.imageUrl || "/placeholder.png"}
+          alt={product.name}
+          loading="lazy"
+          referrerPolicy="no-referrer"
+          style={{ width: "100%", height: 520, objectFit: "cover" }}
+          onError={(e) => {
+            e.currentTarget.src = "/placeholder.png";
+          }}
+        />
       </div>
 
       {/* Title + Share */}
@@ -341,5 +343,5 @@ export default function ProductPage({ params }) {
       )}
     </div>
   );
-    }
-    
+        }
+          
