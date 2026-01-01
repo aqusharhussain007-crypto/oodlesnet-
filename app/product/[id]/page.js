@@ -139,12 +139,12 @@ export default function ProductPage({ params }) {
         }}
       >
         <Image
-          src={product.imageUrl}
-          alt={product.name}
-          width={900}
-          height={520}
-          style={{ width: "100%", objectFit: "cover" }}
-        />
+  src={product.imageUrl}
+  alt={product.name}
+  width={900}
+  height={520}
+  unoptimized
+/>
       </div>
 
       {/* Title + Share */}
