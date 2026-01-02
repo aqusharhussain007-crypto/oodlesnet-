@@ -61,7 +61,7 @@ export default function ProductCard({ product }) {
             }}
           >
             <img
-  src="/products/oneplus_nord_ce5_thumb.jpg"
+  src={product.imageUrl || "/placeholder.png"}
   alt="test"
   style={{
     width: "100%",
