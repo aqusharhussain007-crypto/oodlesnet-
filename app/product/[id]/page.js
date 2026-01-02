@@ -270,7 +270,20 @@ export default function ProductPage({ params }) {
             </div>
 
             <button
-              onClick={() => handleBuy(store)}
+             {Number(store.price) === cheapest && (
+  <span
+    style={{
+      display: "inline-block",
+      width: 8,
+      height: 8,
+      marginRight: 8,
+      borderRadius: "50%",
+      backgroundColor: "#22c55e",
+      animation: "blink 1.2s infinite",
+    }}
+  />
+)}
+            onClick={() => handleBuy(store)}
               style={{
                 width: "100%",
                 padding: "14px 0",
@@ -343,4 +356,11 @@ export default function ProductPage({ params }) {
     </div>
   );
                                   }
-    
+   <style jsx>{`
+  @keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.2; }
+    100% { opacity: 1; }
+  }
+`}</style>
+     
