@@ -76,9 +76,9 @@ export default function ProductPage({ params }) {
 
   const stores = product.store || [];
 
-  const sortedStores = [...stores].sort(
-    (a, b) => Number(a.price) - Number(b.price)
-  );
+  const sortedStores = [...stores]
+  .filter((s) => Number(s.price) > 0)
+  .sort((a, b) => Number(a.price) - Number(b.price));
 
   const prices = sortedStores
     .map((s) => Number(s.price))
