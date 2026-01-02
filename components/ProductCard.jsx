@@ -61,19 +61,14 @@ export default function ProductCard({ product }) {
             }}
           >
             <img
-              src={product.imageUrl || "/placeholder.png"}
-              alt={product.name}
-              loading="lazy"
-              referrerPolicy="no-referrer"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-              onError={(e) => {
-                e.currentTarget.src = "/placeholder.png";
-              }}
-            />
+  src="/products/oneplus_nord_ce5_thumb.jpg"
+  alt="test"
+  style={{
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  }}
+/>
           </div>
 
           <div style={{ flex: 1 }}>
