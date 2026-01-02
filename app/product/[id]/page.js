@@ -138,15 +138,14 @@ export default function ProductPage({ params }) {
         }}
       >
         <img
-          src={product.imageUrl || "/placeholder.png"}
-          alt={product.name}
-          loading="lazy"
-          referrerPolicy="no-referrer"
-          style={{ width: "100%", height: 520, objectFit: "cover" }}
-          onError={(e) => {
-            e.currentTarget.src = "/placeholder.png";
-          }}
-        />
+  src={product.imageUrl || "/placeholder.png"}
+  alt={product.name}
+  loading="lazy"
+  style={{ width: "100%", height: 520, objectFit: "cover" }}
+  onError={(e) => {
+    e.currentTarget.src = "/placeholder.png";
+  }}
+/>
       </div>
 
       {/* Title + Share */}
