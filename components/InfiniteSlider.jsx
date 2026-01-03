@@ -94,7 +94,7 @@ export default function InfiniteSlider({ items = [], size = "small" }) {
                     alt={item.name}
                     fill
                     sizes="150px"
-                    style={{ objectFit: "cover" }}
+                    style={{ objectFit: "contain" }}
                   />
                 </div>
 
@@ -133,4 +133,4 @@ export default function InfiniteSlider({ items = [], size = "small" }) {
     </div>
   );
             }
-                      
+              
