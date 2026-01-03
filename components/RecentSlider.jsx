@@ -22,7 +22,7 @@ export default function RecentSlider({ items = [] }) {
               width={120}
               height={120}
               alt={item.name}
-              className="rounded-lg object-cover"
+              className="rounded-lg object-contain bg-white"
             />
             <p className="text-sm font-semibold mt-1 text-blue-600 truncate">
               {item.name}
