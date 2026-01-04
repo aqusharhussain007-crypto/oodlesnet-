@@ -62,7 +62,7 @@ export default function ProductCard({ product }) {
           >
             <img
               src={product.imageUrl || "/placeholder.png"}
-              alt="test"
+              alt={product.name}
               style={{
                 width: "100%",
                 height: "100%",
@@ -73,19 +73,34 @@ export default function ProductCard({ product }) {
           </div>
 
           <div style={{ flex: 1 }}>
+            {/* TITLE – CLAMPED */}
             <h3
               style={{
                 color: "#0077aa",
                 fontWeight: 800,
                 fontSize: "1rem",
                 marginBottom: 6,
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
               }}
             >
               {product.name}
             </h3>
 
+            {/* DESCRIPTION – CLAMPED */}
             {product.description && (
-              <div style={{ fontSize: "0.85rem", color: "#555" }}>
+              <div
+                style={{
+                  fontSize: "0.85rem",
+                  color: "#555",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                }}
+              >
                 {product.description}
               </div>
             )}
@@ -123,5 +138,5 @@ export default function ProductCard({ product }) {
       </div>
     </Link>
   );
-                                        }
+                }
                 
