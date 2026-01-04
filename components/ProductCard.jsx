@@ -48,12 +48,22 @@ export default function ProductCard({ product }) {
       document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
 
+  // ESC key closes description
+  useEffect(() => {
+    function handleEsc(e) {
+      if (e.key === "Escape") setOpen(false);
+    }
+
+    if (open) document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, [open]);
+
   return (
     <Link
       href={`/product/${product.id}`}
       onClick={(e) => {
         if (open) {
-          e.preventDefault(); // block navigation when description is open
+          e.preventDefault();
           setOpen(false);
           return;
         }
@@ -155,7 +165,7 @@ export default function ProductCard({ product }) {
           </div>
         </div>
 
-        {/* DESCRIPTION BOX (fixed size, scrollable) */}
+        {/* DESCRIPTION BOX */}
         {open && (
           <div
             ref={boxRef}
@@ -171,14 +181,15 @@ export default function ProductCard({ product }) {
               boxShadow: "0 15px 35px rgba(0,0,0,0.18)",
               border: "1px solid #e5e7eb",
               padding: 14,
-              height: 220,        // fixed height
-              overflow: "hidden", // prevents card stretching
+              height: 220,
+              overflow: "hidden",
+              animation: "slideIn 0.25s ease-out",
             }}
           >
             <div
               style={{
                 height: "100%",
-                overflowY: "auto", // only content scrolls
+                overflowY: "auto",
                 fontSize: "0.9rem",
                 color: "#374151",
                 lineHeight: 1.5,
@@ -241,8 +252,21 @@ export default function ProductCard({ product }) {
             </div>
           )}
         </div>
+
+        <style jsx>{`
+          @keyframes slideIn {
+            from {
+              opacity: 0;
+              transform: translateY(-6px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}</style>
       </div>
     </Link>
   );
-  }
-                                        
+        }
+                            
