@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 
 export default function ProductCard({ product }) {
+  const [open, setOpen] = useState(false);
+
   const prices =
     product.store
       ?.map((s) => Number(s.price))
@@ -49,6 +52,7 @@ export default function ProductCard({ product }) {
         }}
       >
         <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+          {/* IMAGE */}
           <div
             style={{
               width: 140,
@@ -73,40 +77,60 @@ export default function ProductCard({ product }) {
           </div>
 
           <div style={{ flex: 1 }}>
-            {/* TITLE – CLAMPED */}
+            {/* FULL NAME */}
             <h3
               style={{
                 color: "#0077aa",
                 fontWeight: 800,
                 fontSize: "1rem",
                 marginBottom: 6,
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-                overflow: "hidden",
+                lineHeight: 1.25,
               }}
             >
               {product.name}
             </h3>
 
-            {/* DESCRIPTION – CLAMPED */}
+            {/* DESCRIPTION DRAWER */}
             {product.description && (
-              <div
-                style={{
-                  fontSize: "0.85rem",
-                  color: "#555",
-                  display: "-webkit-box",
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical",
-                  overflow: "hidden",
-                }}
-              >
-                {product.description}
-              </div>
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setOpen((v) => !v);
+                  }}
+                  style={{
+                    fontSize: "0.8rem",
+                    fontWeight: 700,
+                    color: "#0bbcff",
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    cursor: "pointer",
+                    marginBottom: 4,
+                  }}
+                >
+                  {open ? "Hide details ▲" : "Details ▾"}
+                </button>
+
+                <div
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "#555",
+                    lineHeight: 1.4,
+                    maxHeight: open ? 120 : 0,
+                    overflow: "hidden",
+                    transition: "max-height 0.35s ease",
+                  }}
+                >
+                  {product.description}
+                </div>
+              </>
             )}
           </div>
         </div>
 
+        {/* PRICES */}
         <div style={{ display: "flex", gap: 18, paddingLeft: 4 }}>
           {Number.isFinite(lowest) && (
             <div>
@@ -138,5 +162,5 @@ export default function ProductCard({ product }) {
       </div>
     </Link>
   );
-                }
-                
+      }
+                           
