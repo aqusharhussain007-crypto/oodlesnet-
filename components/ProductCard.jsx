@@ -35,23 +35,35 @@ export default function ProductCard({ product }) {
     localStorage.setItem("recent", JSON.stringify(recent));
   }
 
-  // close when clicking outside description box
+  // Close ONLY the box on outside click
   useEffect(() => {
     function handleClickOutside(e) {
       if (boxRef.current && !boxRef.current.contains(e.target)) {
+        e.stopPropagation();
         setOpen(false);
       }
     }
 
-    if (open) document.addEventListener("mousedown", handleClickOutside);
+    if (open) document.addEventListener("mousedown", handleClickOutside, true);
     return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside,
+        true
+      );
   }, [open]);
 
   return (
     <Link
       href={`/product/${product.id}`}
-      onClick={saveRecent}
+      onClick={(e) => {
+        if (open) {
+          e.preventDefault(); // block navigation when box is open
+          setOpen(false);
+          return;
+        }
+        saveRecent();
+      }}
       style={{ textDecoration: "none" }}
     >
       <div
@@ -63,6 +75,7 @@ export default function ProductCard({ product }) {
           display: "flex",
           flexDirection: "column",
           gap: 12,
+          position: "relative",
         }}
       >
         <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
@@ -90,7 +103,7 @@ export default function ProductCard({ product }) {
             />
           </div>
 
-          <div style={{ flex: 1, position: "relative" }}>
+          <div style={{ flex: 1 }}>
             {/* FULL NAME */}
             <h3
               style={{
@@ -104,82 +117,87 @@ export default function ProductCard({ product }) {
               {product.name}
             </h3>
 
-            {/* DETAILS TOGGLE */}
+            {/* DETAILS BUTTON */}
             {product.description && (
-              <>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setOpen(true);
-                  }}
-                  style={{
-                    fontSize: "0.8rem",
-                    fontWeight: 700,
-                    color: "#0bbcff",
-                    background: "none",
-                    border: "none",
-                    padding: 0,
-                    cursor: "pointer",
-                  }}
-                >
-                  View details ▾
-                </button>
-
-                {/* SCROLLABLE DESCRIPTION BOX */}
-                {open && (
-                  <div
-                    ref={boxRef}
-                    style={{
-                      position: "absolute",
-                      top: 60,
-                      left: 0,
-                      right: 0,
-                      zIndex: 20,
-                      background: "#ffffff",
-                      borderRadius: 12,
-                      boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
-                      border: "1px solid #e5e7eb",
-                      padding: 12,
-                    }}
-                  >
-                    <div
-                      style={{
-                        maxHeight: 120,
-                        overflowY: "auto",
-                        fontSize: "0.85rem",
-                        color: "#374151",
-                        lineHeight: 1.45,
-                        paddingRight: 6,
-                      }}
-                    >
-                      {product.description}
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setOpen(false);
-                      }}
-                      style={{
-                        marginTop: 8,
-                        fontSize: "0.8rem",
-                        fontWeight: 700,
-                        color: "#ef4444",
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Close ✕
-                    </button>
-                  </div>
-                )}
-              </>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setOpen(true);
+                }}
+                style={{
+                  fontSize: "0.8rem",
+                  fontWeight: 700,
+                  color: "#0bbcff",
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                }}
+              >
+                View details ▾
+              </button>
             )}
           </div>
         </div>
+
+        {/* DESCRIPTION BOX */}
+        {open && (
+          <div
+            ref={boxRef}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "50vw",
+              maxWidth: 360,
+              minWidth: 260,
+              maxHeight: 220,
+              background: "#ffffff",
+              borderRadius: 16,
+              boxShadow: "0 14px 30px rgba(0,0,0,0.2)",
+              border: "1px solid #e5e7eb",
+              padding: 16,
+              zIndex: 50,
+            }}
+          >
+            <div
+              style={{
+                maxHeight: 160,
+                overflowY: "auto",
+                fontSize: "0.9rem",
+                color: "#374151",
+                lineHeight: 1.5,
+                paddingRight: 6,
+              }}
+            >
+              {product.description}
+            </div>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setOpen(false);
+              }}
+              style={{
+                marginTop: 10,
+                fontSize: "0.85rem",
+                fontWeight: 700,
+                color: "#ef4444",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              Close ✕
+            </button>
+          </div>
+        )}
 
         {/* PRICES */}
         <div style={{ display: "flex", gap: 18, paddingLeft: 4 }}>
@@ -213,5 +231,5 @@ export default function ProductCard({ product }) {
       </div>
     </Link>
   );
-}
-  
+    }
+    
