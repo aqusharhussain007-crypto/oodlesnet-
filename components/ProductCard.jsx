@@ -35,22 +35,17 @@ export default function ProductCard({ product }) {
     localStorage.setItem("recent", JSON.stringify(recent));
   }
 
-  // Close ONLY the box on outside click
+  // Close description only on outside click
   useEffect(() => {
-    function handleClickOutside(e) {
+    function handleOutside(e) {
       if (boxRef.current && !boxRef.current.contains(e.target)) {
-        e.stopPropagation();
         setOpen(false);
       }
     }
 
-    if (open) document.addEventListener("mousedown", handleClickOutside, true);
+    if (open) document.addEventListener("mousedown", handleOutside);
     return () =>
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside,
-        true
-      );
+      document.removeEventListener("mousedown", handleOutside);
   }, [open]);
 
   return (
@@ -58,7 +53,7 @@ export default function ProductCard({ product }) {
       href={`/product/${product.id}`}
       onClick={(e) => {
         if (open) {
-          e.preventDefault(); // block navigation when box is open
+          e.preventDefault(); // block navigation when description is open
           setOpen(false);
           return;
         }
@@ -124,44 +119,60 @@ export default function ProductCard({ product }) {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setOpen(true);
+                  setOpen((v) => !v);
                 }}
                 style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
                   fontSize: "0.8rem",
                   fontWeight: 700,
                   color: "#0bbcff",
-                  background: "none",
-                  border: "none",
-                  padding: 0,
+                  background: "#e6f8ff",
+                  border: "1px solid #bae6fd",
+                  borderRadius: 8,
+                  padding: "4px 8px",
                   cursor: "pointer",
                 }}
               >
-                View details ▾
+                Details
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    transform: open ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.2s ease",
+                  }}
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
               </button>
             )}
           </div>
         </div>
 
-        {/* DESCRIPTION BOX */}
-        {open && (
+        {/* DESCRIPTION PANEL (opens downward, right aligned) */}
+        {open && product.description && (
           <div
             ref={boxRef}
             onClick={(e) => e.stopPropagation()}
             style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "50vw",
-              maxWidth: 360,
+              marginLeft: "auto",
+              marginTop: 8,
+              width: "60%",
               minWidth: 260,
-              maxHeight: 220,
+              maxWidth: 420,
               background: "#ffffff",
-              borderRadius: 16,
-              boxShadow: "0 14px 30px rgba(0,0,0,0.2)",
+              borderRadius: 14,
               border: "1px solid #e5e7eb",
-              padding: 16,
-              zIndex: 50,
+              boxShadow: "0 10px 22px rgba(0,0,0,0.15)",
+              padding: 14,
             }}
           >
             <div
@@ -176,26 +187,6 @@ export default function ProductCard({ product }) {
             >
               {product.description}
             </div>
-
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setOpen(false);
-              }}
-              style={{
-                marginTop: 10,
-                fontSize: "0.85rem",
-                fontWeight: 700,
-                color: "#ef4444",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              Close ✕
-            </button>
           </div>
         )}
 
@@ -231,5 +222,5 @@ export default function ProductCard({ product }) {
       </div>
     </Link>
   );
-    }
-    
+          }
+            
