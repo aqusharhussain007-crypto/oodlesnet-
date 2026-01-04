@@ -35,25 +35,26 @@ export default function ProductCard({ product }) {
     localStorage.setItem("recent", JSON.stringify(recent));
   }
 
-  // close only description on outside click
+  /* ✅ CLOSE ONLY DESCRIPTION ON OUTSIDE CLICK */
   useEffect(() => {
     function handleClickOutside(e) {
-      if (boxRef.current && !boxRef.current.contains(e.target)) {
+      if (open && boxRef.current && !boxRef.current.contains(e.target)) {
+        e.preventDefault();
+        e.stopPropagation();
         setOpen(false);
       }
     }
 
-    if (open) document.addEventListener("mousedown", handleClickOutside);
+    if (open) document.addEventListener("mousedown", handleClickOutside, true);
     return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside, true);
   }, [open]);
 
-  // ESC key closes description
+  /* ✅ ESC CLOSE */
   useEffect(() => {
     function handleEsc(e) {
       if (e.key === "Escape") setOpen(false);
     }
-
     if (open) document.addEventListener("keydown", handleEsc);
     return () => document.removeEventListener("keydown", handleEsc);
   }, [open]);
@@ -63,11 +64,10 @@ export default function ProductCard({ product }) {
       href={`/product/${product.id}`}
       onClick={(e) => {
         if (open) {
-          e.preventDefault();
-          setOpen(false);
+          e.preventDefault(); // 🚫 block navigation
           return;
         }
-        saveRecent();
+        saveRecent(); // ✅ fresh click only
       }}
       style={{ textDecoration: "none" }}
     >
@@ -127,7 +127,7 @@ export default function ProductCard({ product }) {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setOpen((v) => !v);
+                  setOpen(true); // ✅ explicit open (no toggle)
                 }}
                 style={{
                   display: "inline-flex",
@@ -268,5 +268,5 @@ export default function ProductCard({ product }) {
       </div>
     </Link>
   );
-        }
-                            
+    }
+  
