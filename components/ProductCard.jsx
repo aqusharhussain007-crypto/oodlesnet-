@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function ProductCard({ product }) {
   const [open, setOpen] = useState(false);
+  const boxRef = useRef(null);
 
   const prices =
     product.store
@@ -33,6 +34,19 @@ export default function ProductCard({ product }) {
     if (recent.length > 10) recent = recent.slice(0, 10);
     localStorage.setItem("recent", JSON.stringify(recent));
   }
+
+  // close when clicking outside description box
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (boxRef.current && !boxRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    }
+
+    if (open) document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
 
   return (
     <Link
@@ -76,7 +90,7 @@ export default function ProductCard({ product }) {
             />
           </div>
 
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, position: "relative" }}>
             {/* FULL NAME */}
             <h3
               style={{
@@ -90,14 +104,14 @@ export default function ProductCard({ product }) {
               {product.name}
             </h3>
 
-            {/* DESCRIPTION DRAWER */}
+            {/* DETAILS TOGGLE */}
             {product.description && (
               <>
                 <button
                   type="button"
                   onClick={(e) => {
                     e.preventDefault();
-                    setOpen((v) => !v);
+                    setOpen(true);
                   }}
                   style={{
                     fontSize: "0.8rem",
@@ -107,24 +121,61 @@ export default function ProductCard({ product }) {
                     border: "none",
                     padding: 0,
                     cursor: "pointer",
-                    marginBottom: 4,
                   }}
                 >
-                  {open ? "Hide details ▲" : "Details ▾"}
+                  View details ▾
                 </button>
 
-                <div
-                  style={{
-                    fontSize: "0.85rem",
-                    color: "#555",
-                    lineHeight: 1.4,
-                    maxHeight: open ? 120 : 0,
-                    overflow: "hidden",
-                    transition: "max-height 0.35s ease",
-                  }}
-                >
-                  {product.description}
-                </div>
+                {/* SCROLLABLE DESCRIPTION BOX */}
+                {open && (
+                  <div
+                    ref={boxRef}
+                    style={{
+                      position: "absolute",
+                      top: 60,
+                      left: 0,
+                      right: 0,
+                      zIndex: 20,
+                      background: "#ffffff",
+                      borderRadius: 12,
+                      boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+                      border: "1px solid #e5e7eb",
+                      padding: 12,
+                    }}
+                  >
+                    <div
+                      style={{
+                        maxHeight: 120,
+                        overflowY: "auto",
+                        fontSize: "0.85rem",
+                        color: "#374151",
+                        lineHeight: 1.45,
+                        paddingRight: 6,
+                      }}
+                    >
+                      {product.description}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setOpen(false);
+                      }}
+                      style={{
+                        marginTop: 8,
+                        fontSize: "0.8rem",
+                        fontWeight: 700,
+                        color: "#ef4444",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Close ✕
+                    </button>
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -162,5 +213,5 @@ export default function ProductCard({ product }) {
       </div>
     </Link>
   );
-      }
-                           
+}
+  
