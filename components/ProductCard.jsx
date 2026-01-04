@@ -63,7 +63,7 @@ export default function ProductCard({ product }) {
           display: "flex",
           flexDirection: "column",
           gap: 12,
-          position: "relative", // ✅ anchor for absolute box
+          position: "relative",
         }}
       >
         <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
@@ -92,7 +92,6 @@ export default function ProductCard({ product }) {
           </div>
 
           <div style={{ flex: 1 }}>
-            {/* FULL NAME */}
             <h3
               style={{
                 color: "#0077aa",
@@ -105,7 +104,6 @@ export default function ProductCard({ product }) {
               {product.name}
             </h3>
 
-            {/* DETAILS TOGGLE */}
             {product.description && (
               <button
                 type="button"
@@ -129,29 +127,29 @@ export default function ProductCard({ product }) {
           </div>
         </div>
 
-        {/* SCROLLABLE DESCRIPTION BOX */}
+        {/* DESCRIPTION BOX */}
         {open && (
           <div
             ref={boxRef}
             style={{
               position: "absolute",
-              top: 190,                 // ✅ below image
-              left: 70,                 // ✅ mid-image start
-              right: 12,                // ✅ to right edge
+              top: 190,
+              left: 70,
+              right: 12,
               zIndex: 30,
               background: "#ffffff",
               borderRadius: 14,
               boxShadow: "0 15px 35px rgba(0,0,0,0.18)",
               border: "1px solid #e5e7eb",
               padding: 14,
-              maxHeight: "calc(100vh - 260px)", // ✅ stops above footer
-              overflow: "hidden",
+              height: 220,          // ✅ fixed height
+              overflow: "hidden",   // ✅ prevents card stretching
             }}
           >
             <div
               style={{
-                maxHeight: "100%",
-                overflowY: "auto",
+                height: "100%",
+                overflowY: "auto",   // ✅ only content scrolls
                 fontSize: "0.9rem",
                 color: "#374151",
                 lineHeight: 1.5,
@@ -168,7 +166,9 @@ export default function ProductCard({ product }) {
                 setOpen(false);
               }}
               style={{
-                marginTop: 10,
+                position: "absolute",
+                bottom: 8,
+                right: 12,
                 fontSize: "0.8rem",
                 fontWeight: 700,
                 color: "#ef4444",
