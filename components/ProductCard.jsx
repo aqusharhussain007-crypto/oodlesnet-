@@ -42,13 +42,15 @@ export default function ProductCard({ product }) {
       if (
         open &&
         boxRef.current &&
-        !boxRef.current.contains(e.target)
+        !boxRef.current.contains(e.target) &&
+        cardRef.current &&
+        !cardRef.current.contains(e.target)
       ) {
         setOpen(false);
       }
     }
 
-    if (open) document.addEventListener("mousedown", handleOutside);
+    document.addEventListener("mousedown", handleOutside);
     return () =>
       document.removeEventListener("mousedown", handleOutside);
   }, [open]);
@@ -125,7 +127,7 @@ export default function ProductCard({ product }) {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    setOpen(true);
+                    setOpen((v) => !v);
                   }}
                   style={{
                     display: "inline-flex",
@@ -210,7 +212,7 @@ export default function ProductCard({ product }) {
             height: 220,
             background: "#ffffff",
             borderRadius: 14,
-            border: "2px solid #38bdf8", // ✅ visible border
+            border: "2px solid #38bdf8",
             boxShadow: "0 15px 35px rgba(0,0,0,0.18)",
             padding: 14,
             zIndex: 50,
@@ -265,3 +267,4 @@ export default function ProductCard({ product }) {
     </div>
   );
 }
+  
