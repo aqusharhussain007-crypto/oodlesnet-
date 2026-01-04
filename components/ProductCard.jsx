@@ -61,14 +61,15 @@ export default function ProductCard({ product }) {
             }}
           >
             <img
-  src={product.imageUrl || "/placeholder.png"}
-  alt="test"
-  style={{
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-  }}
-/>
+              src={product.imageUrl || "/placeholder.png"}
+              alt="test"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                background: "#fff",
+              }}
+            />
           </div>
 
           <div style={{ flex: 1 }}>
@@ -122,4 +123,5 @@ export default function ProductCard({ product }) {
       </div>
     </Link>
   );
-}
+                                        }
+                
