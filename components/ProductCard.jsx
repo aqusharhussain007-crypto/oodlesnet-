@@ -35,7 +35,7 @@ export default function ProductCard({ product }) {
     localStorage.setItem("recent", JSON.stringify(recent));
   }
 
-  // close when clicking outside description box
+  // close only description on outside click
   useEffect(() => {
     function handleClickOutside(e) {
       if (boxRef.current && !boxRef.current.contains(e.target)) {
@@ -51,7 +51,14 @@ export default function ProductCard({ product }) {
   return (
     <Link
       href={`/product/${product.id}`}
-      onClick={saveRecent}
+      onClick={(e) => {
+        if (open) {
+          e.preventDefault(); // block navigation when description is open
+          setOpen(false);
+          return;
+        }
+        saveRecent();
+      }}
       style={{ textDecoration: "none" }}
     >
       <div
@@ -109,28 +116,50 @@ export default function ProductCard({ product }) {
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();
-                  setOpen(true);
+                  e.stopPropagation();
+                  setOpen((v) => !v);
                 }}
                 style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
                   fontSize: "0.8rem",
                   fontWeight: 700,
                   color: "#0bbcff",
-                  background: "none",
-                  border: "none",
-                  padding: 0,
+                  background: "#e6f8ff",
+                  border: "1px solid #bae6fd",
+                  borderRadius: 8,
+                  padding: "4px 8px",
                   cursor: "pointer",
                 }}
               >
-                View details ▾
+                Details
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{
+                    transform: open ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.2s ease",
+                  }}
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
               </button>
             )}
           </div>
         </div>
 
-        {/* DESCRIPTION BOX */}
+        {/* DESCRIPTION BOX (fixed size, scrollable) */}
         {open && (
           <div
             ref={boxRef}
+            onClick={(e) => e.stopPropagation()}
             style={{
               position: "absolute",
               top: 190,
@@ -142,14 +171,14 @@ export default function ProductCard({ product }) {
               boxShadow: "0 15px 35px rgba(0,0,0,0.18)",
               border: "1px solid #e5e7eb",
               padding: 14,
-              height: 220,          // ✅ fixed height
-              overflow: "hidden",   // ✅ prevents card stretching
+              height: 220,        // fixed height
+              overflow: "hidden", // prevents card stretching
             }}
           >
             <div
               style={{
                 height: "100%",
-                overflowY: "auto",   // ✅ only content scrolls
+                overflowY: "auto", // only content scrolls
                 fontSize: "0.9rem",
                 color: "#374151",
                 lineHeight: 1.5,
@@ -163,6 +192,7 @@ export default function ProductCard({ product }) {
               type="button"
               onClick={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 setOpen(false);
               }}
               style={{
@@ -214,5 +244,5 @@ export default function ProductCard({ product }) {
       </div>
     </Link>
   );
-      }
-      
+  }
+                                        
