@@ -35,30 +35,23 @@ export default function ProductCard({ product }) {
     localStorage.setItem("recent", JSON.stringify(recent));
   }
 
-  // Close description only on outside click
+  // close when clicking outside description box
   useEffect(() => {
-    function handleOutside(e) {
+    function handleClickOutside(e) {
       if (boxRef.current && !boxRef.current.contains(e.target)) {
         setOpen(false);
       }
     }
 
-    if (open) document.addEventListener("mousedown", handleOutside);
+    if (open) document.addEventListener("mousedown", handleClickOutside);
     return () =>
-      document.removeEventListener("mousedown", handleOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
 
   return (
     <Link
       href={`/product/${product.id}`}
-      onClick={(e) => {
-        if (open) {
-          e.preventDefault(); // block navigation when description is open
-          setOpen(false);
-          return;
-        }
-        saveRecent();
-      }}
+      onClick={saveRecent}
       style={{ textDecoration: "none" }}
     >
       <div
@@ -70,7 +63,6 @@ export default function ProductCard({ product }) {
           display: "flex",
           flexDirection: "column",
           gap: 12,
-          position: "relative",
         }}
       >
         <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
@@ -98,7 +90,7 @@ export default function ProductCard({ product }) {
             />
           </div>
 
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, position: "relative" }}>
             {/* FULL NAME */}
             <h3
               style={{
@@ -112,83 +104,82 @@ export default function ProductCard({ product }) {
               {product.name}
             </h3>
 
-            {/* DETAILS BUTTON */}
+            {/* DETAILS TOGGLE */}
             {product.description && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setOpen((v) => !v);
-                }}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  fontSize: "0.8rem",
-                  fontWeight: 700,
-                  color: "#0bbcff",
-                  background: "#e6f8ff",
-                  border: "1px solid #bae6fd",
-                  borderRadius: 8,
-                  padding: "4px 8px",
-                  cursor: "pointer",
-                }}
-              >
-                Details
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setOpen(true);
+                  }}
                   style={{
-                    transform: open ? "rotate(180deg)" : "rotate(0deg)",
-                    transition: "transform 0.2s ease",
+                    fontSize: "0.8rem",
+                    fontWeight: 700,
+                    color: "#0bbcff",
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    cursor: "pointer",
                   }}
                 >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
+                  View details ▾
+                </button>
+
+                {/* SCROLLABLE DESCRIPTION BOX */}
+                {open && (
+                  <div
+                    ref={boxRef}
+                    style={{
+                      position: "absolute",
+                      top: 60,
+                      left: 0,
+                      right: 0,
+                      zIndex: 20,
+                      background: "#ffffff",
+                      borderRadius: 12,
+                      boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+                      border: "1px solid #e5e7eb",
+                      padding: 12,
+                    }}
+                  >
+                    <div
+                      style={{
+                        maxHeight: 120,
+                        overflowY: "auto",
+                        fontSize: "0.85rem",
+                        color: "#374151",
+                        lineHeight: 1.45,
+                        paddingRight: 6,
+                      }}
+                    >
+                      {product.description}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setOpen(false);
+                      }}
+                      style={{
+                        marginTop: 8,
+                        fontSize: "0.8rem",
+                        fontWeight: 700,
+                        color: "#ef4444",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Close ✕
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
-
-        {/* DESCRIPTION PANEL (opens downward, right aligned) */}
-        {open && product.description && (
-          <div
-            ref={boxRef}
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              marginLeft: "auto",
-              marginTop: 8,
-              width: "60%",
-              minWidth: 260,
-              maxWidth: 420,
-              background: "#ffffff",
-              borderRadius: 14,
-              border: "1px solid #e5e7eb",
-              boxShadow: "0 10px 22px rgba(0,0,0,0.15)",
-              padding: 14,
-            }}
-          >
-            <div
-              style={{
-                maxHeight: 160,
-                overflowY: "auto",
-                fontSize: "0.9rem",
-                color: "#374151",
-                lineHeight: 1.5,
-                paddingRight: 6,
-              }}
-            >
-              {product.description}
-            </div>
-          </div>
-        )}
 
         {/* PRICES */}
         <div style={{ display: "flex", gap: 18, paddingLeft: 4 }}>
@@ -222,5 +213,5 @@ export default function ProductCard({ product }) {
       </div>
     </Link>
   );
-          }
-            
+                  }
+                      
