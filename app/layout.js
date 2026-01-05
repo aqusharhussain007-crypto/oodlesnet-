@@ -1,6 +1,7 @@
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import DrawerProvider from "@/components/DrawerProvider";
 
 export const metadata = {
   metadataBase: new URL("https://oodlesnet.vercel.app"),
@@ -62,11 +63,12 @@ export default function RootLayout({ children }) {
           background: "#e4e9f1",
         }}
       >
-        <Navbar />
-        <main style={{ flex: 1 }}>{children}</main>
-        <Footer />
+        <DrawerProvider>
+          <Navbar />
+          <main style={{ flex: 1 }}>{children}</main>
+          <Footer />
+        </DrawerProvider>
       </body>
     </html>
   );
-      }
-    
+        }
