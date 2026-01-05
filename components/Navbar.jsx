@@ -3,11 +3,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import FilterDrawer from "@/components/FilterDrawer";
+
+import CategoryDrawer from "./CategoryDrawer";
+import FilterDrawer from "./FilterDrawer";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
+  const [showCategory, setShowCategory] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
 
   useEffect(() => {
@@ -31,16 +34,13 @@ export default function Navbar() {
     }
   }
 
-  function handleShare() {
+  function shareApp() {
     if (navigator.share) {
       navigator.share({
         title: "Oodlesnet",
-        text: "Compare prices smarter with Oodlesnet",
+        text: "Compare prices smarter on Oodlesnet",
         url: window.location.origin,
       });
-    } else {
-      navigator.clipboard.writeText(window.location.origin);
-      alert("Link copied");
     }
   }
 
@@ -137,13 +137,13 @@ export default function Navbar() {
             <Link href="/about" onClick={() => setOpen(false)}>About</Link>
             <Link href="/contact" onClick={() => setOpen(false)}>Contact</Link>
 
-            {/* CATEGORY (hook point) */}
+            {/* CATEGORY */}
             <button
               onClick={() => {
-                alert("Category drawer coming next");
                 setOpen(false);
+                setShowCategory(true);
               }}
-              style={{ background: "none", border: "none", color: "#e6f7ff", textAlign: "left" }}
+              style={{ background: "none", border: "none", color: "inherit", textAlign: "left" }}
             >
               Categories
             </button>
@@ -151,27 +151,37 @@ export default function Navbar() {
             {/* FILTER */}
             <button
               onClick={() => {
-                setShowFilter(true);
                 setOpen(false);
+                setShowFilter(true);
               }}
-              style={{ background: "none", border: "none", color: "#e6f7ff", textAlign: "left" }}
+              style={{ background: "none", border: "none", color: "inherit", textAlign: "left" }}
             >
               Filters
             </button>
 
-            {/* SHARE */}
+            {/* SHARE ICON */}
             <button
-              onClick={() => {
-                handleShare();
-                setOpen(false);
+              onClick={shareApp}
+              style={{
+                background: "none",
+                border: "none",
+                color: "inherit",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
               }}
-              style={{ background: "none", border: "none", color: "#e6f7ff", textAlign: "left" }}
             >
-              Share App
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="18" cy="5" r="3" />
+                <circle cx="6" cy="12" r="3" />
+                <circle cx="18" cy="19" r="3" />
+                <path d="M8.6 13.5l6.8 3.9M15.4 6.6L8.6 10.5" />
+              </svg>
+              Share
             </button>
           </div>
 
-          {/* DARK MODE SWITCH */}
+          {/* DARK MODE */}
           <div
             style={{
               marginTop: 20,
@@ -184,21 +194,17 @@ export default function Navbar() {
 
             <button
               onClick={toggleDark}
-              aria-label="Toggle dark mode"
               style={{
                 width: 52,
                 height: 28,
                 borderRadius: 999,
                 border: "none",
-                cursor: "pointer",
                 padding: 3,
                 background: dark
                   ? "linear-gradient(135deg,#0ea5e9,#10b981)"
                   : "#020617",
                 display: "flex",
-                alignItems: "center",
                 justifyContent: dark ? "flex-end" : "flex-start",
-                transition: "all 0.25s ease",
               }}
             >
               <span
@@ -206,36 +212,23 @@ export default function Navbar() {
                   width: 22,
                   height: 22,
                   borderRadius: "50%",
-                  background: "#ffffff",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.35)",
+                  background: "#fff",
                 }}
               />
             </button>
           </div>
-
-          <div
-            style={{
-              textAlign: "center",
-              marginTop: 18,
-              fontSize: 12,
-              opacity: 0.6,
-            }}
-          >
-            © Oodlesnet
-          </div>
         </div>
       )}
 
-      {/* FILTER DRAWER */}
+      {/* DRAWERS */}
+      {showCategory && <CategoryDrawer onClose={() => setShowCategory(false)} />}
       {showFilter && (
         <FilterDrawer
           onClose={() => setShowFilter(false)}
-          onApply={(filters) => {
-            console.log("Applied filters:", filters);
-          }}
+          onApply={() => {}}
         />
       )}
     </>
   );
             }
-          
+            
