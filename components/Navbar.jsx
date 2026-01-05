@@ -1,23 +1,12 @@
 "use client";
 
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-import CategoryDrawer from "./CategoryDrawer";
-import FilterDrawer from "./FilterDrawer";
-import { DrawerContext } from "@/components/DrawerProvider";
-
-export default function Navbar() {
+export default function Navbar({ onOpenCategory }) {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
-
-  const {
-    openCategory,
-    setOpenCategory,
-    openFilter,
-    setOpenFilter,
-  } = useContext(DrawerContext);
 
   useEffect(() => {
     const saved = localStorage.getItem("darkMode");
@@ -142,21 +131,11 @@ export default function Navbar() {
             <button
               onClick={() => {
                 setOpen(false);
-                setOpenCategory(true);
+                onOpenCategory();
               }}
               style={{ background: "none", border: "none", color: "inherit", textAlign: "left" }}
             >
               Categories
-            </button>
-
-            <button
-              onClick={() => {
-                setOpen(false);
-                setOpenFilter(true);
-              }}
-              style={{ background: "none", border: "none", color: "inherit", textAlign: "left" }}
-            >
-              Filters
             </button>
 
             <button
@@ -217,18 +196,7 @@ export default function Navbar() {
           </div>
         </div>
       )}
-
-      {openCategory && (
-        <CategoryDrawer onClose={() => setOpenCategory(false)} />
-      )}
-
-      {openFilter && (
-        <FilterDrawer
-          onClose={() => setOpenFilter(false)}
-          onApply={() => {}}
-        />
-      )}
     </>
   );
-              }
-                      
+          }
+                
