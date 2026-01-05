@@ -1,3 +1,5 @@
+app/page.js file 
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -9,18 +11,8 @@ import CategoryDrawer from "@/components/CategoryDrawer";
 import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
-import { useDrawer } from "@/components/DrawerProvider";
 
 export default function Home() {
-  const {
-    openDrawer,
-    setOpenDrawer,
-    activeCategory,
-    setActiveCategory,
-    filters,
-    setFilters,
-  } = useDrawer();
-
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
@@ -29,6 +21,13 @@ export default function Home() {
   const [ads, setAds] = useState([]);
   const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
+
+  const [showFilter, setShowFilter] = useState(false);
+  const [showCategory, setShowCategory] = useState(false);
+  const [activeCategory, setActiveCategory] = useState("all");
+
+  // 🔹 NEW: filter state (additive only)
+  const [filters, setFilters] = useState(null);
 
   /* ---------------- LOAD PRODUCTS ---------------- */
   useEffect(() => {
@@ -40,10 +39,7 @@ export default function Home() {
       setFiltered(items);
 
       const top = [...items]
-        .sort(
-          (a, b) =>
-            Number(b.impressions || 0) - Number(a.impressions || 0)
-        )
+        .sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0))
         .slice(0, 10);
 
       setTrending(top);
@@ -67,16 +63,16 @@ export default function Home() {
     setRecent(Array.isArray(data) ? data : []);
   }, []);
 
-  /* ---------------- SEARCH + CATEGORY + FILTERS ---------------- */
+  /* ---------------- SEARCH + CATEGORY (+ FILTERS) ---------------- */
   useEffect(() => {
     let list = products;
 
-    // CATEGORY
-    if (activeCategory && activeCategory !== "all") {
+    // Category (UNCHANGED)
+    if (activeCategory !== "all") {
       list = list.filter((p) => p.categorySlug === activeCategory);
     }
 
-    // SEARCH
+    // Search (UNCHANGED)
     if (search) {
       list = list.filter((p) =>
         (p.name || "").toLowerCase().includes(search.toLowerCase())
@@ -86,71 +82,40 @@ export default function Home() {
       setSuggestions([]);
     }
 
-    // FILTERS
+    // 🔹 NEW: Filters (additive, does NOT affect existing logic)
     if (filters) {
-      if (filters.min) {
-        list = list.filter((p) =>
-          p.store?.some(
-            (s) => Number(s.price) >= Number(filters.min)
-          )
-        );
-      }
+      if (filters.min)
+        list = list.filter((p) => p.price >= Number(filters.min));
 
-      if (filters.max) {
-        list = list.filter((p) =>
-          p.store?.some(
-            (s) => Number(s.price) <= Number(filters.max)
-          )
-        );
-      }
+      if (filters.max)
+        list = list.filter((p) => p.price <= Number(filters.max));
 
-      if (filters.stores?.length) {
+      if (filters.stores?.length)
         list = list.filter((p) =>
-          p.store?.some((s) =>
-            filters.stores.includes(s.name)
-          )
+          p.stores?.some((s) => filters.stores.includes(s.name))
         );
-      }
 
-      if (filters.inStockOnly) {
+      if (filters.inStockOnly)
         list = list.filter((p) => p.inStock);
-      }
 
-      if (filters.discountOnly) {
+      if (filters.discountOnly)
         list = list.filter(
-          (p) =>
-            p.originalPrice &&
-            p.store?.some(
-              (s) => Number(s.price) < Number(p.originalPrice)
-            )
+          (p) => p.originalPrice && p.originalPrice > p.price
         );
-      }
 
-      if (filters.sort === "price-asc") {
-        list = [...list].sort(
-          (a, b) =>
-            Math.min(...a.store.map((s) => Number(s.price))) -
-            Math.min(...b.store.map((s) => Number(s.price)))
-        );
-      }
+      if (filters.sort === "price-asc")
+        list = [...list].sort((a, b) => a.price - b.price);
 
-      if (filters.sort === "price-desc") {
-        list = [...list].sort(
-          (a, b) =>
-            Math.min(...b.store.map((s) => Number(s.price))) -
-            Math.min(...a.store.map((s) => Number(s.price)))
-        );
-      }
+      if (filters.sort === "price-desc")
+        list = [...list].sort((a, b) => b.price - a.price);
     }
 
     setFiltered(list);
-  }, [products, search, activeCategory, filters]);
+  }, [search, products, activeCategory, filters]);
 
   /* ---------------- VOICE SEARCH ---------------- */
   function startVoiceSearch() {
-    const SR =
-      window.SpeechRecognition ||
-      window.webkitSpeechRecognition;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return alert("Voice search not supported");
 
     const recog = new SR();
@@ -173,6 +138,7 @@ export default function Home() {
             style={{ paddingRight: 44 }}
           />
 
+          {/* SEARCH ICON */}
           <svg
             width="18"
             height="18"
@@ -204,17 +170,10 @@ export default function Home() {
               {suggestions.map((item) => (
                 <div
                   key={item.id}
-                  onClick={() => {
-                    setSearch("");
-                    setSuggestions([]);
-                    window.location.href = `/product/${item.id}`;
-                  }}
-                  style={{
-                    display: "flex",
-                    gap: 8,
-                    padding: 8,
-                    cursor: "pointer",
-                  }}
+                  onClick={() =>
+                    (window.location.href = `/product/${item.id}`)
+                  }
+                  style={{ display: "flex", gap: 8, padding: 8 }}
                 >
                   <Image
                     src={item.imageUrl}
@@ -232,7 +191,7 @@ export default function Home() {
           )}
         </div>
 
-        {/* MIC */}
+        {/* SVG MIC */}
         <button
           onClick={startVoiceSearch}
           style={{
@@ -275,7 +234,7 @@ export default function Home() {
       {/* CATEGORY + FILTER BUTTONS */}
       <div style={{ display: "flex", gap: 12, marginBottom: 10 }}>
         <button
-          onClick={() => setOpenDrawer("category")}
+          onClick={() => setShowCategory(true)}
           style={{
             flex: 1,
             padding: "14px 0",
@@ -293,7 +252,7 @@ export default function Home() {
         </button>
 
         <button
-          onClick={() => setOpenDrawer("filter")}
+          onClick={() => setShowFilter(true)}
           style={{
             flex: 1,
             padding: "14px 0",
@@ -320,27 +279,23 @@ export default function Home() {
       </div>
 
       {/* DRAWERS */}
-      {openDrawer === "category" && (
+      {showCategory && (
         <CategoryDrawer
-          active={activeCategory || "all"}
+          active={activeCategory}
           onSelect={(c) => {
-            setActiveCategory(c || "all");
-            setOpenDrawer(null);
+            setActiveCategory(c);
+            setShowCategory(false);
           }}
-          onClose={() => setOpenDrawer(null)}
+          onClose={() => setShowCategory(false)}
         />
       )}
 
-      {openDrawer === "filter" && (
+      {showFilter && (
         <FilterDrawer
-          onClose={() => setOpenDrawer(null)}
-          onApply={(data) => {
-            setFilters(data);
-            setOpenDrawer(null);
-          }}
+          onClose={() => setShowFilter(false)}
+          onApply={(data) => setFilters(data)} // 🔹 NEW
         />
       )}
     </main>
   );
-    }
-  
+          }
