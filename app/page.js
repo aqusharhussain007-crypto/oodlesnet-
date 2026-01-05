@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import ProductCard from "@/components/ProductCard";
 import BannerAd from "@/components/ads/BannerAd";
 import InfiniteSlider from "@/components/InfiniteSlider";
@@ -9,6 +9,7 @@ import CategoryDrawer from "@/components/CategoryDrawer";
 import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
+import { DrawerContext } from "@/components/DrawerProvider";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -20,12 +21,15 @@ export default function Home() {
   const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
 
-  const [showFilter, setShowFilter] = useState(false);
-  const [showCategory, setShowCategory] = useState(false);
   const [activeCategory, setActiveCategory] = useState("all");
-
-  // 🔹 NEW: filter state (additive only)
   const [filters, setFilters] = useState(null);
+
+  const {
+    openCategory,
+    setOpenCategory,
+    openFilter,
+    setOpenFilter,
+  } = useContext(DrawerContext);
 
   /* ---------------- LOAD PRODUCTS ---------------- */
   useEffect(() => {
@@ -37,7 +41,11 @@ export default function Home() {
       setFiltered(items);
 
       const top = [...items]
-        .sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0))
+        .sort(
+          (a, b) =>
+            Number(b.impressions || 0) -
+            Number(a.impressions || 0)
+        )
         .slice(0, 10);
 
       setTrending(top);
@@ -61,36 +69,43 @@ export default function Home() {
     setRecent(Array.isArray(data) ? data : []);
   }, []);
 
-  /* ---------------- SEARCH + CATEGORY (+ FILTERS) ---------------- */
+  /* ---------------- SEARCH + CATEGORY + FILTER ---------------- */
   useEffect(() => {
     let list = products;
 
-    // Category (UNCHANGED)
     if (activeCategory !== "all") {
-      list = list.filter((p) => p.categorySlug === activeCategory);
+      list = list.filter(
+        (p) => p.categorySlug === activeCategory
+      );
     }
 
-    // Search (UNCHANGED)
     if (search) {
       list = list.filter((p) =>
-        (p.name || "").toLowerCase().includes(search.toLowerCase())
+        (p.name || "")
+          .toLowerCase()
+          .includes(search.toLowerCase())
       );
       setSuggestions(list.slice(0, 5));
     } else {
       setSuggestions([]);
     }
 
-    // 🔹 NEW: Filters (additive, does NOT affect existing logic)
     if (filters) {
       if (filters.min)
-        list = list.filter((p) => p.price >= Number(filters.min));
+        list = list.filter(
+          (p) => Number(p.price) >= Number(filters.min)
+        );
 
       if (filters.max)
-        list = list.filter((p) => p.price <= Number(filters.max));
+        list = list.filter(
+          (p) => Number(p.price) <= Number(filters.max)
+        );
 
       if (filters.stores?.length)
         list = list.filter((p) =>
-          p.stores?.some((s) => filters.stores.includes(s.name))
+          p.store?.some((s) =>
+            filters.stores.includes(s.name)
+          )
         );
 
       if (filters.inStockOnly)
@@ -98,14 +113,20 @@ export default function Home() {
 
       if (filters.discountOnly)
         list = list.filter(
-          (p) => p.originalPrice && p.originalPrice > p.price
+          (p) =>
+            p.originalPrice &&
+            p.originalPrice > p.price
         );
 
       if (filters.sort === "price-asc")
-        list = [...list].sort((a, b) => a.price - b.price);
+        list = [...list].sort(
+          (a, b) => a.price - b.price
+        );
 
       if (filters.sort === "price-desc")
-        list = [...list].sort((a, b) => b.price - a.price);
+        list = [...list].sort(
+          (a, b) => b.price - a.price
+        );
     }
 
     setFiltered(list);
@@ -113,7 +134,9 @@ export default function Home() {
 
   /* ---------------- VOICE SEARCH ---------------- */
   function startVoiceSearch() {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SR =
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
     if (!SR) return alert("Voice search not supported");
 
     const recog = new SR();
@@ -136,7 +159,6 @@ export default function Home() {
             style={{ paddingRight: 44 }}
           />
 
-          {/* SEARCH ICON */}
           <svg
             width="18"
             height="18"
@@ -152,7 +174,6 @@ export default function Home() {
             <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2z" />
           </svg>
 
-          {/* AUTOCOMPLETE */}
           {suggestions.length > 0 && (
             <div
               className="autocomplete-box"
@@ -171,7 +192,11 @@ export default function Home() {
                   onClick={() =>
                     (window.location.href = `/product/${item.id}`)
                   }
-                  style={{ display: "flex", gap: 8, padding: 8 }}
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    padding: 8,
+                  }}
                 >
                   <Image
                     src={item.imageUrl}
@@ -180,16 +205,13 @@ export default function Home() {
                     alt={item.name}
                     style={{ borderRadius: 8 }}
                   />
-                  <div>
-                    <strong>{item.name}</strong>
-                  </div>
+                  <strong>{item.name}</strong>
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* SVG MIC */}
         <button
           onClick={startVoiceSearch}
           style={{
@@ -229,45 +251,6 @@ export default function Home() {
         </>
       )}
 
-      {/* CATEGORY + FILTER BUTTONS */}
-      <div style={{ display: "flex", gap: 12, marginBottom: 10 }}>
-        <button
-          onClick={() => setShowCategory(true)}
-          style={{
-            flex: 1,
-            padding: "14px 0",
-            borderRadius: 16,
-            border: "none",
-            fontWeight: 800,
-            fontSize: 16,
-            color: "#fff",
-            background:
-              "linear-gradient(135deg,#0f4c81,#0bbcff)",
-            boxShadow: "0 8px 20px rgba(15,76,129,0.35)",
-          }}
-        >
-          Categories
-        </button>
-
-        <button
-          onClick={() => setShowFilter(true)}
-          style={{
-            flex: 1,
-            padding: "14px 0",
-            borderRadius: 16,
-            border: "none",
-            fontWeight: 800,
-            fontSize: 16,
-            color: "#fff",
-            background:
-              "linear-gradient(135deg,#0f4c81,#0bbcff)",
-            boxShadow: "0 8px 20px rgba(15,76,129,0.35)",
-          }}
-        >
-          Filters
-        </button>
-      </div>
-
       {/* PRODUCTS */}
       <h2 className="section-title">Products</h2>
       <div className="products-grid">
@@ -277,23 +260,24 @@ export default function Home() {
       </div>
 
       {/* DRAWERS */}
-      {showCategory && (
+      {openCategory && (
         <CategoryDrawer
           active={activeCategory}
           onSelect={(c) => {
             setActiveCategory(c);
-            setShowCategory(false);
+            setOpenCategory(false);
           }}
-          onClose={() => setShowCategory(false)}
+          onClose={() => setOpenCategory(false)}
         />
       )}
 
-      {showFilter && (
+      {openFilter && (
         <FilterDrawer
-          onClose={() => setShowFilter(false)}
-          onApply={(data) => setFilters(data)} // 🔹 NEW
+          onClose={() => setOpenFilter(false)}
+          onApply={(data) => setFilters(data)}
         />
       )}
     </main>
   );
-          }
+             }
+        
