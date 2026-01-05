@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 export default function AboutPage() {
   const cardStyle = {
     background: "#ecfffb",
@@ -22,7 +20,6 @@ export default function AboutPage() {
 
   return (
     <main
-      className="page-container"
       style={{
         maxWidth: 800,
         margin: "0 auto",
@@ -39,7 +36,7 @@ export default function AboutPage() {
           fontWeight: 800,
         }}
       >
-        About OodlesNet
+        About Oodlesnet
       </h1>
 
       <p
@@ -50,109 +47,51 @@ export default function AboutPage() {
           marginBottom: 20,
         }}
       >
-        Compare smarter. Discover the best prices across stores — without
-        noise, without hassle.
+        Compare smarter. Discover the best prices across stores — without noise,
+        without hassle.
       </p>
 
       <div style={cardStyle}>
         <p style={{ fontSize: "1.05rem", lineHeight: 1.7 }}>
-          OodlesNet is your trusted hub for smart online shopping. We bring
-          together products, prices, and store comparisons so you can make the
-          best choice — quickly and confidently.
+          Oodlesnet is a smart product comparison platform that helps you find
+          the best prices across multiple online stores in one place.
         </p>
       </div>
 
-      <h2
-        style={{
-          marginTop: 28,
-          marginBottom: 12,
-          color: "#2563eb",
-          fontSize: 22,
-          fontWeight: 800,
-        }}
-      >
+      <h2 style={{ marginTop: 28, marginBottom: 12, color: "#2563eb" }}>
         What We Do
       </h2>
 
-      <div style={cardStyle}>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <svg style={iconStyle} fill="none" viewBox="0 0 24 24">
-            <path d="M5 13l4 4L19 7" strokeWidth="2" />
-          </svg>
-          Compare lowest prices across stores
+      {[
+        "Compare lowest prices across stores",
+        "Show clear and real-time product details",
+        "Offer a fast and clutter-free experience",
+        "Save time by avoiding multiple websites",
+      ].map((text, i) => (
+        <div style={cardStyle} key={i}>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <svg style={iconStyle} fill="none" viewBox="0 0 24 24">
+              <path d="M5 13l4 4L19 7" strokeWidth="2" />
+            </svg>
+            {text}
+          </div>
         </div>
-      </div>
+      ))}
 
-      <div style={cardStyle}>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <svg style={iconStyle} fill="none" viewBox="0 0 24 24">
-            <path d="M4 6h16M4 12h16M4 18h16" strokeWidth="2" />
-          </svg>
-          Show real-time product details
-        </div>
-      </div>
-
-      <div style={cardStyle}>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <svg style={iconStyle} fill="none" viewBox="0 0 24 24">
-            <path d="M3 12h18" strokeWidth="2" />
-          </svg>
-          Provide clean and fast user experience
-        </div>
-      </div>
-
-      <div style={cardStyle}>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <svg style={iconStyle} fill="none" viewBox="0 0 24 24">
-            <path
-              d="M12 2a10 10 0 100 20 10 10 0 000-20z"
-              strokeWidth="2"
-            />
-          </svg>
-          Reduce the hassle of opening multiple websites
-        </div>
-      </div>
-
-      <h2
-        style={{
-          marginTop: 28,
-          marginBottom: 12,
-          color: "#2563eb",
-          fontSize: 22,
-          fontWeight: 800,
-        }}
-      >
+      <h2 style={{ marginTop: 28, marginBottom: 12, color: "#2563eb" }}>
         Our Mission
       </h2>
 
       <div style={cardStyle}>
         <p style={{ fontSize: "1.05rem", lineHeight: 1.7 }}>
-          Our aim is simple:{" "}
+          Our mission is to help users{" "}
           <strong style={{ color: "#2563eb" }}>
-            help you save money and time
+            save money and make confident buying decisions
           </strong>{" "}
-          by giving you the best price in one place — transparently and
-          reliably.
+          by showing transparent price comparisons.
         </p>
-      </div>
-
-      <div
-        style={{
-          marginTop: 28,
-          padding: 18,
-          borderRadius: 20,
-          background: "linear-gradient(135deg,#2563eb,#10b981)",
-          color: "#fff",
-          textAlign: "center",
-          fontWeight: 800,
-          fontSize: "1.1rem",
-          cursor: "pointer",
-        }}
-        onClick={() => (window.location.href = "/")}
-      >
-        Start comparing smarter with OodlesNet
       </div>
     </main>
   );
-          }
+        }
             
