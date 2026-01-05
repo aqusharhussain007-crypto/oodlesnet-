@@ -9,8 +9,12 @@ import CategoryDrawer from "@/components/CategoryDrawer";
 import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
+import { useDrawer } from "@/components/DrawerProvider";
 
 export default function Home() {
+  const { openDrawer, setOpenDrawer, activeCategory, setActiveCategory, filters, setFilters } =
+    useDrawer();
+
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
@@ -19,13 +23,6 @@ export default function Home() {
   const [ads, setAds] = useState([]);
   const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
-
-  const [showFilter, setShowFilter] = useState(false);
-  const [showCategory, setShowCategory] = useState(false);
-  const [activeCategory, setActiveCategory] = useState("all");
-
-  // 🔹 NEW: filter state (additive only)
-  const [filters, setFilters] = useState(null);
 
   /* ---------------- LOAD PRODUCTS ---------------- */
   useEffect(() => {
@@ -61,16 +58,14 @@ export default function Home() {
     setRecent(Array.isArray(data) ? data : []);
   }, []);
 
-  /* ---------------- SEARCH + CATEGORY (+ FILTERS) ---------------- */
+  /* ---------------- SEARCH + CATEGORY + FILTERS ---------------- */
   useEffect(() => {
     let list = products;
 
-    // Category (UNCHANGED)
     if (activeCategory !== "all") {
       list = list.filter((p) => p.categorySlug === activeCategory);
     }
 
-    // Search (UNCHANGED)
     if (search) {
       list = list.filter((p) =>
         (p.name || "").toLowerCase().includes(search.toLowerCase())
@@ -80,17 +75,20 @@ export default function Home() {
       setSuggestions([]);
     }
 
-    // 🔹 NEW: Filters (additive, does NOT affect existing logic)
     if (filters) {
       if (filters.min)
-        list = list.filter((p) => p.price >= Number(filters.min));
+        list = list.filter((p) =>
+          p.store?.some((s) => Number(s.price) >= Number(filters.min))
+        );
 
       if (filters.max)
-        list = list.filter((p) => p.price <= Number(filters.max));
+        list = list.filter((p) =>
+          p.store?.some((s) => Number(s.price) <= Number(filters.max))
+        );
 
       if (filters.stores?.length)
         list = list.filter((p) =>
-          p.stores?.some((s) => filters.stores.includes(s.name))
+          p.store?.some((s) => filters.stores.includes(s.name))
         );
 
       if (filters.inStockOnly)
@@ -102,10 +100,18 @@ export default function Home() {
         );
 
       if (filters.sort === "price-asc")
-        list = [...list].sort((a, b) => a.price - b.price);
+        list = [...list].sort(
+          (a, b) =>
+            Math.min(...a.store.map((s) => s.price)) -
+            Math.min(...b.store.map((s) => s.price))
+        );
 
       if (filters.sort === "price-desc")
-        list = [...list].sort((a, b) => b.price - a.price);
+        list = [...list].sort(
+          (a, b) =>
+            Math.min(...b.store.map((s) => s.price)) -
+            Math.min(...a.store.map((s) => s.price))
+        );
     }
 
     setFiltered(list);
@@ -136,7 +142,6 @@ export default function Home() {
             style={{ paddingRight: 44 }}
           />
 
-          {/* SEARCH ICON */}
           <svg
             width="18"
             height="18"
@@ -152,7 +157,6 @@ export default function Home() {
             <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2z" />
           </svg>
 
-          {/* AUTOCOMPLETE */}
           {suggestions.length > 0 && (
             <div
               className="autocomplete-box"
@@ -189,7 +193,6 @@ export default function Home() {
           )}
         </div>
 
-        {/* SVG MIC */}
         <button
           onClick={startVoiceSearch}
           style={{
@@ -208,18 +211,15 @@ export default function Home() {
         </button>
       </div>
 
-      {/* ADS */}
       <div className="mt-3">
         <BannerAd ads={ads} />
       </div>
 
-      {/* TRENDING */}
       <h2 className="section-title">Trending Today</h2>
       <div className="slider-row">
         <InfiniteSlider items={trending} size="small" />
       </div>
 
-      {/* RECENT */}
       {recent.length > 0 && (
         <>
           <h2 className="section-title">Recently Viewed</h2>
@@ -229,10 +229,9 @@ export default function Home() {
         </>
       )}
 
-      {/* CATEGORY + FILTER BUTTONS */}
       <div style={{ display: "flex", gap: 12, marginBottom: 10 }}>
         <button
-          onClick={() => setShowCategory(true)}
+          onClick={() => setOpenDrawer("category")}
           style={{
             flex: 1,
             padding: "14px 0",
@@ -241,8 +240,7 @@ export default function Home() {
             fontWeight: 800,
             fontSize: 16,
             color: "#fff",
-            background:
-              "linear-gradient(135deg,#0f4c81,#0bbcff)",
+            background: "linear-gradient(135deg,#0f4c81,#0bbcff)",
             boxShadow: "0 8px 20px rgba(15,76,129,0.35)",
           }}
         >
@@ -250,7 +248,7 @@ export default function Home() {
         </button>
 
         <button
-          onClick={() => setShowFilter(true)}
+          onClick={() => setOpenDrawer("filter")}
           style={{
             flex: 1,
             padding: "14px 0",
@@ -259,8 +257,7 @@ export default function Home() {
             fontWeight: 800,
             fontSize: 16,
             color: "#fff",
-            background:
-              "linear-gradient(135deg,#0f4c81,#0bbcff)",
+            background: "linear-gradient(135deg,#0f4c81,#0bbcff)",
             boxShadow: "0 8px 20px rgba(15,76,129,0.35)",
           }}
         >
@@ -268,7 +265,6 @@ export default function Home() {
         </button>
       </div>
 
-      {/* PRODUCTS */}
       <h2 className="section-title">Products</h2>
       <div className="products-grid">
         {filtered.map((product) => (
@@ -276,24 +272,27 @@ export default function Home() {
         ))}
       </div>
 
-      {/* DRAWERS */}
-      {showCategory && (
+      {openDrawer === "category" && (
         <CategoryDrawer
           active={activeCategory}
           onSelect={(c) => {
             setActiveCategory(c);
-            setShowCategory(false);
+            setOpenDrawer(null);
           }}
-          onClose={() => setShowCategory(false)}
+          onClose={() => setOpenDrawer(null)}
         />
       )}
 
-      {showFilter && (
+      {openDrawer === "filter" && (
         <FilterDrawer
-          onClose={() => setShowFilter(false)}
-          onApply={(data) => setFilters(data)} // 🔹 NEW
+          onClose={() => setOpenDrawer(null)}
+          onApply={(data) => {
+            setFilters(data);
+            setOpenDrawer(null);
+          }}
         />
       )}
     </main>
   );
-}
+    }
+        
