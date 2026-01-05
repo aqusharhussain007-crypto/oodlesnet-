@@ -126,5 +126,4 @@ export default function CategoryDrawer({
       `}</style>
     </div>
   );
-          }
-              
+        }
