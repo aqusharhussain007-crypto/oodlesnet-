@@ -1,17 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
 import CategoryDrawer from "./CategoryDrawer";
 import FilterDrawer from "./FilterDrawer";
+import { DrawerContext } from "@/components/DrawerProvider";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
-  const [showCategory, setShowCategory] = useState(false);
-  const [showFilter, setShowFilter] = useState(false);
+
+  const {
+    openCategory,
+    setOpenCategory,
+    openFilter,
+    setOpenFilter,
+  } = useContext(DrawerContext);
 
   useEffect(() => {
     const saved = localStorage.getItem("darkMode");
@@ -46,7 +52,6 @@ export default function Navbar() {
 
   return (
     <>
-      {/* NAVBAR */}
       <header
         style={{
           height: 54,
@@ -71,7 +76,6 @@ export default function Navbar() {
           />
         </Link>
 
-        {/* MENU BUTTON */}
         <button
           onClick={() => setOpen((v) => !v)}
           style={{
@@ -91,7 +95,6 @@ export default function Navbar() {
         </button>
       </header>
 
-      {/* BACKDROP */}
       {open && (
         <div
           onClick={() => setOpen(false)}
@@ -104,7 +107,6 @@ export default function Navbar() {
         />
       )}
 
-      {/* MENU PANEL */}
       {open && (
         <div
           style={{
@@ -137,29 +139,26 @@ export default function Navbar() {
             <Link href="/about" onClick={() => setOpen(false)}>About</Link>
             <Link href="/contact" onClick={() => setOpen(false)}>Contact</Link>
 
-            {/* CATEGORY */}
             <button
               onClick={() => {
                 setOpen(false);
-                setShowCategory(true);
+                setOpenCategory(true);
               }}
               style={{ background: "none", border: "none", color: "inherit", textAlign: "left" }}
             >
               Categories
             </button>
 
-            {/* FILTER */}
             <button
               onClick={() => {
                 setOpen(false);
-                setShowFilter(true);
+                setOpenFilter(true);
               }}
               style={{ background: "none", border: "none", color: "inherit", textAlign: "left" }}
             >
               Filters
             </button>
 
-            {/* SHARE ICON */}
             <button
               onClick={shareApp}
               style={{
@@ -181,7 +180,6 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* DARK MODE */}
           <div
             style={{
               marginTop: 20,
@@ -220,15 +218,17 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* DRAWERS */}
-      {showCategory && <CategoryDrawer onClose={() => setShowCategory(false)} />}
-      {showFilter && (
+      {openCategory && (
+        <CategoryDrawer onClose={() => setOpenCategory(false)} />
+      )}
+
+      {openFilter && (
         <FilterDrawer
-          onClose={() => setShowFilter(false)}
+          onClose={() => setOpenFilter(false)}
           onApply={() => {}}
         />
       )}
     </>
   );
-                }
-              
+              }
+                      
