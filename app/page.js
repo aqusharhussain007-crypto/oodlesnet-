@@ -12,8 +12,14 @@ import Image from "next/image";
 import { useDrawer } from "@/components/DrawerProvider";
 
 export default function Home() {
-  const { openDrawer, setOpenDrawer, activeCategory, setActiveCategory, filters, setFilters } =
-    useDrawer();
+  const {
+    openDrawer,
+    setOpenDrawer,
+    activeCategory,
+    setActiveCategory,
+    filters,
+    setFilters,
+  } = useDrawer();
 
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -34,7 +40,10 @@ export default function Home() {
       setFiltered(items);
 
       const top = [...items]
-        .sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0))
+        .sort(
+          (a, b) =>
+            Number(b.impressions || 0) - Number(a.impressions || 0)
+        )
         .slice(0, 10);
 
       setTrending(top);
@@ -62,10 +71,12 @@ export default function Home() {
   useEffect(() => {
     let list = products;
 
-    if (activeCategory !== "all") {
+    // CATEGORY
+    if (activeCategory && activeCategory !== "all") {
       list = list.filter((p) => p.categorySlug === activeCategory);
     }
 
+    // SEARCH
     if (search) {
       list = list.filter((p) =>
         (p.name || "").toLowerCase().includes(search.toLowerCase())
@@ -75,51 +86,71 @@ export default function Home() {
       setSuggestions([]);
     }
 
+    // FILTERS
     if (filters) {
-      if (filters.min)
+      if (filters.min) {
         list = list.filter((p) =>
-          p.store?.some((s) => Number(s.price) >= Number(filters.min))
+          p.store?.some(
+            (s) => Number(s.price) >= Number(filters.min)
+          )
         );
+      }
 
-      if (filters.max)
+      if (filters.max) {
         list = list.filter((p) =>
-          p.store?.some((s) => Number(s.price) <= Number(filters.max))
+          p.store?.some(
+            (s) => Number(s.price) <= Number(filters.max)
+          )
         );
+      }
 
-      if (filters.stores?.length)
+      if (filters.stores?.length) {
         list = list.filter((p) =>
-          p.store?.some((s) => filters.stores.includes(s.name))
+          p.store?.some((s) =>
+            filters.stores.includes(s.name)
+          )
         );
+      }
 
-      if (filters.inStockOnly)
+      if (filters.inStockOnly) {
         list = list.filter((p) => p.inStock);
+      }
 
-      if (filters.discountOnly)
+      if (filters.discountOnly) {
         list = list.filter(
-          (p) => p.originalPrice && p.originalPrice > p.price
+          (p) =>
+            p.originalPrice &&
+            p.store?.some(
+              (s) => Number(s.price) < Number(p.originalPrice)
+            )
         );
+      }
 
-      if (filters.sort === "price-asc")
+      if (filters.sort === "price-asc") {
         list = [...list].sort(
           (a, b) =>
-            Math.min(...a.store.map((s) => s.price)) -
-            Math.min(...b.store.map((s) => s.price))
+            Math.min(...a.store.map((s) => Number(s.price))) -
+            Math.min(...b.store.map((s) => Number(s.price)))
         );
+      }
 
-      if (filters.sort === "price-desc")
+      if (filters.sort === "price-desc") {
         list = [...list].sort(
           (a, b) =>
-            Math.min(...b.store.map((s) => s.price)) -
-            Math.min(...a.store.map((s) => s.price))
+            Math.min(...b.store.map((s) => Number(s.price))) -
+            Math.min(...a.store.map((s) => Number(s.price)))
         );
+      }
     }
 
     setFiltered(list);
-  }, [search, products, activeCategory, filters]);
+  }, [products, search, activeCategory, filters]);
 
   /* ---------------- VOICE SEARCH ---------------- */
   function startVoiceSearch() {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SR =
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition;
     if (!SR) return alert("Voice search not supported");
 
     const recog = new SR();
@@ -157,6 +188,7 @@ export default function Home() {
             <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2z" />
           </svg>
 
+          {/* AUTOCOMPLETE */}
           {suggestions.length > 0 && (
             <div
               className="autocomplete-box"
@@ -172,10 +204,17 @@ export default function Home() {
               {suggestions.map((item) => (
                 <div
                   key={item.id}
-                  onClick={() =>
-                    (window.location.href = `/product/${item.id}`)
-                  }
-                  style={{ display: "flex", gap: 8, padding: 8 }}
+                  onClick={() => {
+                    setSearch("");
+                    setSuggestions([]);
+                    window.location.href = `/product/${item.id}`;
+                  }}
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    padding: 8,
+                    cursor: "pointer",
+                  }}
                 >
                   <Image
                     src={item.imageUrl}
@@ -193,6 +232,7 @@ export default function Home() {
           )}
         </div>
 
+        {/* MIC */}
         <button
           onClick={startVoiceSearch}
           style={{
@@ -211,15 +251,18 @@ export default function Home() {
         </button>
       </div>
 
+      {/* ADS */}
       <div className="mt-3">
         <BannerAd ads={ads} />
       </div>
 
+      {/* TRENDING */}
       <h2 className="section-title">Trending Today</h2>
       <div className="slider-row">
         <InfiniteSlider items={trending} size="small" />
       </div>
 
+      {/* RECENT */}
       {recent.length > 0 && (
         <>
           <h2 className="section-title">Recently Viewed</h2>
@@ -229,6 +272,7 @@ export default function Home() {
         </>
       )}
 
+      {/* CATEGORY + FILTER BUTTONS */}
       <div style={{ display: "flex", gap: 12, marginBottom: 10 }}>
         <button
           onClick={() => setOpenDrawer("category")}
@@ -240,7 +284,8 @@ export default function Home() {
             fontWeight: 800,
             fontSize: 16,
             color: "#fff",
-            background: "linear-gradient(135deg,#0f4c81,#0bbcff)",
+            background:
+              "linear-gradient(135deg,#0f4c81,#0bbcff)",
             boxShadow: "0 8px 20px rgba(15,76,129,0.35)",
           }}
         >
@@ -257,7 +302,8 @@ export default function Home() {
             fontWeight: 800,
             fontSize: 16,
             color: "#fff",
-            background: "linear-gradient(135deg,#0f4c81,#0bbcff)",
+            background:
+              "linear-gradient(135deg,#0f4c81,#0bbcff)",
             boxShadow: "0 8px 20px rgba(15,76,129,0.35)",
           }}
         >
@@ -265,6 +311,7 @@ export default function Home() {
         </button>
       </div>
 
+      {/* PRODUCTS */}
       <h2 className="section-title">Products</h2>
       <div className="products-grid">
         {filtered.map((product) => (
@@ -272,11 +319,12 @@ export default function Home() {
         ))}
       </div>
 
+      {/* DRAWERS */}
       {openDrawer === "category" && (
         <CategoryDrawer
-          active={activeCategory}
+          active={activeCategory || "all"}
           onSelect={(c) => {
-            setActiveCategory(c);
+            setActiveCategory(c || "all");
             setOpenDrawer(null);
           }}
           onClose={() => setOpenDrawer(null)}
@@ -295,4 +343,4 @@ export default function Home() {
     </main>
   );
     }
-        
+  
