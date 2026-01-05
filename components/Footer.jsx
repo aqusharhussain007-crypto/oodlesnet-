@@ -1,12 +1,14 @@
 "use client";
 
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer
       style={{
         marginTop: "40px",
         width: "100%",
-        padding: "18px 0",
+        padding: "18px 0 10px 0",
         textAlign: "center",
         background: "#0a0f1a",
         borderTop: "2px solid #00b7ff",
@@ -15,10 +17,10 @@ export default function Footer() {
         position: "relative",
       }}
     >
+      {/* Copyright */}
       <div style={{ fontSize: "1rem", fontWeight: 500, opacity: 0.9 }}>
         © {new Date().getFullYear()}{" "}
-        <span style={{ color: "#00c9ff" }}>OodlesNet</span>.{" "}
-        All Rights Reserved.
+        <span style={{ color: "#00c9ff" }}>OodlesNet</span>. All Rights Reserved.
       </div>
 
       {/* Affiliate Disclaimer */}
@@ -45,11 +47,48 @@ export default function Footer() {
           height: "3px",
           background:
             "linear-gradient(90deg, transparent, #00b7ff, transparent)",
-          margin: "10px auto 0 auto",
+          margin: "12px auto",
           opacity: 0.7,
         }}
-      ></div>
+      />
+
+      {/* Secondary Footer Links (NEW) */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: 18,
+          flexWrap: "wrap",
+          fontSize: "0.8rem",
+          opacity: 0.85,
+          paddingBottom: 6,
+        }}
+      >
+        <Link
+          href="/privacy-policy"
+          style={{ color: "#8fdcff", textDecoration: "none" }}
+        >
+          Privacy Policy
+        </Link>
+
+        <span style={{ opacity: 0.4 }}>|</span>
+
+        <Link
+          href="/terms"
+          style={{ color: "#8fdcff", textDecoration: "none" }}
+        >
+          Terms & Conditions
+        </Link>
+
+        <span style={{ opacity: 0.4 }}>|</span>
+
+        <Link
+          href="/disclaimer"
+          style={{ color: "#8fdcff", textDecoration: "none" }}
+        >
+          Disclaimer
+        </Link>
+      </div>
     </footer>
   );
-        }
-          
+          }
