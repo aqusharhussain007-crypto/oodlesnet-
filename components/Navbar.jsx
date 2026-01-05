@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import FilterDrawer from "@/components/FilterDrawer";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
+  const [showFilter, setShowFilter] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("darkMode");
@@ -29,6 +31,19 @@ export default function Navbar() {
     }
   }
 
+  function handleShare() {
+    if (navigator.share) {
+      navigator.share({
+        title: "Oodlesnet",
+        text: "Compare prices smarter with Oodlesnet",
+        url: window.location.origin,
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.origin);
+      alert("Link copied");
+    }
+  }
+
   return (
     <>
       {/* NAVBAR */}
@@ -48,7 +63,7 @@ export default function Navbar() {
         <Link href="/">
           <Image
             src="/logo.png"
-            alt="OodlesNet"
+            alt="Oodlesnet"
             width={170}
             height={56}
             style={{ maxHeight: 45, width: "auto" }}
@@ -114,13 +129,46 @@ export default function Navbar() {
               color: "#7dd3fc",
             }}
           >
-            OodlesNet Menu
+            Oodlesnet Menu
           </h3>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <Link href="/" onClick={() => setOpen(false)}>Home</Link>
             <Link href="/about" onClick={() => setOpen(false)}>About</Link>
             <Link href="/contact" onClick={() => setOpen(false)}>Contact</Link>
+
+            {/* CATEGORY (hook point) */}
+            <button
+              onClick={() => {
+                alert("Category drawer coming next");
+                setOpen(false);
+              }}
+              style={{ background: "none", border: "none", color: "#e6f7ff", textAlign: "left" }}
+            >
+              Categories
+            </button>
+
+            {/* FILTER */}
+            <button
+              onClick={() => {
+                setShowFilter(true);
+                setOpen(false);
+              }}
+              style={{ background: "none", border: "none", color: "#e6f7ff", textAlign: "left" }}
+            >
+              Filters
+            </button>
+
+            {/* SHARE */}
+            <button
+              onClick={() => {
+                handleShare();
+                setOpen(false);
+              }}
+              style={{ background: "none", border: "none", color: "#e6f7ff", textAlign: "left" }}
+            >
+              Share App
+            </button>
           </div>
 
           {/* DARK MODE SWITCH */}
@@ -173,11 +221,21 @@ export default function Navbar() {
               opacity: 0.6,
             }}
           >
-            © OodlesNet
+            © Oodlesnet
           </div>
         </div>
       )}
+
+      {/* FILTER DRAWER */}
+      {showFilter && (
+        <FilterDrawer
+          onClose={() => setShowFilter(false)}
+          onApply={(filters) => {
+            console.log("Applied filters:", filters);
+          }}
+        />
+      )}
     </>
   );
-      }
-      
+            }
+          
