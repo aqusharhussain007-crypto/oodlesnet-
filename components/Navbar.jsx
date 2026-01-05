@@ -4,14 +4,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-import CategoryDrawer from "./CategoryDrawer";
-import FilterDrawer from "./FilterDrawer";
-
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
-  const [showCategory, setShowCategory] = useState(false);
-  const [showFilter, setShowFilter] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("darkMode");
@@ -44,15 +39,8 @@ export default function Navbar() {
     }
   }
 
-  const Arrow = () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M9 18l6-6-6-6" />
-    </svg>
-  );
-
   return (
     <>
-      {/* NAVBAR */}
       <header
         style={{
           height: 54,
@@ -77,7 +65,6 @@ export default function Navbar() {
           />
         </Link>
 
-        {/* MENU BUTTON */}
         <button
           onClick={() => setOpen((v) => !v)}
           style={{
@@ -97,7 +84,6 @@ export default function Navbar() {
         </button>
       </header>
 
-      {/* BACKDROP */}
       {open && (
         <div
           onClick={() => setOpen(false)}
@@ -110,7 +96,6 @@ export default function Navbar() {
         />
       )}
 
-      {/* MENU PANEL */}
       {open && (
         <div
           style={{
@@ -147,22 +132,22 @@ export default function Navbar() {
             <button
               onClick={() => {
                 setOpen(false);
-                setShowCategory(true);
+                window.dispatchEvent(new Event("open-category"));
               }}
-              style={{ background: "none", border: "none", color: "inherit", display: "flex", justifyContent: "space-between", alignItems: "center" }}
+              style={{ background: "none", border: "none", color: "inherit", textAlign: "left" }}
             >
-              Categories <Arrow />
+              Categories →
             </button>
 
             {/* FILTER */}
             <button
               onClick={() => {
                 setOpen(false);
-                setShowFilter(true);
+                window.dispatchEvent(new Event("open-filter"));
               }}
-              style={{ background: "none", border: "none", color: "inherit", display: "flex", justifyContent: "space-between", alignItems: "center" }}
+              style={{ background: "none", border: "none", color: "inherit", textAlign: "left" }}
             >
-              Filters <Arrow />
+              Filters →
             </button>
 
             {/* SHARE */}
@@ -187,7 +172,6 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* DARK MODE */}
           <div
             style={{
               marginTop: 20,
@@ -197,7 +181,6 @@ export default function Navbar() {
             }}
           >
             <span style={{ opacity: 0.85 }}>Dark Mode</span>
-
             <button
               onClick={toggleDark}
               style={{
@@ -225,15 +208,7 @@ export default function Navbar() {
           </div>
         </div>
       )}
-
-      {/* DRAWERS */}
-      {showCategory && <CategoryDrawer onClose={() => setShowCategory(false)} />}
-      {showFilter && (
-        <FilterDrawer
-          onClose={() => setShowFilter(false)}
-          onApply={() => {}}
-        />
-      )}
     </>
   );
-}
+        }
+    
