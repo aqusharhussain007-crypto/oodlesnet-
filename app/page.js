@@ -22,7 +22,7 @@ export default function Home() {
   const [trending, setTrending] = useState([]);
 
   const [activeCategory, setActiveCategory] = useState("all");
-  const [filters, setFilters] = useState(null);
+  const [filters, setFilters] = useState(null); // kept, not used yet
 
   const {
     openCategory,
@@ -31,7 +31,7 @@ export default function Home() {
     setOpenFilter,
   } = useContext(DrawerContext);
 
-  /* ---------------- LOAD PRODUCTS ---------------- */
+  /* LOAD PRODUCTS */
   useEffect(() => {
     async function load() {
       const snap = await getDocs(collection(db, "products"));
@@ -41,11 +41,7 @@ export default function Home() {
       setFiltered(items);
 
       const top = [...items]
-        .sort(
-          (a, b) =>
-            Number(b.impressions || 0) -
-            Number(a.impressions || 0)
-        )
+        .sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0))
         .slice(0, 10);
 
       setTrending(top);
@@ -53,7 +49,7 @@ export default function Home() {
     load();
   }, []);
 
-  /* ---------------- LOAD ADS ---------------- */
+  /* LOAD ADS */
   useEffect(() => {
     async function load() {
       const snap = await getDocs(collection(db, "ads"));
@@ -62,14 +58,14 @@ export default function Home() {
     load();
   }, []);
 
-  /* ---------------- RECENTLY VIEWED ---------------- */
+  /* RECENTLY VIEWED */
   useEffect(() => {
     if (typeof window === "undefined") return;
     const data = JSON.parse(localStorage.getItem("recent") || "[]");
     setRecent(Array.isArray(data) ? data : []);
   }, []);
 
-  /* ---------------- SEARCH + CATEGORY + FILTER ---------------- */
+  /* SEARCH + CATEGORY ONLY */
   useEffect(() => {
     let list = products;
 
@@ -81,62 +77,18 @@ export default function Home() {
 
     if (search) {
       list = list.filter((p) =>
-        (p.name || "")
-          .toLowerCase()
-          .includes(search.toLowerCase())
+        (p.name || "").toLowerCase().includes(search.toLowerCase())
       );
       setSuggestions(list.slice(0, 5));
     } else {
       setSuggestions([]);
     }
 
-    if (filters) {
-      if (filters.min)
-        list = list.filter(
-          (p) => Number(p.price) >= Number(filters.min)
-        );
-
-      if (filters.max)
-        list = list.filter(
-          (p) => Number(p.price) <= Number(filters.max)
-        );
-
-      if (filters.stores?.length)
-        list = list.filter((p) =>
-          p.store?.some((s) =>
-            filters.stores.includes(s.name)
-          )
-        );
-
-      if (filters.inStockOnly)
-        list = list.filter((p) => p.inStock);
-
-      if (filters.discountOnly)
-        list = list.filter(
-          (p) =>
-            p.originalPrice &&
-            p.originalPrice > p.price
-        );
-
-      if (filters.sort === "price-asc")
-        list = [...list].sort(
-          (a, b) => a.price - b.price
-        );
-
-      if (filters.sort === "price-desc")
-        list = [...list].sort(
-          (a, b) => b.price - a.price
-        );
-    }
-
     setFiltered(list);
-  }, [search, products, activeCategory, filters]);
+  }, [search, products, activeCategory]);
 
-  /* ---------------- VOICE SEARCH ---------------- */
   function startVoiceSearch() {
-    const SR =
-      window.SpeechRecognition ||
-      window.webkitSpeechRecognition;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return alert("Voice search not supported");
 
     const recog = new SR();
@@ -192,11 +144,7 @@ export default function Home() {
                   onClick={() =>
                     (window.location.href = `/product/${item.id}`)
                   }
-                  style={{
-                    display: "flex",
-                    gap: 8,
-                    padding: 8,
-                  }}
+                  style={{ display: "flex", gap: 8, padding: 8 }}
                 >
                   <Image
                     src={item.imageUrl}
@@ -230,28 +178,18 @@ export default function Home() {
         </button>
       </div>
 
-      {/* ADS */}
-      <div className="mt-3">
-        <BannerAd ads={ads} />
-      </div>
+      <BannerAd ads={ads} />
 
-      {/* TRENDING */}
       <h2 className="section-title">Trending Today</h2>
-      <div className="slider-row">
-        <InfiniteSlider items={trending} size="small" />
-      </div>
+      <InfiniteSlider items={trending} size="small" />
 
-      {/* RECENT */}
       {recent.length > 0 && (
         <>
           <h2 className="section-title">Recently Viewed</h2>
-          <div className="slider-row">
-            <InfiniteSlider items={recent} size="small" />
-          </div>
+          <InfiniteSlider items={recent} size="small" />
         </>
       )}
 
-      {/* PRODUCTS */}
       <h2 className="section-title">Products</h2>
       <div className="products-grid">
         {filtered.map((product) => (
@@ -259,7 +197,6 @@ export default function Home() {
         ))}
       </div>
 
-      {/* DRAWERS */}
       {openCategory && (
         <CategoryDrawer
           active={activeCategory}
@@ -279,5 +216,5 @@ export default function Home() {
       )}
     </main>
   );
-             }
-        
+        }
+                                                            
