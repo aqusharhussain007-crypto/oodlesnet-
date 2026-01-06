@@ -58,7 +58,13 @@ export async function GET(request, { params }) {
       );
     }
 
-    const redirectUrl = storeData.url;
+    // FIX: handle raw OR encoded URLs safely
+    let redirectUrl;
+    try {
+      redirectUrl = decodeURIComponent(storeData.url);
+    } catch {
+      redirectUrl = storeData.url;
+    }
 
     /* --------------------
        SAFETY CHECK
@@ -129,4 +135,5 @@ export async function GET(request, { params }) {
     );
   }
                }
-               
+                }
+                
