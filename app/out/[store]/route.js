@@ -58,7 +58,7 @@ export async function GET(request, { params }) {
       );
     }
 
-    // FIX: handle raw OR encoded URLs safely
+    // handle raw OR encoded URLs
     let redirectUrl;
     try {
       redirectUrl = decodeURIComponent(storeData.url);
@@ -134,6 +134,4 @@ export async function GET(request, { params }) {
       { status: 500 }
     );
   }
-               }
-                }
-                
+}
