@@ -1,4 +1,4 @@
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 import ProductCard from "@/components/ProductCard";
 
@@ -36,11 +36,17 @@ export async function generateMetadata({ params }) {
 export default async function CategoryPage({ params }) {
   const slug = params.slug;
 
-  const snap = await getDocs(collection(db, "products"));
+  const q = query(
+    collection(db, "products"),
+    where("categorySlug", "==", slug)
+  );
 
-  const products = snap.docs
-    .map((d) => ({ id: d.id, ...d.data() }))
-    .filter((p) => p.categorySlug === slug);
+  const snap = await getDocs(q);
+
+  const products = snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
 
   return (
     <main className="page-container" style={{ padding: 12 }}>
@@ -64,5 +70,4 @@ export default async function CategoryPage({ params }) {
       </div>
     </main>
   );
-      }
-      
+    }
