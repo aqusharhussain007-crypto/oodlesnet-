@@ -25,7 +25,6 @@ export default function ProductPage({ params }) {
   const [relatedBrand, setRelatedBrand] = useState([]);
   const [relatedPrice, setRelatedPrice] = useState([]);
 
-  /* CLOSE ON OUTSIDE CLICK */
   useEffect(() => {
     function handleClickOutside(e) {
       if (
@@ -39,7 +38,8 @@ export default function ProductPage({ params }) {
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, [detailsOpen]);
 
   useEffect(() => {
@@ -119,7 +119,6 @@ export default function ProductPage({ params }) {
           margin: "0 auto",
         }}
       >
-        {/* Breadcrumb */}
         <div style={{ fontSize: 14, marginBottom: 12 }}>
           <Link href="/" style={{ color: "#3b82f6" }}>
             Home
@@ -143,57 +142,7 @@ export default function ProductPage({ params }) {
             aspectRatio: "3 / 4",
           }}
         >
-          {/* DETAILS BUTTON */}
-          <button
-            ref={buttonRef}
-            onClick={() => setDetailsOpen((v) => !v)}
-            style={{
-              position: "absolute",
-              top: 12,
-              right: 12,
-              zIndex: 20,
-              padding: "8px 14px",
-              borderRadius: 999,
-              border: "none",
-              fontWeight: 800,
-              color: "#fff",
-              background: "linear-gradient(135deg,#0f4c81,#10b981)",
-              boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
-            }}
-          >
-            {detailsOpen ? "Close" : "Details"}
-          </button>
-
-          {/* DETAILS PANEL (ANIMATED) */}
-          <div
-            ref={detailsRef}
-            style={{
-              position: "absolute",
-              top: 52,
-              right: 0,
-              width: "85%",
-              zIndex: 15,
-              background: "#ffffff",
-              borderRadius: 16,
-              padding: 16,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
-              borderLeft: "4px solid #10b981",
-
-              /* ANIMATION */
-              transform: detailsOpen
-                ? "translateY(0)"
-                : "translateY(-12px)",
-              opacity: detailsOpen ? 1 : 0,
-              pointerEvents: detailsOpen ? "auto" : "none",
-              transition:
-                "transform 320ms ease-out, opacity 320ms ease-out",
-            }}
-          >
-            <div style={{ fontSize: 14, color: "#374151" }}>
-              {product.description}
-            </div>
-          </div>
-
+          {/* IMAGE FIRST */}
           <img
             src={product.imageUrl || "/placeholder.png"}
             alt={product.name}
@@ -209,9 +158,57 @@ export default function ProductPage({ params }) {
               e.currentTarget.src = "/placeholder.png";
             }}
           />
+
+          {/* DETAILS BUTTON */}
+          <button
+            ref={buttonRef}
+            onClick={() => setDetailsOpen((v) => !v)}
+            style={{
+              position: "absolute",
+              top: 12,
+              right: 12,
+              zIndex: 40,
+              padding: "8px 14px",
+              borderRadius: 999,
+              border: "none",
+              fontWeight: 800,
+              color: "#fff",
+              background: "linear-gradient(135deg,#0f4c81,#10b981)",
+              boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
+            }}
+          >
+            {detailsOpen ? "Close" : "Details"}
+          </button>
+
+          {/* DETAILS PANEL */}
+          <div
+            ref={detailsRef}
+            style={{
+              position: "absolute",
+              top: 52,
+              right: 0,
+              width: "85%",
+              zIndex: 30,
+              background: "#ffffff",
+              borderRadius: 16,
+              padding: 16,
+              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+              borderLeft: "4px solid #10b981",
+              transform: detailsOpen
+                ? "translateY(0)"
+                : "translateY(-12px)",
+              opacity: detailsOpen ? 1 : 0,
+              pointerEvents: detailsOpen ? "auto" : "none",
+              transition:
+                "transform 320ms ease-out, opacity 320ms ease-out",
+            }}
+          >
+            <div style={{ fontSize: 14, color: "#374151" }}>
+              {product.description}
+            </div>
+          </div>
         </div>
 
-        {/* TITLE + SHARE */}
         <div
           style={{
             display: "flex",
@@ -242,4 +239,5 @@ export default function ProductPage({ params }) {
       </div>
     </>
   );
-          }
+        }
+      
