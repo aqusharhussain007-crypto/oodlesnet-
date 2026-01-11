@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 export default function ProductCard({ product }) {
   const [open, setOpen] = useState(false);
   const boxRef = useRef(null);
-  const cardRef = useRef(null);
+  const btnRef = useRef(null);
 
   const prices =
     product.store
@@ -14,45 +14,37 @@ export default function ProductCard({ product }) {
       .filter((p) => Number.isFinite(p)) || [];
 
   const sorted = [...prices].sort((a, b) => a - b);
-
-  const lowest = sorted[0];
-  const second = sorted[1];
-  const third = sorted[2];
+  const [lowest, second, third] = sorted;
 
   function saveRecent() {
     if (typeof window === "undefined") return;
-
     let recent = JSON.parse(localStorage.getItem("recent") || "[]");
     recent = recent.filter((p) => p.id !== product.id);
-
     recent.unshift({
       id: product.id,
       name: product.name,
       imageUrl: product.imageUrl,
       store: product.store || [],
     });
-
     if (recent.length > 10) recent = recent.slice(0, 10);
     localStorage.setItem("recent", JSON.stringify(recent));
   }
 
-  /* CLOSE DESCRIPTION ON OUTSIDE CLICK */
+  /* OUTSIDE CLICK CLOSE */
   useEffect(() => {
     function handleOutside(e) {
       if (
         open &&
         boxRef.current &&
         !boxRef.current.contains(e.target) &&
-        cardRef.current &&
-        !cardRef.current.contains(e.target)
+        btnRef.current &&
+        !btnRef.current.contains(e.target)
       ) {
         setOpen(false);
       }
     }
-
     document.addEventListener("mousedown", handleOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
   }, [open]);
 
   /* ESC CLOSE */
@@ -66,15 +58,14 @@ export default function ProductCard({ product }) {
 
   return (
     <div style={{ position: "relative" }}>
-      {/* CARD LINK (UNCHANGED) */}
       <Link
         href={`/product/${product.id}`}
         onClick={saveRecent}
         style={{ textDecoration: "none" }}
       >
         <div
-          ref={cardRef}
           style={{
+            position: "relative",
             borderRadius: 18,
             padding: 14,
             background: "#ecfffb",
@@ -84,6 +75,34 @@ export default function ProductCard({ product }) {
             gap: 12,
           }}
         >
+          {/* DETAILS BUTTON */}
+          {product.description && (
+            <button
+              ref={btnRef}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setOpen((v) => !v);
+              }}
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                zIndex: 20,
+                padding: "6px 12px",
+                borderRadius: 999,
+                border: "none",
+                fontSize: "0.75rem",
+                fontWeight: 800,
+                color: "#fff",
+                background: "linear-gradient(135deg,#0f4c81,#10b981)",
+                boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
+              }}
+            >
+              {open ? "Close" : "Details"}
+            </button>
+          )}
+
           <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
             {/* IMAGE */}
             <div
@@ -120,48 +139,6 @@ export default function ProductCard({ product }) {
               >
                 {product.name}
               </h3>
-
-              {product.description && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setOpen((v) => !v);
-                  }}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    fontSize: "0.8rem",
-                    fontWeight: 700,
-                    color: "#0bbcff",
-                    background: "#e6f8ff",
-                    border: "1px solid #bae6fd",
-                    borderRadius: 8,
-                    padding: "4px 8px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Details
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{
-                      transform: open ? "rotate(180deg)" : "rotate(0deg)",
-                      transition: "transform 0.2s ease",
-                    }}
-                  >
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
-                </button>
-              )}
             </div>
           </div>
 
@@ -175,7 +152,6 @@ export default function ProductCard({ product }) {
                 <div style={{ fontSize: 12 }}>Lowest</div>
               </div>
             )}
-
             {Number.isFinite(second) && (
               <div>
                 <div style={{ color: "#2563eb", fontWeight: 700 }}>
@@ -184,7 +160,6 @@ export default function ProductCard({ product }) {
                 <div style={{ fontSize: 12 }}>2nd</div>
               </div>
             )}
-
             {Number.isFinite(third) && (
               <div>
                 <div style={{ color: "#2563eb", fontWeight: 700 }}>
@@ -197,74 +172,41 @@ export default function ProductCard({ product }) {
         </div>
       </Link>
 
-      {/* DESCRIPTION BOX (SEPARATE FROM LINK) */}
-      {open && (
+      {/* DETAILS PANEL */}
+      <div
+        ref={boxRef}
+        style={{
+          position: "absolute",
+          top: 46,
+          right: 0,
+          width: "85%",
+          zIndex: 30,
+          background: "#fff",
+          borderRadius: 16,
+          padding: 14,
+          boxShadow: "0 12px 30px rgba(0,0,0,0.25)",
+          borderLeft: "4px solid #10b981",
+          transform: open ? "translateY(0)" : "translateY(-10px)",
+          opacity: open ? 1 : 0,
+          pointerEvents: open ? "auto" : "none",
+          transition: "all 320ms ease-out",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div
-          ref={boxRef}
-          onClick={(e) => e.stopPropagation()}
           style={{
-            position: "absolute",
-            top: 200,
-            right: 12,
-            width: "60%",
-            minWidth: 260,
-            maxWidth: 420,
-            height: 220,
-            background: "#ffffff",
-            borderRadius: 14,
-            border: "2px solid #38bdf8",
-            boxShadow: "0 15px 35px rgba(0,0,0,0.18)",
-            padding: 14,
-            zIndex: 50,
-            animation: "slideIn 0.25s ease-out",
+            maxHeight: 180,
+            overflowY: "auto",
+            fontSize: "0.9rem",
+            color: "#374151",
+            lineHeight: 1.5,
+            paddingRight: 6,
           }}
         >
-          <div
-            style={{
-              height: "100%",
-              overflowY: "auto",
-              fontSize: "0.9rem",
-              color: "#374151",
-              lineHeight: 1.5,
-              paddingRight: 6,
-            }}
-          >
-            {product.description}
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            style={{
-              position: "absolute",
-              bottom: 8,
-              right: 12,
-              fontSize: "0.8rem",
-              fontWeight: 700,
-              color: "#ef4444",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            Close ✕
-          </button>
+          {product.description}
         </div>
-      )}
-
-      <style jsx>{`
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-6px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
+      </div>
     </div>
   );
-}
+    }
   
