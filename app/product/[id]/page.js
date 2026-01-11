@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 import ProductCard from "@/components/ProductCard";
@@ -16,31 +16,10 @@ export default function ProductPage({ params }) {
   const { product, loading } = useProduct(id);
 
   const [expanded, setExpanded] = useState(false);
-  const [detailsOpen, setDetailsOpen] = useState(false);
-
-  const detailsRef = useRef(null);
-  const buttonRef = useRef(null);
 
   const [relatedCategory, setRelatedCategory] = useState([]);
   const [relatedBrand, setRelatedBrand] = useState([]);
   const [relatedPrice, setRelatedPrice] = useState([]);
-
-  useEffect(() => {
-    function handleClickOutside(e) {
-      if (
-        detailsOpen &&
-        detailsRef.current &&
-        !detailsRef.current.contains(e.target) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(e.target)
-      ) {
-        setDetailsOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
-  }, [detailsOpen]);
 
   useEffect(() => {
     if (!product) return;
@@ -95,14 +74,32 @@ export default function ProductPage({ params }) {
   if (!product)
     return <div style={{ padding: 16, color: "red" }}>Product not found</div>;
 
+  const stores = product.store || [];
+
+  const sortedStores = [...stores]
+    .filter((s) => Number(s.price) > 0)
+    .sort((a, b) => Number(a.price) - Number(b.price));
+
+  const prices = sortedStores
+    .map((s) => Number(s.price))
+    .filter((p) => Number.isFinite(p));
+
+  const cheapest = prices.length ? Math.min(...prices) : null;
+
+  function handleBuy(store) {
+    window.location.href = `/out/${store.name.toLowerCase()}?pid=${product.id}`;
+  }
+
   function handleShare() {
     const url = window.location.href;
     if (navigator.share) {
-      navigator.share({
-        title: product.name,
-        text: `Compare prices for ${product.name}`,
-        url,
-      });
+      navigator
+        .share({
+          title: product.name,
+          text: `Compare prices for ${product.name}`,
+          url,
+        })
+        .catch(() => {});
     } else {
       navigator.clipboard.writeText(url);
       alert("Link copied");
@@ -119,6 +116,7 @@ export default function ProductPage({ params }) {
           margin: "0 auto",
         }}
       >
+        {/* Breadcrumb */}
         <div style={{ fontSize: 14, marginBottom: 12 }}>
           <Link href="/" style={{ color: "#3b82f6" }}>
             Home
@@ -130,19 +128,17 @@ export default function ProductPage({ params }) {
           / <strong>{product.name}</strong>
         </div>
 
-        {/* IMAGE + DETAILS */}
+        {/* IMAGE — FIXED (ONLY CHANGE) */}
         <div
           style={{
-            position: "relative",
             borderRadius: 18,
-            overflow: "visible",
+            overflow: "hidden",
             background: "#fff",
             boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
             marginBottom: 16,
             aspectRatio: "3 / 4",
           }}
         >
-          {/* IMAGE FIRST */}
           <img
             src={product.imageUrl || "/placeholder.png"}
             alt={product.name}
@@ -152,63 +148,14 @@ export default function ProductPage({ params }) {
               height: "100%",
               objectFit: "contain",
               background: "#fff",
-              borderRadius: 18,
             }}
             onError={(e) => {
               e.currentTarget.src = "/placeholder.png";
             }}
           />
-
-          {/* DETAILS BUTTON */}
-          <button
-            ref={buttonRef}
-            onClick={() => setDetailsOpen((v) => !v)}
-            style={{
-              position: "absolute",
-              top: 12,
-              right: 12,
-              zIndex: 40,
-              padding: "8px 14px",
-              borderRadius: 999,
-              border: "none",
-              fontWeight: 800,
-              color: "#fff",
-              background: "linear-gradient(135deg,#0f4c81,#10b981)",
-              boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
-            }}
-          >
-            {detailsOpen ? "Close" : "Details"}
-          </button>
-
-          {/* DETAILS PANEL */}
-          <div
-            ref={detailsRef}
-            style={{
-              position: "absolute",
-              top: 52,
-              right: 0,
-              width: "85%",
-              zIndex: 30,
-              background: "#ffffff",
-              borderRadius: 16,
-              padding: 16,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
-              borderLeft: "4px solid #10b981",
-              transform: detailsOpen
-                ? "translateY(0)"
-                : "translateY(-12px)",
-              opacity: detailsOpen ? 1 : 0,
-              pointerEvents: detailsOpen ? "auto" : "none",
-              transition:
-                "transform 320ms ease-out, opacity 320ms ease-out",
-            }}
-          >
-            <div style={{ fontSize: 14, color: "#374151" }}>
-              {product.description}
-            </div>
-          </div>
         </div>
 
+        {/* Title + Share */}
         <div
           style={{
             display: "flex",
@@ -236,8 +183,193 @@ export default function ProductPage({ params }) {
             Share
           </button>
         </div>
+
+        {/* Description */}
+        <div style={{ marginTop: 12 }}>
+          <p
+            style={{
+              color: "#374151",
+              display: "-webkit-box",
+              WebkitLineClamp: expanded ? "unset" : 3,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {product.description}
+          </p>
+
+          {product.description?.length > 120 && (
+            <button
+              onClick={() => setExpanded((v) => !v)}
+              style={{
+                marginTop: 6,
+                color: "#0bbcff",
+                fontWeight: 700,
+                background: "none",
+                border: "none",
+                padding: 0,
+              }}
+            >
+              {expanded ? "Show less" : "Read more"}
+            </button>
+          )}
+        </div>
+
+        {/* Compare Prices */}
+        <h3
+          style={{
+            marginTop: 24,
+            fontSize: 20,
+            fontWeight: 800,
+            color: "#2563eb",
+          }}
+        >
+          Compare Prices
+        </h3>
+
+        <div
+          style={{
+            display: "flex",
+            gap: 16,
+            overflowX: "auto",
+            padding: "16px 0",
+          }}
+        >
+          {sortedStores.map((store, index) => (
+            <div
+              key={index}
+              style={{
+                minWidth: 260,
+                background: "#fff",
+                padding: 20,
+                borderRadius: 18,
+                boxShadow: "0 6px 14px rgba(0,0,0,0.1)",
+                border: "1px solid #e5e7eb",
+                flexShrink: 0,
+              }}
+            >
+              <div style={{ fontSize: 18, fontWeight: 800 }}>
+                {store.name}
+              </div>
+
+              <div
+                style={{
+                  fontSize: 22,
+                  fontWeight: 900,
+                  margin: "8px 0",
+                  color:
+                    Number(store.price) === cheapest
+                      ? "#16a34a"
+                      : "#2563eb",
+                }}
+              >
+                ₹ {Number(store.price).toLocaleString("en-IN")}
+              </div>
+
+              <div
+                style={{
+                  fontSize: 14,
+                  color: "#6b7280",
+                  marginBottom: 14,
+                }}
+              >
+                {store.offer}
+              </div>
+
+              <button
+                onClick={() => handleBuy(store)}
+                style={{
+                  width: "100%",
+                  padding: "14px 0",
+                  fontWeight: 800,
+                  borderRadius: 14,
+                  border: "none",
+                  color: "#fff",
+                  background:
+                    store.name.toLowerCase() === "amazon"
+                      ? "linear-gradient(90deg,#ff9900,#ff6600)"
+                      : store.name.toLowerCase() === "meesho"
+                      ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
+                      : store.name.toLowerCase() === "ajio"
+                      ? "linear-gradient(90deg,#005bea,#00c6fb)"
+                      : "linear-gradient(90deg,#00c6ff,#00ff99)",
+                  boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
+                }}
+              >
+                {Number(store.price) === cheapest && (
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: 8,
+                      height: 8,
+                      marginRight: 8,
+                      borderRadius: "50%",
+                      backgroundColor: "#22c55e",
+                      animation: "blink 1.2s infinite",
+                    }}
+                  />
+                )}
+                Buy on {store.name}
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* RELATED SECTIONS */}
+        {relatedCategory.length > 0 && (
+          <>
+            <h3 className="section-title">
+              More in {product.categorySlug}
+            </h3>
+            <div className="slider-row">
+              <div className="flex gap-4 overflow-x-auto no-scrollbar">
+                {relatedCategory.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {relatedBrand.length > 0 && (
+          <>
+            <h3 className="section-title">
+              More from {product.brand}
+            </h3>
+            <div className="slider-row">
+              <div className="flex gap-4 overflow-x-auto no-scrollbar">
+                {relatedBrand.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {relatedPrice.length > 0 && (
+          <>
+            <h3 className="section-title">
+              Similar Price Range
+            </h3>
+            <div className="slider-row">
+              <div className="flex gap-4 overflow-x-auto no-scrollbar">
+                {relatedPrice.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
+
+      <style jsx>{`
+        @keyframes blink {
+          0% { opacity: 1; }
+          50% { opacity: 0.2; }
+          100% { opacity: 1; }
+        }
+      `}</style>
     </>
   );
-        }
-      
+          }
+          
