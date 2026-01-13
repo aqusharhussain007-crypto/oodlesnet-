@@ -10,22 +10,16 @@ import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
 import { DrawerContext } from "@/components/DrawerProvider";
-import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const router = useRouter();
-
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
-  const [categories, setCategories] = useState([]);
-
   const [search, setSearch] = useState("");
   const [suggestions, setSuggestions] = useState([]);
 
   const [ads, setAds] = useState([]);
   const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
-  const [featured, setFeatured] = useState(null);
 
   const [activeCategory, setActiveCategory] = useState("all");
   const [filters, setFilters] = useState(null);
@@ -49,25 +43,10 @@ export default function Home() {
       const top = [...items]
         .sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0))
         .slice(0, 10);
-      setTrending(top);
 
-      // 🔥 DAILY FEATURED PRODUCT (rotates by date)
-      if (items.length > 0) {
-        const index =
-          Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % items.length;
-        setFeatured(items[index]);
-      }
+      setTrending(top);
     }
     load();
-  }, []);
-
-  /* LOAD CATEGORIES */
-  useEffect(() => {
-    async function loadCategories() {
-      const snap = await getDocs(collection(db, "categories"));
-      setCategories(snap.docs.map((d) => d.data()));
-    }
-    loadCategories();
   }, []);
 
   /* LOAD ADS */
@@ -86,12 +65,14 @@ export default function Home() {
     setRecent(Array.isArray(data) ? data : []);
   }, []);
 
-  /* SEARCH + CATEGORY FILTER */
+  /* SEARCH + CATEGORY */
   useEffect(() => {
     let list = products;
 
     if (activeCategory !== "all") {
-      list = list.filter((p) => p.categorySlug === activeCategory);
+      list = list.filter(
+        (p) => p.categorySlug === activeCategory
+      );
     }
 
     if (search) {
@@ -119,7 +100,7 @@ export default function Home() {
 
   return (
     <main className="page-container" style={{ padding: 12 }}>
-      {/* SEARCH */}
+      {/* SEARCH BAR */}
       <div style={{ display: "flex", gap: 8 }}>
         <div style={{ position: "relative", flex: 1 }}>
           <input
@@ -127,9 +108,44 @@ export default function Home() {
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ paddingRight: 44 }}
+            style={{ paddingRight: 80 }}
           />
 
+          {/* SEARCH ICON */}
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="#00c3ff"
+            style={{
+              position: "absolute",
+              right: 44,
+              top: "50%",
+              transform: "translateY(-50%)",
+            }}
+          >
+            <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2z" />
+          </svg>
+
+          {/* MIC ICON */}
+          <svg
+            onClick={startVoiceSearch}
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="#00c3ff"
+            style={{
+              position: "absolute",
+              right: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              cursor: "pointer",
+            }}
+          >
+            <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 9a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7z" />
+          </svg>
+
+          {/* AUTOCOMPLETE */}
           {suggestions.length > 0 && (
             <div
               style={{
@@ -137,15 +153,23 @@ export default function Home() {
                 top: 48,
                 width: "100%",
                 background: "white",
-                borderRadius: 10,
+                borderRadius: 12,
                 zIndex: 1000,
+                boxShadow: "0 6px 20px rgba(0,0,0,0.15)",
               }}
             >
               {suggestions.map((item) => (
                 <div
                   key={item.id}
-                  onClick={() => router.push(`/product/${item.id}`)}
-                  style={{ display: "flex", gap: 8, padding: 8 }}
+                  onClick={() =>
+                    (window.location.href = `/product/${item.id}`)
+                  }
+                  style={{
+                    display: "flex",
+                    gap: 10,
+                    padding: 10,
+                    cursor: "pointer",
+                  }}
                 >
                   <Image
                     src={item.imageUrl}
@@ -157,22 +181,34 @@ export default function Home() {
                   <strong>{item.name}</strong>
                 </div>
               ))}
+
+              {/* SEE ALL BELOW SUGGESTIONS */}
+              <div
+                onClick={() =>
+                  (window.location.href = `/category/${activeCategory}`)
+                }
+                style={{
+                  margin: 10,
+                  height: 64,
+                  borderRadius: 14,
+                  background:
+                    "linear-gradient(90deg,#00c6ff,#00e0a8)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontWeight: 800,
+                  cursor: "pointer",
+                }}
+              >
+                See all →
+              </div>
             </div>
           )}
         </div>
-
-        <button onClick={startVoiceSearch}>🎤</button>
       </div>
 
       <BannerAd ads={ads} />
-
-      {/* 🔥 FEATURED */}
-      {featured && (
-        <>
-          <h2 className="section-title">🔥 Today’s Pick</h2>
-          <ProductCard product={featured} />
-        </>
-      )}
 
       <h2 className="section-title">Trending Today</h2>
       <InfiniteSlider items={trending} size="small" />
@@ -184,48 +220,38 @@ export default function Home() {
         </>
       )}
 
-      {/* CATEGORY SECTIONS */}
-      {!search &&
-        categories.map((cat) => {
-          const items = filtered.filter(
-            (p) => p.categorySlug === cat.slug
-          );
+      <h2 className="section-title">Products</h2>
 
-          if (items.length === 0) return null;
+      <div className="products-grid">
+        {filtered.slice(0, 4).map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
 
-          const visible = items.slice(0, 4);
+        {/* SEE ALL CARD AFTER 4 PRODUCTS */}
+        <div
+          onClick={() =>
+            (window.location.href = `/category/${activeCategory}`)
+          }
+          style={{
+            height: 96,
+            borderRadius: 18,
+            background: "linear-gradient(90deg,#00c6ff,#00e0a8)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 20,
+            fontWeight: 900,
+            color: "#fff",
+            cursor: "pointer",
+          }}
+        >
+          See all →
+        </div>
 
-          return (
-            <div key={cat.slug}>
-              <h2 className="section-title">{cat.name}</h2>
-
-              <div className="products-grid">
-                {visible.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-
-                {/* SEE ALL CARD */}
-                {items.length > 4 && (
-                  <div
-                    onClick={() => router.push(`/category/${cat.slug}`)}
-                    style={{
-                      border: "2px dashed #00c6ff",
-                      borderRadius: 16,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontWeight: 800,
-                      color: "#0077aa",
-                      cursor: "pointer",
-                    }}
-                  >
-                    See all →
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        {filtered.slice(4).map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
 
       {openCategory && (
         <CategoryDrawer
@@ -246,5 +272,5 @@ export default function Home() {
       )}
     </main>
   );
-    }
+        }
         
