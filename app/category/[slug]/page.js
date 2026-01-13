@@ -2,6 +2,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 import ProductCard from "@/components/ProductCard";
 import Link from "next/link";
+import CategorySkeleton from "@/components/CategorySkeleton";
 
 /* ---------- SEO METADATA (SERVER) ---------- */
 export async function generateMetadata({ params }) {
@@ -51,7 +52,7 @@ export default async function CategoryPage({ params }) {
 
   return (
     <main className="page-container" style={{ padding: 12 }}>
-      {/* ✅ BREADCRUMB (ONLY ADDITION) */}
+      {/* BREADCRUMB */}
       <div style={{ fontSize: 14, marginBottom: 10 }}>
         <Link href="/" style={{ color: "#3b82f6" }}>
           Home
@@ -66,18 +67,17 @@ export default async function CategoryPage({ params }) {
         {slug}
       </h1>
 
-      {products.length === 0 && (
-        <p style={{ color: "#666" }}>
-          No products found in this category.
-        </p>
+      {/* ✅ SKELETON FALLBACK */}
+      {products.length === 0 ? (
+        <CategorySkeleton />
+      ) : (
+        <div className="products-grid">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
       )}
-
-      <div className="products-grid">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
     </main>
   );
-    }
-    
+        }
+        
