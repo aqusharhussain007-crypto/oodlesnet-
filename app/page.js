@@ -10,19 +10,25 @@ import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
 import { DrawerContext } from "@/components/DrawerProvider";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
   const [products, setProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
+  const [categories, setCategories] = useState([]);
+
   const [search, setSearch] = useState("");
   const [suggestions, setSuggestions] = useState([]);
 
   const [ads, setAds] = useState([]);
   const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
+  const [featured, setFeatured] = useState(null);
 
   const [activeCategory, setActiveCategory] = useState("all");
-  const [filters, setFilters] = useState(null); // kept, not used yet
+  const [filters, setFilters] = useState(null);
 
   const {
     openCategory,
@@ -43,10 +49,25 @@ export default function Home() {
       const top = [...items]
         .sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0))
         .slice(0, 10);
-
       setTrending(top);
+
+      // 🔥 DAILY FEATURED PRODUCT (rotates by date)
+      if (items.length > 0) {
+        const index =
+          Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % items.length;
+        setFeatured(items[index]);
+      }
     }
     load();
+  }, []);
+
+  /* LOAD CATEGORIES */
+  useEffect(() => {
+    async function loadCategories() {
+      const snap = await getDocs(collection(db, "categories"));
+      setCategories(snap.docs.map((d) => d.data()));
+    }
+    loadCategories();
   }, []);
 
   /* LOAD ADS */
@@ -65,14 +86,12 @@ export default function Home() {
     setRecent(Array.isArray(data) ? data : []);
   }, []);
 
-  /* SEARCH + CATEGORY ONLY */
+  /* SEARCH + CATEGORY FILTER */
   useEffect(() => {
     let list = products;
 
     if (activeCategory !== "all") {
-      list = list.filter(
-        (p) => p.categorySlug === activeCategory
-      );
+      list = list.filter((p) => p.categorySlug === activeCategory);
     }
 
     if (search) {
@@ -111,24 +130,8 @@ export default function Home() {
             style={{ paddingRight: 44 }}
           />
 
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="#00c3ff"
-            style={{
-              position: "absolute",
-              right: 12,
-              top: "50%",
-              transform: "translateY(-50%)",
-            }}
-          >
-            <path d="M10 2a8 8 0 105.293 14.293l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2z" />
-          </svg>
-
           {suggestions.length > 0 && (
             <div
-              className="autocomplete-box"
               style={{
                 position: "absolute",
                 top: 48,
@@ -141,9 +144,7 @@ export default function Home() {
               {suggestions.map((item) => (
                 <div
                   key={item.id}
-                  onClick={() =>
-                    (window.location.href = `/product/${item.id}`)
-                  }
+                  onClick={() => router.push(`/product/${item.id}`)}
                   style={{ display: "flex", gap: 8, padding: 8 }}
                 >
                   <Image
@@ -160,25 +161,18 @@ export default function Home() {
           )}
         </div>
 
-        <button
-          onClick={startVoiceSearch}
-          style={{
-            width: 42,
-            height: 42,
-            borderRadius: 10,
-            background: "#00c6ff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-            <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 9a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7z" />
-          </svg>
-        </button>
+        <button onClick={startVoiceSearch}>🎤</button>
       </div>
 
       <BannerAd ads={ads} />
+
+      {/* 🔥 FEATURED */}
+      {featured && (
+        <>
+          <h2 className="section-title">🔥 Today’s Pick</h2>
+          <ProductCard product={featured} />
+        </>
+      )}
 
       <h2 className="section-title">Trending Today</h2>
       <InfiniteSlider items={trending} size="small" />
@@ -190,12 +184,48 @@ export default function Home() {
         </>
       )}
 
-      <h2 className="section-title">Products</h2>
-      <div className="products-grid">
-        {filtered.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {/* CATEGORY SECTIONS */}
+      {!search &&
+        categories.map((cat) => {
+          const items = filtered.filter(
+            (p) => p.categorySlug === cat.slug
+          );
+
+          if (items.length === 0) return null;
+
+          const visible = items.slice(0, 4);
+
+          return (
+            <div key={cat.slug}>
+              <h2 className="section-title">{cat.name}</h2>
+
+              <div className="products-grid">
+                {visible.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+
+                {/* SEE ALL CARD */}
+                {items.length > 4 && (
+                  <div
+                    onClick={() => router.push(`/category/${cat.slug}`)}
+                    style={{
+                      border: "2px dashed #00c6ff",
+                      borderRadius: 16,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontWeight: 800,
+                      color: "#0077aa",
+                      cursor: "pointer",
+                    }}
+                  >
+                    See all →
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
 
       {openCategory && (
         <CategoryDrawer
@@ -216,5 +246,5 @@ export default function Home() {
       )}
     </main>
   );
-        }
-                                                            
+    }
+        
