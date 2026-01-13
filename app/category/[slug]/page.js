@@ -1,7 +1,6 @@
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 import ProductCard from "@/components/ProductCard";
-import Link from "next/link";
 
 /* ---------- SEO METADATA (SERVER) ---------- */
 export async function generateMetadata({ params }) {
@@ -34,23 +33,9 @@ export async function generateMetadata({ params }) {
 }
 
 /* ---------- PAGE ---------- */
-export default async function CategoryPage({ params, searchParams }) {
+export default async function CategoryPage({ params }) {
   const slug = params.slug;
 
-  /* ---------- FETCH CATEGORY NAME ---------- */
-  const catSnap = await getDocs(
-    query(collection(db, "categories"), where("slug", "==", slug))
-  );
-
-  const category = catSnap.docs[0]?.data();
-
-  const categoryName =
-    category?.name ||
-    slug
-      .replace(/-/g, " ")
-      .replace(/\b\w/g, (c) => c.toUpperCase());
-
-  /* ---------- FETCH PRODUCTS ---------- */
   const q = query(
     collection(db, "products"),
     where("categorySlug", "==", slug)
@@ -58,66 +43,19 @@ export default async function CategoryPage({ params, searchParams }) {
 
   const snap = await getDocs(q);
 
-  let products = snap.docs.map((d) => ({
+  const products = snap.docs.map((d) => ({
     id: d.id,
     ...d.data(),
   }));
 
-  /* ---------- SORTING (SERVER SAFE) ---------- */
-  const sort = searchParams?.sort || "default";
-
-  if (sort === "price-asc") {
-    products.sort(
-      (a, b) =>
-        Number(a.store?.[0]?.price || 0) -
-        Number(b.store?.[0]?.price || 0)
-    );
-  }
-
-  if (sort === "price-desc") {
-    products.sort(
-      (a, b) =>
-        Number(b.store?.[0]?.price || 0) -
-        Number(a.store?.[0]?.price || 0)
-    );
-  }
-
   return (
     <main className="page-container" style={{ padding: 12 }}>
-      {/* ---------- BREADCRUMB ---------- */}
-      <div style={{ fontSize: 14, marginBottom: 10 }}>
-        <Link href="/" style={{ color: "#3b82f6" }}>
-          Home
-        </Link>{" "}
-        / <strong>{categoryName}</strong>
-      </div>
-
-      {/* ---------- CATEGORY TITLE ---------- */}
-      <h1 className="section-title" style={{ marginBottom: 12 }}>
-        {categoryName}
+      <h1
+        className="section-title"
+        style={{ marginBottom: 12, textTransform: "capitalize" }}
+      >
+        {slug}
       </h1>
-
-      {/* ---------- SORT DROPDOWN ---------- */}
-      <div style={{ marginBottom: 16 }}>
-        <select
-          defaultValue={sort}
-          onChange={(e) => {
-            const v = e.target.value;
-            window.location.search =
-              v === "default" ? "" : `?sort=${v}`;
-          }}
-          style={{
-            padding: 10,
-            borderRadius: 10,
-            border: "1px solid #ddd",
-            fontWeight: 600,
-          }}
-        >
-          <option value="default">Sort by</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-        </select>
-      </div>
 
       {products.length === 0 && (
         <p style={{ color: "#666" }}>
@@ -133,4 +71,3 @@ export default async function CategoryPage({ params, searchParams }) {
     </main>
   );
     }
-    
