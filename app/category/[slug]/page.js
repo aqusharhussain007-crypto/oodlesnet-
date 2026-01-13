@@ -34,20 +34,23 @@ export async function generateMetadata({ params }) {
 }
 
 /* ---------- PAGE ---------- */
-export default async function CategoryPage({ params }) {
+export default async function CategoryPage({ params, searchParams }) {
   const slug = params.slug;
 
-  /* FETCH CATEGORY (FOR PROPER NAME) */
+  /* ---------- FETCH CATEGORY NAME ---------- */
   const catSnap = await getDocs(
     query(collection(db, "categories"), where("slug", "==", slug))
   );
+
   const category = catSnap.docs[0]?.data();
 
   const categoryName =
     category?.name ||
-    slug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+    slug
+      .replace(/-/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
 
-  /* FETCH PRODUCTS */
+  /* ---------- FETCH PRODUCTS ---------- */
   const q = query(
     collection(db, "products"),
     where("categorySlug", "==", slug)
@@ -60,11 +63,11 @@ export default async function CategoryPage({ params }) {
     ...d.data(),
   }));
 
-  /* SORTING (SERVER SAFE) */
-  const sort = params?.searchParams?.sort || "default";
+  /* ---------- SORTING (SERVER SAFE) ---------- */
+  const sort = searchParams?.sort || "default";
 
   if (sort === "price-asc") {
-    products = products.sort(
+    products.sort(
       (a, b) =>
         Number(a.store?.[0]?.price || 0) -
         Number(b.store?.[0]?.price || 0)
@@ -72,7 +75,7 @@ export default async function CategoryPage({ params }) {
   }
 
   if (sort === "price-desc") {
-    products = products.sort(
+    products.sort(
       (a, b) =>
         Number(b.store?.[0]?.price || 0) -
         Number(a.store?.[0]?.price || 0)
@@ -81,7 +84,7 @@ export default async function CategoryPage({ params }) {
 
   return (
     <main className="page-container" style={{ padding: 12 }}>
-      {/* BREADCRUMB */}
+      {/* ---------- BREADCRUMB ---------- */}
       <div style={{ fontSize: 14, marginBottom: 10 }}>
         <Link href="/" style={{ color: "#3b82f6" }}>
           Home
@@ -89,18 +92,15 @@ export default async function CategoryPage({ params }) {
         / <strong>{categoryName}</strong>
       </div>
 
-      {/* CATEGORY TITLE */}
-      <h1
-        className="section-title"
-        style={{ marginBottom: 12 }}
-      >
+      {/* ---------- CATEGORY TITLE ---------- */}
+      <h1 className="section-title" style={{ marginBottom: 12 }}>
         {categoryName}
       </h1>
 
-      {/* SORTING */}
+      {/* ---------- SORT DROPDOWN ---------- */}
       <div style={{ marginBottom: 16 }}>
         <select
-          defaultValue="default"
+          defaultValue={sort}
           onChange={(e) => {
             const v = e.target.value;
             window.location.search =
@@ -132,5 +132,5 @@ export default async function CategoryPage({ params }) {
       </div>
     </main>
   );
-               }
+    }
     
