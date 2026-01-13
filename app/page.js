@@ -14,36 +14,25 @@ import { useRouter } from "next/navigation";
 
 /* SVG ICONS */
 const SearchIcon = () => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <circle cx="11" cy="11" r="8" />
     <line x1="21" y1="21" x2="16.65" y2="16.65" />
   </svg>
 );
 
 const MicIcon = () => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
     <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
     <line x1="12" y1="19" x2="12" y2="23" />
     <line x1="8" y1="23" x2="16" y2="23" />
+  </svg>
+);
+
+const ArrowIcon = () => (
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <polyline points="13 6 19 12 13 18" />
   </svg>
 );
 
@@ -60,24 +49,18 @@ export default function Home() {
   const [ads, setAds] = useState([]);
   const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
-  const [featured, setFeatured] = useState(null);
 
   const [activeCategory, setActiveCategory] = useState("all");
   const [filters, setFilters] = useState(null);
 
-  const {
-    openCategory,
-    setOpenCategory,
-    openFilter,
-    setOpenFilter,
-  } = useContext(DrawerContext);
+  const { openCategory, setOpenCategory, openFilter, setOpenFilter } =
+    useContext(DrawerContext);
 
   /* LOAD PRODUCTS */
   useEffect(() => {
     async function load() {
       const snap = await getDocs(collection(db, "products"));
       const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-
       setProducts(items);
       setFiltered(items);
 
@@ -85,12 +68,6 @@ export default function Home() {
         .sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0))
         .slice(0, 10);
       setTrending(top);
-
-      if (items.length > 0) {
-        const index =
-          Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % items.length;
-        setFeatured(items[index]);
-      }
     }
     load();
   }, []);
@@ -164,44 +141,15 @@ export default function Home() {
             style={{ paddingRight: 44 }}
           />
 
-          {/* SEARCH ICON */}
-          <div
-            style={{
-              position: "absolute",
-              right: 12,
-              top: "50%",
-              transform: "translateY(-50%)",
-              color: "#666",
-              pointerEvents: "none",
-            }}
-          >
+          <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", color: "#666" }}>
             <SearchIcon />
           </div>
 
           {suggestions.length > 0 && (
-            <div
-              style={{
-                position: "absolute",
-                top: 48,
-                width: "100%",
-                background: "white",
-                borderRadius: 10,
-                zIndex: 1000,
-              }}
-            >
+            <div style={{ position: "absolute", top: 48, width: "100%", background: "white", borderRadius: 10, zIndex: 1000 }}>
               {suggestions.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => router.push(`/product/${item.id}`)}
-                  style={{ display: "flex", gap: 8, padding: 8 }}
-                >
-                  <Image
-                    src={item.imageUrl}
-                    width={42}
-                    height={42}
-                    alt={item.name}
-                    style={{ borderRadius: 8 }}
-                  />
+                <div key={item.id} onClick={() => router.push(`/product/${item.id}`)} style={{ display: "flex", gap: 8, padding: 8 }}>
+                  <Image src={item.imageUrl} width={42} height={42} alt={item.name} style={{ borderRadius: 8 }} />
                   <strong>{item.name}</strong>
                 </div>
               ))}
@@ -209,34 +157,12 @@ export default function Home() {
           )}
         </div>
 
-        {/* MIC BUTTON */}
-        <button
-          onClick={startVoiceSearch}
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: "50%",
-            border: "none",
-            background: "linear-gradient(135deg, #00c6ff, #00d084)",
-            color: "#fff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
-          }}
-        >
+        <button onClick={startVoiceSearch} style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: "linear-gradient(135deg,#00c6ff,#00d084)", color: "#fff" }}>
           <MicIcon />
         </button>
       </div>
 
       <BannerAd ads={ads} />
-
-      {featured && (
-        <>
-          <h2 className="section-title">🔥 Today’s Pick</h2>
-          <ProductCard product={featured} />
-        </>
-      )}
 
       <h2 className="section-title">Trending Today</h2>
       <InfiniteSlider items={trending} size="small" />
@@ -250,44 +176,36 @@ export default function Home() {
 
       {!search &&
         categories.map((cat) => {
-          const items = filtered.filter(
-            (p) => p.categorySlug === cat.slug
-          );
-
+          const items = filtered.filter((p) => p.categorySlug === cat.slug);
           if (items.length === 0) return null;
-
-          const visible = items.slice(0, 4);
 
           return (
             <div key={cat.slug}>
               <h2 className="section-title">{cat.name}</h2>
 
               <div className="products-grid">
-                {visible.map((product) => (
+                {items.slice(0, 4).map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
 
-                {/* SEE ALL CARD */}
                 {items.length > 4 && (
                   <div
                     onClick={() => router.push(`/category/${cat.slug}`)}
                     style={{
-                      height: "150%",
-                      minHeight: 180,
+                      minHeight: 120,
                       borderRadius: 18,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      gap: 10,
                       fontWeight: 900,
                       fontSize: 18,
                       color: "#fff",
                       cursor: "pointer",
-                      background:
-                        "linear-gradient(135deg, #00c6ff, #00d084)",
-                      boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+                      background: "linear-gradient(135deg,#00c6ff,#00d084)",
                     }}
                   >
-                    See all →
+                    See all <ArrowIcon />
                   </div>
                 )}
               </div>
@@ -314,5 +232,5 @@ export default function Home() {
       )}
     </main>
   );
-      }
-      
+  }
+  
