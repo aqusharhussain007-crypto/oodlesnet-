@@ -344,29 +344,6 @@ export default function ProductPage({ params }) {
                 {relatedCategory.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
-
-                {/* ✅ ADDED ONLY THIS CARD */}
-                <div
-                  onClick={() =>
-                    router.push(`/category/${product.categorySlug}`)
-                  }
-                  style={{
-                    minWidth: 180,
-                    borderRadius: 18,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 10,
-                    fontWeight: 900,
-                    fontSize: 15,
-                    color: "#fff",
-                    cursor: "pointer",
-                    background:
-                      "linear-gradient(135deg,#0099cc,#009966)",
-                  }}
-                >
-                  See all in {product.categorySlug} <ArrowIcon />
-                </div>
               </div>
             </div>
           </>
@@ -403,6 +380,33 @@ export default function ProductPage({ params }) {
             </div>
           </>
         )}
+
+        {/* ✅ SEE ALL – BELOW ALL RELATED, ABOVE FOOTER */}
+        {product?.categorySlug && (
+          <div
+            onClick={() =>
+              router.push(`/category/${product.categorySlug}`)
+            }
+            style={{
+              marginTop: 28,
+              padding: "18px 20px",
+              borderRadius: 20,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 12,
+              fontWeight: 900,
+              fontSize: 16,
+              color: "#fff",
+              cursor: "pointer",
+              background: "linear-gradient(135deg,#0099cc,#009966)",
+              boxShadow: "0 10px 24px rgba(0,0,0,0.25)",
+            }}
+          >
+            See all in {product.categorySlug}
+            <ArrowIcon />
+          </div>
+        )}
       </div>
 
       {/* ✅ ADDED: arrow animation only */}
@@ -420,5 +424,4 @@ export default function ProductPage({ params }) {
       `}</style>
     </>
   );
-      }
-    
+    }
