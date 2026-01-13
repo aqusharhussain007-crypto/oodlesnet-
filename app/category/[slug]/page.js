@@ -2,7 +2,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 import ProductCard from "@/components/ProductCard";
 import Link from "next/link";
-import CategorySkeleton from "@/components/CategorySkeleton";
+import SkeletonLoader from "@/components/SkeletonLoader";
 
 /* ---------- SEO METADATA (SERVER) ---------- */
 export async function generateMetadata({ params }) {
@@ -67,9 +67,9 @@ export default async function CategoryPage({ params }) {
         {slug}
       </h1>
 
-      {/* ✅ SKELETON FALLBACK */}
+      {/* SKELETON + PRODUCTS */}
       {products.length === 0 ? (
-        <CategorySkeleton />
+        <SkeletonLoader rows={4} height={260} />
       ) : (
         <div className="products-grid">
           {products.map((product) => (
@@ -79,4 +79,5 @@ export default async function CategoryPage({ params }) {
       )}
     </main>
   );
-}
+    }
+    
