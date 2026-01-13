@@ -12,6 +12,41 @@ import Image from "next/image";
 import { DrawerContext } from "@/components/DrawerProvider";
 import { useRouter } from "next/navigation";
 
+/* SVG ICONS */
+const SearchIcon = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+);
+
+const MicIcon = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+    <line x1="12" y1="19" x2="12" y2="23" />
+    <line x1="8" y1="23" x2="16" y2="23" />
+  </svg>
+);
+
 export default function Home() {
   const router = useRouter();
 
@@ -51,7 +86,6 @@ export default function Home() {
         .slice(0, 10);
       setTrending(top);
 
-      // 🔥 DAILY FEATURED PRODUCT (rotates by date)
       if (items.length > 0) {
         const index =
           Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % items.length;
@@ -130,6 +164,20 @@ export default function Home() {
             style={{ paddingRight: 44 }}
           />
 
+          {/* SEARCH ICON */}
+          <div
+            style={{
+              position: "absolute",
+              right: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: "#666",
+              pointerEvents: "none",
+            }}
+          >
+            <SearchIcon />
+          </div>
+
           {suggestions.length > 0 && (
             <div
               style={{
@@ -161,12 +209,28 @@ export default function Home() {
           )}
         </div>
 
-        <button onClick={startVoiceSearch}>🎤</button>
+        {/* MIC BUTTON */}
+        <button
+          onClick={startVoiceSearch}
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: "50%",
+            border: "none",
+            background: "linear-gradient(135deg, #00c6ff, #00d084)",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
+          }}
+        >
+          <MicIcon />
+        </button>
       </div>
 
       <BannerAd ads={ads} />
 
-      {/* 🔥 FEATURED */}
       {featured && (
         <>
           <h2 className="section-title">🔥 Today’s Pick</h2>
@@ -184,7 +248,6 @@ export default function Home() {
         </>
       )}
 
-      {/* CATEGORY SECTIONS */}
       {!search &&
         categories.map((cat) => {
           const items = filtered.filter(
@@ -209,14 +272,19 @@ export default function Home() {
                   <div
                     onClick={() => router.push(`/category/${cat.slug}`)}
                     style={{
-                      border: "2px dashed #00c6ff",
-                      borderRadius: 16,
+                      height: "150%",
+                      minHeight: 180,
+                      borderRadius: 18,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontWeight: 800,
-                      color: "#0077aa",
+                      fontWeight: 900,
+                      fontSize: 18,
+                      color: "#fff",
                       cursor: "pointer",
+                      background:
+                        "linear-gradient(135deg, #00c6ff, #00d084)",
+                      boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
                     }}
                   >
                     See all →
@@ -246,5 +314,5 @@ export default function Home() {
       )}
     </main>
   );
-                               }
-        
+      }
+      
