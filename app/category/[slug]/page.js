@@ -1,6 +1,7 @@
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 import ProductCard from "@/components/ProductCard";
+import Link from "next/link";
 
 /* ---------- SEO METADATA (SERVER) ---------- */
 export async function generateMetadata({ params }) {
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }) {
   };
 
   return {
-    title: titles[slug] || "Category Deals | OodlesNet",
+    title: titles[slug] || "Category | OodlesNet",
     description:
       descriptions[slug] ||
       "Compare prices and find the best deals online on OodlesNet.",
@@ -50,6 +51,14 @@ export default async function CategoryPage({ params }) {
 
   return (
     <main className="page-container" style={{ padding: 12 }}>
+      {/* ✅ BREADCRUMB (ONLY ADDITION) */}
+      <div style={{ fontSize: 14, marginBottom: 10 }}>
+        <Link href="/" style={{ color: "#3b82f6" }}>
+          Home
+        </Link>{" "}
+        / <strong style={{ textTransform: "capitalize" }}>{slug}</strong>
+      </div>
+
       <h1
         className="section-title"
         style={{ marginBottom: 12, textTransform: "capitalize" }}
@@ -71,3 +80,4 @@ export default async function CategoryPage({ params }) {
     </main>
   );
     }
+    
