@@ -79,5 +79,4 @@ export default async function CategoryPage({ params }) {
       )}
     </main>
   );
-        }
-        
+}
