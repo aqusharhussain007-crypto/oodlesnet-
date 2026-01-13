@@ -11,6 +11,7 @@ import { collection, getDocs } from "firebase/firestore";
 import Image from "next/image";
 import { DrawerContext } from "@/components/DrawerProvider";
 import { useRouter } from "next/navigation";
+import SkeletonLoader from "@/components/SkeletonLoader";
 
 /* SVG ICONS */
 const SearchIcon = () => (
@@ -38,9 +39,7 @@ const ArrowIcon = () => (
     fill="none"
     stroke="white"
     strokeWidth="2.5"
-    style={{
-      animation: "arrowMove 1.2s infinite ease-in-out",
-    }}
+    style={{ animation: "arrowMove 1.2s infinite ease-in-out" }}
   >
     <line x1="5" y1="12" x2="19" y2="12" />
     <polyline points="13 6 19 12 13 18" />
@@ -213,10 +212,20 @@ export default function Home() {
         </button>
       </div>
 
-      <BannerAd ads={ads} />
+      {/* BANNER */}
+      {ads.length === 0 ? (
+        <SkeletonLoader height={120} />
+      ) : (
+        <BannerAd ads={ads} />
+      )}
 
+      {/* TRENDING */}
       <h2 className="section-title">Trending Today</h2>
-      <InfiniteSlider items={trending} size="small" />
+      {trending.length === 0 ? (
+        <SkeletonLoader rows={5} width={120} height={150} horizontal />
+      ) : (
+        <InfiniteSlider items={trending} size="small" />
+      )}
 
       {recent.length > 0 && (
         <>
@@ -231,16 +240,18 @@ export default function Home() {
             (p) => p.categorySlug === cat.slug
           );
 
-          if (items.length === 0) return null;
-
           return (
             <div key={cat.slug}>
               <h2 className="section-title">{cat.name}</h2>
 
               <div className="products-grid">
-                {items.slice(0, 4).map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
+                {products.length === 0 ? (
+                  <SkeletonLoader rows={4} height={260} />
+                ) : (
+                  items.slice(0, 4).map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))
+                )}
 
                 {items.length > 4 && (
                   <div
@@ -286,7 +297,6 @@ export default function Home() {
         />
       )}
 
-      {/* Arrow animation */}
       <style jsx>{`
         @keyframes arrowMove {
           0% { transform: translateX(0); }
