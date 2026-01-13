@@ -29,8 +29,19 @@ const MicIcon = () => (
   </svg>
 );
 
+/* ANIMATED ARROW */
 const ArrowIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="white"
+    strokeWidth="2.5"
+    style={{
+      animation: "arrowMove 1.2s infinite ease-in-out",
+    }}
+  >
     <line x1="5" y1="12" x2="19" y2="12" />
     <polyline points="13 6 19 12 13 18" />
   </svg>
@@ -184,7 +195,6 @@ export default function Home() {
           )}
         </div>
 
-        {/* MIC BUTTON */}
         <button
           onClick={startVoiceSearch}
           style={{
@@ -236,21 +246,21 @@ export default function Home() {
                   <div
                     onClick={() => router.push(`/category/${cat.slug}`)}
                     style={{
-                      minHeight: 96, // ⬇️ 20% reduced
+                      minHeight: 96,
                       borderRadius: 18,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       gap: 10,
                       fontWeight: 900,
-                      fontSize: 17,
+                      fontSize: 16,
                       color: "#fff",
                       cursor: "pointer",
                       background:
                         "linear-gradient(135deg,#0099cc,#009966)",
                     }}
                   >
-                    See all <ArrowIcon />
+                    See all in {cat.name} <ArrowIcon />
                   </div>
                 )}
               </div>
@@ -275,6 +285,15 @@ export default function Home() {
           onApply={(data) => setFilters(data)}
         />
       )}
+
+      {/* Arrow animation */}
+      <style jsx>{`
+        @keyframes arrowMove {
+          0% { transform: translateX(0); }
+          50% { transform: translateX(6px); }
+          100% { transform: translateX(0); }
+        }
+      `}</style>
     </main>
   );
   }
