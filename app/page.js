@@ -30,7 +30,7 @@ const MicIcon = () => (
 );
 
 const ArrowIcon = () => (
-  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
     <line x1="5" y1="12" x2="19" y2="12" />
     <polyline points="13 6 19 12 13 18" />
   </svg>
@@ -141,15 +141,42 @@ export default function Home() {
             style={{ paddingRight: 44 }}
           />
 
-          <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", color: "#666" }}>
+          <div
+            style={{
+              position: "absolute",
+              right: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: "#666",
+            }}
+          >
             <SearchIcon />
           </div>
 
           {suggestions.length > 0 && (
-            <div style={{ position: "absolute", top: 48, width: "100%", background: "white", borderRadius: 10, zIndex: 1000 }}>
+            <div
+              style={{
+                position: "absolute",
+                top: 48,
+                width: "100%",
+                background: "white",
+                borderRadius: 10,
+                zIndex: 1000,
+              }}
+            >
               {suggestions.map((item) => (
-                <div key={item.id} onClick={() => router.push(`/product/${item.id}`)} style={{ display: "flex", gap: 8, padding: 8 }}>
-                  <Image src={item.imageUrl} width={42} height={42} alt={item.name} style={{ borderRadius: 8 }} />
+                <div
+                  key={item.id}
+                  onClick={() => router.push(`/product/${item.id}`)}
+                  style={{ display: "flex", gap: 8, padding: 8 }}
+                >
+                  <Image
+                    src={item.imageUrl}
+                    width={42}
+                    height={42}
+                    alt={item.name}
+                    style={{ borderRadius: 8 }}
+                  />
                   <strong>{item.name}</strong>
                 </div>
               ))}
@@ -157,7 +184,21 @@ export default function Home() {
           )}
         </div>
 
-        <button onClick={startVoiceSearch} style={{ width: 44, height: 44, borderRadius: "50%", border: "none", background: "linear-gradient(135deg,#00c6ff,#00d084)", color: "#fff" }}>
+        {/* MIC BUTTON */}
+        <button
+          onClick={startVoiceSearch}
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: "50%",
+            border: "none",
+            background: "linear-gradient(135deg,#0099cc,#009966)",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <MicIcon />
         </button>
       </div>
@@ -176,7 +217,10 @@ export default function Home() {
 
       {!search &&
         categories.map((cat) => {
-          const items = filtered.filter((p) => p.categorySlug === cat.slug);
+          const items = filtered.filter(
+            (p) => p.categorySlug === cat.slug
+          );
+
           if (items.length === 0) return null;
 
           return (
@@ -192,17 +236,18 @@ export default function Home() {
                   <div
                     onClick={() => router.push(`/category/${cat.slug}`)}
                     style={{
-                      minHeight: 120,
+                      minHeight: 96, // ⬇️ 20% reduced
                       borderRadius: 18,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       gap: 10,
                       fontWeight: 900,
-                      fontSize: 18,
+                      fontSize: 17,
                       color: "#fff",
                       cursor: "pointer",
-                      background: "linear-gradient(135deg,#00c6ff,#00d084)",
+                      background:
+                        "linear-gradient(135deg,#0099cc,#009966)",
                     }}
                   >
                     See all <ArrowIcon />
