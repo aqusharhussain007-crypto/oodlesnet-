@@ -10,9 +10,27 @@ import {
   filterByPriceRange,
 } from "@/lib/productUtils";
 import { useProduct } from "./product-client";
+import { useRouter } from "next/navigation"; // ✅ ADDED (required)
+
+/* ✅ ADDED: animated arrow icon ONLY */
+const ArrowIcon = () => (
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="white"
+    strokeWidth="2.5"
+    style={{ animation: "arrowMove 1.2s infinite ease-in-out" }}
+  >
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <polyline points="13 6 19 12 13 18" />
+  </svg>
+);
 
 export default function ProductPage({ params }) {
   const { id } = params;
+  const router = useRouter(); // ✅ ADDED
   const { product, loading } = useProduct(id);
 
   const [expanded, setExpanded] = useState(false);
@@ -128,7 +146,7 @@ export default function ProductPage({ params }) {
           / <strong>{product.name}</strong>
         </div>
 
-        {/* IMAGE — FIXED (ONLY CHANGE) */}
+        {/* IMAGE */}
         <div
           style={{
             borderRadius: 18,
@@ -315,7 +333,7 @@ export default function ProductPage({ params }) {
           ))}
         </div>
 
-        {/* RELATED SECTIONS */}
+        {/* RELATED BY CATEGORY */}
         {relatedCategory.length > 0 && (
           <>
             <h3 className="section-title">
@@ -326,11 +344,35 @@ export default function ProductPage({ params }) {
                 {relatedCategory.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
+
+                {/* ✅ ADDED ONLY THIS CARD */}
+                <div
+                  onClick={() =>
+                    router.push(`/category/${product.categorySlug}`)
+                  }
+                  style={{
+                    minWidth: 180,
+                    borderRadius: 18,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 10,
+                    fontWeight: 900,
+                    fontSize: 15,
+                    color: "#fff",
+                    cursor: "pointer",
+                    background:
+                      "linear-gradient(135deg,#0099cc,#009966)",
+                  }}
+                >
+                  See all in {product.categorySlug} <ArrowIcon />
+                </div>
               </div>
             </div>
           </>
         )}
 
+        {/* RELATED BRAND — UNCHANGED */}
         {relatedBrand.length > 0 && (
           <>
             <h3 className="section-title">
@@ -346,6 +388,7 @@ export default function ProductPage({ params }) {
           </>
         )}
 
+        {/* RELATED PRICE — UNCHANGED */}
         {relatedPrice.length > 0 && (
           <>
             <h3 className="section-title">
@@ -362,7 +405,13 @@ export default function ProductPage({ params }) {
         )}
       </div>
 
+      {/* ✅ ADDED: arrow animation only */}
       <style jsx>{`
+        @keyframes arrowMove {
+          0% { transform: translateX(0); }
+          50% { transform: translateX(6px); }
+          100% { transform: translateX(0); }
+        }
         @keyframes blink {
           0% { opacity: 1; }
           50% { opacity: 0.2; }
@@ -371,5 +420,5 @@ export default function ProductPage({ params }) {
       `}</style>
     </>
   );
-          }
-          
+      }
+    
