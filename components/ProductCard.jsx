@@ -4,7 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, variant }) {
+  const isRelated = variant === "related";
+
   const [open, setOpen] = useState(false);
   const boxRef = useRef(null);
   const btnRef = useRef(null);
@@ -66,18 +68,19 @@ export default function ProductCard({ product }) {
       >
         <div
           style={{
-            width: 165,
-            borderRadius: 16,
-            padding: 12,
+            position: "relative",
+            borderRadius: 18,
+            padding: 14,
             background: "#ecfffb",
             border: "1px solid #6ee7d8",
             display: "flex",
-            flexDirection: "column",
-            gap: 10,
+            flexDirection: isRelated ? "row" : "column",
+            gap: 12,
+            width: isRelated ? 260 : "auto",
           }}
         >
           {/* DETAILS BUTTON */}
-          {product.description && (
+          {product.description && !isRelated && (
             <button
               ref={btnRef}
               onClick={(e) => {
@@ -87,17 +90,17 @@ export default function ProductCard({ product }) {
               }}
               style={{
                 position: "absolute",
-                top: 8,
-                right: 8,
+                top: 10,
+                right: 10,
                 zIndex: 20,
-                padding: "4px 10px",
+                padding: "6px 12px",
                 borderRadius: 999,
                 border: "none",
-                fontSize: 11,
+                fontSize: "0.75rem",
                 fontWeight: 800,
                 color: "#fff",
                 background: "linear-gradient(135deg,#0f4c81,#10b981)",
-                boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
+                boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
               }}
             >
               {open ? "Close" : "Details"}
@@ -107,11 +110,12 @@ export default function ProductCard({ product }) {
           {/* IMAGE */}
           <div
             style={{
-              width: "100%",
-              height: 125,
+              width: isRelated ? 125 : 140,
+              height: isRelated ? 125 : 170,
               borderRadius: 14,
               overflow: "hidden",
               background: "#f3f4f6",
+              flexShrink: 0,
               position: "relative",
             }}
           >
@@ -119,93 +123,115 @@ export default function ProductCard({ product }) {
               src={product.imageUrl || "/placeholder.png"}
               alt={product.name}
               fill
-              sizes="160px"
+              sizes={isRelated ? "125px" : "140px"}
               loading="lazy"
               style={{ objectFit: "contain", background: "#fff" }}
             />
           </div>
 
-          {/* NAME */}
-          <h3
-            style={{
-              color: "#0077aa",
-              fontWeight: 800,
-              fontSize: 14,
-              lineHeight: 1.25,
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-              minHeight: 36,
-            }}
-          >
-            {product.name}
-          </h3>
+          <div style={{ flex: 1 }}>
+            <h3
+              style={{
+                color: "#0077aa",
+                fontWeight: 800,
+                fontSize: isRelated ? 14 : "1rem",
+                marginBottom: 6,
+                lineHeight: 1.25,
+                display: isRelated ? "-webkit-box" : "block",
+                WebkitLineClamp: isRelated ? 2 : "unset",
+                WebkitBoxOrient: "vertical",
+                overflow: isRelated ? "hidden" : "visible",
+              }}
+            >
+              {product.name}
+            </h3>
 
-          {/* PRICES */}
-          <div style={{ display: "flex", gap: 12 }}>
-            {Number.isFinite(lowest) && (
-              <div>
-                <div style={{ color: "#16a34a", fontWeight: 800, fontSize: 14 }}>
-                  ₹{lowest.toLocaleString("en-IN")}
+            {/* PRICES */}
+            <div style={{ display: "flex", gap: 14 }}>
+              {Number.isFinite(lowest) && (
+                <div>
+                  <div
+                    style={{
+                      color: "#16a34a",
+                      fontWeight: 800,
+                      fontSize: isRelated ? 14 : "inherit",
+                    }}
+                  >
+                    ₹{lowest.toLocaleString("en-IN")}
+                  </div>
+                  <div style={{ fontSize: 11 }}>Lowest</div>
                 </div>
-                <div style={{ fontSize: 11 }}>Lowest</div>
-              </div>
-            )}
-            {Number.isFinite(second) && (
-              <div>
-                <div style={{ color: "#2563eb", fontWeight: 700, fontSize: 13 }}>
-                  ₹{second.toLocaleString("en-IN")}
+              )}
+              {Number.isFinite(second) && (
+                <div>
+                  <div
+                    style={{
+                      color: "#2563eb",
+                      fontWeight: 700,
+                      fontSize: isRelated ? 13 : "inherit",
+                    }}
+                  >
+                    ₹{second.toLocaleString("en-IN")}
+                  </div>
+                  <div style={{ fontSize: 11 }}>2nd</div>
                 </div>
-                <div style={{ fontSize: 11 }}>2nd</div>
-              </div>
-            )}
-            {Number.isFinite(third) && (
-              <div>
-                <div style={{ color: "#2563eb", fontWeight: 700, fontSize: 13 }}>
-                  ₹{third.toLocaleString("en-IN")}
+              )}
+              {Number.isFinite(third) && (
+                <div>
+                  <div
+                    style={{
+                      color: "#2563eb",
+                      fontWeight: 700,
+                      fontSize: isRelated ? 13 : "inherit",
+                    }}
+                  >
+                    ₹{third.toLocaleString("en-IN")}
+                  </div>
+                  <div style={{ fontSize: 11 }}>3rd</div>
                 </div>
-                <div style={{ fontSize: 11 }}>3rd</div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </Link>
 
-      {/* DETAILS PANEL */}
-      <div
-        ref={boxRef}
-        style={{
-          position: "absolute",
-          top: 44,
-          right: 0,
-          width: "92%",
-          zIndex: 30,
-          background: "#fff",
-          borderRadius: 16,
-          padding: 14,
-          boxShadow: "0 12px 30px rgba(0,0,0,0.25)",
-          borderLeft: "4px solid #10b981",
-          transform: open ? "translateY(0)" : "translateY(-10px)",
-          opacity: open ? 1 : 0,
-          pointerEvents: open ? "auto" : "none",
-          transition: "all 300ms ease-out",
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
+      {/* DETAILS PANEL (unchanged, non-related only) */}
+      {!isRelated && (
         <div
+          ref={boxRef}
           style={{
-            maxHeight: 160,
-            overflowY: "auto",
-            fontSize: 13,
-            color: "#374151",
-            lineHeight: 1.45,
-            paddingRight: 6,
+            position: "absolute",
+            top: 46,
+            right: 0,
+            width: "85%",
+            zIndex: 30,
+            background: "#fff",
+            borderRadius: 16,
+            padding: 14,
+            boxShadow: "0 12px 30px rgba(0,0,0,0.25)",
+            borderLeft: "4px solid #10b981",
+            transform: open ? "translateY(0)" : "translateY(-10px)",
+            opacity: open ? 1 : 0,
+            pointerEvents: open ? "auto" : "none",
+            transition: "all 320ms ease-out",
           }}
+          onClick={(e) => e.stopPropagation()}
         >
-          {product.description}
+          <div
+            style={{
+              maxHeight: 180,
+              overflowY: "auto",
+              fontSize: "0.9rem",
+              color: "#374151",
+              lineHeight: 1.5,
+              paddingRight: 6,
+            }}
+          >
+            {product.description}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
-}
+              }
+    
