@@ -173,7 +173,7 @@ html.dark nav div {
     #e0f2fe 63%
   );
   background-size: 200% 100%;
-  animation: shimmerMove 1.4s ease-in-out infinite;
+  animation: shimmerMove 2.8s ease-in-out infinite;
 }
 
 @keyframes shimmerMove {
