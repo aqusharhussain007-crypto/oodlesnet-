@@ -57,7 +57,8 @@ export default function ProductCard({ product }) {
   }, [open]);
 
   return (
-    <div style={{ position: "relative" }}>
+    /* ✅ FIX 1: allow floating panels to escape safely */
+    <div style={{ position: "relative", overflow: "visible" }}>
       <Link
         href={`/product/${product.id}`}
         onClick={saveRecent}
@@ -73,6 +74,7 @@ export default function ProductCard({ product }) {
             display: "flex",
             flexDirection: "column",
             gap: 12,
+            overflow: "visible", // ✅ FIX 2
           }}
         >
           {/* DETAILS BUTTON */}
@@ -208,5 +210,4 @@ export default function ProductCard({ product }) {
       </div>
     </div>
   );
-    }
-  
+}
