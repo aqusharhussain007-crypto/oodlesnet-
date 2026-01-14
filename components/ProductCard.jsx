@@ -74,10 +74,10 @@ export default function ProductCard({ product, variant }) {
             background: "#ecfffb",
             border: "1px solid #6ee7d8",
             display: "flex",
-            flexDirection: "column",
-            gap: 10,
+            flexDirection: isRelated ? "row" : "column",
+            gap: 12,
             width: isRelated ? 260 : "auto",
-            minHeight: isRelated ? 190 : "auto",
+            minHeight: isRelated ? 150 : "auto",
           }}
         >
           {/* DETAILS BUTTON */}
@@ -111,94 +111,97 @@ export default function ProductCard({ product, variant }) {
           {/* IMAGE */}
           <div
             style={{
-              width: 140,
-              height: 140,
+              width: isRelated ? 125 : 140,
+              height: isRelated ? 125 : 170,
               borderRadius: 14,
               overflow: "hidden",
               background: "#f3f4f6",
+              flexShrink: 0,
               position: "relative",
-              alignSelf: "flex-start",
             }}
           >
             <Image
               src={product.imageUrl || "/placeholder.png"}
               alt={product.name}
               fill
-              sizes="140px"
+              sizes={isRelated ? "125px" : "140px"}
               loading="lazy"
               style={{ objectFit: "contain", background: "#fff" }}
             />
           </div>
 
-          {/* NAME (3 lines fixed) */}
-          <h3
-            style={{
-              color: "#0077aa",
-              fontWeight: 800,
-              fontSize: isRelated ? 14 : "1rem",
-              lineHeight: 1.25,
-              margin: 0,
-              display: "-webkit-box",
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-              minHeight: 52,
-            }}
-          >
-            {product.name}
-          </h3>
-
-          {/* PRICE ROW – ALWAYS AT BOTTOM */}
+          {/* CONTENT */}
           <div
             style={{
-              marginTop: "auto",
+              flex: 1,
               display: "flex",
-              gap: 14,
-              alignItems: "flex-end",
+              flexDirection: "column",
             }}
           >
-            {Number.isFinite(lowest) && (
-              <div>
-                <div
-                  style={{
-                    color: "#16a34a",
-                    fontWeight: 800,
-                    fontSize: 14,
-                  }}
-                >
-                  ₹{lowest.toLocaleString("en-IN")}
-                </div>
-                <div style={{ fontSize: 11 }}>Lowest</div>
+            {/* NAME – FIXED 3 LINES (RELATED ONLY) */}
+            <h3
+              style={{
+                color: "#0077aa",
+                fontWeight: 800,
+                fontSize: isRelated ? 14 : "1rem",
+                lineHeight: 1.25,
+                marginBottom: 6,
+                display: isRelated ? "-webkit-box" : "block",
+                WebkitLineClamp: isRelated ? 3 : "unset",
+                WebkitBoxOrient: isRelated ? "vertical" : "unset",
+                overflow: isRelated ? "hidden" : "visible",
+              }}
+            >
+              {product.name}
+            </h3>
+
+            {/* PRICE ROW – LOCKED AT BOTTOM (RELATED ONLY VISUAL FIX) */}
+            <div style={{ marginTop: "auto" }}>
+              <div style={{ display: "flex", gap: 14 }}>
+                {Number.isFinite(lowest) && (
+                  <div>
+                    <div
+                      style={{
+                        color: "#16a34a",
+                        fontWeight: 800,
+                        fontSize: isRelated ? 14 : "inherit",
+                      }}
+                    >
+                      ₹{lowest.toLocaleString("en-IN")}
+                    </div>
+                    <div style={{ fontSize: 11 }}>Lowest</div>
+                  </div>
+                )}
+                {Number.isFinite(second) && (
+                  <div>
+                    <div
+                      style={{
+                        color: "#2563eb",
+                        fontWeight: 700,
+                        fontSize: isRelated ? 13 : "inherit",
+                      }}
+                    >
+                      ₹{second.toLocaleString("en-IN")}
+                    </div>
+                    <div style={{ fontSize: 11 }}>2nd</div>
+                  </div>
+                )}
+                {Number.isFinite(third) && (
+                  <div>
+                    <div
+                      style={{
+                        color: "#2563eb",
+                        fontWeight: 700,
+                        fontSize: isRelated ? 13 : "inherit",
+                      }}
+                    >
+                      ₹{third.toLocaleString("en-IN")}
+                    </div>
+                    <div style={{ fontSize: 11 }}>3rd</div>
+                  </div>
+                )}
               </div>
-            )}
-            {Number.isFinite(second) && (
-              <div>
-                <div
-                  style={{
-                    color: "#2563eb",
-                    fontWeight: 700,
-                    fontSize: 13,
-                  }}
-                >
-                  ₹{second.toLocaleString("en-IN")}
-                </div>
-                <div style={{ fontSize: 11 }}>2nd</div>
-              </div>
-            )}
-            {Number.isFinite(third) && (
-              <div>
-                <div
-                  style={{
-                    color: "#2563eb",
-                    fontWeight: 700,
-                    fontSize: 13,
-                  }}
-                >
-                  ₹{third.toLocaleString("en-IN")}
-                </div>
-                <div style={{ fontSize: 11 }}>3rd</div>
-              </div>
-            )}
+            </div>
           </div>
         </div>
       </Link>
@@ -241,5 +244,5 @@ export default function ProductCard({ product, variant }) {
       )}
     </div>
   );
-          }
-          
+        }
+    
