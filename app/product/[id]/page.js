@@ -209,7 +209,7 @@ export default function ProductPage({ params }) {
           </button>
         </div>
 
-        {/* ✅ NEW DETAILS CARD (ONLY CHANGE) */}
+        {/* DETAILS CARD */}
         <div
           style={{
             marginTop: 14,
@@ -240,7 +240,6 @@ export default function ProductPage({ params }) {
           </button>
         )}
 
-        {/* layout clear */}
         <div style={{ height: 16 }} />
 
         {/* Compare Prices */}
@@ -352,7 +351,11 @@ export default function ProductPage({ params }) {
             <div className="slider-row">
               <div className="flex gap-4 overflow-x-auto no-scrollbar">
                 {relatedCategory.map((p) => (
-                  <ProductCard key={p.id} product={p} />
+                  <ProductCard
+                    key={p.id}
+                    product={p}
+                    variant="related"
+                  />
                 ))}
               </div>
             </div>
@@ -368,7 +371,11 @@ export default function ProductPage({ params }) {
             <div className="slider-row">
               <div className="flex gap-4 overflow-x-auto no-scrollbar">
                 {relatedBrand.map((p) => (
-                  <ProductCard key={p.id} product={p} />
+                  <ProductCard
+                    key={p.id}
+                    product={p}
+                    variant="related"
+                  />
                 ))}
               </div>
             </div>
@@ -378,11 +385,17 @@ export default function ProductPage({ params }) {
         {/* RELATED PRICE */}
         {relatedPrice.length > 0 && (
           <>
-            <h3 className="section-title">Similar Price Range</h3>
+            <h3 className="section-title">
+              Similar Price Range
+            </h3>
             <div className="slider-row">
               <div className="flex gap-4 overflow-x-auto no-scrollbar">
                 {relatedPrice.map((p) => (
-                  <ProductCard key={p.id} product={p} />
+                  <ProductCard
+                    key={p.id}
+                    product={p}
+                    variant="related"
+                  />
                 ))}
               </div>
             </div>
@@ -432,3 +445,4 @@ export default function ProductPage({ params }) {
     </>
   );
     }
+        
