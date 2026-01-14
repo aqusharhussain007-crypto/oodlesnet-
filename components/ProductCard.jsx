@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 export default function ProductCard({ product }) {
@@ -65,14 +66,14 @@ export default function ProductCard({ product }) {
       >
         <div
           style={{
-            position: "relative",
-            borderRadius: 18,
-            padding: 14,
+            width: 165,
+            borderRadius: 16,
+            padding: 12,
             background: "#ecfffb",
             border: "1px solid #6ee7d8",
             display: "flex",
             flexDirection: "column",
-            gap: 12,
+            gap: 10,
           }}
         >
           {/* DETAILS BUTTON */}
@@ -86,86 +87,85 @@ export default function ProductCard({ product }) {
               }}
               style={{
                 position: "absolute",
-                top: 10,
-                right: 10,
+                top: 8,
+                right: 8,
                 zIndex: 20,
-                padding: "6px 12px",
+                padding: "4px 10px",
                 borderRadius: 999,
                 border: "none",
-                fontSize: "0.75rem",
+                fontSize: 11,
                 fontWeight: 800,
                 color: "#fff",
                 background: "linear-gradient(135deg,#0f4c81,#10b981)",
-                boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
+                boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
               }}
             >
               {open ? "Close" : "Details"}
             </button>
           )}
 
-          <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
-            {/* IMAGE */}
-            <div
-              style={{
-                width: 140,
-                height: 170,
-                borderRadius: 14,
-                overflow: "hidden",
-                background: "#f3f4f6",
-                flexShrink: 0,
-              }}
-            >
-              <img
-                src={product.imageUrl || "/placeholder.png"}
-                alt={product.name}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "contain",
-                  background: "#fff",
-                }}
-              />
-            </div>
-
-            <div style={{ flex: 1 }}>
-              <h3
-                style={{
-                  color: "#0077aa",
-                  fontWeight: 800,
-                  fontSize: "1rem",
-                  marginBottom: 6,
-                  lineHeight: 1.25,
-                }}
-              >
-                {product.name}
-              </h3>
-            </div>
+          {/* IMAGE */}
+          <div
+            style={{
+              width: "100%",
+              height: 125,
+              borderRadius: 14,
+              overflow: "hidden",
+              background: "#f3f4f6",
+              position: "relative",
+            }}
+          >
+            <Image
+              src={product.imageUrl || "/placeholder.png"}
+              alt={product.name}
+              fill
+              sizes="160px"
+              loading="lazy"
+              style={{ objectFit: "contain", background: "#fff" }}
+            />
           </div>
 
+          {/* NAME */}
+          <h3
+            style={{
+              color: "#0077aa",
+              fontWeight: 800,
+              fontSize: 14,
+              lineHeight: 1.25,
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              minHeight: 36,
+            }}
+          >
+            {product.name}
+          </h3>
+
           {/* PRICES */}
-          <div style={{ display: "flex", gap: 18, paddingLeft: 4 }}>
+          <div style={{ display: "flex", gap: 12 }}>
             {Number.isFinite(lowest) && (
               <div>
-                <div style={{ color: "#16a34a", fontWeight: 800 }}>
+                <div style={{ color: "#16a34a", fontWeight: 800, fontSize: 14 }}>
                   ₹{lowest.toLocaleString("en-IN")}
                 </div>
-                <div style={{ fontSize: 12 }}>Lowest</div>
+                <div style={{ fontSize: 11 }}>Lowest</div>
               </div>
             )}
             {Number.isFinite(second) && (
               <div>
-                <div style={{ color: "#2563eb", fontWeight: 700 }}>
+                <div style={{ color: "#2563eb", fontWeight: 700, fontSize: 13 }}>
                   ₹{second.toLocaleString("en-IN")}
                 </div>
-                <div style={{ fontSize: 12 }}>2nd</div>
+                <div style={{ fontSize: 11 }}>2nd</div>
               </div>
             )}
             {Number.isFinite(third) && (
               <div>
-                <div style={{ color: "#2563eb", fontWeight: 700 }}>
+                <div style={{ color: "#2563eb", fontWeight: 700, fontSize: 13 }}>
                   ₹{third.toLocaleString("en-IN")}
                 </div>
-                <div style={{ fontSize: 12 }}>3rd</div>
+                <div style={{ fontSize: 11 }}>3rd</div>
               </div>
             )}
           </div>
@@ -177,9 +177,9 @@ export default function ProductCard({ product }) {
         ref={boxRef}
         style={{
           position: "absolute",
-          top: 46,
+          top: 44,
           right: 0,
-          width: "85%",
+          width: "92%",
           zIndex: 30,
           background: "#fff",
           borderRadius: 16,
@@ -189,17 +189,17 @@ export default function ProductCard({ product }) {
           transform: open ? "translateY(0)" : "translateY(-10px)",
           opacity: open ? 1 : 0,
           pointerEvents: open ? "auto" : "none",
-          transition: "all 320ms ease-out",
+          transition: "all 300ms ease-out",
         }}
         onClick={(e) => e.stopPropagation()}
       >
         <div
           style={{
-            maxHeight: 180,
+            maxHeight: 160,
             overflowY: "auto",
-            fontSize: "0.9rem",
+            fontSize: 13,
             color: "#374151",
-            lineHeight: 1.5,
+            lineHeight: 1.45,
             paddingRight: 6,
           }}
         >
@@ -208,5 +208,4 @@ export default function ProductCard({ product }) {
       </div>
     </div>
   );
-    }
-  
+}
