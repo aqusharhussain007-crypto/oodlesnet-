@@ -1,5 +1,6 @@
 "use client";
 
+import SkeletonLoader from "@/components/SkeletonLoader";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
@@ -88,7 +89,15 @@ export default function ProductPage({ params }) {
     loadRelated();
   }, [product]);
 
-  if (loading) return <div style={{ padding: 16 }}>Loading…</div>;
+  if (loading)
+  return (
+    <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
+      <SkeletonLoader height={360} />
+      <SkeletonLoader rows={3} height={18} />
+      <SkeletonLoader height={220} />
+    </div>
+  );
+
   if (!product)
     return <div style={{ padding: 16, color: "red" }}>Product not found</div>;
 
