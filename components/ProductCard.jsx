@@ -74,7 +74,7 @@ export default function ProductCard({ product, variant }) {
             background: "#ecfffb",
             border: "1px solid #6ee7d8",
             display: "flex",
-            flexDirection: "row", // ✅ ONLY CHANGE: always row
+            flexDirection: "column", // ⬅️ unchanged
             gap: 12,
             width: isRelated ? 260 : "auto",
           }}
@@ -107,96 +107,99 @@ export default function ProductCard({ product, variant }) {
             </button>
           )}
 
-          {/* IMAGE */}
-          <div
-            style={{
-              width: isRelated ? 125 : 140,
-              height: isRelated ? 125 : 170,
-              borderRadius: 14,
-              overflow: "hidden",
-              background: "#f3f4f6",
-              flexShrink: 0,
-              position: "relative",
-            }}
-          >
-            <Image
-              src={product.imageUrl || "/placeholder.png"}
-              alt={product.name}
-              fill
-              sizes={isRelated ? "125px" : "140px"}
-              loading="lazy"
-              style={{ objectFit: "contain", background: "#fff" }}
-            />
-          </div>
-
-          {/* TEXT CONTENT (RIGHT SIDE) */}
-          <div style={{ flex: 1 }}>
-            <h3
+          {/* IMAGE + NAME ROW */}
+          <div style={{ display: "flex", gap: 12 }}>
+            {/* IMAGE */}
+            <div
               style={{
-                color: "#0077aa",
-                fontWeight: 800,
-                fontSize: isRelated ? 14 : "1rem",
-                marginBottom: 6,
-                lineHeight: 1.25,
-                display: isRelated ? "-webkit-box" : "block",
-                WebkitLineClamp: isRelated ? 2 : "unset",
-                WebkitBoxOrient: "vertical",
-                overflow: isRelated ? "hidden" : "visible",
+                width: isRelated ? 125 : 140,
+                height: isRelated ? 125 : 170,
+                borderRadius: 14,
+                overflow: "hidden",
+                background: "#f3f4f6",
+                flexShrink: 0,
+                position: "relative",
               }}
             >
-              {product.name}
-            </h3>
-
-            {/* PRICES */}
-            <div style={{ display: "flex", gap: 14 }}>
-              {Number.isFinite(lowest) && (
-                <div>
-                  <div
-                    style={{
-                      color: "#16a34a",
-                      fontWeight: 800,
-                      fontSize: isRelated ? 14 : "inherit",
-                    }}
-                  >
-                    ₹{lowest.toLocaleString("en-IN")}
-                  </div>
-                  <div style={{ fontSize: 11 }}>Lowest</div>
-                </div>
-              )}
-              {Number.isFinite(second) && (
-                <div>
-                  <div
-                    style={{
-                      color: "#2563eb",
-                      fontWeight: 700,
-                      fontSize: isRelated ? 13 : "inherit",
-                    }}
-                  >
-                    ₹{second.toLocaleString("en-IN")}
-                  </div>
-                  <div style={{ fontSize: 11 }}>2nd</div>
-                </div>
-              )}
-              {Number.isFinite(third) && (
-                <div>
-                  <div
-                    style={{
-                      color: "#2563eb",
-                      fontWeight: 700,
-                      fontSize: isRelated ? 13 : "inherit",
-                    }}
-                  >
-                    ₹{third.toLocaleString("en-IN")}
-                  </div>
-                  <div style={{ fontSize: 11 }}>3rd</div>
-                </div>
-              )}
+              <Image
+                src={product.imageUrl || "/placeholder.png"}
+                alt={product.name}
+                fill
+                sizes={isRelated ? "125px" : "140px"}
+                loading="lazy"
+                style={{ objectFit: "contain", background: "#fff" }}
+              />
             </div>
+
+            {/* NAME (RIGHT SIDE, BELOW DETAILS) */}
+            <div style={{ flex: 1, paddingTop: 28 }}>
+              <h3
+                style={{
+                  color: "#0077aa",
+                  fontWeight: 800,
+                  fontSize: isRelated ? 14 : "1rem",
+                  marginBottom: 6,
+                  lineHeight: 1.25,
+                  display: isRelated ? "-webkit-box" : "block",
+                  WebkitLineClamp: isRelated ? 2 : "unset",
+                  WebkitBoxOrient: "vertical",
+                  overflow: isRelated ? "hidden" : "visible",
+                }}
+              >
+                {product.name}
+              </h3>
+            </div>
+          </div>
+
+          {/* PRICES — BELOW IMAGE (UNCHANGED) */}
+          <div style={{ display: "flex", gap: 14 }}>
+            {Number.isFinite(lowest) && (
+              <div>
+                <div
+                  style={{
+                    color: "#16a34a",
+                    fontWeight: 800,
+                    fontSize: isRelated ? 14 : "inherit",
+                  }}
+                >
+                  ₹{lowest.toLocaleString("en-IN")}
+                </div>
+                <div style={{ fontSize: 11 }}>Lowest</div>
+              </div>
+            )}
+            {Number.isFinite(second) && (
+              <div>
+                <div
+                  style={{
+                    color: "#2563eb",
+                    fontWeight: 700,
+                    fontSize: isRelated ? 13 : "inherit",
+                  }}
+                >
+                  ₹{second.toLocaleString("en-IN")}
+                </div>
+                <div style={{ fontSize: 11 }}>2nd</div>
+              </div>
+            )}
+            {Number.isFinite(third) && (
+              <div>
+                <div
+                  style={{
+                    color: "#2563eb",
+                    fontWeight: 700,
+                    fontSize: isRelated ? 13 : "inherit",
+                  }}
+                >
+                  ₹{third.toLocaleString("en-IN")}
+                </div>
+                <div style={{ fontSize: 11 }}>3rd</div>
+              </div>
+            )}
           </div>
         </div>
       </Link>
 
-      {/* DETAILS PANEL (unchanged, non-related only) */}
+      {/* DETAILS PANEL (UNCHANGED) */}
       {!isRelated && (
         <div
           ref={boxRef}
@@ -234,5 +237,4 @@ export default function ProductCard({ product, variant }) {
       )}
     </div>
   );
-          }
-                
+}
