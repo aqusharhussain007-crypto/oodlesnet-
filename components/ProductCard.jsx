@@ -80,7 +80,7 @@ export default function ProductCard({ product, variant }) {
             minHeight: isRelated ? 150 : "auto",
           }}
         >
-          {/* DETAILS BUTTON */}
+          {/* DETAILS BUTTON (unchanged, non-related only) */}
           {product.description && !isRelated && (
             <button
               ref={btnRef}
@@ -138,7 +138,7 @@ export default function ProductCard({ product, variant }) {
               flexDirection: "column",
             }}
           >
-            {/* NAME – FIXED 3 LINES (RELATED ONLY) */}
+            {/* NAME – 3 LINES */}
             <h3
               style={{
                 color: "#0077aa",
@@ -148,14 +148,15 @@ export default function ProductCard({ product, variant }) {
                 marginBottom: 6,
                 display: isRelated ? "-webkit-box" : "block",
                 WebkitLineClamp: isRelated ? 3 : "unset",
-                WebkitBoxOrient: isRelated ? "vertical" : "unset",
+                WebkitBoxOrient: "vertical",
                 overflow: isRelated ? "hidden" : "visible",
+                minHeight: isRelated ? 54 : "auto", // reserve space for 3 lines
               }}
             >
               {product.name}
             </h3>
 
-            {/* PRICE ROW – LOCKED AT BOTTOM (RELATED ONLY VISUAL FIX) */}
+            {/* PUSH PRICES TO BOTTOM */}
             <div style={{ marginTop: "auto" }}>
               <div style={{ display: "flex", gap: 14 }}>
                 {Number.isFinite(lowest) && (
@@ -206,7 +207,7 @@ export default function ProductCard({ product, variant }) {
         </div>
       </Link>
 
-      {/* DETAILS PANEL */}
+      {/* DETAILS PANEL (unchanged, non-related only) */}
       {!isRelated && (
         <div
           ref={boxRef}
@@ -244,5 +245,4 @@ export default function ProductCard({ product, variant }) {
       )}
     </div>
   );
-        }
-    
+    }
