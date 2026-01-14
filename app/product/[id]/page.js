@@ -101,6 +101,36 @@ export default function ProductPage({ params }) {
   if (!product)
     return <div style={{ padding: 16, color: "red" }}>Product not found</div>;
 
+  const stores = product.store || [];
+
+  const sortedStores = [...stores]
+    .filter((s) => Number(s.price) > 0)
+    .sort((a, b) => Number(a.price) - Number(b.price));
+
+  const prices = sortedStores
+    .map((s) => Number(s.price))
+    .filter((p) => Number.isFinite(p));
+
+  const cheapest = prices.length ? Math.min(...prices) : null;
+
+  function handleBuy(store) {
+    window.location.href = `/out/${store.name.toLowerCase()}?pid=${product.id}`;
+  }
+
+  function handleShare() {
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({
+        title: product.name,
+        text: `Compare prices for ${product.name}`,
+        url,
+      });
+    } else {
+      navigator.clipboard.writeText(url);
+      alert("Link copied");
+    }
+  }
+
   return (
     <>
       <div
@@ -144,15 +174,42 @@ export default function ProductPage({ params }) {
               objectFit: "contain",
               background: "#fff",
             }}
+            onError={(e) => {
+              e.currentTarget.src = "/placeholder.png";
+            }}
           />
         </div>
 
-        {/* Title */}
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1d4ed8" }}>
-          {product.name}
-        </h1>
+        {/* Title + Share */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 12,
+          }}
+        >
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1d4ed8" }}>
+            {product.name}
+          </h1>
 
-        {/* DETAILS CARD (UNCHANGED UI) */}
+          <button
+            onClick={handleShare}
+            style={{
+              padding: "8px 16px",
+              borderRadius: 999,
+              border: "none",
+              fontWeight: 800,
+              color: "#fff",
+              background: "linear-gradient(135deg,#0f4c81,#10b981)",
+              boxShadow: "0 8px 18px rgba(16,185,129,0.45)",
+            }}
+          >
+            Share
+          </button>
+        </div>
+
+        {/* ✅ NEW DETAILS CARD (ONLY CHANGE) */}
         <div
           style={{
             marginTop: 14,
@@ -183,7 +240,7 @@ export default function ProductPage({ params }) {
           </button>
         )}
 
-        {/* ✅ FIX: CLEAR LAYOUT AFTER DETAILS */}
+        {/* layout clear */}
         <div style={{ height: 16 }} />
 
         {/* Compare Prices */}
@@ -198,8 +255,166 @@ export default function ProductPage({ params }) {
           Compare Prices
         </h3>
 
-        {/* REST OF FILE IS BIT-TO-BIT SAME */}
-        {/* related sections unchanged */}
+        <div
+          style={{
+            display: "flex",
+            gap: 16,
+            overflowX: "auto",
+            padding: "16px 0",
+          }}
+        >
+          {sortedStores.map((store, index) => (
+            <div
+              key={index}
+              style={{
+                minWidth: 260,
+                background: "#fff",
+                padding: 20,
+                borderRadius: 18,
+                boxShadow: "0 6px 14px rgba(0,0,0,0.1)",
+                border: "1px solid #e5e7eb",
+                flexShrink: 0,
+              }}
+            >
+              <div style={{ fontSize: 18, fontWeight: 800 }}>
+                {store.name}
+              </div>
+
+              <div
+                style={{
+                  fontSize: 22,
+                  fontWeight: 900,
+                  margin: "8px 0",
+                  color:
+                    Number(store.price) === cheapest
+                      ? "#16a34a"
+                      : "#2563eb",
+                }}
+              >
+                ₹ {Number(store.price).toLocaleString("en-IN")}
+              </div>
+
+              <div
+                style={{
+                  fontSize: 14,
+                  color: "#6b7280",
+                  marginBottom: 14,
+                }}
+              >
+                {store.offer}
+              </div>
+
+              <button
+                onClick={() => handleBuy(store)}
+                style={{
+                  width: "100%",
+                  padding: "14px 0",
+                  fontWeight: 800,
+                  borderRadius: 14,
+                  border: "none",
+                  color: "#fff",
+                  background:
+                    store.name.toLowerCase() === "amazon"
+                      ? "linear-gradient(90deg,#ff9900,#ff6600)"
+                      : store.name.toLowerCase() === "meesho"
+                      ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
+                      : store.name.toLowerCase() === "ajio"
+                      ? "linear-gradient(90deg,#005bea,#00c6fb)"
+                      : "linear-gradient(90deg,#00c6ff,#00ff99)",
+                  boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
+                }}
+              >
+                {Number(store.price) === cheapest && (
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: 8,
+                      height: 8,
+                      marginRight: 8,
+                      borderRadius: "50%",
+                      backgroundColor: "#22c55e",
+                      animation: "blink 1.2s infinite",
+                    }}
+                  />
+                )}
+                Buy on {store.name}
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* RELATED BY CATEGORY */}
+        {relatedCategory.length > 0 && (
+          <>
+            <h3 className="section-title">
+              More in {product.categorySlug}
+            </h3>
+            <div className="slider-row">
+              <div className="flex gap-4 overflow-x-auto no-scrollbar">
+                {relatedCategory.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* RELATED BRAND */}
+        {relatedBrand.length > 0 && (
+          <>
+            <h3 className="section-title">
+              More from {product.brand}
+            </h3>
+            <div className="slider-row">
+              <div className="flex gap-4 overflow-x-auto no-scrollbar">
+                {relatedBrand.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* RELATED PRICE */}
+        {relatedPrice.length > 0 && (
+          <>
+            <h3 className="section-title">Similar Price Range</h3>
+            <div className="slider-row">
+              <div className="flex gap-4 overflow-x-auto no-scrollbar">
+                {relatedPrice.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* SEE ALL */}
+        {product?.categorySlug && (
+          <div
+            onClick={() =>
+              router.push(`/category/${product.categorySlug}`)
+            }
+            style={{
+              marginTop: 28,
+              padding: "18px 20px",
+              borderRadius: 20,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 12,
+              fontWeight: 900,
+              fontSize: 16,
+              color: "#fff",
+              cursor: "pointer",
+              background: "linear-gradient(135deg,#0099cc,#009966)",
+              boxShadow: "0 10px 24px rgba(0,0,0,0.25)",
+            }}
+          >
+            See all in {product.categorySlug}
+            <ArrowIcon />
+          </div>
+        )}
       </div>
 
       <style jsx>{`
@@ -208,8 +423,12 @@ export default function ProductPage({ params }) {
           50% { transform: translateX(6px); }
           100% { transform: translateX(0); }
         }
+        @keyframes blink {
+          0% { opacity: 1; }
+          50% { opacity: 0.2; }
+          100% { opacity: 1; }
+        }
       `}</style>
     </>
   );
-                                     }
-  
+    }
