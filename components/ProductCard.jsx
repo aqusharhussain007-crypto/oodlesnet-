@@ -57,8 +57,7 @@ export default function ProductCard({ product }) {
   }, [open]);
 
   return (
-    /* ✅ FIX 1: allow floating panels to escape safely */
-    <div style={{ position: "relative", overflow: "visible" }}>
+    <div style={{ width: "100%" }}>
       <Link
         href={`/product/${product.id}`}
         onClick={saveRecent}
@@ -66,7 +65,6 @@ export default function ProductCard({ product }) {
       >
         <div
           style={{
-            position: "relative",
             borderRadius: 18,
             padding: 14,
             background: "#ecfffb",
@@ -74,7 +72,7 @@ export default function ProductCard({ product }) {
             display: "flex",
             flexDirection: "column",
             gap: 12,
-            overflow: "visible", // ✅ FIX 2
+            position: "relative",
           }}
         >
           {/* DETAILS BUTTON */}
@@ -90,7 +88,7 @@ export default function ProductCard({ product }) {
                 position: "absolute",
                 top: 10,
                 right: 10,
-                zIndex: 20,
+                zIndex: 5,
                 padding: "6px 12px",
                 borderRadius: 999,
                 border: "none",
@@ -106,7 +104,6 @@ export default function ProductCard({ product }) {
           )}
 
           <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
-            {/* IMAGE */}
             <div
               style={{
                 width: 140,
@@ -174,40 +171,34 @@ export default function ProductCard({ product }) {
         </div>
       </Link>
 
-      {/* DETAILS PANEL */}
-      <div
-        ref={boxRef}
-        style={{
-          position: "absolute",
-          top: 46,
-          right: 0,
-          width: "85%",
-          zIndex: 30,
-          background: "#fff",
-          borderRadius: 16,
-          padding: 14,
-          boxShadow: "0 12px 30px rgba(0,0,0,0.25)",
-          borderLeft: "4px solid #10b981",
-          transform: open ? "translateY(0)" : "translateY(-10px)",
-          opacity: open ? 1 : 0,
-          pointerEvents: open ? "auto" : "none",
-          transition: "all 320ms ease-out",
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
+      {/* ✅ INLINE DETAILS PANEL (SAFE) */}
+      {open && (
         <div
+          ref={boxRef}
           style={{
-            maxHeight: 180,
-            overflowY: "auto",
-            fontSize: "0.9rem",
-            color: "#374151",
-            lineHeight: 1.5,
-            paddingRight: 6,
+            marginTop: 10,
+            background: "#fff",
+            borderRadius: 16,
+            padding: 14,
+            boxShadow: "0 12px 30px rgba(0,0,0,0.15)",
+            borderLeft: "4px solid #10b981",
           }}
         >
-          {product.description}
+          <div
+            style={{
+              maxHeight: 180,
+              overflowY: "auto",
+              fontSize: "0.9rem",
+              color: "#374151",
+              lineHeight: 1.5,
+              paddingRight: 6,
+            }}
+          >
+            {product.description}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
-}
+            }
+                
