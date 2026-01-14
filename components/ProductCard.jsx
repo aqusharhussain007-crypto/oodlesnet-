@@ -74,7 +74,7 @@ export default function ProductCard({ product, variant }) {
             background: "#ecfffb",
             border: "1px solid #6ee7d8",
             display: "flex",
-            flexDirection: isRelated ? "row" : "column",
+            flexDirection: "row", // ✅ ONLY CHANGE: always row
             gap: 12,
             width: isRelated ? 260 : "auto",
           }}
@@ -129,6 +129,7 @@ export default function ProductCard({ product, variant }) {
             />
           </div>
 
+          {/* TEXT CONTENT (RIGHT SIDE) */}
           <div style={{ flex: 1 }}>
             <h3
               style={{
@@ -233,5 +234,5 @@ export default function ProductCard({ product, variant }) {
       )}
     </div>
   );
-              }
-    
+          }
+                
