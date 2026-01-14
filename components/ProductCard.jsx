@@ -33,6 +33,7 @@ export default function ProductCard({ product, variant }) {
     localStorage.setItem("recent", JSON.stringify(recent));
   }
 
+  /* OUTSIDE CLICK CLOSE */
   useEffect(() => {
     function handleOutside(e) {
       if (
@@ -49,6 +50,7 @@ export default function ProductCard({ product, variant }) {
     return () => document.removeEventListener("mousedown", handleOutside);
   }, [open]);
 
+  /* ESC CLOSE */
   useEffect(() => {
     function handleEsc(e) {
       if (e.key === "Escape") setOpen(false);
@@ -72,12 +74,12 @@ export default function ProductCard({ product, variant }) {
             background: "#ecfffb",
             border: "1px solid #6ee7d8",
             display: "flex",
-            flexDirection: "row", // ✅ NORMAL CARD FIX
-            gap: 14,
-            minHeight: isRelated ? 150 : 190,
+            flexDirection: isRelated ? "row" : "column",
+            gap: 12,
+            width: isRelated ? 260 : "auto",
           }}
         >
-          {/* DETAILS BUTTON (normal only) */}
+          {/* DETAILS BUTTON */}
           {product.description && !isRelated && (
             <button
               ref={btnRef}
@@ -108,7 +110,7 @@ export default function ProductCard({ product, variant }) {
           {/* IMAGE */}
           <div
             style={{
-              width: isRelated ? 125 : 150,
+              width: isRelated ? 125 : 140,
               height: isRelated ? 125 : 170,
               borderRadius: 14,
               overflow: "hidden",
@@ -121,30 +123,22 @@ export default function ProductCard({ product, variant }) {
               src={product.imageUrl || "/placeholder.png"}
               alt={product.name}
               fill
-              sizes={isRelated ? "125px" : "150px"}
+              sizes={isRelated ? "125px" : "140px"}
               loading="lazy"
               style={{ objectFit: "contain", background: "#fff" }}
             />
           </div>
 
-          {/* CONTENT */}
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            {/* NAME */}
+          <div style={{ flex: 1 }}>
             <h3
               style={{
                 color: "#0077aa",
                 fontWeight: 800,
-                fontSize: isRelated ? 14 : "1.05rem",
-                lineHeight: 1.3,
-                marginBottom: 10,
+                fontSize: isRelated ? 14 : "1rem",
+                marginBottom: 6,
+                lineHeight: 1.25,
                 display: isRelated ? "-webkit-box" : "block",
-                WebkitLineClamp: isRelated ? 3 : "unset",
+                WebkitLineClamp: isRelated ? 2 : "unset",
                 WebkitBoxOrient: "vertical",
                 overflow: isRelated ? "hidden" : "visible",
               }}
@@ -152,40 +146,56 @@ export default function ProductCard({ product, variant }) {
               {product.name}
             </h3>
 
-            {/* PRICES AT BOTTOM */}
-            <div style={{ marginTop: "auto" }}>
-              <div style={{ display: "flex", gap: 18 }}>
-                {Number.isFinite(lowest) && (
-                  <div>
-                    <div style={{ color: "#16a34a", fontWeight: 800 }}>
-                      ₹{lowest.toLocaleString("en-IN")}
-                    </div>
-                    <div style={{ fontSize: 11 }}>Lowest</div>
+            {/* PRICES */}
+            <div style={{ display: "flex", gap: 14 }}>
+              {Number.isFinite(lowest) && (
+                <div>
+                  <div
+                    style={{
+                      color: "#16a34a",
+                      fontWeight: 800,
+                      fontSize: isRelated ? 14 : "inherit",
+                    }}
+                  >
+                    ₹{lowest.toLocaleString("en-IN")}
                   </div>
-                )}
-                {Number.isFinite(second) && (
-                  <div>
-                    <div style={{ color: "#2563eb", fontWeight: 700 }}>
-                      ₹{second.toLocaleString("en-IN")}
-                    </div>
-                    <div style={{ fontSize: 11 }}>2nd</div>
+                  <div style={{ fontSize: 11 }}>Lowest</div>
+                </div>
+              )}
+              {Number.isFinite(second) && (
+                <div>
+                  <div
+                    style={{
+                      color: "#2563eb",
+                      fontWeight: 700,
+                      fontSize: isRelated ? 13 : "inherit",
+                    }}
+                  >
+                    ₹{second.toLocaleString("en-IN")}
                   </div>
-                )}
-                {Number.isFinite(third) && (
-                  <div>
-                    <div style={{ color: "#2563eb", fontWeight: 700 }}>
-                      ₹{third.toLocaleString("en-IN")}
-                    </div>
-                    <div style={{ fontSize: 11 }}>3rd</div>
+                  <div style={{ fontSize: 11 }}>2nd</div>
+                </div>
+              )}
+              {Number.isFinite(third) && (
+                <div>
+                  <div
+                    style={{
+                      color: "#2563eb",
+                      fontWeight: 700,
+                      fontSize: isRelated ? 13 : "inherit",
+                    }}
+                  >
+                    ₹{third.toLocaleString("en-IN")}
                   </div>
-                )}
-              </div>
+                  <div style={{ fontSize: 11 }}>3rd</div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </Link>
 
-      {/* DETAILS PANEL (normal only) */}
+      {/* DETAILS PANEL (unchanged, non-related only) */}
       {!isRelated && (
         <div
           ref={boxRef}
@@ -223,5 +233,5 @@ export default function ProductCard({ product, variant }) {
       )}
     </div>
   );
-        }
-        
+              }
+    
