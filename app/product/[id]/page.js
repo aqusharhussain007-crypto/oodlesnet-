@@ -11,7 +11,8 @@ import {
   filterByPriceRange,
 } from "@/lib/productUtils";
 import { useProduct } from "./product-client";
-import { useRouter } from "next/navigation"; // ✅ ADDED (required)
+import { useRouter } from "next/navigation";
+import ReactMarkdown from "react-markdown"; // ✅ ADDED
 
 /* ✅ ADDED: animated arrow icon ONLY */
 const ArrowIcon = () => (
@@ -31,11 +32,10 @@ const ArrowIcon = () => (
 
 export default function ProductPage({ params }) {
   const { id } = params;
-  const router = useRouter(); // ✅ ADDED
+  const router = useRouter();
   const { product, loading } = useProduct(id);
 
   const [expanded, setExpanded] = useState(false);
-
   const [relatedCategory, setRelatedCategory] = useState([]);
   const [relatedBrand, setRelatedBrand] = useState([]);
   const [relatedPrice, setRelatedPrice] = useState([]);
@@ -63,8 +63,7 @@ export default function ProductPage({ params }) {
       const brandItems = all
         .filter(
           (p) =>
-            p.brand === product.brand &&
-            !usedIds.has(p.id)
+            p.brand === product.brand && !usedIds.has(p.id)
         )
         .slice(0, 4);
       brandItems.forEach((p) => usedIds.add(p.id));
@@ -90,19 +89,22 @@ export default function ProductPage({ params }) {
   }, [product]);
 
   if (loading)
-  return (
-    <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
-      <SkeletonLoader height={360} />
-      <SkeletonLoader rows={3} height={18} />
-      <SkeletonLoader height={220} />
-    </div>
-  );
+    return (
+      <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
+        <SkeletonLoader height={360} />
+        <SkeletonLoader rows={3} height={18} />
+        <SkeletonLoader height={220} />
+      </div>
+    );
 
   if (!product)
-    return <div style={{ padding: 16, color: "red" }}>Product not found</div>;
+    return (
+      <div style={{ padding: 16, color: "red" }}>
+        Product not found
+      </div>
+    );
 
   const stores = product.store || [];
-
   const sortedStores = [...stores]
     .filter((s) => Number(s.price) > 0)
     .sort((a, b) => Number(a.price) - Number(b.price));
@@ -120,13 +122,11 @@ export default function ProductPage({ params }) {
   function handleShare() {
     const url = window.location.href;
     if (navigator.share) {
-      navigator
-        .share({
-          title: product.name,
-          text: `Compare prices for ${product.name}`,
-          url,
-        })
-        .catch(() => {});
+      navigator.share({
+        title: product.name,
+        text: `Compare prices for ${product.name}`,
+        url,
+      });
     } else {
       navigator.clipboard.writeText(url);
       alert("Link copied");
@@ -191,7 +191,13 @@ export default function ProductPage({ params }) {
             gap: 12,
           }}
         >
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1d4ed8" }}>
+          <h1
+            style={{
+              fontSize: 22,
+              fontWeight: 800,
+              color: "#1d4ed8",
+            }}
+          >
             {product.name}
           </h1>
 
@@ -203,44 +209,35 @@ export default function ProductPage({ params }) {
               border: "none",
               fontWeight: 800,
               color: "#fff",
-              background: "linear-gradient(135deg,#0f4c81,#10b981)",
-              boxShadow: "0 8px 18px rgba(16,185,129,0.45)",
+              background:
+                "linear-gradient(135deg,#0f4c81,#10b981)",
+              boxShadow:
+                "0 8px 18px rgba(16,185,129,0.45)",
             }}
           >
             Share
           </button>
         </div>
 
-        {/* Description */}
-        <div style={{ marginTop: 12 }}>
-          <p
+        {/* ✅ DETAILS CARD (MARKDOWN, SCROLLABLE, AS-IS FROM FIRESTORE) */}
+        {product.details && (
+          <div
             style={{
+              marginTop: 16,
+              padding: 16,
+              borderRadius: 18,
+              background: "#ffffff",
+              boxShadow: "0 6px 14px rgba(0,0,0,0.08)",
+              maxHeight: 260,
+              overflowY: "auto",
               color: "#374151",
-              display: "-webkit-box",
-              WebkitLineClamp: expanded ? "unset" : 3,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
             }}
           >
-            {product.description}
-          </p>
-
-          {product.description?.length > 120 && (
-            <button
-              onClick={() => setExpanded((v) => !v)}
-              style={{
-                marginTop: 6,
-                color: "#0bbcff",
-                fontWeight: 700,
-                background: "none",
-                border: "none",
-                padding: 0,
-              }}
-            >
-              {expanded ? "Show less" : "Read more"}
-            </button>
-          )}
-        </div>
+            <ReactMarkdown>
+              {product.details}
+            </ReactMarkdown>
+          </div>
+        )}
 
         {/* Compare Prices */}
         <h3
@@ -270,12 +267,15 @@ export default function ProductPage({ params }) {
                 background: "#fff",
                 padding: 20,
                 borderRadius: 18,
-                boxShadow: "0 6px 14px rgba(0,0,0,0.1)",
+                boxShadow:
+                  "0 6px 14px rgba(0,0,0,0.1)",
                 border: "1px solid #e5e7eb",
                 flexShrink: 0,
               }}
             >
-              <div style={{ fontSize: 18, fontWeight: 800 }}>
+              <div
+                style={{ fontSize: 18, fontWeight: 800 }}
+              >
                 {store.name}
               </div>
 
@@ -290,7 +290,10 @@ export default function ProductPage({ params }) {
                       : "#2563eb",
                 }}
               >
-                ₹ {Number(store.price).toLocaleString("en-IN")}
+                ₹{" "}
+                {Number(store.price).toLocaleString(
+                  "en-IN"
+                )}
               </div>
 
               <div
@@ -313,36 +316,18 @@ export default function ProductPage({ params }) {
                   border: "none",
                   color: "#fff",
                   background:
-                    store.name.toLowerCase() === "amazon"
-                      ? "linear-gradient(90deg,#ff9900,#ff6600)"
-                      : store.name.toLowerCase() === "meesho"
-                      ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
-                      : store.name.toLowerCase() === "ajio"
-                      ? "linear-gradient(90deg,#005bea,#00c6fb)"
-                      : "linear-gradient(90deg,#00c6ff,#00ff99)",
-                  boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
+                    "linear-gradient(90deg,#00c6ff,#00ff99)",
+                  boxShadow:
+                    "0 6px 14px rgba(0,0,0,0.25)",
                 }}
               >
-                {Number(store.price) === cheapest && (
-                  <span
-                    style={{
-                      display: "inline-block",
-                      width: 8,
-                      height: 8,
-                      marginRight: 8,
-                      borderRadius: "50%",
-                      backgroundColor: "#22c55e",
-                      animation: "blink 1.2s infinite",
-                    }}
-                  />
-                )}
                 Buy on {store.name}
               </button>
             </div>
           ))}
         </div>
 
-        {/* RELATED BY CATEGORY */}
+        {/* RELATED SECTIONS — UNCHANGED */}
         {relatedCategory.length > 0 && (
           <>
             <h3 className="section-title">
@@ -358,7 +343,6 @@ export default function ProductPage({ params }) {
           </>
         )}
 
-        {/* RELATED BRAND — UNCHANGED */}
         {relatedBrand.length > 0 && (
           <>
             <h3 className="section-title">
@@ -374,7 +358,6 @@ export default function ProductPage({ params }) {
           </>
         )}
 
-        {/* RELATED PRICE — UNCHANGED */}
         {relatedPrice.length > 0 && (
           <>
             <h3 className="section-title">
@@ -390,11 +373,12 @@ export default function ProductPage({ params }) {
           </>
         )}
 
-        {/* ✅ SEE ALL – BELOW ALL RELATED, ABOVE FOOTER */}
         {product?.categorySlug && (
           <div
             onClick={() =>
-              router.push(`/category/${product.categorySlug}`)
+              router.push(
+                `/category/${product.categorySlug}`
+              )
             }
             style={{
               marginTop: 28,
@@ -408,8 +392,10 @@ export default function ProductPage({ params }) {
               fontSize: 16,
               color: "#fff",
               cursor: "pointer",
-              background: "linear-gradient(135deg,#0099cc,#009966)",
-              boxShadow: "0 10px 24px rgba(0,0,0,0.25)",
+              background:
+                "linear-gradient(135deg,#0099cc,#009966)",
+              boxShadow:
+                "0 10px 24px rgba(0,0,0,0.25)",
             }}
           >
             See all in {product.categorySlug}
@@ -418,19 +404,20 @@ export default function ProductPage({ params }) {
         )}
       </div>
 
-      {/* ✅ ADDED: arrow animation only */}
       <style jsx>{`
         @keyframes arrowMove {
-          0% { transform: translateX(0); }
-          50% { transform: translateX(6px); }
-          100% { transform: translateX(0); }
-        }
-        @keyframes blink {
-          0% { opacity: 1; }
-          50% { opacity: 0.2; }
-          100% { opacity: 1; }
+          0% {
+            transform: translateX(0);
+          }
+          50% {
+            transform: translateX(6px);
+          }
+          100% {
+            transform: translateX(0);
+          }
         }
       `}</style>
     </>
   );
     }
+    
