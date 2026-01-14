@@ -77,10 +77,9 @@ export default function ProductCard({ product, variant }) {
             flexDirection: isRelated ? "row" : "column",
             gap: 12,
             width: isRelated ? 260 : "auto",
-            minHeight: isRelated ? 150 : "auto",
           }}
         >
-          {/* DETAILS BUTTON (unchanged, non-related only) */}
+          {/* DETAILS BUTTON */}
           {product.description && !isRelated && (
             <button
               ref={btnRef}
@@ -130,78 +129,67 @@ export default function ProductCard({ product, variant }) {
             />
           </div>
 
-          {/* CONTENT */}
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            {/* NAME – 3 LINES */}
+          <div style={{ flex: 1 }}>
             <h3
               style={{
                 color: "#0077aa",
                 fontWeight: 800,
                 fontSize: isRelated ? 14 : "1rem",
-                lineHeight: 1.25,
                 marginBottom: 6,
+                lineHeight: 1.25,
                 display: isRelated ? "-webkit-box" : "block",
-                WebkitLineClamp: isRelated ? 3 : "unset",
+                WebkitLineClamp: isRelated ? 2 : "unset",
                 WebkitBoxOrient: "vertical",
                 overflow: isRelated ? "hidden" : "visible",
-                minHeight: isRelated ? 54 : "auto", // reserve space for 3 lines
               }}
             >
               {product.name}
             </h3>
 
-            {/* PUSH PRICES TO BOTTOM */}
-            <div style={{ marginTop: "auto" }}>
-              <div style={{ display: "flex", gap: 14 }}>
-                {Number.isFinite(lowest) && (
-                  <div>
-                    <div
-                      style={{
-                        color: "#16a34a",
-                        fontWeight: 800,
-                        fontSize: isRelated ? 14 : "inherit",
-                      }}
-                    >
-                      ₹{lowest.toLocaleString("en-IN")}
-                    </div>
-                    <div style={{ fontSize: 11 }}>Lowest</div>
+            {/* PRICES */}
+            <div style={{ display: "flex", gap: 14 }}>
+              {Number.isFinite(lowest) && (
+                <div>
+                  <div
+                    style={{
+                      color: "#16a34a",
+                      fontWeight: 800,
+                      fontSize: isRelated ? 14 : "inherit",
+                    }}
+                  >
+                    ₹{lowest.toLocaleString("en-IN")}
                   </div>
-                )}
-                {Number.isFinite(second) && (
-                  <div>
-                    <div
-                      style={{
-                        color: "#2563eb",
-                        fontWeight: 700,
-                        fontSize: isRelated ? 13 : "inherit",
-                      }}
-                    >
-                      ₹{second.toLocaleString("en-IN")}
-                    </div>
-                    <div style={{ fontSize: 11 }}>2nd</div>
+                  <div style={{ fontSize: 11 }}>Lowest</div>
+                </div>
+              )}
+              {Number.isFinite(second) && (
+                <div>
+                  <div
+                    style={{
+                      color: "#2563eb",
+                      fontWeight: 700,
+                      fontSize: isRelated ? 13 : "inherit",
+                    }}
+                  >
+                    ₹{second.toLocaleString("en-IN")}
                   </div>
-                )}
-                {Number.isFinite(third) && (
-                  <div>
-                    <div
-                      style={{
-                        color: "#2563eb",
-                        fontWeight: 700,
-                        fontSize: isRelated ? 13 : "inherit",
-                      }}
-                    >
-                      ₹{third.toLocaleString("en-IN")}
-                    </div>
-                    <div style={{ fontSize: 11 }}>3rd</div>
+                  <div style={{ fontSize: 11 }}>2nd</div>
+                </div>
+              )}
+              {Number.isFinite(third) && (
+                <div>
+                  <div
+                    style={{
+                      color: "#2563eb",
+                      fontWeight: 700,
+                      fontSize: isRelated ? 13 : "inherit",
+                    }}
+                  >
+                    ₹{third.toLocaleString("en-IN")}
                   </div>
-                )}
-              </div>
+                  <div style={{ fontSize: 11 }}>3rd</div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -245,4 +233,5 @@ export default function ProductCard({ product, variant }) {
       )}
     </div>
   );
-    }
+              }
+    
