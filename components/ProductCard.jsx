@@ -33,7 +33,6 @@ export default function ProductCard({ product, variant }) {
     localStorage.setItem("recent", JSON.stringify(recent));
   }
 
-  /* OUTSIDE CLICK CLOSE */
   useEffect(() => {
     function handleOutside(e) {
       if (
@@ -50,7 +49,6 @@ export default function ProductCard({ product, variant }) {
     return () => document.removeEventListener("mousedown", handleOutside);
   }, [open]);
 
-  /* ESC CLOSE */
   useEffect(() => {
     function handleEsc(e) {
       if (e.key === "Escape") setOpen(false);
@@ -80,7 +78,6 @@ export default function ProductCard({ product, variant }) {
             minHeight: isRelated ? 150 : "auto",
           }}
         >
-          {/* DETAILS BUTTON (unchanged, non-related only) */}
           {product.description && !isRelated && (
             <button
               ref={btnRef}
@@ -136,28 +133,30 @@ export default function ProductCard({ product, variant }) {
               flex: 1,
               display: "flex",
               flexDirection: "column",
+              justifyContent: isRelated ? "space-between" : "flex-start",
+              minHeight: isRelated ? 125 : "auto",
             }}
           >
-            {/* NAME – 3 LINES */}
+            {/* NAME */}
             <h3
               style={{
                 color: "#0077aa",
                 fontWeight: 800,
                 fontSize: isRelated ? 14 : "1rem",
                 lineHeight: 1.25,
-                marginBottom: 6,
+                marginBottom: 8,
                 display: isRelated ? "-webkit-box" : "block",
                 WebkitLineClamp: isRelated ? 3 : "unset",
                 WebkitBoxOrient: "vertical",
                 overflow: isRelated ? "hidden" : "visible",
-                minHeight: isRelated ? 54 : "auto", // reserve space for 3 lines
+                flexShrink: 0,
               }}
             >
               {product.name}
             </h3>
 
-            {/* PUSH PRICES TO BOTTOM */}
-            <div style={{ marginTop: "auto" }}>
+            {/* PRICES */}
+            <div>
               <div style={{ display: "flex", gap: 14 }}>
                 {Number.isFinite(lowest) && (
                   <div>
@@ -207,7 +206,6 @@ export default function ProductCard({ product, variant }) {
         </div>
       </Link>
 
-      {/* DETAILS PANEL (unchanged, non-related only) */}
       {!isRelated && (
         <div
           ref={boxRef}
@@ -245,4 +243,4 @@ export default function ProductCard({ product, variant }) {
       )}
     </div>
   );
-                  }
+         }
