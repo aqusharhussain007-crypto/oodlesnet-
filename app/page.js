@@ -60,9 +60,6 @@ export default function Home() {
   const [recent, setRecent] = useState([]);
   const [trending, setTrending] = useState([]);
 
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [filters, setFilters] = useState(null);
-
   const { openCategory, setOpenCategory, openFilter, setOpenFilter } =
     useContext(DrawerContext);
 
@@ -107,13 +104,9 @@ export default function Home() {
     setRecent(Array.isArray(data) ? data : []);
   }, []);
 
-  /* SEARCH + CATEGORY FILTER */
+  /* SEARCH FILTER */
   useEffect(() => {
     let list = products;
-
-    if (activeCategory !== "all") {
-      list = list.filter((p) => p.categorySlug === activeCategory);
-    }
 
     if (search) {
       list = list.filter((p) =>
@@ -125,7 +118,7 @@ export default function Home() {
     }
 
     setFiltered(list);
-  }, [search, products, activeCategory]);
+  }, [search, products]);
 
   function startVoiceSearch() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -213,11 +206,7 @@ export default function Home() {
       </div>
 
       {/* BANNER */}
-      {ads.length === 0 ? (
-        <SkeletonLoader height={120} />
-      ) : (
-        <BannerAd ads={ads} />
-      )}
+      {ads.length === 0 ? <SkeletonLoader height={120} /> : <BannerAd ads={ads} />}
 
       {/* TRENDING */}
       <h2 className="section-title">Trending Today</h2>
@@ -240,6 +229,8 @@ export default function Home() {
             (p) => p.categorySlug === cat.slug
           );
 
+          if (items.length === 0) return null;
+
           return (
             <div key={cat.slug}>
               <h2 className="section-title">{cat.name}</h2>
@@ -255,7 +246,9 @@ export default function Home() {
 
                 {items.length > 4 && (
                   <div
-                    onClick={() => router.push(`/category/${cat.slug}`)}
+                    onClick={() =>
+                      router.push(`/category/${cat.slug}`)
+                    }
                     style={{
                       minHeight: 96,
                       borderRadius: 18,
@@ -280,20 +273,13 @@ export default function Home() {
         })}
 
       {openCategory && (
-        <CategoryDrawer
-          active={activeCategory}
-          onSelect={(c) => {
-            setActiveCategory(c);
-            setOpenCategory(false);
-          }}
-          onClose={() => setOpenCategory(false)}
-        />
+        <CategoryDrawer onClose={() => setOpenCategory(false)} />
       )}
 
       {openFilter && (
         <FilterDrawer
           onClose={() => setOpenFilter(false)}
-          onApply={(data) => setFilters(data)}
+          onApply={(data) => {}}
         />
       )}
 
