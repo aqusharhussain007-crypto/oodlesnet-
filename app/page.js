@@ -272,9 +272,6 @@ export default function Home() {
           );
         })}
 
-      {openCategory && (
-        <CategoryDrawer onClose={() => setOpenCategory(false)} />
-      )}
 
       {openFilter && (
         <FilterDrawer
