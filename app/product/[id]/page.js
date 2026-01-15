@@ -353,36 +353,53 @@ export default function ProductPage({ params }) {
                       🎁 View available offers
                     </button>
 
-                    {openOffer === index && (
-                      <div
-                        style={{
-                          marginTop: 8,
-                          padding: 12,
-                          borderRadius: 12,
-                          background: "#fff",
-                          border: "1px solid #e5e7eb",
-                          maxHeight: 160,
-                          overflowY: "auto",
-                          boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
-                        }}
-                      >
-                        {offers.map((offer, i) => (
-                          <div
-                            key={i}
-                            style={{
-                              marginBottom: 10,
-                              fontSize: 14,
-                              color: "#374151",
-                              lineHeight: 1.4,
-                            }}
-                          >
-                            {typeof offer === "string"
-                              ? offer
-                              : Object.values(offer).join(" • ")}
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    {/* POLISHED SLIDE DRAWER */}
+                    <div
+                      style={{
+                        marginTop: 8,
+                        padding: 12,
+                        borderRadius: 12,
+                        background:
+                          openOffer === index ? "#f8fffc" : "#fff",
+                        border: "1px solid #e5e7eb",
+                        maxHeight:
+                          openOffer === index ? 180 : 0,
+                        overflowY: "auto",
+                        boxShadow:
+                          openOffer === index
+                            ? "0 10px 24px rgba(0,0,0,0.18)"
+                            : "0 4px 10px rgba(0,0,0,0.08)",
+                        opacity:
+                          openOffer === index ? 1 : 0,
+                        transform:
+                          openOffer === index
+                            ? "translateY(0)"
+                            : "translateY(-8px)",
+                        transition:
+                          "max-height 320ms cubic-bezier(0.16,1,0.3,1), " +
+                          "opacity 220ms ease, " +
+                          "transform 320ms cubic-bezier(0.16,1,0.3,1), " +
+                          "background 220ms ease",
+                        pointerEvents:
+                          openOffer === index ? "auto" : "none",
+                      }}
+                    >
+                      {offers.map((offer, i) => (
+                        <div
+                          key={i}
+                          style={{
+                            marginBottom: 10,
+                            fontSize: 14,
+                            color: "#374151",
+                            lineHeight: 1.4,
+                          }}
+                        >
+                          {typeof offer === "string"
+                            ? offer
+                            : Object.values(offer).join(" • ")}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -399,7 +416,11 @@ export default function ProductPage({ params }) {
             <div className="slider-row">
               <div className="flex gap-4 overflow-x-auto no-scrollbar">
                 {relatedCategory.map((p) => (
-                  <ProductCard key={p.id} product={p} variant="related" />
+                  <ProductCard
+                    key={p.id}
+                    product={p}
+                    variant="related"
+                  />
                 ))}
               </div>
             </div>
@@ -415,7 +436,11 @@ export default function ProductPage({ params }) {
             <div className="slider-row">
               <div className="flex gap-4 overflow-x-auto no-scrollbar">
                 {relatedBrand.map((p) => (
-                  <ProductCard key={p.id} product={p} variant="related" />
+                  <ProductCard
+                    key={p.id}
+                    product={p}
+                    variant="related"
+                  />
                 ))}
               </div>
             </div>
@@ -425,11 +450,17 @@ export default function ProductPage({ params }) {
         {/* RELATED PRICE */}
         {relatedPrice.length > 0 && (
           <>
-            <h3 className="section-title">Similar Price Range</h3>
+            <h3 className="section-title">
+              Similar Price Range
+            </h3>
             <div className="slider-row">
               <div className="flex gap-4 overflow-x-auto no-scrollbar">
                 {relatedPrice.map((p) => (
-                  <ProductCard key={p.id} product={p} variant="related" />
+                  <ProductCard
+                    key={p.id}
+                    product={p}
+                    variant="related"
+                  />
                 ))}
               </div>
             </div>
@@ -439,7 +470,9 @@ export default function ProductPage({ params }) {
         {/* SEE ALL */}
         {product?.categorySlug && (
           <div
-            onClick={() => router.push(`/category/${product.categorySlug}`)}
+            onClick={() =>
+              router.push(`/category/${product.categorySlug}`)
+            }
             style={{
               marginTop: 28,
               padding: "18px 20px",
@@ -476,5 +509,5 @@ export default function ProductPage({ params }) {
       `}</style>
     </>
   );
-      }
-    
+                                         }
+          
