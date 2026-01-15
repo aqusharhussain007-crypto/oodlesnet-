@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
 
-export default function CategoryDrawer({
-  active = "all",
-  onSelect,
-  onClose,
-}) {
+export default function CategoryDrawer({ onClose }) {
+  const router = useRouter();
+
   const [categories, setCategories] = useState([
     { slug: "all", name: "All" },
   ]);
@@ -29,6 +28,16 @@ export default function CategoryDrawer({
     loadCategories();
   }, []);
 
+  function handleSelect(slug) {
+    onClose();
+
+    if (slug === "all") {
+      router.push("/");
+    } else {
+      router.push(`/category/${slug}`);
+    }
+  }
+
   return (
     <div
       className="category-drawer-backdrop"
@@ -39,14 +48,14 @@ export default function CategoryDrawer({
         background: "rgba(0,0,0,0.35)",
         zIndex: 1200,
         display: "flex",
-        justifyContent: "flex-end",   // ✅ move drawer to right
+        justifyContent: "flex-end",
         alignItems: "flex-end",
       }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          width: "82%",               // ✅ reduced width
+          width: "82%",
           maxWidth: 420,
           background: "#fff",
           borderTopLeftRadius: 22,
@@ -55,7 +64,7 @@ export default function CategoryDrawer({
           animation: "slideUp 0.25s ease",
         }}
       >
-        {/* Header (UNCHANGED) */}
+        {/* Header */}
         <div
           style={{
             display: "flex",
@@ -80,7 +89,7 @@ export default function CategoryDrawer({
           </button>
         </div>
 
-        {/* SINGLE COLUMN + SCROLL (UNCHANGED LOGIC) */}
+        {/* Category List */}
         <div
           style={{
             display: "flex",
@@ -93,19 +102,13 @@ export default function CategoryDrawer({
           {categories.map((c) => (
             <button
               key={c.slug}
-              onClick={() => onSelect(c.slug)}
+              onClick={() => handleSelect(c.slug)}
               style={{
-                width: "100%",        // fills drawer, not screen
-                padding: "12px 14px", // ✅ tighter padding
+                width: "100%",
+                padding: "12px 14px",
                 borderRadius: 14,
-                border:
-                  active === c.slug
-                    ? "2px solid #00c6ff"
-                    : "1px solid #ddd",
-                background:
-                  active === c.slug
-                    ? "linear-gradient(90deg,#eafffb,#e9fff0)"
-                    : "#fff",
+                border: "1px solid #ddd",
+                background: "#fff",
                 fontWeight: 700,
                 color: "#0077aa",
                 cursor: "pointer",
@@ -126,4 +129,4 @@ export default function CategoryDrawer({
       `}</style>
     </div>
   );
-        }
+}
