@@ -35,6 +35,7 @@ export default function ProductPage({ params }) {
   const { product, loading } = useProduct(id);
 
   const [expanded, setExpanded] = useState(false);
+  const [openOffer, setOpenOffer] = useState(null);
 
   const [relatedCategory, setRelatedCategory] = useState([]);
   const [relatedBrand, setRelatedBrand] = useState([]);
@@ -174,9 +175,6 @@ export default function ProductPage({ params }) {
               objectFit: "contain",
               background: "#fff",
             }}
-            onError={(e) => {
-              e.currentTarget.src = "/placeholder.png";
-            }}
           />
         </div>
 
@@ -262,84 +260,134 @@ export default function ProductPage({ params }) {
             padding: "16px 0",
           }}
         >
-          {sortedStores.map((store, index) => (
-            <div
-              key={index}
-              style={{
-                minWidth: 260,
-                background: "#fff",
-                padding: 20,
-                borderRadius: 18,
-                boxShadow: "0 6px 14px rgba(0,0,0,0.1)",
-                border: "1px solid #e5e7eb",
-                flexShrink: 0,
-              }}
-            >
-              <div style={{ fontSize: 18, fontWeight: 800 }}>
-                {store.name}
-              </div>
+          {sortedStores.map((store, index) => {
+            const offers = Array.isArray(store.offers)
+              ? store.offers
+              : store.offer
+              ? [store.offer]
+              : [];
 
+            return (
               <div
+                key={index}
                 style={{
-                  fontSize: 22,
-                  fontWeight: 900,
-                  margin: "8px 0",
-                  color:
-                    Number(store.price) === cheapest
-                      ? "#16a34a"
-                      : "#2563eb",
+                  minWidth: 260,
+                  background: "#fff",
+                  padding: 20,
+                  borderRadius: 18,
+                  boxShadow: "0 6px 14px rgba(0,0,0,0.1)",
+                  border: "1px solid #e5e7eb",
+                  flexShrink: 0,
                 }}
               >
-                ₹ {Number(store.price).toLocaleString("en-IN")}
-              </div>
+                <div style={{ fontSize: 18, fontWeight: 800 }}>
+                  {store.name}
+                </div>
 
-              <div
-                style={{
-                  fontSize: 14,
-                  color: "#6b7280",
-                  marginBottom: 14,
-                }}
-              >
-                {store.offer}
-              </div>
+                <div
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 900,
+                    margin: "8px 0",
+                    color:
+                      Number(store.price) === cheapest
+                        ? "#16a34a"
+                        : "#2563eb",
+                  }}
+                >
+                  ₹ {Number(store.price).toLocaleString("en-IN")}
+                </div>
 
-              <button
-                onClick={() => handleBuy(store)}
-                style={{
-                  width: "100%",
-                  padding: "14px 0",
-                  fontWeight: 800,
-                  borderRadius: 14,
-                  border: "none",
-                  color: "#fff",
-                  background:
-                    store.name.toLowerCase() === "amazon"
-                      ? "linear-gradient(90deg,#ff9900,#ff6600)"
-                      : store.name.toLowerCase() === "meesho"
-                      ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
-                      : store.name.toLowerCase() === "ajio"
-                      ? "linear-gradient(90deg,#005bea,#00c6fb)"
-                      : "linear-gradient(90deg,#00c6ff,#00ff99)",
-                  boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
-                }}
-              >
-                {Number(store.price) === cheapest && (
-                  <span
-                    style={{
-                      display: "inline-block",
-                      width: 8,
-                      height: 8,
-                      marginRight: 8,
-                      borderRadius: "50%",
-                      backgroundColor: "#22c55e",
-                      animation: "blink 1.2s infinite",
-                    }}
-                  />
+                <button
+                  onClick={() => handleBuy(store)}
+                  style={{
+                    width: "100%",
+                    padding: "14px 0",
+                    fontWeight: 800,
+                    borderRadius: 14,
+                    border: "none",
+                    color: "#fff",
+                    background:
+                      store.name.toLowerCase() === "amazon"
+                        ? "linear-gradient(90deg,#ff9900,#ff6600)"
+                        : store.name.toLowerCase() === "meesho"
+                        ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
+                        : store.name.toLowerCase() === "ajio"
+                        ? "linear-gradient(90deg,#005bea,#00c6fb)"
+                        : "linear-gradient(90deg,#00c6ff,#00ff99)",
+                    boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
+                  }}
+                >
+                  {Number(store.price) === cheapest && (
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: 8,
+                        height: 8,
+                        marginRight: 8,
+                        borderRadius: "50%",
+                        backgroundColor: "#22c55e",
+                        animation: "blink 1.2s infinite",
+                      }}
+                    />
+                  )}
+                  Buy on {store.name}
+                </button>
+
+                {offers.length > 0 && (
+                  <div style={{ marginTop: 10 }}>
+                    <button
+                      onClick={() =>
+                        setOpenOffer(openOffer === index ? null : index)
+                      }
+                      style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        borderRadius: 12,
+                        border: "1px dashed #10b981",
+                        background: "#ecfdf5",
+                        fontWeight: 700,
+                        color: "#065f46",
+                      }}
+                    >
+                      🎁 View available offers
+                    </button>
+
+                    {openOffer === index && (
+                      <div
+                        style={{
+                          marginTop: 8,
+                          padding: 12,
+                          borderRadius: 12,
+                          background: "#fff",
+                          border: "1px solid #e5e7eb",
+                          maxHeight: 160,
+                          overflowY: "auto",
+                          boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+                        }}
+                      >
+                        {offers.map((offer, i) => (
+                          <div
+                            key={i}
+                            style={{
+                              marginBottom: 10,
+                              fontSize: 14,
+                              color: "#374151",
+                              lineHeight: 1.4,
+                            }}
+                          >
+                            {typeof offer === "string"
+                              ? offer
+                              : Object.values(offer).join(" • ")}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 )}
-                Buy on {store.name}
-              </button>
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
 
         {/* RELATED BY CATEGORY */}
@@ -351,11 +399,7 @@ export default function ProductPage({ params }) {
             <div className="slider-row">
               <div className="flex gap-4 overflow-x-auto no-scrollbar">
                 {relatedCategory.map((p) => (
-                  <ProductCard
-                    key={p.id}
-                    product={p}
-                    variant="related"
-                  />
+                  <ProductCard key={p.id} product={p} variant="related" />
                 ))}
               </div>
             </div>
@@ -371,11 +415,7 @@ export default function ProductPage({ params }) {
             <div className="slider-row">
               <div className="flex gap-4 overflow-x-auto no-scrollbar">
                 {relatedBrand.map((p) => (
-                  <ProductCard
-                    key={p.id}
-                    product={p}
-                    variant="related"
-                  />
+                  <ProductCard key={p.id} product={p} variant="related" />
                 ))}
               </div>
             </div>
@@ -385,17 +425,11 @@ export default function ProductPage({ params }) {
         {/* RELATED PRICE */}
         {relatedPrice.length > 0 && (
           <>
-            <h3 className="section-title">
-              Similar Price Range
-            </h3>
+            <h3 className="section-title">Similar Price Range</h3>
             <div className="slider-row">
               <div className="flex gap-4 overflow-x-auto no-scrollbar">
                 {relatedPrice.map((p) => (
-                  <ProductCard
-                    key={p.id}
-                    product={p}
-                    variant="related"
-                  />
+                  <ProductCard key={p.id} product={p} variant="related" />
                 ))}
               </div>
             </div>
@@ -405,9 +439,7 @@ export default function ProductPage({ params }) {
         {/* SEE ALL */}
         {product?.categorySlug && (
           <div
-            onClick={() =>
-              router.push(`/category/${product.categorySlug}`)
-            }
+            onClick={() => router.push(`/category/${product.categorySlug}`)}
             style={{
               marginTop: 28,
               padding: "18px 20px",
@@ -444,5 +476,5 @@ export default function ProductPage({ params }) {
       `}</style>
     </>
   );
-    }
-        
+      }
+    
