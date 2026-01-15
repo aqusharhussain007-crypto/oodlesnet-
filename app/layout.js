@@ -2,10 +2,6 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DrawerProvider from "@/components/DrawerProvider";
-import CategoryDrawer from "@/components/CategoryDrawer";
-import FilterDrawer from "@/components/FilterDrawer";
-import { useContext } from "react";
-import { DrawerContext } from "@/components/DrawerProvider";
 
 export const metadata = {
   metadataBase: new URL("https://oodlesnet.vercel.app"),
@@ -56,24 +52,6 @@ export const metadata = {
   },
 };
 
-/* ✅ GLOBAL DRAWERS (CLIENT-ONLY) */
-function GlobalDrawers() {
-  const { openCategory, setOpenCategory, openFilter, setOpenFilter } =
-    useContext(DrawerContext);
-
-  return (
-    <>
-      {openCategory && (
-        <CategoryDrawer onClose={() => setOpenCategory(false)} />
-      )}
-
-      {openFilter && (
-        <FilterDrawer onClose={() => setOpenFilter(false)} />
-      )}
-    </>
-  );
-}
-
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
@@ -89,9 +67,8 @@ export default function RootLayout({ children }) {
           <Navbar />
           <main style={{ flex: 1 }}>{children}</main>
           <Footer />
-          <GlobalDrawers />
         </DrawerProvider>
       </body>
     </html>
   );
-}
+  }
