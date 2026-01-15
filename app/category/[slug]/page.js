@@ -24,7 +24,7 @@ export async function generateMetadata({ params }) {
   };
 
   return {
-    title: titles[slug] || "Category | OodlesNet",
+    title: titles[slug] || `Compare ${slug} Prices | OodlesNet`,
     description:
       descriptions[slug] ||
       "Compare prices and find the best deals online on OodlesNet.",
@@ -50,6 +50,9 @@ export default async function CategoryPage({ params }) {
     ...d.data(),
   }));
 
+  const title =
+    slug.charAt(0).toUpperCase() + slug.slice(1);
+
   return (
     <main className="page-container" style={{ padding: 12 }}>
       {/* BREADCRUMB */}
@@ -57,27 +60,30 @@ export default async function CategoryPage({ params }) {
         <Link href="/" style={{ color: "#3b82f6" }}>
           Home
         </Link>{" "}
-        / <strong style={{ textTransform: "capitalize" }}>{slug}</strong>
+        / <strong>{title}</strong>
       </div>
 
       <h1
         className="section-title"
-        style={{ marginBottom: 12, textTransform: "capitalize" }}
+        style={{ marginBottom: 12 }}
       >
-        {slug}
+        {title}
       </h1>
 
-      {/* SKELETON + PRODUCTS */}
+      {/* PRODUCTS */}
       {products.length === 0 ? (
         <SkeletonLoader rows={4} height={260} />
       ) : (
         <div className="products-grid">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={product}
+            />
           ))}
         </div>
       )}
     </main>
   );
     }
-    
+      
