@@ -85,7 +85,7 @@ export default function Navbar() {
             height={56}
             priority
             style={{
-              maxHeight: 38, // ✅ key fix
+              maxHeight: 46, // ✅ key fix
               width: "auto",
               objectFit: "contain",
               display: "block",
