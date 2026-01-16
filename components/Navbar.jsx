@@ -9,8 +9,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(false);
 
-  const { setOpenCategory, setOpenFilter } =
-    useContext(DrawerContext);
+  const { setOpenCategory, setOpenFilter } = useContext(DrawerContext);
 
   useEffect(() => {
     const saved = localStorage.getItem("darkMode");
@@ -144,12 +143,6 @@ export default function Navbar() {
             <Link href="/" onClick={() => setOpen(false)}>
               Home
             </Link>
-            <Link href="/about" onClick={() => setOpen(false)}>
-              About
-            </Link>
-            <Link href="/contact" onClick={() => setOpen(false)}>
-              Contact
-            </Link>
 
             {/* CATEGORY */}
             <button
@@ -256,5 +249,5 @@ export default function Navbar() {
       )}
     </>
   );
-        }
-                                 
+            }
+            
