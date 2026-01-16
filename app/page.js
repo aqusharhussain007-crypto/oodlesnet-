@@ -272,17 +272,6 @@ export default function Home() {
           );
         })}
 
-      {openCategory && (
-        <CategoryDrawer onClose={() => setOpenCategory(false)} />
-      )}
-
-      {openFilter && (
-        <FilterDrawer
-          onClose={() => setOpenFilter(false)}
-          onApply={(data) => {}}
-        />
-      )}
-
       <style jsx>{`
         @keyframes arrowMove {
           0% { transform: translateX(0); }
