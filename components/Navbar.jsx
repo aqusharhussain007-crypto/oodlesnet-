@@ -59,10 +59,10 @@ export default function Navbar() {
     <>
       <header
         style={{
-          height: 54,
+          height: 56, // ✅ fixed height
           padding: "0 14px",
           display: "flex",
-          alignItems: "center",
+          alignItems: "center", // ✅ vertical centering
           justifyContent: "space-between",
           background: "linear-gradient(90deg,#021526,#041f3a)",
           position: "sticky",
@@ -70,17 +70,30 @@ export default function Navbar() {
           zIndex: 2000,
         }}
       >
-        <Link href="/">
+        {/* LOGO */}
+        <Link
+          href="/"
+          style={{
+            display: "flex",
+            alignItems: "center", // ✅ center logo container
+          }}
+        >
           <Image
             src="/logo.png"
             alt="Oodlesnet"
             width={170}
             height={56}
-            style={{ maxHeight: 45, width: "auto" }}
             priority
+            style={{
+              maxHeight: 38, // ✅ key fix
+              width: "auto",
+              objectFit: "contain",
+              display: "block",
+            }}
           />
         </Link>
 
+        {/* MENU BUTTON */}
         <button
           onClick={() => setOpen((v) => !v)}
           style={{
@@ -100,6 +113,7 @@ export default function Navbar() {
         </button>
       </header>
 
+      {/* BACKDROP */}
       {open && (
         <div
           onClick={() => setOpen(false)}
@@ -112,6 +126,7 @@ export default function Navbar() {
         />
       )}
 
+      {/* MENU */}
       {open && (
         <div
           style={{
@@ -140,9 +155,7 @@ export default function Navbar() {
           </h3>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            <Link href="/" onClick={() => setOpen(false)}>
-              Home
-            </Link>
+            <Link href="/" onClick={() => setOpen(false)}>Home</Link>
 
             {/* CATEGORY */}
             <button
@@ -159,8 +172,7 @@ export default function Navbar() {
                 justifyContent: "space-between",
               }}
             >
-              Categories
-              <ArrowIcon />
+              Categories <ArrowIcon />
             </button>
 
             {/* FILTER */}
@@ -178,8 +190,7 @@ export default function Navbar() {
                 justifyContent: "space-between",
               }}
             >
-              Filters
-              <ArrowIcon />
+              Filters <ArrowIcon />
             </button>
 
             {/* SHARE */}
@@ -211,6 +222,7 @@ export default function Navbar() {
             </button>
           </div>
 
+          {/* DARK MODE */}
           <div
             style={{
               marginTop: 20,
@@ -250,4 +262,4 @@ export default function Navbar() {
     </>
   );
             }
-            
+              
