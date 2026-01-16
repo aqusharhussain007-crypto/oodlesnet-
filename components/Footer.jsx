@@ -52,7 +52,7 @@ export default function Footer() {
         }}
       />
 
-      {/* Secondary Footer Links (NEW) */}
+      {/* Secondary Footer Links */}
       <div
         style={{
           display: "flex",
@@ -64,6 +64,24 @@ export default function Footer() {
           paddingBottom: 6,
         }}
       >
+        <Link
+          href="/about"
+          style={{ color: "#8fdcff", textDecoration: "none" }}
+        >
+          About
+        </Link>
+
+        <span style={{ opacity: 0.4 }}>|</span>
+
+        <Link
+          href="/contact"
+          style={{ color: "#8fdcff", textDecoration: "none" }}
+        >
+          Contact
+        </Link>
+
+        <span style={{ opacity: 0.4 }}>|</span>
+
         <Link
           href="/privacy-policy"
           style={{ color: "#8fdcff", textDecoration: "none" }}
@@ -91,4 +109,5 @@ export default function Footer() {
       </div>
     </footer>
   );
-          }
+      }
+          
