@@ -63,6 +63,7 @@ export default function RootLayout({ children }) {
           background: "#e4e9f1",
         }}
       >
+        {/* ✅ Global UI State */}
         <DrawerProvider>
           <Navbar />
           <main style={{ flex: 1 }}>{children}</main>
@@ -71,4 +72,5 @@ export default function RootLayout({ children }) {
       </body>
     </html>
   );
-  }
+    }
+  
