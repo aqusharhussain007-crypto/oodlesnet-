@@ -4,6 +4,58 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
+/* =====================================
+   AUTO-DETECT BENEFIT BULLETS (HOME)
+   ===================================== */
+function renderBenefitBullets(text, limit = 4) {
+  if (!text) return null;
+
+  const specKeywords =
+    /(w|mah|gb|tb|mp|hz|inch|cm|mm|kg|motor|battery|camera|display|storage|warranty|voltage|power)/i;
+
+  const points = text
+    .replace(/\n+/g, "\n")
+    .split(/[\n•\-–]/)
+    .map((p) => p.trim())
+    .filter(
+      (p) =>
+        p.length > 10 &&
+        !specKeywords.test(p) // ⬅️ filter OUT specs
+    )
+    .slice(0, limit);
+
+  if (!points.length) return null;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {points.map((point, i) => (
+        <div
+          key={i}
+          style={{
+            display: "flex",
+            gap: 8,
+            fontSize: "0.9rem",
+            lineHeight: 1.4,
+            color: "#374151",
+          }}
+        >
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              marginTop: 7,
+              borderRadius: "50%",
+              background: "#10b981",
+              flexShrink: 0,
+            }}
+          />
+          <span>{point}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function ProductCard({ product, variant }) {
   const isRelated = variant === "related";
 
@@ -74,7 +126,7 @@ export default function ProductCard({ product, variant }) {
             background: "#ecfffb",
             border: "1px solid #6ee7d8",
             display: "flex",
-            flexDirection: "column", // ⬅️ unchanged
+            flexDirection: "column",
             gap: 12,
             width: isRelated ? 260 : "auto",
           }}
@@ -107,9 +159,8 @@ export default function ProductCard({ product, variant }) {
             </button>
           )}
 
-          {/* IMAGE + NAME ROW */}
+          {/* IMAGE + NAME */}
           <div style={{ display: "flex", gap: 12 }}>
-            {/* IMAGE */}
             <div
               style={{
                 width: isRelated ? 125 : 140,
@@ -131,7 +182,6 @@ export default function ProductCard({ product, variant }) {
               />
             </div>
 
-            {/* NAME (RIGHT SIDE, BELOW DETAILS) */}
             <div style={{ flex: 1, paddingTop: 28 }}>
               <h3
                 style={{
@@ -151,7 +201,7 @@ export default function ProductCard({ product, variant }) {
             </div>
           </div>
 
-          {/* PRICES — BELOW IMAGE (UNCHANGED) */}
+          {/* PRICES */}
           <div style={{ display: "flex", gap: 14 }}>
             {Number.isFinite(lowest) && (
               <div>
@@ -199,7 +249,7 @@ export default function ProductCard({ product, variant }) {
         </div>
       </Link>
 
-      {/* DETAILS PANEL (UNCHANGED) */}
+      {/* DETAILS PANEL */}
       {!isRelated && (
         <div
           ref={boxRef}
@@ -225,16 +275,14 @@ export default function ProductCard({ product, variant }) {
             style={{
               maxHeight: 180,
               overflowY: "auto",
-              fontSize: "0.9rem",
-              color: "#374151",
-              lineHeight: 1.5,
               paddingRight: 6,
             }}
           >
-            {product.description}
+            {renderBenefitBullets(product.description)}
           </div>
         </div>
       )}
     </div>
   );
 }
+  
