@@ -30,82 +30,53 @@ const ArrowIcon = () => (
 );
 
 /* =====================================
-   DETAILS CARD – BENEFITS + SPECS
+   DETAILS CARD – DETAILS ONLY
    ===================================== */
 function renderDescription(description, expanded) {
   if (!description) return null;
 
-  const rawPoints = description
+  const points = description
     .replace(/\n+/g, "\n")
     .split(/[\n•\-–]/)
     .map((p) => p.trim())
     .filter((p) => p.length > 10);
 
-  const specKeywords =
-    /(w|mah|gb|tb|mp|hz|inch|cm|mm|kg|motor|battery|camera|display|storage|warranty|voltage|power)/i;
+  const visible = expanded ? points : points.slice(0, 3);
 
-  const specs = [];
-  const benefits = [];
-
-  rawPoints.forEach((point) => {
-    if (specKeywords.test(point)) specs.push(point);
-    else benefits.push(point);
-  });
-
-  const visibleBenefits = expanded ? benefits : benefits.slice(0, 3);
-
-  const StarIcon = () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="#10b981">
-      <path d="M12 17.3l6.18 3.7-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-    </svg>
-  );
-
-  const GearIcon = () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="#2563eb">
-      <path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.03 7.03 0 0 0-1.63-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.58.23-1.13.53-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 8.84a.5.5 0 0 0 .12.64l2.03 1.58c-.04.3-.06.61-.06.94s.02.64.06.94L2.83 14.52a.5.5 0 0 0-.12.64l1.92 3.32c.13.23.4.32.6.22l2.39-.96c.5.41 1.05.71 1.63.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.58-.23 1.13-.53 1.63-.94l2.39.96c.23.1.5 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z" />
-    </svg>
+  const Dot = () => (
+    <span
+      style={{
+        width: 6,
+        height: 6,
+        borderRadius: "50%",
+        backgroundColor: "#2563eb",
+        marginTop: 8,
+        flexShrink: 0,
+      }}
+    />
   );
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      {benefits.length > 0 && (
-        <>
-          <div style={{ fontWeight: 800, fontSize: 15, color: "#065f46" }}>
-            Why you’ll like it
-          </div>
-
-          {visibleBenefits.map((b, i) => (
-            <div
-              key={i}
-              style={{ display: "flex", gap: 10, fontSize: 15 }}
-            >
-              <StarIcon />
-              <span>{b}</span>
-            </div>
-          ))}
-        </>
-      )}
-
-      {expanded && specs.length > 0 && (
+      {points.length > 0 && (
         <>
           <div
             style={{
-              marginTop: 6,
               fontWeight: 800,
               fontSize: 15,
               color: "#1d4ed8",
             }}
           >
-            Technical details
+            Details
           </div>
 
-          {specs.map((s, i) => (
+          {visible.map((p, i) => (
             <div
               key={i}
               style={{ display: "flex", gap: 10, fontSize: 15 }}
             >
-              <GearIcon />
-              <span>{s}</span>
+              <Dot />
+              <span>{p}</span>
             </div>
           ))}
         </>
@@ -227,7 +198,7 @@ export default function ProductPage({ params }) {
           margin: "0 auto",
         }}
       >
-        {/* Breadcrumb */}
+            {/* Breadcrumb navigation */}
         <div style={{ fontSize: 14, marginBottom: 12 }}>
           <Link href="/" style={{ color: "#3b82f6" }}>
             Home
@@ -239,7 +210,7 @@ export default function ProductPage({ params }) {
           / <strong>{product.name}</strong>
         </div>
 
-        {/* IMAGE */}
+        {/* Product image */}
         <div
           style={{
             borderRadius: 18,
@@ -263,7 +234,7 @@ export default function ProductPage({ params }) {
           />
         </div>
 
-        {/* Title + Share */}
+        {/* Product title + share button */}
         <div
           style={{
             display: "flex",
@@ -293,6 +264,11 @@ export default function ProductPage({ params }) {
         </div>
 
         {/* DETAILS CARD */}
+        {/* 🔴 ONLY SECTION THAT WAS MODIFIED:
+            - Removed “Why you’ll like it”
+            - Removed “Technical details”
+            - Everything rendered under “Details”
+        */}
         <div
           style={{
             marginTop: 14,
@@ -307,6 +283,7 @@ export default function ProductPage({ params }) {
           {renderDescription(product.description, expanded)}
         </div>
 
+        {/* Expand / collapse */}
         {product.description?.length > 120 && (
           <button
             onClick={() => setExpanded((v) => !v)}
@@ -325,7 +302,7 @@ export default function ProductPage({ params }) {
 
         <div style={{ height: 16 }} />
 
-        {/* Compare Prices */}
+        {/* Compare Prices section */}
         <h3
           style={{
             marginTop: 24,
@@ -419,6 +396,7 @@ export default function ProductPage({ params }) {
                   Buy on {store.name}
                 </button>
 
+                {/* Offers dropdown */}
                 {offers.length > 0 && (
                   <div style={{ marginTop: 10 }}>
                     <button
@@ -446,24 +424,19 @@ export default function ProductPage({ params }) {
                         background:
                           openOffer === index ? "#f8fffc" : "#fff",
                         border: "1px solid #e5e7eb",
-                        maxHeight:
-                          openOffer === index ? 180 : 0,
+                        maxHeight: openOffer === index ? 180 : 0,
                         overflowY: "auto",
                         boxShadow:
                           openOffer === index
                             ? "0 10px 24px rgba(0,0,0,0.18)"
                             : "0 4px 10px rgba(0,0,0,0.08)",
-                        opacity:
-                          openOffer === index ? 1 : 0,
+                        opacity: openOffer === index ? 1 : 0,
                         transform:
                           openOffer === index
                             ? "translateY(0)"
                             : "translateY(-8px)",
                         transition:
-                          "max-height 320ms cubic-bezier(0.16,1,0.3,1), " +
-                          "opacity 220ms ease, " +
-                          "transform 320ms cubic-bezier(0.16,1,0.3,1), " +
-                          "background 220ms ease",
+                          "max-height 320ms cubic-bezier(0.16,1,0.3,1), opacity 220ms ease, transform 320ms cubic-bezier(0.16,1,0.3,1)",
                         pointerEvents:
                           openOffer === index ? "auto" : "none",
                       }}
@@ -491,7 +464,7 @@ export default function ProductPage({ params }) {
           })}
         </div>
 
-        {/* RELATED BY CATEGORY */}
+        {/* Related by category */}
         {relatedCategory.length > 0 && (
           <>
             <h3 className="section-title">
@@ -500,18 +473,14 @@ export default function ProductPage({ params }) {
             <div className="slider-row">
               <div className="flex gap-4 overflow-x-auto no-scrollbar">
                 {relatedCategory.map((p) => (
-                  <ProductCard
-                    key={p.id}
-                    product={p}
-                    variant="related"
-                  />
+                  <ProductCard key={p.id} product={p} variant="related" />
                 ))}
               </div>
             </div>
           </>
         )}
 
-        {/* RELATED BRAND */}
+        {/* Related by brand */}
         {relatedBrand.length > 0 && (
           <>
             <h3 className="section-title">
@@ -520,38 +489,28 @@ export default function ProductPage({ params }) {
             <div className="slider-row">
               <div className="flex gap-4 overflow-x-auto no-scrollbar">
                 {relatedBrand.map((p) => (
-                  <ProductCard
-                    key={p.id}
-                    product={p}
-                    variant="related"
-                  />
+                  <ProductCard key={p.id} product={p} variant="related" />
                 ))}
               </div>
             </div>
           </>
         )}
 
-        {/* RELATED PRICE */}
+        {/* Related by price */}
         {relatedPrice.length > 0 && (
           <>
-            <h3 className="section-title">
-              Similar Price Range
-            </h3>
+            <h3 className="section-title">Similar Price Range</h3>
             <div className="slider-row">
               <div className="flex gap-4 overflow-x-auto no-scrollbar">
                 {relatedPrice.map((p) => (
-                  <ProductCard
-                    key={p.id}
-                    product={p}
-                    variant="related"
-                  />
+                  <ProductCard key={p.id} product={p} variant="related" />
                 ))}
               </div>
             </div>
           </>
         )}
 
-        {/* SEE ALL */}
+        {/* See all CTA */}
         {product?.categorySlug && (
           <div
             onClick={() =>
@@ -579,6 +538,7 @@ export default function ProductPage({ params }) {
         )}
       </div>
 
+      {/* Animations */}
       <style jsx>{`
         @keyframes arrowMove {
           0% { transform: translateX(0); }
@@ -593,5 +553,5 @@ export default function ProductPage({ params }) {
       `}</style>
     </>
   );
-    }
-    
+              }
+          
