@@ -5,37 +5,52 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 /* =====================================
-   AUTO-DETECT BENEFIT BULLETS (HOME)
+   STABLE BENEFIT BULLETS (HOME DETAILS)
    ===================================== */
-function renderBenefitBullets(text, limit = 4) {
+function renderBenefitBullets(text) {
   if (!text) return null;
 
-  const specKeywords =
-    /(w|mah|gb|tb|mp|hz|inch|cm|mm|kg|motor|battery|camera|display|storage|warranty|voltage|power)/i;
-
-  const points = text
+  // Normalize text
+  const cleaned = text
+    .replace(/\s+/g, " ")
     .replace(/\n+/g, "\n")
-    .split(/[\n•\-–]/)
-    .map((p) => p.trim())
-    .filter(
-      (p) =>
-        p.length > 10 &&
-        !specKeywords.test(p) // ⬅️ filter OUT specs
-    )
-    .slice(0, limit);
+    .trim();
 
-  if (!points.length) return null;
+  // Split ONLY on strong separators (NO hyphens)
+  let parts = cleaned
+    .split(/[\n•]/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  // Merge short fragments into previous line
+  const bullets = [];
+  for (const part of parts) {
+    if (part.length < 25 && bullets.length) {
+      bullets[bullets.length - 1] += " " + part;
+    } else {
+      bullets.push(part);
+    }
+  }
+
+  // Remove junk lines
+  const filtered = bullets.filter(
+    (b) =>
+      b.length > 25 &&
+      !/^description$/i.test(b)
+  );
+
+  if (!filtered.length) return null;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      {points.map((point, i) => (
+      {filtered.map((point, i) => (
         <div
           key={i}
           style={{
             display: "flex",
             gap: 8,
             fontSize: "0.9rem",
-            lineHeight: 1.4,
+            lineHeight: 1.45,
             color: "#374151",
           }}
         >
@@ -284,5 +299,5 @@ export default function ProductCard({ product, variant }) {
       )}
     </div>
   );
-}
-  
+                   }
+           
