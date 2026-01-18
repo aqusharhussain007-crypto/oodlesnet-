@@ -184,4 +184,40 @@ html.dark nav div {
     background-position: -200% 0;
   }
   }
+
+/* ========== Price Confidence Indicator ========== */
+.confidence-ring {
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  border: 2px solid;
+  animation: confidencePulse 1.8s ease-out infinite;
+}
+
+.confidence-high {
+  border-color: #22c55e;
+}
+
+.confidence-medium {
+  border-color: #eab308;
+}
+
+.confidence-low {
+  border-color: #ef4444;
+}
+
+@keyframes confidencePulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.9;
+  }
+  70% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+  }
   
