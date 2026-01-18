@@ -194,40 +194,52 @@ export default function ProductPage({ params }) {
         </div>
 
         {/* Image */}
-        <div style={{
-          borderRadius: 18,
-          overflow: "hidden",
-          background: "#fff",
-          boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
-          marginBottom: 16,
-          aspectRatio: "3 / 4",
-        }}>
+        <div
+          style={{
+            borderRadius: 18,
+            overflow: "hidden",
+            background: "#fff",
+            boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
+            marginBottom: 16,
+            aspectRatio: "3 / 4",
+          }}
+        >
           <img
             src={product.imageUrl || "/placeholder.png"}
             alt={product.name}
             loading="lazy"
-            style={{ width: "100%", height: "100%", objectFit: "contain" }}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              background: "#fff",
+            }}
           />
         </div>
 
         {/* Title + Share */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1d4ed8" }}>
             {product.name}
           </h1>
-          <button onClick={handleShare} style={{
-            padding: "8px 16px",
-            borderRadius: 999,
-            border: "none",
-            fontWeight: 800,
-            color: "#fff",
-            background: "linear-gradient(135deg,#0f4c81,#10b981)",
-          }}>
+
+          <button
+            onClick={handleShare}
+            style={{
+              padding: "8px 16px",
+              borderRadius: 999,
+              border: "none",
+              fontWeight: 800,
+              color: "#fff",
+              background: "linear-gradient(135deg,#0f4c81,#10b981)",
+              boxShadow: "0 8px 18px rgba(16,185,129,0.45)",
+            }}
+          >
             Share
           </button>
         </div>
 
-        {/* ✅ BUYING CONFIDENCE (ONLY ADDITION) */}
+        {/* BUYING CONFIDENCE (ADDED) */}
         <section style={{ marginTop: 10 }}>
           <strong>{confidence.title}</strong>
           <p style={{ fontSize: 14, color: "#555", marginTop: 4 }}>
@@ -236,15 +248,17 @@ export default function ProductPage({ params }) {
         </section>
 
         {/* DETAILS */}
-        <div style={{
-          marginTop: 14,
-          padding: 16,
-          borderRadius: 16,
-          border: "1px solid #e5e7eb",
-          background: "#fff",
-          maxHeight: expanded ? "unset" : 220,
-          overflowY: "auto",
-        }}>
+        <div
+          style={{
+            marginTop: 14,
+            padding: 16,
+            borderRadius: 16,
+            border: "1px solid #e5e7eb",
+            background: "#fff",
+            maxHeight: expanded ? "unset" : 220,
+            overflowY: "auto",
+          }}
+        >
           {renderDescription(product.description, expanded)}
         </div>
 
@@ -264,26 +278,12 @@ export default function ProductPage({ params }) {
           </button>
         )}
 
-        {/* Compare Prices section */}
-        <h3
-          style={{
-            marginTop: 24,
-            fontSize: 20,
-            fontWeight: 800,
-            color: "#2563eb",
-          }}
-        >
+        {/* Compare Prices */}
+        <h3 style={{ marginTop: 24, fontSize: 20, fontWeight: 800, color: "#2563eb" }}>
           Compare Prices
         </h3>
 
-        <div
-          style={{
-            display: "flex",
-            gap: 16,
-            overflowX: "auto",
-            padding: "16px 0",
-          }}
-        >
+        <div style={{ display: "flex", gap: 16, overflowX: "auto", padding: "16px 0" }}>
           {sortedStores.map((store, index) => {
             const offers = Array.isArray(store.offers)
               ? store.offers
@@ -358,7 +358,6 @@ export default function ProductPage({ params }) {
                   Buy on {store.name}
                 </button>
 
-                {/* Offers dropdown */}
                 {offers.length > 0 && (
                   <div style={{ marginTop: 10 }}>
                     <button
@@ -425,4 +424,95 @@ export default function ProductPage({ params }) {
             );
           })}
         </div>
-                    
+
+        {/* Related by category */}
+        {relatedCategory.length > 0 && (
+          <>
+            <h3 className="section-title">
+              More in {product.categorySlug}
+            </h3>
+            <div className="slider-row">
+              <div className="flex gap-4 overflow-x-auto no-scrollbar">
+                {relatedCategory.map((p) => (
+                  <ProductCard key={p.id} product={p} variant="related" />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Related by brand */}
+        {relatedBrand.length > 0 && (
+          <>
+            <h3 className="section-title">
+              More from {product.brand}
+            </h3>
+            <div className="slider-row">
+              <div className="flex gap-4 overflow-x-auto no-scrollbar">
+                {relatedBrand.map((p) => (
+                  <ProductCard key={p.id} product={p} variant="related" />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Related by price */}
+        {relatedPrice.length > 0 && (
+          <>
+            <h3 className="section-title">Similar Price Range</h3>
+            <div className="slider-row">
+              <div className="flex gap-4 overflow-x-auto no-scrollbar">
+                {relatedPrice.map((p) => (
+                  <ProductCard key={p.id} product={p} variant="related" />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* See all CTA */}
+        {product?.categorySlug && (
+          <div
+            onClick={() =>
+              router.push(`/category/${product.categorySlug}`)
+            }
+            style={{
+              marginTop: 28,
+              padding: "18px 20px",
+              borderRadius: 20,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 12,
+              fontWeight: 900,
+              fontSize: 16,
+              color: "#fff",
+              cursor: "pointer",
+              background: "linear-gradient(135deg,#0099cc,#009966)",
+              boxShadow: "0 10px 24px rgba(0,0,0,0.25)",
+            }}
+          >
+            See all in {product.categorySlug}
+            <ArrowIcon />
+          </div>
+        )}
+      </div>
+
+      {/* Animations */}
+      <style jsx>{`
+        @keyframes arrowMove {
+          0% { transform: translateX(0); }
+          50% { transform: translateX(6px); }
+          100% { transform: translateX(0); }
+        }
+        @keyframes blink {
+          0% { opacity: 1; }
+          50% { opacity: 0.2; }
+          100% { opacity: 1; }
+        }
+      `}</style>
+    </>
+  );
+}
+  
