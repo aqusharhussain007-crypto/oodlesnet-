@@ -239,13 +239,47 @@ export default function ProductPage({ params }) {
           </button>
         </div>
 
-        {/* BUYING CONFIDENCE (ADDED) */}
-        <section style={{ marginTop: 10 }}>
-          <strong>{confidence.title}</strong>
-          <p style={{ fontSize: 14, color: "#555", marginTop: 4 }}>
-            {confidence.message}
-          </p>
-        </section>
+        {/* BUYING CONFIDENCE (UPDATED) */}
+<div style={{ marginTop: 10 }}>
+  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+    <strong>Confidence</strong>
+
+    <span
+      onClick={() => setShowConfidenceHint((v) => !v)}
+      style={{
+        width: 18,
+        height: 18,
+        borderRadius: "50%",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 12,
+        fontWeight: 900,
+        color: "#fff",
+        cursor: "pointer",
+        backgroundColor:
+          confidence.color === "green"
+            ? "#16a34a"
+            : confidence.color === "yellow"
+            ? "#ca8a04"
+            : "#dc2626",
+        animation: "pulse 1.6s infinite",
+      }}
+    >
+      ⓘ
+    </span>
+  </div>
+
+  {showConfidenceHint && (
+    <div style={{ marginTop: 6, fontSize: 14, color: "#374151" }}>
+      {confidence.color === "green"
+        ? "Good time to buy"
+        : confidence.color === "yellow"
+        ? "You can wait"
+        : "High price right now"}
+    </div>
+  )}
+</div>
 
         {/* DETAILS */}
         <div
