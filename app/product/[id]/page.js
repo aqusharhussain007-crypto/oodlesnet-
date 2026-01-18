@@ -416,6 +416,20 @@ export default function ProductPage({ params }) {
         )}
       </div>
 
+<style jsx>{`
+  @keyframes arrowMove {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(6px); }
+    100% { transform: translateX(0); }
+  }
+
+  @keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.2; }
+    100% { opacity: 1; }
+  }
+`}</style>
+          
       <style jsx>{`
         @keyframes arrowMove {
           0% { transform: translateX(0); }
