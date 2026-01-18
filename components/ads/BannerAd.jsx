@@ -1,10 +1,44 @@
 "use client";
 
-export default function BannerAd({ ads }) {
-  const hasAd = Array.isArray(ads) && ads.length > 0;
+import { useEffect, useRef } from "react";
 
-  // 🔹 PROMISE BANNER (fallback when no ads)
-  if (!hasAd) {
+export default function BannerAd({ ads }) {
+  /**
+   * ✅ Only treat ads as REAL if they have creative + destination
+   */
+  const validAds = Array.isArray(ads)
+    ? ads.filter((ad) => ad.imageUrl && ad.link)
+    : [];
+
+  const hasRealAd = validAds.length > 0;
+
+  /**
+   * 🔹 Prevent duplicate impression firing
+   */
+  const impressionTracked = useRef(false);
+
+  /**
+   * 🔹 Track PROMISE BANNER impression
+   * Fires once per mount, only if no real ad exists
+   */
+  useEffect(() => {
+    if (!hasRealAd && !impressionTracked.current) {
+      impressionTracked.current = true;
+
+      fetch("/api/track-click", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "promise_impression",
+        }),
+      }).catch(() => {});
+    }
+  }, [hasRealAd]);
+
+  /**
+   * 🔹 PROMISE BANNER (fallback)
+   */
+  if (!hasRealAd) {
     return (
       <div
         style={{
@@ -28,8 +62,10 @@ export default function BannerAd({ ads }) {
     );
   }
 
-  // 🔹 REAL AD
-  const ad = ads[0];
+  /**
+   * 🔹 REAL AD (first valid one)
+   */
+  const ad = validAds[0];
 
   return (
     <a
@@ -46,7 +82,7 @@ export default function BannerAd({ ads }) {
     >
       <img
         src={ad.imageUrl}
-        alt="Ad"
+        alt="Sponsored"
         style={{
           width: "100%",
           height: "100%",
@@ -56,5 +92,4 @@ export default function BannerAd({ ads }) {
       />
     </a>
   );
-          }
-  
+}
