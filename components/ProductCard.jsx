@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { getPriceConfidence } from "@/lib/priceConfidence";
 
 /* =====================================
    STABLE BENEFIT BULLETS (HOME DETAILS)
@@ -10,19 +11,16 @@ import { useEffect, useRef, useState } from "react";
 function renderBenefitBullets(text) {
   if (!text) return null;
 
-  // Normalize text
   const cleaned = text
     .replace(/\s+/g, " ")
     .replace(/\n+/g, "\n")
     .trim();
 
-  // Split ONLY on strong separators (NO hyphens)
   let parts = cleaned
     .split(/[\n•]/)
     .map((p) => p.trim())
     .filter(Boolean);
 
-  // Merge short fragments into previous line
   const bullets = [];
   for (const part of parts) {
     if (part.length < 25 && bullets.length) {
@@ -32,11 +30,8 @@ function renderBenefitBullets(text) {
     }
   }
 
-  // Remove junk lines
   const filtered = bullets.filter(
-    (b) =>
-      b.length > 25 &&
-      !/^description$/i.test(b)
+    (b) => b.length > 25 && !/^description$/i.test(b)
   );
 
   if (!filtered.length) return null;
@@ -86,6 +81,14 @@ export default function ProductCard({ product, variant }) {
   const sorted = [...prices].sort((a, b) => a - b);
   const [lowest, second, third] = sorted;
 
+  const confidence = getPriceConfidence(product.store || []);
+  const confidenceClass =
+    confidence.label === "High"
+      ? "confidence-high"
+      : confidence.label === "Medium"
+      ? "confidence-medium"
+      : "confidence-low";
+
   function saveRecent() {
     if (typeof window === "undefined") return;
     let recent = JSON.parse(localStorage.getItem("recent") || "[]");
@@ -100,7 +103,6 @@ export default function ProductCard({ product, variant }) {
     localStorage.setItem("recent", JSON.stringify(recent));
   }
 
-  /* OUTSIDE CLICK CLOSE */
   useEffect(() => {
     function handleOutside(e) {
       if (
@@ -117,7 +119,6 @@ export default function ProductCard({ product, variant }) {
     return () => document.removeEventListener("mousedown", handleOutside);
   }, [open]);
 
-  /* ESC CLOSE */
   useEffect(() => {
     function handleEsc(e) {
       if (e.key === "Escape") setOpen(false);
@@ -146,7 +147,6 @@ export default function ProductCard({ product, variant }) {
             width: isRelated ? 260 : "auto",
           }}
         >
-          {/* DETAILS BUTTON */}
           {product.description && !isRelated && (
             <button
               ref={btnRef}
@@ -187,6 +187,18 @@ export default function ProductCard({ product, variant }) {
                 position: "relative",
               }}
             >
+              {/* CONFIDENCE RING */}
+              <div
+                className={`confidence-ring ${confidenceClass}`}
+                style={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  zIndex: 5,
+                }}
+                title={confidence.title}
+              />
+
               <Image
                 src={product.imageUrl || "/placeholder.png"}
                 alt={product.name}
@@ -264,7 +276,6 @@ export default function ProductCard({ product, variant }) {
         </div>
       </Link>
 
-      {/* DETAILS PANEL */}
       {!isRelated && (
         <div
           ref={boxRef}
@@ -299,5 +310,5 @@ export default function ProductCard({ product, variant }) {
       )}
     </div>
   );
-                   }
-           
+             }
+         
