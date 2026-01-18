@@ -88,7 +88,8 @@ export default function ProductPage({ params }) {
   const [relatedCategory, setRelatedCategory] = useState([]);
   const [relatedBrand, setRelatedBrand] = useState([]);
   const [relatedPrice, setRelatedPrice] = useState([]);
-
+  const [showConfidenceHint, setShowConfidenceHint] = useState(false);
+                
   useEffect(() => {
     if (!product) return;
 
