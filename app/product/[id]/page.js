@@ -374,56 +374,77 @@ export default function ProductPage({ params }) {
                         color: "#065f46",
                       }}
                     >
-                      🎁 View available offers
-                    </button>
+🎁 View available offers
+</button>
 
-                    <div
-                      style={{
-                        marginTop: 8,
-                        padding: 12,
-                        borderRadius: 12,
-                        background:
-                          openOffer === index ? "#f8fffc" : "#fff",
-                        border: "1px solid #e5e7eb",
-                        maxHeight: openOffer === index ? 180 : 0,
-                        overflowY: "auto",
-                        boxShadow:
-                          openOffer === index
-                            ? "0 10px 24px rgba(0,0,0,0.18)"
-                            : "0 4px 10px rgba(0,0,0,0.08)",
-                        opacity: openOffer === index ? 1 : 0,
-                        transform:
-                          openOffer === index
-                            ? "translateY(0)"
-                            : "translateY(-8px)",
-                        transition:
-                          "max-height 320ms cubic-bezier(0.16,1,0.3,1), opacity 220ms ease, transform 320ms cubic-bezier(0.16,1,0.3,1)",
-                        pointerEvents:
-                          openOffer === index ? "auto" : "none",
-                      }}
-                    >
-                      {offers.map((offer, i) => (
-                        <div
-                          key={i}
-                          style={{
-                            marginBottom: 10,
-                            fontSize: 14,
-                            color: "#374151",
-                            lineHeight: 1.4,
-                          }}
-                        >
-                          {typeof offer === "string"
-                            ? offer
-                            : Object.values(offer).join(" • ")}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+<div
+  style={{
+    marginTop: 10,
+    padding: 14,
+    borderRadius: 14,
+    background:
+      openOffer === index ? "#f8fffc" : "#fff",
+    border: "1px solid #e5e7eb",
+
+    /* slide container */
+    maxHeight: openOffer === index ? 220 : 0,
+    overflowY: "auto",
+
+    boxShadow:
+      openOffer === index
+        ? "0 12px 28px rgba(0,0,0,0.18)"
+        : "0 4px 10px rgba(0,0,0,0.08)",
+
+    opacity: openOffer === index ? 1 : 0,
+    transform:
+      openOffer === index
+        ? "translateY(0)"
+        : "translateY(-12px)",
+
+    /* 🔑 SLOWER, SMOOTHER SLIDE */
+    transition:
+      "max-height 520ms cubic-bezier(0.16,1,0.3,1), opacity 320ms ease, transform 520ms cubic-bezier(0.16,1,0.3,1)",
+
+    pointerEvents:
+      openOffer === index ? "auto" : "none",
+
+    /* layout safety */
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    gap: 10,
+  }}
+>
+  {offers.map((offer, i) => (
+    <div
+      key={i}
+      style={{
+        padding: "10px 12px",
+        borderRadius: 10,
+        background: "#f9fafb",
+        borderBottom:
+          i !== offers.length - 1
+            ? "1px dashed #e5e7eb"
+            : "none",
+
+        fontSize: 14,
+        color: "#374151",
+        lineHeight: 1.5,
+
+        /* text safety */
+        whiteSpace: "normal",
+        wordBreak: "break-word",
+        overflowWrap: "anywhere",
+        maxWidth: "100%",
+      }}
+    >
+      {typeof offer === "string"
+        ? offer
+        : Object.values(offer).join(" • ")}
+    </div>
+  ))}
+</div>
+  
 
         {/* Related by category */}
         {relatedCategory.length > 0 && (
