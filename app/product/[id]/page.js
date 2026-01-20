@@ -374,8 +374,8 @@ export default function ProductPage({ params }) {
                         color: "#065f46",
                       }}
                     >
-🎁 View available offers
-</button>
+                      🎁 View available offers
+                    </button>
 
 <div
   style={{
