@@ -283,7 +283,8 @@ export default function ProductPage({ params }) {
         </h3>
 
         <div style={{ display: "flex", gap: 16, overflowX: "auto", padding: "16px 0" }}>
-                      {sortedStores.map((store, index) => {
+               
+        {sortedStores.map((store, index) => {
             const offers = Array.isArray(store.offers)
               ? store.offers
               : store.offer
@@ -358,7 +359,14 @@ export default function ProductPage({ params }) {
                 </button>
 
                 {offers.length > 0 && (
-                  <div style={{ marginTop: 10 }}>
+                  <div
+                    style={{
+                      marginTop: 10,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "stretch",
+                    }}
+                  >
                     <button
                       onClick={() =>
                         setOpenOffer(openOffer === index ? null : index)
@@ -409,6 +417,10 @@ export default function ProductPage({ params }) {
                             fontSize: 14,
                             color: "#374151",
                             lineHeight: 1.4,
+                            whiteSpace: "normal",
+                            wordBreak: "break-word",
+                            overflowWrap: "anywhere",
+                            maxWidth: "100%",
                           }}
                         >
                           {typeof offer === "string"
@@ -513,5 +525,4 @@ export default function ProductPage({ params }) {
       `}</style>
     </>
   );
-                   }
-                            
+}
