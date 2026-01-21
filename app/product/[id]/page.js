@@ -279,197 +279,277 @@ export default function ProductPage({ params }) {
         )}
 
         {/* Compare Prices */}
-        <h3 style={{ marginTop: 24, fontSize: 20, fontWeight: 800, color: "#2563eb" }}>
-          Compare Prices
-        </h3>
+<h3 style={{ marginTop: 24, fontSize: 20, fontWeight: 800, color: "#2563eb" }}>
+  Compare Prices
+</h3>
 
-        <div style={{ display: "flex", gap: 16, overflowX: "auto", padding: "16px 0" }}>
-          {sortedStores.map((store, index) => {
-            const rawOffers = Array.isArray(store.offers)
-              ? store.offers
-              : store.offer
-              ? [store.offer]
-              : [];
+<div style={{ display: "flex", gap: 16, overflowX: "auto", padding: "16px 0" }}>
+  {sortedStores.map((store, index) => {
+    const rawOffers = Array.isArray(store.offers)
+      ? store.offers
+      : store.offer
+      ? [store.offer]
+      : [];
 
-            const normalizeOffers = (offer) => {
-              if (Array.isArray(offer)) return offer;
+    const normalizeOffers = (offer) => {
+      if (Array.isArray(offer)) return offer;
 
-              if (typeof offer === "string") {
-                return offer
-                  .replace(/•/g, "|")
-                  .replace(/Save upto/g, "|Save upto")
-                  .replace(/Exchange/g, "|Exchange")
-                  .replace(/Add/g, "|Add")
-                  .replace(/Amazon/g, "|Amazon")
-                  .split("|")
-                  .map((s) => s.trim())
-                  .filter(Boolean);
-              }
+      if (typeof offer === "string") {
+        return offer
+          .replace(/•/g, "|")
+          .replace(/Save upto/g, "|Save upto")
+          .replace(/Exchange/g, "|Exchange")
+          .replace(/Add/g, "|Add")
+          .replace(/Amazon/g, "|Amazon")
+          .split("|")
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
 
-              if (typeof offer === "object") {
-                return Object.values(offer)
-                  .map((s) => String(s).trim())
-                  .filter(Boolean);
-              }
+      if (typeof offer === "object") {
+        return Object.values(offer)
+          .map((s) => String(s).trim())
+          .filter(Boolean);
+      }
 
-              return [];
-            };
+      return [];
+    };
 
-            const offers = rawOffers.flatMap(normalizeOffers);
+    const offers = rawOffers.flatMap(normalizeOffers);
 
-            return (
-              <div
-                key={index}
-                style={{
-                  minWidth: 260,
-                  background: "#fff",
-                  padding: 20,
-                  borderRadius: 18,
-                  boxShadow: "0 6px 14px rgba(0,0,0,0.1)",
-                  border: "1px solid #e5e7eb",
-                  flexShrink: 0,
-                }}
-              >
-                <div style={{ fontSize: 18, fontWeight: 800 }}>
-                  {store.name}
-                </div>
+    const isMobile =
+      typeof window !== "undefined" && window.innerWidth <= 640;
 
-                <div
-                  style={{
-                    fontSize: 22,
-                    fontWeight: 900,
-                    margin: "8px 0",
-                    color:
-                      Number(store.price) === cheapest
-                        ? "#16a34a"
-                        : "#2563eb",
-                  }}
-                >
-                  ₹ {Number(store.price).toLocaleString("en-IN")}
-                </div>
+    return (
+      <div
+        key={index}
+        style={{
+          minWidth: 260,
+          background: "#fff",
+          padding: 20,
+          borderRadius: 18,
+          boxShadow: "0 6px 14px rgba(0,0,0,0.1)",
+          border: "1px solid #e5e7eb",
+          flexShrink: 0,
+          position: "relative",
+        }}
+      >
+        <div style={{ fontSize: 18, fontWeight: 800 }}>
+          {store.name}
+        </div>
 
-                {/* CONSTRAINED ACTION COLUMN */}
-                <div
-                  style={{
-                    maxWidth: 220,
-                    margin: "0 auto",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 10,
-                  }}
-                >
-                  {/* BUY BUTTON */}
-                  <button
-                    onClick={() => handleBuy(store)}
-                    style={{
-                      width: "100%",
-                      padding: "14px 0",
-                      fontWeight: 800,
-                      borderRadius: 14,
-                      border: "none",
-                      color: "#fff",
-                      background:
-                        store.name.toLowerCase() === "amazon"
-                          ? "linear-gradient(90deg,#ff9900,#ff6600)"
-                          : store.name.toLowerCase() === "meesho"
-                          ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
-                          : store.name.toLowerCase() === "ajio"
-                          ? "linear-gradient(90deg,#005bea,#00c6fb)"
-                          : "linear-gradient(90deg,#00c6ff,#00ff99)",
-                      boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
-                    }}
-                  >
-                    {Number(store.price) === cheapest && (
-                      <span
-                        style={{
-                          display: "inline-block",
-                          width: 18,
-                          height: 6,
-                          marginRight: 8,
-                          borderRadius: 999,
-                          backgroundColor: "#22c55e",
-                          animation: "blink 1.2s infinite",
-                        }}
-                      />
-                    )}
-                    Buy on {store.name}
-                  </button>
+        <div
+          style={{
+            fontSize: 22,
+            fontWeight: 900,
+            margin: "8px 0",
+            color:
+              Number(store.price) === cheapest
+                ? "#16a34a"
+                : "#2563eb",
+          }}
+        >
+          ₹ {Number(store.price).toLocaleString("en-IN")}
+        </div>
 
-                  {offers.length > 0 && (
-                    <>
-                      {/* VIEW OFFERS */}
-                      <button
-                        onClick={() =>
-                          setOpenOffer(openOffer === index ? null : index)
-                        }
-                        style={{
-                          width: "100%",
-                          padding: "10px 12px",
-                          borderRadius: 12,
-                          border: "1px dashed #10b981",
-                          background: "#ecfdf5",
-                          fontWeight: 700,
-                          color: "#065f46",
-                        }}
-                      >
-                        🎁 View available offers
-                      </button>
+        {/* CONSTRAINED ACTION COLUMN */}
+        <div
+          style={{
+            maxWidth: 220,
+            margin: "0 auto",
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+          }}
+        >
+          {/* BUY BUTTON */}
+          <button
+            onClick={() => handleBuy(store)}
+            style={{
+              width: "100%",
+              padding: "14px 0",
+              fontWeight: 800,
+              borderRadius: 14,
+              border: "none",
+              color: "#fff",
+              background:
+                store.name.toLowerCase() === "amazon"
+                  ? "linear-gradient(90deg,#ff9900,#ff6600)"
+                  : store.name.toLowerCase() === "meesho"
+                  ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
+                  : store.name.toLowerCase() === "ajio"
+                  ? "linear-gradient(90deg,#005bea,#00c6fb)"
+                  : "linear-gradient(90deg,#00c6ff,#00ff99)",
+              boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
+            }}
+          >
+            {Number(store.price) === cheapest && (
+              <span
+                style={{
+                  display: "inline-block",
+                  width: 18,
+                  height: 6,
+                  marginRight: 8,
+                  borderRadius: 999,
+                  backgroundColor: "#22c55e",
+                  animation: "blink 1.2s infinite",
+                }}
+              />
+            )}
+            Buy on {store.name}
+          </button>
 
-                      {/* OFFER PANEL */}
-                      <div
-                        style={{
-                          padding: 12,
-                          borderRadius: 12,
-                          background:
-                            openOffer === index ? "#f8fffc" : "#fff",
-                          border: "1px solid #e5e7eb",
-                          maxHeight: openOffer === index ? 260 : 0,
-                          overflowY: "auto",
-                          boxShadow:
-                            openOffer === index
-                              ? "0 10px 24px rgba(0,0,0,0.18)"
-                              : "0 4px 10px rgba(0,0,0,0.08)",
-                          opacity: openOffer === index ? 1 : 0,
-                          transform:
-                            openOffer === index
-                              ? "translateY(0)"
-                              : "translateY(-8px)",
-                          transition:
-                            "max-height 320ms cubic-bezier(0.16,1,0.3,1), opacity 220ms ease, transform 320ms cubic-bezier(0.16,1,0.3,1)",
-                          pointerEvents:
-                            openOffer === index ? "auto" : "none",
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 10,
-                        }}
-                      >
-                        {offers.map((line, i) => (
-                          <div
-                            key={i}
-                            style={{
-                              padding: "10px 12px",
-                              borderRadius: 10,
-                              background: "#f9fafb",
-                              border: "1px solid #e5e7eb",
-                              fontSize: 14,
-                              color: "#374151",
-                              lineHeight: 1.4,
-                              whiteSpace: "normal",
-                              wordBreak: "break-word",
-                              overflowWrap: "anywhere",
-                            }}
-                          >
-                            {line}
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+          {offers.length > 0 && (
+            <>
+              {/* VIEW OFFERS */}
+              <button
+                onClick={() => {
+                  if (isMobile) {
+                    setOpenOffer(index);
+                  } else {
+                    setOpenOffer(openOffer === index ? null : index);
+                  }
+                }}
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: 12,
+                  border: "1px dashed #10b981",
+                  background: "#ecfdf5",
+                  fontWeight: 700,
+                  color: "#065f46",
+                }}
+              >
+                🎁 View available offers
+              </button>
+
+              {/* INLINE OFFER PANEL (DESKTOP) */}
+              {!isMobile && (
+                <div
+                  style={{
+                    position: "absolute",
+                    left: "50%",
+                    top: "100%",
+                    transform:
+                      openOffer === index
+                        ? "translate(-50%, 0)"
+                        : "translate(-50%, -8px)",
+                    marginTop: 8,
+                    width: 220,
+                    padding: 12,
+                    borderRadius: 12,
+                    background: "#f8fffc",
+                    border: "1px solid #e5e7eb",
+                    maxHeight: openOffer === index ? 260 : 0,
+                    overflowY: "auto",
+                    boxShadow: "0 14px 28px rgba(0,0,0,0.25)",
+                    opacity: openOffer === index ? 1 : 0,
+                    transition:
+                      "max-height 320ms cubic-bezier(0.16,1,0.3,1), opacity 220ms ease, transform 320ms cubic-bezier(0.16,1,0.3,1)",
+                    pointerEvents:
+                      openOffer === index ? "auto" : "none",
+                    zIndex: 50,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 10,
+                  }}
+                >
+                  {offers.map((line, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        padding: "10px 12px",
+                        borderRadius: 10,
+                        background: "#f9fafb",
+                        border: "1px solid #e5e7eb",
+                        fontSize: 14,
+                        color: "#374151",
+                        lineHeight: 1.4,
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                        overflowWrap: "anywhere",
+                      }}
+                    >
+                      {line}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    );
+  })}
+</div>
+
+{/* MOBILE BOTTOM SHEET */}
+{openOffer !== null && (
+  <div
+    onClick={() => setOpenOffer(null)}
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.4)",
+      zIndex: 999,
+    }}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: "#fff",
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        padding: 16,
+        maxHeight: "65vh",
+        overflowY: "auto",
+        boxShadow: "0 -10px 30px rgba(0,0,0,0.3)",
+        animation: "sheetUp 300ms ease",
+      }}
+    >
+      <div
+        style={{
+          width: 40,
+          height: 5,
+          borderRadius: 999,
+          background: "#d1d5db",
+          margin: "0 auto 12px",
+        }}
+      />
+
+      {(() => {
+        const rawOffers =
+          sortedStores[openOffer]?.offers ||
+          sortedStores[openOffer]?.offer ||
+          [];
+        const offers = Array.isArray(rawOffers)
+          ? rawOffers
+          : [rawOffers];
+
+        return offers.flatMap(normalizeOffers).map((line, i) => (
+          <div
+            key={i}
+            style={{
+              padding: "12px 14px",
+              borderRadius: 12,
+              background: "#f9fafb",
+              border: "1px solid #e5e7eb",
+              fontSize: 14,
+              color: "#374151",
+              marginBottom: 10,
+            }}
+          >
+            {line}
+          </div>
+        ));
+      })()}
+    </div>
+  </div>
+)}
 
         {/* Related sections */}
         {relatedCategory.length > 0 && (
