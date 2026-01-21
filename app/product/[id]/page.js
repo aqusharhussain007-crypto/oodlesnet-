@@ -576,9 +576,7 @@ export default function ProductPage({ params }) {
           50% { opacity: 0.2; }
           100% { opacity: 1; }
         }
-        @keyframes sheetUp {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
-        }
       `}</style>
-                    
+    </>
+  );
+}
