@@ -32,7 +32,7 @@ const ArrowIcon = () => (
 
 /* =====================================
    DETAILS CARD – DETAILS ONLY
-   ===================================== */
+===================================== */
 function renderDescription(description, expanded) {
   if (!description) return null;
 
@@ -184,100 +184,6 @@ export default function ProductPage({ params }) {
   return (
     <>
       <div style={{ padding: 16, paddingBottom: 96, maxWidth: 720, margin: "0 auto" }}>
-        {/* Breadcrumb */}
-        <div style={{ fontSize: 14, marginBottom: 12 }}>
-          <Link href="/" style={{ color: "#3b82f6" }}>Home</Link> /{" "}
-          <span style={{ color: "#2563eb", fontWeight: 600 }}>
-            {product.categorySlug}
-          </span>{" "}
-          / <strong>{product.name}</strong>
-        </div>
-
-        {/* Image */}
-        <div
-          style={{
-            borderRadius: 18,
-            overflow: "hidden",
-            background: "#fff",
-            boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
-            marginBottom: 16,
-            aspectRatio: "3 / 4",
-          }}
-        >
-          <img
-            src={product.imageUrl || "/placeholder.png"}
-            alt={product.name}
-            loading="lazy"
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
-              background: "#fff",
-            }}
-          />
-        </div>
-
-        {/* Title + Share */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1d4ed8" }}>
-            {product.name}
-          </h1>
-
-          <button
-            onClick={handleShare}
-            style={{
-              padding: "8px 16px",
-              borderRadius: 999,
-              border: "none",
-              fontWeight: 800,
-              color: "#fff",
-              background: "linear-gradient(135deg,#0f4c81,#10b981)",
-              boxShadow: "0 8px 18px rgba(16,185,129,0.45)",
-            }}
-          >
-            Share
-          </button>
-        </div>
-
-        {/* BUYING CONFIDENCE (ADDED) */}
-        <section style={{ marginTop: 10 }}>
-          <strong>{confidence.title}</strong>
-          <p style={{ fontSize: 14, color: "#555", marginTop: 4 }}>
-            {confidence.message}
-          </p>
-        </section>
-
-        {/* DETAILS */}
-        <div
-          style={{
-            marginTop: 14,
-            padding: 16,
-            borderRadius: 16,
-            border: "1px solid #e5e7eb",
-            background: "#fff",
-            maxHeight: expanded ? "unset" : 220,
-            overflowY: "auto",
-          }}
-        >
-          {renderDescription(product.description, expanded)}
-        </div>
-
-        {product.description?.length > 120 && (
-          <button
-            onClick={() => setExpanded((v) => !v)}
-            style={{
-              marginTop: 8,
-              color: "#0bbcff",
-              fontWeight: 700,
-              background: "none",
-              border: "none",
-              padding: 0,
-            }}
-          >
-            {expanded ? "Show less" : "Read more"}
-          </button>
-        )}
-
         {/* Compare Prices */}
         <h3 style={{ marginTop: 24, fontSize: 20, fontWeight: 800, color: "#2563eb" }}>
           Compare Prices
@@ -377,122 +283,68 @@ export default function ProductPage({ params }) {
                       🎁 View available offers
                     </button>
 
-                      <div
-                      style={{
-                        marginTop: 8,
-                        padding: 12,
-                        borderRadius: 12,
-                        background:
-                          openOffer === index ? "#f8fffc" : "#fff",
-                        border: "1px solid #e5e7eb",
-                        maxHeight: openOffer === index ? 180 : 0,
-                        overflowY: "auto",
-                        opacity: openOffer === index ? 1 : 0,
-                        transition: "max-height 300ms ease, opacity 200ms ease",
-                        pointerEvents:
-                          openOffer === index ? "auto" : "none",
-                      }}
-                    >
-                      {offers.map((offer, i) => (
-                        <div
-                          key={i}
-                          style={{
-                            marginBottom: 10,
-                            fontSize: 14,
-                            color: "#374151",
-                            lineHeight: 1.4,
-                            whiteSpace: "normal",
-                            wordBreak: "break-word",
-                            overflowWrap: "anywhere",
-                            maxWidth: "100%",
-                          }}
-                        >
-                          {typeof offer === "string"
-                            ? offer
-                            : Object.values(offer).join(" • ")}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-        {/* Related by category */}
-        {relatedCategory.length > 0 && (
-          <>
-            <h3 className="section-title">
-              More in {product.categorySlug}
-            </h3>
-            <div className="slider-row">
-              <div className="flex gap-4 overflow-x-auto no-scrollbar">
-                {relatedCategory.map((p) => (
-                  <ProductCard key={p.id} product={p} variant="related" />
-                ))}
+                    {/* ✅ FIXED + ENHANCED OFFER LIST */}
+                    <div
+                      style={{
+                        marginTop: 10,
+                        padding: 14,
+                        borderRadius: 14,
+                        background:
+                          openOffer === index ? "#f8fffc" : "#fff",
+                        border: "1px solid #e5e7eb",
+                        maxHeight: openOffer === index ? 220 : 0,
+                        overflowY: "auto",
+                        boxShadow:
+                          openOffer === index
+                            ? "0 12px 28px rgba(0,0,0,0.18)"
+                            : "0 4px 10px rgba(0,0,0,0.08)",
+                        opacity: openOffer === index ? 1 : 0,
+                        transform:
+                          openOffer === index
+                            ? "translateY(0)"
+                            : "translateY(-12px)",
+                        transition:
+                          "max-height 520ms cubic-bezier(0.16,1,0.3,1), opacity 320ms ease, transform 520ms cubic-bezier(0.16,1,0.3,1)",
+                        pointerEvents:
+                          openOffer === index ? "auto" : "none",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "stretch",
+                        gap: 10,
+                      }}
+                    >
+                      {offers.map((offer, i) => (
+                        <div
+                          key={i}
+                          style={{
+                            padding: "10px 12px",
+                            borderRadius: 10,
+                            background: "#f9fafb",
+                            borderBottom:
+                              i !== offers.length - 1
+                                ? "1px dashed #e5e7eb"
+                                : "none",
+                            fontSize: 14,
+                            color: "#374151",
+                            lineHeight: 1.5,
+                            whiteSpace: "normal",
+                            wordBreak: "break-word",
+                            overflowWrap: "anywhere",
+                            maxWidth: "100%",
+                          }}
+                        >
+                          {typeof offer === "string"
+                            ? offer
+                            : Object.values(offer).join(" • ")}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          </>
-        )}
-
-        {/* Related by brand */}
-        {relatedBrand.length > 0 && (
-          <>
-            <h3 className="section-title">
-              More from {product.brand}
-            </h3>
-            <div className="slider-row">
-              <div className="flex gap-4 overflow-x-auto no-scrollbar">
-                {relatedBrand.map((p) => (
-                  <ProductCard key={p.id} product={p} variant="related" />
-                ))}
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Related by price */}
-        {relatedPrice.length > 0 && (
-          <>
-            <h3 className="section-title">Similar Price Range</h3>
-            <div className="slider-row">
-              <div className="flex gap-4 overflow-x-auto no-scrollbar">
-                {relatedPrice.map((p) => (
-                  <ProductCard key={p.id} product={p} variant="related" />
-                ))}
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* See all CTA */}
-        {product?.categorySlug && (
-          <div
-            onClick={() =>
-              router.push(`/category/${product.categorySlug}`)
-            }
-            style={{
-              marginTop: 28,
-              padding: "18px 20px",
-              borderRadius: 20,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 12,
-              fontWeight: 900,
-              fontSize: 16,
-              color: "#fff",
-              cursor: "pointer",
-              background: "linear-gradient(135deg,#0099cc,#009966)",
-              boxShadow: "0 10px 24px rgba(0,0,0,0.25)",
-            }}
-          >
-            See all in {product.categorySlug}
-            <ArrowIcon />
-          </div>
-        )}
+            );
+          })}
+        </div>
       </div>
 
       {/* Animations */}
@@ -510,5 +362,5 @@ export default function ProductPage({ params }) {
       `}</style>
     </>
   );
-}
-  
+                            }
+            
