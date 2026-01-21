@@ -284,12 +284,38 @@ export default function ProductPage({ params }) {
 
         <div style={{ display: "flex", gap: 16, overflowX: "auto", padding: "16px 0" }}>
                
-        {sortedStores.map((store, index) => {
-            const offers = Array.isArray(store.offers)
+                  {sortedStores.map((store, index) => {
+            const rawOffers = Array.isArray(store.offers)
               ? store.offers
               : store.offer
               ? [store.offer]
               : [];
+
+            const normalizeOffers = (offer) => {
+              if (Array.isArray(offer)) return offer;
+
+              if (typeof offer === "string") {
+                return offer
+                  .replace(/•/g, "|")
+                  .replace(/Save upto/g, "|Save upto")
+                  .replace(/Exchange/g, "|Exchange")
+                  .replace(/Add/g, "|Add")
+                  .replace(/Amazon/g, "|Amazon")
+                  .split("|")
+                  .map((s) => s.trim())
+                  .filter(Boolean);
+              }
+
+              if (typeof offer === "object") {
+                return Object.values(offer)
+                  .map((s) => String(s).trim())
+                  .filter(Boolean);
+              }
+
+              return [];
+            };
+
+            const offers = rawOffers.flatMap(normalizeOffers);
 
             return (
               <div
@@ -392,7 +418,7 @@ export default function ProductPage({ params }) {
                         background:
                           openOffer === index ? "#f8fffc" : "#fff",
                         border: "1px solid #e5e7eb",
-                        maxHeight: openOffer === index ? 180 : 0,
+                        maxHeight: openOffer === index ? 260 : 0,
                         overflowY: "auto",
                         boxShadow:
                           openOffer === index
@@ -407,25 +433,28 @@ export default function ProductPage({ params }) {
                           "max-height 320ms cubic-bezier(0.16,1,0.3,1), opacity 220ms ease, transform 320ms cubic-bezier(0.16,1,0.3,1)",
                         pointerEvents:
                           openOffer === index ? "auto" : "none",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 10,
                       }}
                     >
-                      {offers.map((offer, i) => (
+                      {offers.map((line, i) => (
                         <div
                           key={i}
                           style={{
-                            marginBottom: 10,
+                            padding: "10px 12px",
+                            borderRadius: 10,
+                            background: "#f9fafb",
+                            border: "1px solid #e5e7eb",
                             fontSize: 14,
                             color: "#374151",
                             lineHeight: 1.4,
                             whiteSpace: "normal",
                             wordBreak: "break-word",
                             overflowWrap: "anywhere",
-                            maxWidth: "100%",
                           }}
                         >
-                          {typeof offer === "string"
-                            ? offer
-                            : Object.values(offer).join(" • ")}
+                          {line}
                         </div>
                       ))}
                     </div>
@@ -525,4 +554,4 @@ export default function ProductPage({ params }) {
       `}</style>
     </>
   );
-}
+                            }
