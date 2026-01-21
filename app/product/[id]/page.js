@@ -32,7 +32,7 @@ const ArrowIcon = () => (
 
 /* =====================================
    DETAILS CARD – DETAILS ONLY
-   ===================================== */
+===================================== */
 function renderDescription(description, expanded) {
   if (!description) return null;
 
@@ -137,8 +137,7 @@ export default function ProductPage({ params }) {
 
     loadRelated();
   }, [product]);
-
-  if (loading)
+                  if (loading)
     return (
       <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
         <SkeletonLoader height={360} />
@@ -284,7 +283,7 @@ export default function ProductPage({ params }) {
         </h3>
 
         <div style={{ display: "flex", gap: 16, overflowX: "auto", padding: "16px 0" }}>
-          {sortedStores.map((store, index) => {
+                      {sortedStores.map((store, index) => {
             const offers = Array.isArray(store.offers)
               ? store.offers
               : store.offer
@@ -514,5 +513,5 @@ export default function ProductPage({ params }) {
       `}</style>
     </>
   );
-}
-  
+                   }
+                            
