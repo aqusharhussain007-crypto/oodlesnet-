@@ -283,7 +283,7 @@ export default function ProductPage({ params }) {
         </h3>
 
         <div style={{ display: "flex", gap: 16, overflowX: "auto", padding: "16px 0" }}>
-                  {sortedStores.map((store, index) => {
+         {sortedStores.map((store, index) => {
             const rawOffers = Array.isArray(store.offers)
               ? store.offers
               : store.offer
@@ -553,5 +553,6 @@ export default function ProductPage({ params }) {
       `}</style>
     </>
   );
-              }
+}
+
 
