@@ -553,6 +553,3 @@ export default function ProductPage({ params }) {
     </>
   );
         }
-      
-Can you check this please is this the file I pasted first.
-Reply short first 
