@@ -89,7 +89,8 @@ export default function ProductPage({ params }) {
   const [relatedCategory, setRelatedCategory] = useState([]);
   const [relatedBrand, setRelatedBrand] = useState([]);
   const [relatedPrice, setRelatedPrice] = useState([]);
-
+  const offerButtonRefs = useRef({});
+  
   /* close on outside tap */
   useEffect(() => {
     function handleClick(e) {
@@ -416,86 +417,87 @@ export default function ProductPage({ params }) {
                     <>
                       {/* VIEW OFFERS */}
                       <button
-                        onClick={() =>
-                          setOpenOffer(openOffer === index ? null : index)
-                        }
-                        style={{
-                          width: "100%",
-                          padding: "10px 12px",
-                          borderRadius: 12,
-                          border: "1px dashed #10b981",
-                          background: "#ecfdf5",
-                          fontWeight: 700,
-                          color: "#065f46",
-                        }}
-                      >
-                        🎁 View available offers
-                      </button>
-
+  ref={(el) => (offerButtonRefs.current[index] = el)}
+  onClick={() =>
+    setOpenOffer(openOffer === index ? null : index)
+  }
+  style={{
+    width: "100%",
+    padding: "10px 12px",
+    borderRadius: 12,
+    border: "1px dashed #10b981",
+    background: "#ecfdf5",
+    fontWeight: 700,
+    color: "#065f46",
+  }}
+>
+  🎁 View available offers
+</button>
+    
                       {/* FLOATING OFFER SHEET */}
-                      {openOffer === index && (
-                        <div
-                          ref={(el) => (offerRefs.current[index] = el)}
-                          style={{
-                            position: "absolute",
-                            top: "110%",
-                            left: 0,
-                            width: "100%",
-                            zIndex: 50,
-                            padding: 14,
-                            borderRadius: 14,
-                            background: "#fff",
-                            border: "1px solid #e5e7eb",
-                            boxShadow: "0 14px 34px rgba(0,0,0,0.25)",
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: 10,
-                            maxHeight: 260,
-                            overflowY: "auto",                            
-                          }}
-                        >
-                          <button
-                            onClick={() => setOpenOffer(null)}
-                            style={{
-                              position: "absolute",
-                              top: 8,
-                              right: 10,
-                              border: "none",
-                              background: "none",
-                              fontSize: 18,
-                              cursor: "pointer",
-                            }}
-                          >
-                            ✕
-                          </button>
+{openOffer === index && (() => {
+  const btn = offerButtonRefs.current[index];
+  const rect = btn?.getBoundingClientRect();
 
-                          {offers.map((line, i) => (
-                            <div
-                              key={i}
-                              style={{
-                                padding: "10px 12px",
-                                borderRadius: 10,
-                                background: "#f9fafb",
-                                border: "1px solid #e5e7eb",
-                                fontSize: 14,
-                                lineHeight: 1.4,
-                                whiteSpace: "normal",
-                                wordBreak: "break-word",
-                                overflowWrap: "anywhere",
-                              }}
-                            >
-                              {line}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+  return (
+    <div
+      ref={(el) => (offerRefs.current[index] = el)}
+      style={{
+        position: "fixed",
+        top: rect ? rect.bottom + 8 : "50%",
+        left: rect ? rect.left : "50%",
+        width: rect ? rect.width : 220,
+        zIndex: 9999,
+
+        padding: 14,
+        borderRadius: 14,
+        background: "#fff",
+        border: "1px solid #e5e7eb",
+        boxShadow: "0 18px 40px rgba(0,0,0,0.35)",
+
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
+
+        maxHeight: 260,
+        overflowY: "auto",
+        overscrollBehavior: "contain",
+      }}
+    >
+      <button
+        onClick={() => setOpenOffer(null)}
+        style={{
+          position: "absolute",
+          top: 8,
+          right: 10,
+          border: "none",
+          background: "none",
+          fontSize: 18,
+          cursor: "pointer",
+        }}
+      >
+        ✕
+      </button>
+
+      {offers.map((line, i) => (
+        <div
+          key={i}
+          style={{
+            padding: "10px 12px",
+            borderRadius: 10,
+            background: "#f9fafb",
+            border: "1px solid #e5e7eb",
+            fontSize: 14,
+            lineHeight: 1.4,
+            wordBreak: "break-word",
+          }}
+        >
+          {line}
         </div>
+      ))}
+    </div>
+  );
+})()}
 
         {/* RELATED SECTIONS */}
         {relatedCategory.length > 0 && (
