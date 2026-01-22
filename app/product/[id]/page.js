@@ -307,7 +307,28 @@ export default function ProductPage({ params }) {
               ? [store.offer]
               : [];
 
-            const offers = rawOffers.flat();
+            const normalizeOffers = (offer) => {
+              if (Array.isArray(offer)) return offer;
+              if (typeof offer === "string") {
+                return offer
+                  .replace(/•/g, "|")
+                  .replace(/Save upto/g, "|Save upto")
+                  .replace(/Exchange/g, "|Exchange")
+                  .replace(/Add/g, "|Add")
+                  .replace(/Amazon/g, "|Amazon")
+                  .split("|")
+                  .map((s) => s.trim())
+                  .filter(Boolean);
+              }
+              if (typeof offer === "object") {
+                return Object.values(offer)
+                  .map((s) => String(s).trim())
+                  .filter(Boolean);
+              }
+              return [];
+            };
+
+            const offers = rawOffers.flatMap(normalizeOffers);
 
             return (
               <div
@@ -337,6 +358,19 @@ export default function ProductPage({ params }) {
                         : "#2563eb",
                   }}
                 >
+                  {Number(store.price) === cheapest && (
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: 18,
+                        height: 6,
+                        marginRight: 8,
+                        borderRadius: 999,
+                        backgroundColor: "#22c55e",
+                        animation: "blink 1.2s infinite",
+                      }}
+                    />
+                  )}
                   ₹ {Number(store.price).toLocaleString("en-IN")}
                 </div>
 
@@ -349,7 +383,15 @@ export default function ProductPage({ params }) {
                     borderRadius: 14,
                     border: "none",
                     color: "#fff",
-                    background: "linear-gradient(90deg,#00c6ff,#00ff99)",
+                    background:
+                      store.name.toLowerCase() === "amazon"
+                        ? "linear-gradient(90deg,#ff9900,#ff6600)"
+                        : store.name.toLowerCase() === "meesho"
+                        ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
+                        : store.name.toLowerCase() === "ajio"
+                        ? "linear-gradient(90deg,#005bea,#00c6fb)"
+                        : "linear-gradient(90deg,#00c6ff,#00ff99)",
+                    boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
                   }}
                 >
                   Buy on {store.name}
@@ -500,8 +542,12 @@ export default function ProductPage({ params }) {
           50% { transform: translateX(6px); }
           100% { transform: translateX(0); }
         }
+        @keyframes blink {
+          0% { opacity: 1; }
+          50% { opacity: 0.2; }
+          100% { opacity: 1; }
+        }
       `}</style>
     </>
   );
-    }
-        
+}
