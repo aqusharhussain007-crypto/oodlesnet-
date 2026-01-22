@@ -450,6 +450,8 @@ export default function ProductPage({ params }) {
                             display: "flex",
                             flexDirection: "column",
                             gap: 10,
+                            maxHeight: 260,
+                            overflowY: "auto",                            
                           }}
                         >
                           <button
