@@ -2,7 +2,7 @@
 
 import SkeletonLoader from "@/components/SkeletonLoader";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 import ProductCard from "@/components/ProductCard";
@@ -84,27 +84,10 @@ export default function ProductPage({ params }) {
 
   const [expanded, setExpanded] = useState(false);
   const [openOffer, setOpenOffer] = useState(null);
-  const offerRefs = useRef({});
 
   const [relatedCategory, setRelatedCategory] = useState([]);
   const [relatedBrand, setRelatedBrand] = useState([]);
   const [relatedPrice, setRelatedPrice] = useState([]);
-  const offerButtonRefs = useRef({});
-  
-  /* close on outside tap */
-  useEffect(() => {
-    function handleClick(e) {
-      if (
-        openOffer !== null &&
-        offerRefs.current[openOffer] &&
-        !offerRefs.current[openOffer].contains(e.target)
-      ) {
-        setOpenOffer(null);
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [openOffer]);
 
   useEffect(() => {
     if (!product) return;
@@ -370,7 +353,6 @@ export default function ProductPage({ params }) {
                   style={{
                     maxWidth: 220,
                     margin: "0 auto",
-                    position: "relative",
                     display: "flex",
                     flexDirection: "column",
                     gap: 10,
@@ -417,89 +399,79 @@ export default function ProductPage({ params }) {
                     <>
                       {/* VIEW OFFERS */}
                       <button
-  ref={(el) => (offerButtonRefs.current[index] = el)}
-  onClick={() =>
-    setOpenOffer(openOffer === index ? null : index)
-  }
-  style={{
-    width: "100%",
-    padding: "10px 12px",
-    borderRadius: 12,
-    border: "1px dashed #10b981",
-    background: "#ecfdf5",
-    fontWeight: 700,
-    color: "#065f46",
-  }}
->
-  🎁 View available offers
-</button>
-    
-                      {/* FLOATING OFFER SHEET */}
-{openOffer === index && (() => {
-  const btn = offerButtonRefs.current[index];
-  const rect = btn?.getBoundingClientRect();
+                        onClick={() =>
+                          setOpenOffer(openOffer === index ? null : index)
+                        }
+                        style={{
+                          width: "100%",
+                          padding: "10px 12px",
+                          borderRadius: 12,
+                          border: "1px dashed #10b981",
+                          background: "#ecfdf5",
+                          fontWeight: 700,
+                          color: "#065f46",
+                        }}
+                      >
+                        🎁 View available offers
+                      </button>
 
-  return (
-    <div
-      ref={(el) => (offerRefs.current[index] = el)}
-      style={{
-        position: "fixed",
-        top: rect ? rect.bottom + 8 : "50%",
-        left: rect ? rect.left : "50%",
-        width: rect ? rect.width : 220,
-        zIndex: 9999,
-
-        padding: 14,
-        borderRadius: 14,
-        background: "#fff",
-        border: "1px solid #e5e7eb",
-        boxShadow: "0 18px 40px rgba(0,0,0,0.35)",
-
-        display: "flex",
-        flexDirection: "column",
-        gap: 10,
-
-        maxHeight: 260,
-        overflowY: "auto",
-        overscrollBehavior: "contain",
-      }}
-    >
-      <button
-        onClick={() => setOpenOffer(null)}
-        style={{
-          position: "absolute",
-          top: 8,
-          right: 10,
-          border: "none",
-          background: "none",
-          fontSize: 18,
-          cursor: "pointer",
-        }}
-      >
-        ✕
-      </button>
-
-      {offers.map((line, i) => (
-        <div
-          key={i}
-          style={{
-            padding: "10px 12px",
-            borderRadius: 10,
-            background: "#f9fafb",
-            border: "1px solid #e5e7eb",
-            fontSize: 14,
-            lineHeight: 1.4,
-            wordBreak: "break-word",
-          }}
-        >
-          {line}
+                      {/* OFFER PANEL */}
+                      <div
+                        style={{
+                          padding: 12,
+                          borderRadius: 12,
+                          background:
+                            openOffer === index ? "#f8fffc" : "#fff",
+                          border: "1px solid #e5e7eb",
+                          maxHeight: openOffer === index ? 260 : 0,
+                          overflowY: "auto",
+                          boxShadow:
+                            openOffer === index
+                              ? "0 10px 24px rgba(0,0,0,0.18)"
+                              : "0 4px 10px rgba(0,0,0,0.08)",
+                          opacity: openOffer === index ? 1 : 0,
+                          transform:
+                            openOffer === index
+                              ? "translateY(0)"
+                              : "translateY(-8px)",
+                          transition:
+                            "max-height 320ms cubic-bezier(0.16,1,0.3,1), opacity 220ms ease, transform 320ms cubic-bezier(0.16,1,0.3,1)",
+                          pointerEvents:
+                            openOffer === index ? "auto" : "none",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 10,
+                        }}
+                      >
+                        {offers.map((line, i) => (
+                          <div
+                            key={i}
+                            style={{
+                              padding: "10px 12px",
+                              borderRadius: 10,
+                              background: "#f9fafb",
+                              border: "1px solid #e5e7eb",
+                              fontSize: 14,
+                              color: "#374151",
+                              lineHeight: 1.4,
+                              whiteSpace: "normal",
+                              wordBreak: "break-word",
+                              overflowWrap: "anywhere",
+                            }}
+                          >
+                            {line}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
-      ))}
-    </div>
-  );
-})()}
 
-        {/* RELATED SECTIONS */}
+        {/* Related sections */}
         {relatedCategory.length > 0 && (
           <>
             <h3 className="section-title">More in {product.categorySlug}</h3>
@@ -581,4 +553,3 @@ export default function ProductPage({ params }) {
     </>
   );
   }
-      
