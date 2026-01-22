@@ -2,7 +2,7 @@
 
 import SkeletonLoader from "@/components/SkeletonLoader";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 import ProductCard from "@/components/ProductCard";
@@ -84,10 +84,26 @@ export default function ProductPage({ params }) {
 
   const [expanded, setExpanded] = useState(false);
   const [openOffer, setOpenOffer] = useState(null);
+  const offerRefs = useRef({});
 
   const [relatedCategory, setRelatedCategory] = useState([]);
   const [relatedBrand, setRelatedBrand] = useState([]);
   const [relatedPrice, setRelatedPrice] = useState([]);
+
+  /* close on outside tap */
+  useEffect(() => {
+    function handleClick(e) {
+      if (
+        openOffer !== null &&
+        offerRefs.current[openOffer] &&
+        !offerRefs.current[openOffer].contains(e.target)
+      ) {
+        setOpenOffer(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [openOffer]);
 
   useEffect(() => {
     if (!product) return;
@@ -293,25 +309,10 @@ export default function ProductPage({ params }) {
 
             const normalizeOffers = (offer) => {
               if (Array.isArray(offer)) return offer;
-
-              if (typeof offer === "string") {
-                return offer
-                  .replace(/•/g, "|")
-                  .replace(/Save upto/g, "|Save upto")
-                  .replace(/Exchange/g, "|Exchange")
-                  .replace(/Add/g, "|Add")
-                  .replace(/Amazon/g, "|Amazon")
-                  .split("|")
-                  .map((s) => s.trim())
-                  .filter(Boolean);
-              }
-
-              if (typeof offer === "object") {
-                return Object.values(offer)
-                  .map((s) => String(s).trim())
-                  .filter(Boolean);
-              }
-
+              if (typeof offer === "string")
+                return offer.split("|").map((s) => s.trim()).filter(Boolean);
+              if (typeof offer === "object")
+                return Object.values(offer).map(String);
               return [];
             };
 
@@ -353,6 +354,7 @@ export default function ProductPage({ params }) {
                   style={{
                     maxWidth: 220,
                     margin: "0 auto",
+                    position: "relative",
                     display: "flex",
                     flexDirection: "column",
                     gap: 10,
@@ -379,19 +381,6 @@ export default function ProductPage({ params }) {
                       boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
                     }}
                   >
-                    {Number(store.price) === cheapest && (
-                      <span
-                        style={{
-                          display: "inline-block",
-                          width: 18,
-                          height: 6,
-                          marginRight: 8,
-                          borderRadius: 999,
-                          backgroundColor: "#22c55e",
-                          animation: "blink 1.2s infinite",
-                        }}
-                      />
-                    )}
                     Buy on {store.name}
                   </button>
 
@@ -415,54 +404,57 @@ export default function ProductPage({ params }) {
                         🎁 View available offers
                       </button>
 
-                      {/* OFFER PANEL */}
-                      <div
-                        style={{
-                          padding: 12,
-                          borderRadius: 12,
-                          background:
-                            openOffer === index ? "#f8fffc" : "#fff",
-                          border: "1px solid #e5e7eb",
-                          maxHeight: openOffer === index ? 260 : 0,
-                          overflowY: "auto",
-                          boxShadow:
-                            openOffer === index
-                              ? "0 10px 24px rgba(0,0,0,0.18)"
-                              : "0 4px 10px rgba(0,0,0,0.08)",
-                          opacity: openOffer === index ? 1 : 0,
-                          transform:
-                            openOffer === index
-                              ? "translateY(0)"
-                              : "translateY(-8px)",
-                          transition:
-                            "max-height 320ms cubic-bezier(0.16,1,0.3,1), opacity 220ms ease, transform 320ms cubic-bezier(0.16,1,0.3,1)",
-                          pointerEvents:
-                            openOffer === index ? "auto" : "none",
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 10,
-                        }}
-                      >
-                        {offers.map((line, i) => (
-                          <div
-                            key={i}
+                      {/* FLOATING BOTTOM SHEET */}
+                      {openOffer === index && (
+                        <div
+                          ref={(el) => (offerRefs.current[index] = el)}
+                          style={{
+                            position: "absolute",
+                            top: "110%",
+                            left: 0,
+                            width: "100%",
+                            zIndex: 50,
+                            padding: 14,
+                            borderRadius: 14,
+                            background: "#fff",
+                            border: "1px solid #e5e7eb",
+                            boxShadow: "0 14px 34px rgba(0,0,0,0.25)",
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 10,
+                          }}
+                        >
+                          <button
+                            onClick={() => setOpenOffer(null)}
                             style={{
-                              padding: "10px 12px",
-                              borderRadius: 10,
-                              background: "#f9fafb",
-                              border: "1px solid #e5e7eb",
-                              fontSize: 14,
-                              color: "#374151",
-                              lineHeight: 1.4,
-                              whiteSpace: "normal",
-                              wordBreak: "break-word",
-                              overflowWrap: "anywhere",
+                              position: "absolute",
+                              top: 8,
+                              right: 10,
+                              border: "none",
+                              background: "none",
+                              fontSize: 18,
+                              cursor: "pointer",
                             }}
                           >
-                            {line}
-                          </div>
-                        ))}
-                      </div>
+                            ✕
+                          </button>
+
+                          {offers.map((line, i) => (
+                            <div
+                              key={i}
+                              style={{
+                                padding: "10px 12px",
+                                borderRadius: 10,
+                                background: "#f9fafb",
+                                border: "1px solid #e5e7eb",
+                                fontSize: 14,
+                              }}
+                            >
+                              {line}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
@@ -471,7 +463,7 @@ export default function ProductPage({ params }) {
           })}
         </div>
 
-        {/* Related sections */}
+        {/* RELATED SECTIONS */}
         {relatedCategory.length > 0 && (
           <>
             <h3 className="section-title">More in {product.categorySlug}</h3>
@@ -544,12 +536,8 @@ export default function ProductPage({ params }) {
           50% { transform: translateX(6px); }
           100% { transform: translateX(0); }
         }
-        @keyframes blink {
-          0% { opacity: 1; }
-          50% { opacity: 0.2; }
-          100% { opacity: 1; }
-        }
       `}</style>
     </>
   );
-        }
+    }
+    
