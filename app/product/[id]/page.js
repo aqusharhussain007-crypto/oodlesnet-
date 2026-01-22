@@ -84,9 +84,10 @@ export default function ProductPage({ params }) {
 
   const [expanded, setExpanded] = useState(false);
 
-  /* OFFER BOTTOM SHEET STATE */
+  /* OFFER FLOATING SHEET STATE */
   const [openOffer, setOpenOffer] = useState(false);
   const [offerData, setOfferData] = useState(null);
+  const [anchorRect, setAnchorRect] = useState(null);
 
   const [relatedCategory, setRelatedCategory] = useState([]);
   const [relatedBrand, setRelatedBrand] = useState([]);
@@ -184,16 +185,16 @@ export default function ProductPage({ params }) {
     }
   }
 
-  function openOfferSheet(store, offers) {
+  function openOfferSheet(e, store, offers) {
+    setAnchorRect(e.currentTarget.getBoundingClientRect());
     setOfferData({ store, offers });
     setOpenOffer(true);
-    document.body.style.overflow = "hidden";
   }
 
   function closeOfferSheet() {
     setOpenOffer(false);
     setOfferData(null);
-    document.body.style.overflow = "";
+    setAnchorRect(null);
   }
 
   return (
@@ -306,28 +307,7 @@ export default function ProductPage({ params }) {
               ? [store.offer]
               : [];
 
-            const normalizeOffers = (offer) => {
-              if (Array.isArray(offer)) return offer;
-              if (typeof offer === "string") {
-                return offer
-                  .replace(/•/g, "|")
-                  .replace(/Save upto/g, "|Save upto")
-                  .replace(/Exchange/g, "|Exchange")
-                  .replace(/Add/g, "|Add")
-                  .replace(/Amazon/g, "|Amazon")
-                  .split("|")
-                  .map((s) => s.trim())
-                  .filter(Boolean);
-              }
-              if (typeof offer === "object") {
-                return Object.values(offer)
-                  .map((s) => String(s).trim())
-                  .filter(Boolean);
-              }
-              return [];
-            };
-
-            const offers = rawOffers.flatMap(normalizeOffers);
+            const offers = rawOffers.flat();
 
             return (
               <div
@@ -369,14 +349,7 @@ export default function ProductPage({ params }) {
                     borderRadius: 14,
                     border: "none",
                     color: "#fff",
-                    background:
-                      store.name.toLowerCase() === "amazon"
-                        ? "linear-gradient(90deg,#ff9900,#ff6600)"
-                        : store.name.toLowerCase() === "meesho"
-                        ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
-                        : store.name.toLowerCase() === "ajio"
-                        ? "linear-gradient(90deg,#005bea,#00c6fb)"
-                        : "linear-gradient(90deg,#00c6ff,#00ff99)",
+                    background: "linear-gradient(90deg,#00c6ff,#00ff99)",
                   }}
                 >
                   Buy on {store.name}
@@ -384,7 +357,7 @@ export default function ProductPage({ params }) {
 
                 {offers.length > 0 && (
                   <button
-                    onClick={() => openOfferSheet(store, offers)}
+                    onClick={(e) => openOfferSheet(e, store, offers)}
                     style={{
                       marginTop: 10,
                       width: "100%",
@@ -470,14 +443,14 @@ export default function ProductPage({ params }) {
         )}
       </div>
 
-      {/* OFFER BOTTOM SHEET */}
-      {openOffer && offerData && (
+      {/* OFFER FLOATING SHEET */}
+      {openOffer && offerData && anchorRect && (
         <div
           onClick={closeOfferSheet}
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.45)",
+            background: "transparent",
             zIndex: 9999,
           }}
         >
@@ -485,65 +458,37 @@ export default function ProductPage({ params }) {
             onClick={(e) => e.stopPropagation()}
             style={{
               position: "absolute",
-              top: 72,
-              left: 0,
-              right: 0,
-              bottom: 0,
+              top: anchorRect.bottom + 8,
+              left: anchorRect.left,
+              width: Math.min(anchorRect.width * 1.1, 320),
+              maxHeight: 220,
               background: "#fff",
-              borderRadius: "18px 18px 0 0",
-              animation: "sheetDown 320ms cubic-bezier(0.16,1,0.3,1)",
-              display: "flex",
-              flexDirection: "column",
+              borderRadius: 14,
+              boxShadow: "0 10px 24px rgba(0,0,0,0.25)",
+              border: "1px solid #e5e7eb",
+              padding: 12,
+              overflowY: "auto",
             }}
           >
-            <div
-              style={{
-                padding: 16,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                borderBottom: "1px solid #e5e7eb",
-              }}
-            >
-              <strong>{offerData.store.name} Offers</strong>
-              <button
-                onClick={closeOfferSheet}
-                style={{
-                  border: "none",
-                  background: "none",
-                  fontSize: 22,
-                  cursor: "pointer",
-                }}
-              >
-                ✕
-              </button>
+            <div style={{ fontWeight: 800, marginBottom: 8 }}>
+              {offerData.store.name} Offers
             </div>
 
-            <div
-              style={{
-                padding: 16,
-                overflowY: "auto",
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                gap: 12,
-              }}
-            >
-              {offerData.offers.map((line, i) => (
-                <div
-                  key={i}
-                  style={{
-                    padding: "12px 14px",
-                    borderRadius: 12,
-                    background: "#f9fafb",
-                    border: "1px solid #e5e7eb",
-                    fontSize: 14,
-                  }}
-                >
-                  {line}
-                </div>
-              ))}
-            </div>
+            {offerData.offers.map((line, i) => (
+              <div
+                key={i}
+                style={{
+                  padding: "8px 10px",
+                  borderRadius: 10,
+                  background: "#f9fafb",
+                  border: "1px solid #e5e7eb",
+                  fontSize: 13,
+                  marginBottom: 6,
+                }}
+              >
+                {line}
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -555,11 +500,8 @@ export default function ProductPage({ params }) {
           50% { transform: translateX(6px); }
           100% { transform: translateX(0); }
         }
-        @keyframes sheetDown {
-          from { transform: translateY(-100%); }
-          to { transform: translateY(0); }
-        }
       `}</style>
     </>
   );
-}
+    }
+        
