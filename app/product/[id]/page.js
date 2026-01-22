@@ -331,7 +331,7 @@ export default function ProductPage({ params }) {
               <div
                 key={index}
                 style={{
-                  minWidth: 260,
+                  minWidth: 220,
                   background: "#fff",
                   padding: 20,
                   borderRadius: 18,
