@@ -83,11 +83,7 @@ export default function ProductPage({ params }) {
   const { product, loading } = useProduct(id);
 
   const [expanded, setExpanded] = useState(false);
-
-  /* OFFER FLOATING SHEET STATE */
-  const [openOffer, setOpenOffer] = useState(false);
-  const [offerData, setOfferData] = useState(null);
-  const [anchorRect, setAnchorRect] = useState(null);
+  const [openOffer, setOpenOffer] = useState(null);
 
   const [relatedCategory, setRelatedCategory] = useState([]);
   const [relatedBrand, setRelatedBrand] = useState([]);
@@ -171,16 +167,18 @@ export default function ProductPage({ params }) {
     window.location.href = `/out/${store.name.toLowerCase()}?pid=${product.id}`;
   }
 
-  function openOfferSheet(e, store, offers) {
-    setAnchorRect(e.currentTarget.getBoundingClientRect());
-    setOfferData({ store, offers });
-    setOpenOffer(true);
-  }
-
-  function closeOfferSheet() {
-    setOpenOffer(false);
-    setOfferData(null);
-    setAnchorRect(null);
+  function handleShare() {
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({
+        title: product.name,
+        text: `Compare prices for ${product.name}`,
+        url,
+      });
+    } else {
+      navigator.clipboard.writeText(url);
+      alert("Link copied");
+    }
   }
 
   return (
@@ -226,19 +224,7 @@ export default function ProductPage({ params }) {
           </h1>
 
           <button
-            onClick={() => {
-              const url = window.location.href;
-              if (navigator.share) {
-                navigator.share({
-                  title: product.name,
-                  text: `Compare prices for ${product.name}`,
-                  url,
-                });
-              } else {
-                navigator.clipboard.writeText(url);
-                alert("Link copied");
-              }
-            }}
+            onClick={handleShare}
             style={{
               padding: "8px 16px",
               borderRadius: 999,
@@ -275,7 +261,8 @@ export default function ProductPage({ params }) {
         >
           {renderDescription(product.description, expanded)}
         </div>
-          {product.description?.length > 120 && (
+
+        {product.description?.length > 120 && (
           <button
             onClick={() => setExpanded((v) => !v)}
             style={{
@@ -306,6 +293,7 @@ export default function ProductPage({ params }) {
 
             const normalizeOffers = (offer) => {
               if (Array.isArray(offer)) return offer;
+
               if (typeof offer === "string") {
                 return offer
                   .replace(/•/g, "|")
@@ -317,11 +305,13 @@ export default function ProductPage({ params }) {
                   .map((s) => s.trim())
                   .filter(Boolean);
               }
+
               if (typeof offer === "object") {
                 return Object.values(offer)
                   .map((s) => String(s).trim())
                   .filter(Boolean);
               }
+
               return [];
             };
 
@@ -331,7 +321,7 @@ export default function ProductPage({ params }) {
               <div
                 key={index}
                 style={{
-                  minWidth: 200,
+                  minWidth: 260,
                   background: "#fff",
                   padding: 20,
                   borderRadius: 18,
@@ -358,60 +348,124 @@ export default function ProductPage({ params }) {
                   ₹ {Number(store.price).toLocaleString("en-IN")}
                 </div>
 
-                <button
-                  onClick={() => handleBuy(store)}
+                {/* CONSTRAINED ACTION COLUMN */}
+                <div
                   style={{
-                    width: "100%",
-                    padding: "14px 0",
-                    fontWeight: 800,
-                    borderRadius: 14,
-                    border: "none",
-                    color: "#fff",
-                    background:
-                      store.name.toLowerCase() === "amazon"
-                        ? "linear-gradient(90deg,#ff9900,#ff6600)"
-                        : store.name.toLowerCase() === "meesho"
-                        ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
-                        : store.name.toLowerCase() === "ajio"
-                        ? "linear-gradient(90deg,#005bea,#00c6fb)"
-                        : "linear-gradient(90deg,#00c6ff,#00ff99)",
-                    boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
+                    maxWidth: 220,
+                    margin: "0 auto",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 10,
                   }}
                 >
-                  {Number(store.price) === cheapest && (
-                    <span
-                      style={{
-                        display: "inline-block",
-                        width: 18,
-                        height: 6,
-                        marginRight: 8,
-                        borderRadius: 999,
-                        backgroundColor: "#22c55e",
-                        animation: "blink 1.2s infinite",
-                        verticalAlign: "middle",
-                      }}
-                    />
-                  )}
-                  Buy on {store.name}
-                </button>
-
-                {offers.length > 0 && (
+                  {/* BUY BUTTON */}
                   <button
-                    onClick={(e) => openOfferSheet(e, store, offers)}
+                    onClick={() => handleBuy(store)}
                     style={{
-                      marginTop: 10,
                       width: "100%",
-                      padding: "10px 12px",
-                      borderRadius: 12,
-                      border: "1px dashed #10b981",
-                      background: "#ecfdf5",
-                      fontWeight: 700,
-                      color: "#065f46",
+                      padding: "14px 0",
+                      fontWeight: 800,
+                      borderRadius: 14,
+                      border: "none",
+                      color: "#fff",
+                      background:
+                        store.name.toLowerCase() === "amazon"
+                          ? "linear-gradient(90deg,#ff9900,#ff6600)"
+                          : store.name.toLowerCase() === "meesho"
+                          ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
+                          : store.name.toLowerCase() === "ajio"
+                          ? "linear-gradient(90deg,#005bea,#00c6fb)"
+                          : "linear-gradient(90deg,#00c6ff,#00ff99)",
+                      boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
                     }}
                   >
-                    🎁 View available offers
+                    {Number(store.price) === cheapest && (
+                      <span
+                        style={{
+                          display: "inline-block",
+                          width: 18,
+                          height: 6,
+                          marginRight: 8,
+                          borderRadius: 999,
+                          backgroundColor: "#22c55e",
+                          animation: "blink 1.2s infinite",
+                        }}
+                      />
+                    )}
+                    Buy on {store.name}
                   </button>
-                )}
+
+                  {offers.length > 0 && (
+                    <>
+                      {/* VIEW OFFERS */}
+                      <button
+                        onClick={() =>
+                          setOpenOffer(openOffer === index ? null : index)
+                        }
+                        style={{
+                          width: "100%",
+                          padding: "10px 12px",
+                          borderRadius: 12,
+                          border: "1px dashed #10b981",
+                          background: "#ecfdf5",
+                          fontWeight: 700,
+                          color: "#065f46",
+                        }}
+                      >
+                        🎁 View available offers
+                      </button>
+
+                      {/* OFFER PANEL */}
+                      <div
+                        style={{
+                          padding: 12,
+                          borderRadius: 12,
+                          background:
+                            openOffer === index ? "#f8fffc" : "#fff",
+                          border: "1px solid #e5e7eb",
+                          maxHeight: openOffer === index ? 260 : 0,
+                          overflowY: "auto",
+                          boxShadow:
+                            openOffer === index
+                              ? "0 10px 24px rgba(0,0,0,0.18)"
+                              : "0 4px 10px rgba(0,0,0,0.08)",
+                          opacity: openOffer === index ? 1 : 0,
+                          transform:
+                            openOffer === index
+                              ? "translateY(0)"
+                              : "translateY(-8px)",
+                          transition:
+                            "max-height 320ms cubic-bezier(0.16,1,0.3,1), opacity 220ms ease, transform 320ms cubic-bezier(0.16,1,0.3,1)",
+                          pointerEvents:
+                            openOffer === index ? "auto" : "none",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 10,
+                        }}
+                      >
+                        {offers.map((line, i) => (
+                          <div
+                            key={i}
+                            style={{
+                              padding: "10px 12px",
+                              borderRadius: 10,
+                              background: "#f9fafb",
+                              border: "1px solid #e5e7eb",
+                              fontSize: 14,
+                              color: "#374151",
+                              lineHeight: 1.4,
+                              whiteSpace: "normal",
+                              wordBreak: "break-word",
+                              overflowWrap: "anywhere",
+                            }}
+                          >
+                            {line}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             );
           })}
@@ -483,56 +537,6 @@ export default function ProductPage({ params }) {
         )}
       </div>
 
-      {/* OFFER FLOATING SHEET */}
-      {openOffer && offerData && anchorRect && (
-        <div
-          onClick={closeOfferSheet}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "transparent",
-            zIndex: 9999,
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              position: "absolute",
-              top: anchorRect.bottom + 8,
-              left: anchorRect.left,
-              width: Math.min(anchorRect.width, 260),
-              maxHeight: 220,
-              background: "#fff",
-              borderRadius: 14,
-              boxShadow: "0 10px 24px rgba(0,0,0,0.25)",
-              border: "1px solid #e5e7eb",
-              padding: 12,
-              overflowY: "auto",
-            }}
-          >
-            <div style={{ fontWeight: 800, marginBottom: 8 }}>
-              {offerData.store.name} Offers
-            </div>
-
-            {offerData.offers.map((line, i) => (
-              <div
-                key={i}
-                style={{
-                  padding: "8px 10px",
-                  borderRadius: 10,
-                  background: "#f9fafb",
-                  border: "1px solid #e5e7eb",
-                  fontSize: 13,
-                  marginBottom: 6,
-                }}
-              >
-                {line}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Animations */}
       <style jsx>{`
         @keyframes arrowMove {
@@ -548,5 +552,7 @@ export default function ProductPage({ params }) {
       `}</style>
     </>
   );
-            }
-              
+        }
+      
+Can you check this please is this the file I pasted first.
+Reply short first 
