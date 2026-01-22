@@ -1,17 +1,21 @@
 "use client";
 
-import { useState, useEffect, useContext } from "react";
-import ProductCard from "@/components/ProductCard";
-import BannerAd from "@/components/ads/BannerAd";
-import InfiniteSlider from "@/components/InfiniteSlider";
-import FilterDrawer from "@/components/FilterDrawer";
-import CategoryDrawer from "@/components/CategoryDrawer";
+import { useState, useEffect, useContext, useMemo, useCallback } from "react";
+import dynamic from "next/dynamic";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+
 import { db } from "@/lib/firebase-app";
 import { collection, getDocs } from "firebase/firestore";
-import Image from "next/image";
 import { DrawerContext } from "@/components/DrawerProvider";
-import { useRouter } from "next/navigation";
-import SkeletonLoader from "@/components/SkeletonLoader";
+
+/* LAZY LOAD NON-CRITICAL COMPONENTS */
+const ProductCard = dynamic(() => import("@/components/ProductCard"));
+const BannerAd = dynamic(() => import("@/components/ads/BannerAd"));
+const InfiniteSlider = dynamic(() => import("@/components/InfiniteSlider"));
+const FilterDrawer = dynamic(() => import("@/components/FilterDrawer"));
+const CategoryDrawer = dynamic(() => import("@/components/CategoryDrawer"));
+const SkeletonLoader = dynamic(() => import("@/components/SkeletonLoader"));
 
 /* SVG ICONS */
 const SearchIcon = () => (
@@ -50,15 +54,12 @@ export default function Home() {
   const router = useRouter();
 
   const [products, setProducts] = useState([]);
-  const [filtered, setFiltered] = useState([]);
   const [categories, setCategories] = useState([]);
-
-  const [search, setSearch] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
-
   const [ads, setAds] = useState([]);
   const [recent, setRecent] = useState([]);
-  const [trending, setTrending] = useState([]);
+
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const { openCategory, setOpenCategory, openFilter, setOpenFilter } =
     useContext(DrawerContext);
@@ -69,12 +70,6 @@ export default function Home() {
       const snap = await getDocs(collection(db, "products"));
       const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       setProducts(items);
-      setFiltered(items);
-
-      const top = [...items]
-        .sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0))
-        .slice(0, 10);
-      setTrending(top);
     }
     load();
   }, []);
@@ -90,11 +85,11 @@ export default function Home() {
 
   /* LOAD ADS */
   useEffect(() => {
-    async function load() {
+    async function loadAds() {
       const snap = await getDocs(collection(db, "ads"));
       setAds(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     }
-    load();
+    loadAds();
   }, []);
 
   /* RECENTLY VIEWED */
@@ -104,23 +99,34 @@ export default function Home() {
     setRecent(Array.isArray(data) ? data : []);
   }, []);
 
-  /* SEARCH FILTER */
+  /* DEBOUNCE SEARCH */
   useEffect(() => {
-    let list = products;
+    const t = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(t);
+  }, [search]);
 
-    if (search) {
-      list = list.filter((p) =>
-        (p.name || "").toLowerCase().includes(search.toLowerCase())
-      );
-      setSuggestions(list.slice(0, 5));
-    } else {
-      setSuggestions([]);
-    }
+  /* FILTERED PRODUCTS */
+  const filtered = useMemo(() => {
+    if (!debouncedSearch) return products;
+    return products.filter((p) =>
+      (p.name || "").toLowerCase().includes(debouncedSearch.toLowerCase())
+    );
+  }, [debouncedSearch, products]);
 
-    setFiltered(list);
-  }, [search, products]);
+  /* SEARCH SUGGESTIONS */
+  const suggestions = useMemo(() => {
+    if (!debouncedSearch) return [];
+    return filtered.slice(0, 5);
+  }, [debouncedSearch, filtered]);
 
-  function startVoiceSearch() {
+  /* TRENDING */
+  const trending = useMemo(() => {
+    return [...products]
+      .sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0))
+      .slice(0, 10);
+  }, [products]);
+
+  const startVoiceSearch = useCallback(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return alert("Voice search not supported");
 
@@ -129,7 +135,7 @@ export default function Home() {
     recog.onresult = (e) =>
       setSearch(e.results[0][0].transcript || "");
     recog.start();
-  }
+  }, []);
 
   return (
     <main className="page-container" style={{ padding: 12 }}>
@@ -177,6 +183,7 @@ export default function Home() {
                     src={item.imageUrl}
                     width={42}
                     height={42}
+                    loading="lazy"
                     alt={item.name}
                     style={{ borderRadius: 8 }}
                   />
