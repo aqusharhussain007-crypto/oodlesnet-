@@ -171,20 +171,6 @@ export default function ProductPage({ params }) {
     window.location.href = `/out/${store.name.toLowerCase()}?pid=${product.id}`;
   }
 
-  function handleShare() {
-    const url = window.location.href;
-    if (navigator.share) {
-      navigator.share({
-        title: product.name,
-        text: `Compare prices for ${product.name}`,
-        url,
-      });
-    } else {
-      navigator.clipboard.writeText(url);
-      alert("Link copied");
-    }
-  }
-
   function openOfferSheet(e, store, offers) {
     setAnchorRect(e.currentTarget.getBoundingClientRect());
     setOfferData({ store, offers });
@@ -240,7 +226,19 @@ export default function ProductPage({ params }) {
           </h1>
 
           <button
-            onClick={handleShare}
+            onClick={() => {
+              const url = window.location.href;
+              if (navigator.share) {
+                navigator.share({
+                  title: product.name,
+                  text: `Compare prices for ${product.name}`,
+                  url,
+                });
+              } else {
+                navigator.clipboard.writeText(url);
+                alert("Link copied");
+              }
+            }}
             style={{
               padding: "8px 16px",
               borderRadius: 999,
@@ -277,8 +275,7 @@ export default function ProductPage({ params }) {
         >
           {renderDescription(product.description, expanded)}
         </div>
-
-        {product.description?.length > 120 && (
+          {product.description?.length > 120 && (
           <button
             onClick={() => setExpanded((v) => !v)}
             style={{
@@ -358,19 +355,6 @@ export default function ProductPage({ params }) {
                         : "#2563eb",
                   }}
                 >
-                  {Number(store.price) === cheapest && (
-                    <span
-                      style={{
-                        display: "inline-block",
-                        width: 18,
-                        height: 6,
-                        marginRight: 8,
-                        borderRadius: 999,
-                        backgroundColor: "#22c55e",
-                        animation: "blink 1.2s infinite",
-                      }}
-                    />
-                  )}
                   ₹ {Number(store.price).toLocaleString("en-IN")}
                 </div>
 
@@ -394,6 +378,20 @@ export default function ProductPage({ params }) {
                     boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
                   }}
                 >
+                  {Number(store.price) === cheapest && (
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: 18,
+                        height: 6,
+                        marginRight: 8,
+                        borderRadius: 999,
+                        backgroundColor: "#22c55e",
+                        animation: "blink 1.2s infinite",
+                        verticalAlign: "middle",
+                      }}
+                    />
+                  )}
                   Buy on {store.name}
                 </button>
 
@@ -502,7 +500,7 @@ export default function ProductPage({ params }) {
               position: "absolute",
               top: anchorRect.bottom + 8,
               left: anchorRect.left,
-              width: Math.min(anchorRect.width * 1.1, 320),
+              width: Math.min(anchorRect.width, 260),
               maxHeight: 220,
               background: "#fff",
               borderRadius: 14,
@@ -550,4 +548,5 @@ export default function ProductPage({ params }) {
       `}</style>
     </>
   );
-}
+            }
+              
