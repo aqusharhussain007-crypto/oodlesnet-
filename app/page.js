@@ -114,7 +114,7 @@ useEffect(() => {
    FILTERED PRODUCTS
    ========================= */
 const filtered = useMemo(() => {
-  if (!debouncedSearch || debouncedSearch.length < 2) return [];
+  if (!debouncedSearch || debouncedSearch.length < 2) products;
 
   const q = debouncedSearch.toLowerCase();
 
