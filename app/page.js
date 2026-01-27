@@ -99,25 +99,49 @@ export default function Home() {
     setRecent(Array.isArray(data) ? data : []);
   }, []);
 
-  /* DEBOUNCE SEARCH */
-  useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(search), 300);
-    return () => clearTimeout(t);
-  }, [search]);
+ /* =========================
+   DEBOUNCE SEARCH
+   ========================= */
+useEffect(() => {
+  const t = setTimeout(() => {
+    setDebouncedSearch(search.trim());
+  }, 300);
 
-  /* FILTERED PRODUCTS */
-  const filtered = useMemo(() => {
-    if (!debouncedSearch) return products;
-    return products.filter((p) =>
-      (p.name || "").toLowerCase().includes(debouncedSearch.toLowerCase())
+  return () => clearTimeout(t);
+}, [search]);
+
+/* =========================
+   FILTERED PRODUCTS
+   ========================= */
+const filtered = useMemo(() => {
+  if (!debouncedSearch || debouncedSearch.length < 2) return [];
+
+  const q = debouncedSearch.toLowerCase();
+
+  const results = products.filter((p) => {
+    return (
+      (p.name || "").toLowerCase().includes(q) ||
+      (p.searchKey || "").toLowerCase().includes(q)
     );
-  }, [debouncedSearch, products]);
+  });
 
-  /* SEARCH SUGGESTIONS */
-  const suggestions = useMemo(() => {
-    if (!debouncedSearch) return [];
-    return filtered.slice(0, 5);
-  }, [debouncedSearch, filtered]);
+  // Rank name matches higher than searchKey matches
+  results.sort((a, b) => {
+    const aName = (a.name || "").toLowerCase().includes(q);
+    const bName = (b.name || "").toLowerCase().includes(q);
+    return Number(bName) - Number(aName);
+  });
+
+  return results;
+}, [debouncedSearch, products]);
+
+/* =========================
+   SEARCH SUGGESTIONS
+   ========================= */
+const suggestions = useMemo(() => {
+  if (!debouncedSearch || debouncedSearch.length < 2) return [];
+  return filtered.slice(0, 5);
+}, [debouncedSearch, filtered]);
 
   /* TRENDING */
   const trending = useMemo(() => {
