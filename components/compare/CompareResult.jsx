@@ -11,26 +11,49 @@ export default function CompareResult({
   if (winner === "B") winnerProduct = productB;
 
   return (
-    <div style={{ marginTop: 20 }}>
+    <div
+      style={{
+        marginTop: 18,
+        padding: 16,
+        borderRadius: 16,
+        background: "#ffffff",
+        border: "1px solid #e5e7eb",
+        boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
+      }}
+    >
       {winner === "tie" ? (
-        <p>
+        <p style={{ fontWeight: 800 }}>
           🤝 Both products offer similar value right now.
         </p>
       ) : (
-        <p>
-          🏆 Better value right now:{" "}
-          <strong>{winnerProduct.name}</strong>
+        <p style={{ fontWeight: 900, fontSize: 16 }}>
+          🏆 Better value right now:
+          <br />
+          <span style={{ color: "#16a34a" }}>
+            {winnerProduct.name}
+          </span>
         </p>
       )}
 
-      <p>
-        Scores — A: {totals.A} | B: {totals.B}
+      <p style={{ marginTop: 6, color: "#374151", fontSize: 14 }}>
+        Score — A: {totals.A} &nbsp;|&nbsp; B: {totals.B}
       </p>
 
-      <button onClick={onReset} style={{ marginTop: 8 }}>
+      <button
+        onClick={onReset}
+        style={{
+          marginTop: 12,
+          padding: "10px 14px",
+          borderRadius: 999,
+          border: "1px solid #10b981",
+          background: "#ecfdf5",
+          fontWeight: 800,
+          color: "#065f46",
+        }}
+      >
         Compare another
       </button>
     </div>
   );
-}
-  
+          }
+                 
