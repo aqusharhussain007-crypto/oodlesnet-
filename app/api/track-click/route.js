@@ -16,7 +16,7 @@ export async function POST(req) {
     /**
      * 🔹 PROMISE BANNER IMPRESSION
      */
-    if (body.type === "promise_impression") {
+    if (body?.type === "promise_impression") {
       const ref = doc(db, "ads", "promise_banner");
 
       await setDoc(
@@ -35,14 +35,25 @@ export async function POST(req) {
     /**
      * 🔹 NORMAL CLICK (existing behavior)
      */
+    if (!body?.productId || !body?.store) {
+      return NextResponse.json(
+        { success: false, error: "Invalid payload" },
+        { status: 400 }
+      );
+    }
+
     await addDoc(collection(db, "clicks"), {
-      productId: body.productId || null,
-      store: body.store || null,
+      productId: body.productId,
+      store: String(body.store).toLowerCase(),
       createdAt: serverTimestamp(),
     });
 
     return NextResponse.json({ success: true });
   } catch (e) {
-    return NextResponse.json({ success: false });
+    console.error("TRACK CLICK ERROR:", e);
+    return NextResponse.json(
+      { success: false },
+      { status: 500 }
+    );
   }
 }
