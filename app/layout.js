@@ -10,9 +10,8 @@ export const metadata = {
   },
   description:
     "Compare prices across Amazon, Flipkart, Meesho and more. Find the best deals instantly with OodlesNet.",
-};
-
-  keywords: [
+  
+    keywords: [
     "price comparison india",
     "compare prices online",
     "best deals india",
