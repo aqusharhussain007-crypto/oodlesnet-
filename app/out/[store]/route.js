@@ -31,6 +31,11 @@ export async function GET(request, { params }) {
     }
 
     /* --------------------
+       NORMALIZE STORE
+    -------------------- */
+    const storeSlug = store.toLowerCase();
+
+    /* --------------------
        FETCH PRODUCT
     -------------------- */
     const doc = await adminDb
@@ -48,7 +53,7 @@ export async function GET(request, { params }) {
     const product = doc.data();
 
     const storeData = product.store?.find(
-      (s) => s.name?.toLowerCase() === store.toLowerCase()
+      (s) => s.name?.toLowerCase() === storeSlug
     );
 
     if (!storeData?.url) {
@@ -74,7 +79,12 @@ export async function GET(request, { params }) {
     /* --------------------
        SAFETY CHECK
     -------------------- */
-    if (!redirectUrl.startsWith("http")) {
+    try {
+      const parsed = new URL(redirectUrl);
+      if (!["http:", "https:"].includes(parsed.protocol)) {
+        throw new Error("Invalid protocol");
+      }
+    } catch {
       return NextResponse.json(
         { error: "Invalid redirect URL" },
         { status: 400 }
@@ -87,13 +97,13 @@ export async function GET(request, { params }) {
     (async () => {
       try {
         const ip =
-          request.headers.get("x-forwarded-for")?.split(",")[0] ||
+          request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
           request.headers.get("x-real-ip") ||
           "unknown";
 
         const rateRef = adminDb
           .collection("rate_limits")
-          .doc(`${ip}_${productId}_${store}`);
+          .doc(`${ip}_${productId}_${storeSlug}`);
 
         const snap = await rateRef.get();
         const now = Date.now();
@@ -111,7 +121,7 @@ export async function GET(request, { params }) {
           await Promise.all([
             adminDb.collection("clicks").add({
               productId,
-              store,
+              store: storeSlug,
               ip,
               createdAt: FieldValue.serverTimestamp(),
             }),
@@ -139,5 +149,4 @@ export async function GET(request, { params }) {
       { status: 500 }
     );
   }
-  }
-  
+}
