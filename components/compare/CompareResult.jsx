@@ -6,6 +6,10 @@ export default function CompareResult({
 }) {
   const { totals, winner } = result;
 
+  const maxScore = 5;
+  const percentA = (totals.A / maxScore) * 100;
+  const percentB = (totals.B / maxScore) * 100;
+
   let winnerProduct = null;
   if (winner === "A") winnerProduct = productA;
   if (winner === "B") winnerProduct = productB;
@@ -13,16 +17,16 @@ export default function CompareResult({
   return (
     <div
       style={{
-        marginTop: 18,
-        padding: 16,
-        borderRadius: 16,
+        marginTop: 20,
+        padding: 18,
+        borderRadius: 18,
         background: "#ffffff",
         border: "1px solid #e5e7eb",
-        boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
+        boxShadow: "0 10px 24px rgba(0,0,0,0.12)",
       }}
     >
       {winner === "tie" ? (
-        <p style={{ fontWeight: 800 }}>
+        <p style={{ fontWeight: 900 }}>
           🤝 Both products offer similar value right now.
         </p>
       ) : (
@@ -35,15 +39,55 @@ export default function CompareResult({
         </p>
       )}
 
-      <p style={{ marginTop: 6, color: "#374151", fontSize: 14 }}>
-        Score — A: {totals.A} &nbsp;|&nbsp; B: {totals.B}
-      </p>
+      {/* SCORE BARS */}
+      <div style={{ marginTop: 14 }}>
+        <div style={{ fontSize: 13, fontWeight: 700 }}>
+          {productA.name}
+        </div>
+        <div
+          style={{
+            height: 10,
+            borderRadius: 999,
+            background: "#e5e7eb",
+            overflow: "hidden",
+            marginBottom: 10,
+          }}
+        >
+          <div
+            style={{
+              width: `${percentA}%`,
+              height: "100%",
+              background: "#2563eb",
+            }}
+          />
+        </div>
+
+        <div style={{ fontSize: 13, fontWeight: 700 }}>
+          {productB.name}
+        </div>
+        <div
+          style={{
+            height: 10,
+            borderRadius: 999,
+            background: "#e5e7eb",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              width: `${percentB}%`,
+              height: "100%",
+              background: "#16a34a",
+            }}
+          />
+        </div>
+      </div>
 
       <button
         onClick={onReset}
         style={{
-          marginTop: 12,
-          padding: "10px 14px",
+          marginTop: 16,
+          padding: "10px 16px",
           borderRadius: 999,
           border: "1px solid #10b981",
           background: "#ecfdf5",
@@ -55,5 +99,5 @@ export default function CompareResult({
       </button>
     </div>
   );
-          }
-                 
+                   }
+      
