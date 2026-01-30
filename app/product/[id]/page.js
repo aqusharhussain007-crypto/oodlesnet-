@@ -93,45 +93,49 @@ export default function ProductPage({ params }) {
     if (!product) return;
 
     async function loadRelated() {
-      const snap = await getDocs(collection(db, "products"));
-      let all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      all = excludeProductById(all, product.id);
+      try {
+        const snap = await getDocs(collection(db, "products"));
+        let all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        all = excludeProductById(all, product.id);
 
-      const usedIds = new Set([product.id]);
+        const usedIds = new Set([product.id]);
 
-      const categoryItems = all
-        .filter(
-          (p) =>
-            p.categorySlug === product.categorySlug &&
-            !usedIds.has(p.id)
-        )
-        .slice(0, 4);
-      categoryItems.forEach((p) => usedIds.add(p.id));
-      setRelatedCategory(categoryItems);
+        const categoryItems = all
+          .filter(
+            (p) =>
+              p.categorySlug === product.categorySlug &&
+              !usedIds.has(p.id)
+          )
+          .slice(0, 4);
+        categoryItems.forEach((p) => usedIds.add(p.id));
+        setRelatedCategory(categoryItems);
 
-      const brandItems = all
-        .filter(
-          (p) =>
-            p.brand === product.brand &&
-            !usedIds.has(p.id)
-        )
-        .slice(0, 4);
-      brandItems.forEach((p) => usedIds.add(p.id));
-      setRelatedBrand(brandItems);
+        const brandItems = all
+          .filter(
+            (p) =>
+              p.brand === product.brand &&
+              !usedIds.has(p.id)
+          )
+          .slice(0, 4);
+        brandItems.forEach((p) => usedIds.add(p.id));
+        setRelatedBrand(brandItems);
 
-      const prices =
-        product.store
-          ?.map((s) => Number(s.price))
-          .filter((p) => Number.isFinite(p)) || [];
+        const prices =
+          product.store
+            ?.map((s) => Number(s.price))
+            .filter((p) => Number.isFinite(p)) || [];
 
-      if (prices.length) {
-        const base = Math.min(...prices);
-        const priceItems = filterByPriceRange(
-          all.filter((p) => !usedIds.has(p.id)),
-          base,
-          15
-        ).slice(0, 4);
-        setRelatedPrice(priceItems);
+        if (prices.length) {
+          const base = Math.min(...prices);
+          const priceItems = filterByPriceRange(
+            all.filter((p) => !usedIds.has(p.id)),
+            base,
+            15
+          ).slice(0, 4);
+          setRelatedPrice(priceItems);
+        }
+      } catch (error) {
+        console.error("Failed to load related products:", error);
       }
     }
 
@@ -154,7 +158,7 @@ export default function ProductPage({ params }) {
   const confidence = getPriceConfidence(stores);
 
   const sortedStores = [...stores]
-    .filter((s) => Number(s.price) > 0)
+    .filter((s) => Number.isFinite(Number(s.price)) && Number(s.price) > 0)
     .sort((a, b) => Number(a.price) - Number(b.price));
 
   const prices = sortedStores
