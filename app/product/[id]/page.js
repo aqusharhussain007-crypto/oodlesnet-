@@ -128,10 +128,15 @@ export default function ProductPage({ params }) {
         if (prices.length) {
           const base = Math.min(...prices);
           const priceItems = filterByPriceRange(
-            all.filter((p) => !usedIds.has(p.id)),
-            base,
-            15
-          ).slice(0, 4);
+  all.filter(
+    (p) =>
+      !usedIds.has(p.id) &&
+      p.categorySlug === product.categorySlug
+  ),
+  base,
+  15
+).slice(0, 4);
+          
           setRelatedPrice(priceItems);
         }
       } catch (error) {
