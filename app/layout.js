@@ -4,12 +4,13 @@ import Footer from "@/components/Footer";
 import DrawerProvider from "@/components/DrawerProvider";
 
 export const metadata = {
-  metadataBase: new URL("https://oodlesnet.vercel.app"),
-
   title: {
-    default: "OodlesNet – Compare Prices & Find Best Deals in India",
+    default: "OodlesNet – Compare Prices & Buy Smarter",
     template: "%s | OodlesNet",
   },
+  description:
+    "Compare prices across Amazon, Flipkart, Meesho and more. Find the best deals instantly with OodlesNet.",
+};
 
   description:
     "Compare prices across Amazon, Meesho, Ajio and more. Find lowest prices, trending products and best online deals on OodlesNet.",
