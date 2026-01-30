@@ -15,24 +15,33 @@ export function useProduct(id) {
   useEffect(() => {
     if (!id) return;
 
+    let isMounted = true;
+
     async function loadProduct() {
       try {
         const ref = doc(db, "products", id);
         const snap = await getDoc(ref);
 
-        if (snap.exists()) {
+        if (snap.exists() && isMounted) {
           setProduct({ id: snap.id, ...snap.data() });
           await updateDoc(ref, { views: increment(1) });
         }
       } catch (e) {
         console.error("Product load error:", e);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
     loadProduct();
+
+    return () => {
+      isMounted = false;
+    };
   }, [id]);
 
   return { product, loading };
-}
+                      }
+            
