@@ -4,13 +4,13 @@ import Footer from "@/components/Footer";
 import DrawerProvider from "@/components/DrawerProvider";
 
 export const metadata = {
+  metadataBase: new URL("https://oodlesnet.in"), // use your real domain
   title: {
     default: "OodlesNet – Compare Prices & Buy Smarter",
     template: "%s | OodlesNet",
   },
   description:
-    "Compare prices across Amazon, Flipkart, Meesho and more. Find the best deals instantly with OodlesNet.",
-  
+    "Compare prices across Amazon, Flipkart, Meesho and more.",
     keywords: [
     "price comparison india",
     "compare prices online",
