@@ -1,5 +1,7 @@
 "use client";
 
+export const revalidate = 60;
+
 import { useState, useEffect, useContext, useMemo, useCallback } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
