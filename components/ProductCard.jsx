@@ -76,7 +76,7 @@ export default function ProductCard({ product, variant }) {
   const prices =
     product.store
       ?.map((s) => Number(s.price))
-      .filter((p) => Number.isFinite(p)) || [];
+      .filter((p) => Number.isFinite(p) && p > 0) || [];
 
   const sorted = [...prices].sort((a, b) => a - b);
   const [lowest, second, third] = sorted;
@@ -310,5 +310,5 @@ export default function ProductCard({ product, variant }) {
       )}
     </div>
   );
-             }
-         
+     }
+           
