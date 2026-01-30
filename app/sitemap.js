@@ -1,16 +1,8 @@
-import { adminDb } from "@/lib/firebase-admin";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase-app";
 
 export default async function sitemap() {
-  const baseUrl = "https://oodlesnet.in"; // use your real domain
-
-  if (!adminDb) {
-    return [
-      {
-        url: baseUrl,
-        lastModified: new Date(),
-      },
-    ];
-  }
+  const baseUrl = "https://oodlesnet.vercel.app";
 
   const staticRoutes = [
     {
@@ -19,7 +11,7 @@ export default async function sitemap() {
     },
   ];
 
-  const snap = await adminDb.collection("products").get();
+  const snap = await getDocs(collection(db, "products"));
 
   const productRoutes = snap.docs.map((doc) => ({
     url: `${baseUrl}/product/${doc.id}`,
