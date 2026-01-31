@@ -128,10 +128,16 @@ export default function CompareContainer({ currentProduct }) {
       </button>
 
       {error === "CATEGORY_MISMATCH" && (
-        <p style={{ color: "#b45309", marginTop: 10, fontWeight: 700 }}>
-          Comparison works best within the same category.
-        </p>
-      )}
+  <p style={{ color: "#b45309", marginTop: 10, fontWeight: 700 }}>
+    Comparison works best within the same category.
+  </p>
+)}
+
+{error === "TYPE_MISMATCH" && (
+  <p style={{ color: "#b91c1c", marginTop: 10, fontWeight: 700 }}>
+    These products are not the same type and can’t be compared.
+  </p>
+)}
 
       {result && (
         <CompareResult
