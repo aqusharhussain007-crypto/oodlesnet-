@@ -13,7 +13,6 @@ import {
 import { useProduct } from "./product-client";
 import { useRouter } from "next/navigation";
 import { getPriceConfidence } from "@/lib/priceConfidence";
-import CompareContainer from "@/components/compare/CompareContainer";
 
 /* animated arrow icon ONLY */
 const ArrowIcon = () => (
@@ -480,10 +479,6 @@ export default function ProductPage({ params }) {
             );
           })}
         </div>
-   
-       <div style={{ marginTop: 24 }}>
-  <CompareContainer currentProduct={product} />
-</div>
             
         {/* Related sections */}
         {relatedCategory.length > 0 && (
