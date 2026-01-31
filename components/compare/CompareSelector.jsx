@@ -4,6 +4,30 @@ import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 
+/* ---------------------------------
+   TEMPORARY TYPE INFERENCE (NO DB)
+   Uses name + searchKey
+---------------------------------- */
+const TYPE_MAP = {
+  earbuds: ["earbuds", "tws", "in-ear", "in ear"],
+  neckband: ["neckband"],
+  bluetooth_speaker: ["speaker", "bluetooth speaker"],
+  smartwatch: ["smartwatch", "watch"],
+  headphones: ["headphone", "over-ear", "on-ear"],
+};
+
+function inferType(product) {
+  const text = `${product.name || ""} ${product.searchKey || ""}`.toLowerCase();
+
+  for (const [type, keywords] of Object.entries(TYPE_MAP)) {
+    if (keywords.some((k) => text.includes(k))) {
+      return type;
+    }
+  }
+
+  return "unknown";
+}
+
 export default function CompareSelector({
   selected,
   onSelect,
@@ -14,16 +38,26 @@ export default function CompareSelector({
 
   useEffect(() => {
     async function load() {
+      if (!db) return;
+
       const snap = await getDocs(collection(db, "products"));
-      const list = snap.docs
-        .map((d) => ({ id: d.id, ...d.data() }))
-        .filter(
-          (p) =>
-            p.id !== excludeId &&
-            p.categorySlug === category
-        );
-      setProducts(list);
+      const all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+      const currentProduct = all.find((p) => p.id === excludeId);
+      if (!currentProduct) return;
+
+      const currentType = inferType(currentProduct);
+
+      const filtered = all.filter(
+        (p) =>
+          p.id !== excludeId &&
+          p.categorySlug === category &&
+          inferType(p) === currentType
+      );
+
+      setProducts(filtered);
     }
+
     load();
   }, [excludeId, category]);
 
@@ -60,11 +94,18 @@ export default function CompareSelector({
         }}
       >
         <option value="">Select a product to compare</option>
+
         {products.map((p) => (
           <option key={p.id} value={p.id}>
             {p.name}
           </option>
         ))}
+
+        {products.length === 0 && (
+          <option disabled>
+            No similar products found
+          </option>
+        )}
       </select>
 
       {/* Dropdown Arrow */}
@@ -84,4 +125,4 @@ export default function CompareSelector({
     </div>
   );
         }
-    
+        
