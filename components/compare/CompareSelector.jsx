@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
-import { canCompare } from "@/lib/compareRules";
+import { canCompare } from "@/components/compare/compareRules";
 
 /**
  * CompareSelector
