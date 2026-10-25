@@ -28,13 +28,36 @@ export function useProduct(id) {
         if (snap.exists() && isMounted) {
           setProduct({ id: snap.id, ...snap.data() });
 
-          // Tracking is best-effort and must not block product rendering.
-          fetch("/api/track-view", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productId: id }),
-            keepalive: true,
-          }).catch(() => {});
+          // Diagnostic branch: record the response so failures aren't silently hidden.
+          try {
+            const response = await fetch("/api/track-view", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ productId: id }),
+              keepalive: true,
+            });
+            const result = await response.json().catch(() => ({}));
+
+            if (!response.ok || result.success !== true) {
+              console.error("Product view tracking diagnostic:", {
+                status: response.status,
+                result,
+                productId: id,
+              });
+            } else {
+              console.info("Product view tracking diagnostic:", {
+                status: response.status,
+                counted: result.counted,
+                result: result.result,
+                productId: id,
+              });
+            }
+          } catch (trackingError) {
+            console.error("Product view tracking request failed:", {
+              message: trackingError?.message || "Network request failed",
+              productId: id,
+            });
+          }
         }
       } catch (error) {
         console.error("Product load error:", error);
