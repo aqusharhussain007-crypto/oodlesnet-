@@ -2,20 +2,14 @@ import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 
-/* --------------------
-   CONFIG
--------------------- */
 const RATE_LIMIT_SECONDS = 5;
 
-/* --------------------
-   ROUTE
--------------------- */
 export async function GET(request, { params }) {
   try {
     if (!adminDb) {
       return NextResponse.json(
         { error: "Firestore not initialized" },
-        { status: 500 }
+        { status: 503 }
       );
     }
 
@@ -23,49 +17,35 @@ export async function GET(request, { params }) {
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get("pid");
 
-    if (!productId || !store) {
+    if (
+      !productId ||
+      productId.length > 200 ||
+      productId.includes("/") ||
+      !store ||
+      store.length > 50
+    ) {
       return NextResponse.json(
         { error: "Invalid parameters" },
         { status: 400 }
       );
     }
 
-    /* --------------------
-       NORMALIZE STORE
-    -------------------- */
     const storeSlug = store.toLowerCase();
-
-    /* --------------------
-       FETCH PRODUCT
-    -------------------- */
-    const doc = await adminDb
-      .collection("products")
-      .doc(productId)
-      .get();
+    const doc = await adminDb.collection("products").doc(productId).get();
 
     if (!doc.exists) {
-      return NextResponse.json(
-        { error: "Product not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
     const product = doc.data();
-
     const storeData = product.store?.find(
-      (s) => s.name?.toLowerCase() === storeSlug
+      (item) => item.name?.toLowerCase() === storeSlug
     );
 
     if (!storeData?.url) {
-      return NextResponse.json(
-        { error: "Store URL not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Store URL not found" }, { status: 404 });
     }
 
-    /* --------------------
-       HANDLE RAW OR ENCODED URL (SAFE)
-    -------------------- */
     let redirectUrl;
     try {
       redirectUrl = decodeURIComponent(storeData.url);
@@ -73,80 +53,52 @@ export async function GET(request, { params }) {
       redirectUrl = storeData.url;
     }
 
-    // ensure final URL is safely encoded
-    redirectUrl = encodeURI(redirectUrl);
-
-    /* --------------------
-       SAFETY CHECK
-    -------------------- */
+    let parsedUrl;
     try {
-      const parsed = new URL(redirectUrl);
-      if (!["http:", "https:"].includes(parsed.protocol)) {
-        throw new Error("Invalid protocol");
-      }
+      parsedUrl = new URL(redirectUrl);
     } catch {
-      return NextResponse.json(
-        { error: "Invalid redirect URL" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid redirect URL" }, { status: 400 });
     }
 
-    /* --------------------
-       FIRE & FORGET TRACKING
-    -------------------- */
-    (async () => {
-      try {
-        const ip =
-          request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-          request.headers.get("x-real-ip") ||
-          "unknown";
+    if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+      return NextResponse.json({ error: "Invalid redirect URL" }, { status: 400 });
+    }
 
-        const rateRef = adminDb
-          .collection("rate_limits")
-          .doc(`${ip}_${productId}_${storeSlug}`);
+    // Await tracking before returning the redirect. Fire-and-forget writes can be
+    // terminated when a serverless function finishes its response.
+    try {
+      const ip =
+        request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+        request.headers.get("x-real-ip") ||
+        "unknown";
+      const rateRef = adminDb
+        .collection("rate_limits")
+        .doc(`${ip}_${productId}_${storeSlug}`);
+      const now = Date.now();
+      const rateSnap = await rateRef.get();
+      const lastClick = rateSnap.exists
+        ? rateSnap.data()?.lastClick?.toMillis?.() || 0
+        : 0;
 
-        const snap = await rateRef.get();
-        const now = Date.now();
-        let allowed = true;
-
-        if (snap.exists) {
-          const last =
-            snap.data()?.lastClick?.toMillis?.() || 0;
-          if (now - last < RATE_LIMIT_SECONDS * 1000) {
-            allowed = false;
-          }
-        }
-
-        if (allowed) {
-          await Promise.all([
-            adminDb.collection("clicks").add({
-              productId,
-              store: storeSlug,
-              ip,
-              createdAt: FieldValue.serverTimestamp(),
-            }),
-            rateRef.set(
-              {
-                lastClick: FieldValue.serverTimestamp(),
-              },
-              { merge: true }
-            ),
-          ]);
-        }
-      } catch (e) {
-        console.error("Tracking error:", e);
+      if (now - lastClick >= RATE_LIMIT_SECONDS * 1000) {
+        await adminDb.collection("clicks").add({
+          productId,
+          store: storeSlug,
+          createdAt: FieldValue.serverTimestamp(),
+        });
+        await rateRef.set(
+          { lastClick: FieldValue.serverTimestamp() },
+          { merge: true }
+        );
       }
-    })();
+    } catch (trackingError) {
+      // Keep the purchase path working, but expose tracking failures in logs.
+      console.error("OUT ROUTE TRACKING ERROR:", trackingError);
+    }
 
-    /* --------------------
-       REDIRECT
-    -------------------- */
-    return NextResponse.redirect(redirectUrl, 302);
-  } catch (err) {
-    console.error("OUT ROUTE ERROR:", err);
-    return NextResponse.json(
-      { error: "Internal error" },
-      { status: 500 }
-    );
+    return NextResponse.redirect(parsedUrl.toString(), 302);
+  } catch (error) {
+    console.error("OUT ROUTE ERROR:", error);
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }
