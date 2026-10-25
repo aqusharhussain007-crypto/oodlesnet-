@@ -24,22 +24,38 @@ function isSameOriginRequest(req) {
 }
 
 export async function POST(req) {
+  let stage = "origin-validation";
+
   try {
     if (!isSameOriginRequest(req)) {
-      return NextResponse.json({ success: false, error: "Invalid origin" }, { status: 403 });
+      console.warn("TRACK VIEW DIAGNOSTIC:", { stage, result: "rejected" });
+      return NextResponse.json(
+        { success: false, stage, error: "Invalid origin" },
+        { status: 403 }
+      );
     }
 
+    stage = "admin-initialization";
     if (!adminDb) {
-      return NextResponse.json({ success: false, error: "Tracking unavailable" }, { status: 503 });
+      console.error("TRACK VIEW DIAGNOSTIC:", { stage, result: "adminDb-null" });
+      return NextResponse.json(
+        { success: false, stage, error: "Tracking unavailable" },
+        { status: 503 }
+      );
     }
 
+    stage = "request-body";
     const body = await req.json();
     const productId = typeof body?.productId === "string" ? body.productId.trim() : "";
 
     if (!productId || productId.length > 200 || productId.includes("/")) {
-      return NextResponse.json({ success: false, error: "Invalid product ID" }, { status: 400 });
+      return NextResponse.json(
+        { success: false, stage, error: "Invalid product ID" },
+        { status: 400 }
+      );
     }
 
+    stage = "firestore-transaction";
     const productRef = adminDb.collection("products").doc(productId);
     const rateRef = adminDb.collection("rate_limits").doc(
       `view_${getClientKey(req)}_${createHash("sha256").update(productId).digest("hex").slice(0, 20)}`
@@ -61,12 +77,22 @@ export async function POST(req) {
     });
 
     if (result === "missing") {
-      return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, counted: false, stage, error: "Product not found" },
+        { status: 404 }
+      );
     }
 
-    return NextResponse.json({ success: true, counted: result === "counted" });
+    console.info("TRACK VIEW DIAGNOSTIC:", { stage, result, productId });
+    return NextResponse.json({ success: true, counted: result === "counted", result });
   } catch (error) {
-    console.error("TRACK VIEW ERROR:", error);
-    return NextResponse.json({ success: false }, { status: 500 });
+    const code = typeof error?.code === "string" || typeof error?.code === "number"
+      ? String(error.code)
+      : "unknown";
+    console.error("TRACK VIEW DIAGNOSTIC ERROR:", { stage, code, message: error?.message });
+    return NextResponse.json(
+      { success: false, stage, error: "Tracking failed", code },
+      { status: 500 }
+    );
   }
 }
