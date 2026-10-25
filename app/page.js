@@ -58,6 +58,7 @@ export default function Home() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [ads, setAds] = useState([]);
+  const [adsLoaded, setAdsLoaded] = useState(false);
   const [recent, setRecent] = useState([]);
 
   const [search, setSearch] = useState("");
@@ -88,8 +89,14 @@ export default function Home() {
   /* LOAD ADS */
   useEffect(() => {
     async function loadAds() {
-      const snap = await getDocs(collection(db, "ads"));
-      setAds(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      try {
+        const snap = await getDocs(collection(db, "ads"));
+        setAds(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      } catch (error) {
+        console.error("Ads load error:", error?.message || "unknown error");
+      } finally {
+        setAdsLoaded(true);
+      }
     }
     loadAds();
   }, []);
@@ -116,7 +123,7 @@ useEffect(() => {
    FILTERED PRODUCTS
    ========================= */
 const filtered = useMemo(() => {
-  if (!debouncedSearch || debouncedSearch.length < 2) products;
+  if (!debouncedSearch || debouncedSearch.length < 2) return products;
 
   const q = debouncedSearch.toLowerCase();
 
@@ -145,11 +152,14 @@ const suggestions = useMemo(() => {
   return filtered.slice(0, 5);
 }, [debouncedSearch, filtered]);
 
-  /* TRENDING */
+  /* TRENDING: rank by real product views, then impressions. */
   const trending = useMemo(() => {
-    return [...products]
-      .sort((a, b) => Number(b.impressions || 0) - Number(a.impressions || 0))
-      .slice(0, 10);
+    const score = (p) => {
+      const views = Number(p?.views);
+      const impressions = Number(p?.impressions);
+      return (Number.isFinite(views) ? views : 0) + (Number.isFinite(impressions) ? impressions : 0);
+    };
+    return [...products].sort((a, b) => score(b) - score(a)).slice(0, 10);
   }, [products]);
 
   const startVoiceSearch = useCallback(() => {
@@ -239,7 +249,7 @@ const suggestions = useMemo(() => {
       </div>
 
       {/* BANNER */}
-      {ads.length === 0 ? <SkeletonLoader height={120} /> : <BannerAd ads={ads} />}
+      {!adsLoaded ? <SkeletonLoader height={120} /> : <BannerAd ads={ads} />}
 
       {/* TRENDING */}
       <h2 className="section-title">Trending Today</h2>

@@ -4,50 +4,48 @@ import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 
-/**
- * Hook: load a product and request view tracking through a server route.
- * Product reads remain public; all counter writes use Firebase Admin on the server.
- */
+const VIEW_GUARD_MS = 30 * 60 * 1000;
+
+function shouldReportView(id) {
+  try {
+    const key = `viewed_${id}`;
+    const last = Number(sessionStorage.getItem(key) || 0);
+    if (Date.now() - last < VIEW_GUARD_MS) return false;
+    sessionStorage.setItem(key, String(Date.now()));
+  } catch {}
+  return true;
+}
+
 export function useProduct(id) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) {
-      setLoading(false);
-      return;
-    }
-
+    if (!id) { setLoading(false); return; }
     let isMounted = true;
 
     async function loadProduct() {
       try {
-        const ref = doc(db, "products", id);
-        const snap = await getDoc(ref);
-
+        const snap = await getDoc(doc(db, "products", id));
         if (snap.exists() && isMounted) {
           setProduct({ id: snap.id, ...snap.data() });
-
-          // Tracking is best-effort and must not block product rendering.
-          fetch("/api/track-view", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productId: id }),
-            keepalive: true,
-          }).catch(() => {});
+          if (shouldReportView(id)) {
+            fetch("/api/track-view", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ productId: id }),
+              keepalive: true,
+            }).catch(() => {});
+          }
         }
       } catch (error) {
-        console.error("Product load error:", error);
+        console.error("Product load error:", error?.message || "unknown error");
       } finally {
         if (isMounted) setLoading(false);
       }
     }
-
     loadProduct();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, [id]);
 
   return { product, loading };

@@ -1,1 +1,19 @@
+# dependencies
+node_modules/
 
+# Next.js / Vercel build output
+.next/
+out/
+.vercel/
+
+# secrets and local env (never commit)
+.env
+.env.*
+!.env.example
+*.pem
+*serviceAccount*.json
+*firebase-adminsdk*.json
+
+# misc
+.DS_Store
+npm-debug.log*
