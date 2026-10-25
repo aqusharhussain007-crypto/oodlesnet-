@@ -1,30 +1,36 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/firebase-app";
-import {
-  collection,
-  addDoc,
-  doc,
-  setDoc,
-  increment,
-  serverTimestamp,
-} from "firebase/firestore";
+import { adminDb } from "@/lib/firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
+
+function isSameOriginRequest(req) {
+  const origin = req.headers.get("origin");
+  if (!origin) return false;
+
+  try {
+    return new URL(origin).host === new URL(req.url).host;
+  } catch {
+    return false;
+  }
+}
 
 export async function POST(req) {
   try {
+    if (!isSameOriginRequest(req)) {
+      return NextResponse.json({ success: false, error: "Invalid origin" }, { status: 403 });
+    }
+
+    if (!adminDb) {
+      return NextResponse.json({ success: false, error: "Tracking unavailable" }, { status: 503 });
+    }
+
     const body = await req.json();
 
-    /**
-     * 🔹 PROMISE BANNER IMPRESSION
-     */
     if (body?.type === "promise_impression") {
-      const ref = doc(db, "ads", "promise_banner");
-
-      await setDoc(
-        ref,
+      await adminDb.collection("ads").doc("promise_banner").set(
         {
-          impressions: increment(1),
+          impressions: FieldValue.increment(1),
           type: "promise",
-          updatedAt: serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
         },
         { merge: true }
       );
@@ -32,28 +38,22 @@ export async function POST(req) {
       return NextResponse.json({ success: true });
     }
 
-    /**
-     * 🔹 NORMAL CLICK (existing behavior)
-     */
-    if (!body?.productId || !body?.store) {
-      return NextResponse.json(
-        { success: false, error: "Invalid payload" },
-        { status: 400 }
-      );
+    const productId = typeof body?.productId === "string" ? body.productId.trim() : "";
+    const store = typeof body?.store === "string" ? body.store.trim().toLowerCase() : "";
+
+    if (!productId || productId.length > 200 || productId.includes("/") || !store || store.length > 50) {
+      return NextResponse.json({ success: false, error: "Invalid payload" }, { status: 400 });
     }
 
-    await addDoc(collection(db, "clicks"), {
-      productId: body.productId,
-      store: String(body.store).toLowerCase(),
-      createdAt: serverTimestamp(),
+    await adminDb.collection("clicks").add({
+      productId,
+      store,
+      createdAt: FieldValue.serverTimestamp(),
     });
 
     return NextResponse.json({ success: true });
-  } catch (e) {
-    console.error("TRACK CLICK ERROR:", e);
-    return NextResponse.json(
-      { success: false },
-      { status: 500 }
-    );
+  } catch (error) {
+    console.error("TRACK CLICK ERROR:", error);
+    return NextResponse.json({ success: false }, { status: 500 });
   }
 }

@@ -1,19 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 
 /**
- * Hook: load single product + increment views
- * NO UI here
+ * Hook: load a product and request view tracking through a server route.
+ * Product reads remain public; all counter writes use Firebase Admin on the server.
  */
 export function useProduct(id) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      setLoading(false);
+      return;
+    }
 
     let isMounted = true;
 
@@ -24,14 +27,19 @@ export function useProduct(id) {
 
         if (snap.exists() && isMounted) {
           setProduct({ id: snap.id, ...snap.data() });
-          await updateDoc(ref, { views: increment(1) });
+
+          // Tracking is best-effort and must not block product rendering.
+          fetch("/api/track-view", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId: id }),
+            keepalive: true,
+          }).catch(() => {});
         }
-      } catch (e) {
-        console.error("Product load error:", e);
+      } catch (error) {
+        console.error("Product load error:", error);
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       }
     }
 
@@ -43,5 +51,4 @@ export function useProduct(id) {
   }, [id]);
 
   return { product, loading };
-                      }
-            
+}
