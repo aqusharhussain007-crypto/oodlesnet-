@@ -139,6 +139,12 @@ export async function POST(request) {
         });
       }
       const saved = snapshot.data();
+      const timestampToIso = (value) =>
+        value && typeof value.toDate === "function"
+          ? value.toDate().toISOString()
+          : value instanceof Date
+            ? value.toISOString()
+            : null;
       return NextResponse.json({
         ok: true,
         mode: "verified",
@@ -146,9 +152,27 @@ export async function POST(request) {
         collection: "products",
         exists: true,
         documentId,
-        productName: saved.name ?? null,
-        brand: saved.brand ?? null,
-        source: saved.source ?? null,
+        product: {
+          name: saved.name ?? null,
+          brand: saved.brand ?? null,
+          categorySlug: saved.categorySlug ?? null,
+          description: saved.description ?? null,
+          imageUrl: saved.imageUrl ?? null,
+          tags: Array.isArray(saved.tags) ? saved.tags : [],
+          impressions: saved.impressions ?? null,
+          views: saved.views ?? null,
+          store: Array.isArray(saved.store)
+            ? saved.store.map((offer) => ({
+                name: offer.name ?? null,
+                price: offer.price ?? null,
+                offer: offer.offer ?? null,
+                url: offer.url ?? null,
+              }))
+            : [],
+          createdAt: timestampToIso(saved.createdAt),
+          updatedAt: timestampToIso(saved.updatedAt),
+          source: saved.source ?? null,
+        },
       });
     } catch {
       return jsonError("Test database read-back verification failed.", 500);
@@ -216,7 +240,12 @@ export async function POST(request) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    const status = message.includes("already exists") ? 409 : 500;
+    const errorCode = error && typeof error === "object" ? error.code : undefined;
+    const isDuplicate =
+      errorCode === 6 ||
+      errorCode === "already-exists" ||
+      message.toLowerCase().includes("already exists");
+    const status = isDuplicate ? 409 : 500;
     return jsonError(status === 409 ? "That document ID already exists." : "Test database write failed.", status);
   }
 }
