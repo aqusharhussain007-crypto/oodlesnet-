@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { writeTestWriterAudit } from "@/lib/test-writer-audit";
 import { enforceTestWriterRateLimit } from "@/lib/test-writer-rate-limit";
 
@@ -130,6 +130,10 @@ export async function POST(request) {
   if (!Array.isArray(products) || products.length < 1 || products.length > MAX_RECORDS) {
     return fail(`Input must contain 1–${MAX_RECORDS} products.`, 400);
   }
+  const batchId = typeof body.batchId === "string" ? body.batchId.trim() : "";
+  if (body.confirmWrite === true && !/^[A-Za-z0-9_-]{8,100}$/.test(batchId)) {
+    return fail("A stable batchId (8–100 letters, numbers, hyphens, or underscores) is required for writes. Reuse it only when retrying the exact same batch.", 400);
+  }
   const errors = products.map((product, index) => validateProduct(product, index)).filter(Boolean);
   if (errors.length) return NextResponse.json({ ok: false, mode: "rejected", targetProject: "oodlesnet-test", errors }, { status: 400 });
 
@@ -163,25 +167,69 @@ export async function POST(request) {
 
   try {
     const db = getDb();
-    const results = [];
-    for (const item of normalized) {
-      const ref = item.documentId ? db.collection("products").doc(item.documentId) : db.collection("products").doc();
+    const batchRef = db.collection("test_writer_batches").doc(batchId);
+    const payloadHash = createHash("sha256").update(JSON.stringify(normalized)).digest("hex");
+    const existingBatch = await batchRef.get();
+    if (existingBatch.exists) {
+      const savedBatch = existingBatch.data();
+      if (savedBatch.payloadHash !== payloadHash) {
+        return fail("This batchId was already used with different data. Use the original data to recover this batch, or choose a new batchId for a new import.", 409);
+      }
+    } else {
       try {
-        await ref.create({ ...item.data, createdAt: new Date(), updatedAt: new Date() });
+        await batchRef.create({
+          batchId,
+          payloadHash,
+          requested: normalized.length,
+          status: "in_progress",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      } catch (error) {
+        // Another request may have initialized the same batch concurrently; verify its manifest below.
+        const latest = await batchRef.get();
+        if (!latest.exists || latest.data().payloadHash !== payloadHash) {
+          return fail("Could not safely initialize this batch. Retry with the same batchId and unchanged data.", 409);
+        }
+      }
+    }
+
+    const results = [];
+    for (let index = 0; index < normalized.length; index++) {
+      const item = normalized[index];
+      // Stable IDs make retries safe after timeouts or partial writes.
+      const generatedId = createHash("sha256").update(`${batchId}:${index}`).digest("hex").slice(0, 32);
+      const ref = item.documentId ? db.collection("products").doc(item.documentId) : db.collection("products").doc(generatedId);
+      try {
+        await ref.create({ ...item.data, createdAt: new Date(), updatedAt: new Date(), importBatchId: batchId, importRow: index + 1 });
         results.push({ documentId: ref.id, name: item.data.name, status: "created" });
       } catch (error) {
         const code = error && typeof error === "object" ? error.code : undefined;
         const message = error instanceof Error ? error.message : "";
         const duplicate = code === 6 || code === "already-exists" || message.toLowerCase().includes("already exists");
-        results.push({ documentId: ref.id, name: item.data.name, status: duplicate ? "duplicate" : "failed" });
+        if (duplicate) {
+          // A deterministic ID that belongs to this same batch is a safely recovered prior success.
+          try {
+            const saved = await ref.get();
+            const savedData = saved.data();
+            const recovered = saved.exists && savedData.importBatchId === batchId && savedData.importRow === index + 1;
+            results.push({ documentId: ref.id, name: item.data.name, status: recovered ? "already_created_by_this_batch" : "duplicate" });
+          } catch {
+            results.push({ documentId: ref.id, name: item.data.name, status: "failed" });
+          }
+        } else {
+          results.push({ documentId: ref.id, name: item.data.name, status: "failed" });
+        }
       }
     }
     const created = results.filter((item) => item.status === "created").length;
+    const recovered = results.filter((item) => item.status === "already_created_by_this_batch").length;
     const duplicates = results.filter((item) => item.status === "duplicate").length;
     const failed = results.filter((item) => item.status === "failed").length;
+    const status = failed > 0 ? "partial_failure" : duplicates > 0 ? "completed_with_duplicates" : "completed";
+    await batchRef.set({ status, requested: results.length, created: created + recovered, newlyCreated: created, recovered, duplicates, failed, updatedAt: new Date() }, { merge: true });
 
     let audit = { logged: false };
-    const batchId = randomUUID();
     try {
       audit = {
         logged: true,
@@ -189,10 +237,10 @@ export async function POST(request) {
           operation: "batch_product_create",
           batchId,
           requested: results.length,
-          created,
+          created: created + recovered,
           duplicates,
           failed,
-          outcome: failed > 0 ? "partial_failure" : duplicates > 0 ? "completed_with_duplicates" : "success",
+          outcome: failed > 0 ? "partial_failure" : duplicates > 0 ? "completed_with_duplicates" : recovered > 0 ? "recovered_retry" : "success",
         }),
       };
     } catch {
@@ -207,12 +255,14 @@ export async function POST(request) {
       collection: "products",
       batchId,
       requested: results.length,
-      created,
+      created: created + recovered,
+      newlyCreated: created,
+      recovered,
       duplicates,
       failed,
       audit,
       results,
-      message: "Create-only writes were attempted. Existing documents were never overwritten.",
+      message: "Create-only writes were attempted. Reuse this batchId and the exact same data to safely recover a partial batch; existing documents are never overwritten.",
     }, { status: failed || duplicates ? 207 : 200 });
   } catch {
     return fail("Test batch writer could not connect to the isolated test database.", 500);
