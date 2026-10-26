@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { writeTestWriterAudit } from "@/lib/test-writer-audit";
+import { enforceTestWriterRateLimit } from "@/lib/test-writer-rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -112,6 +113,15 @@ export async function POST(request) {
   if (authorization !== `Bearer ${token}`) {
     return jsonError("Unauthorized.", 401);
   }
+
+  // Apply a shared, persistent limit only after authentication succeeds.
+  let rateLimitResponse;
+  try {
+    rateLimitResponse = await enforceTestWriterRateLimit(getDb());
+  } catch {
+    return jsonError("Test writer rate limiter is unavailable; request was not processed.", 503);
+  }
+  if (rateLimitResponse) return rateLimitResponse;
 
   let body;
   try {
