@@ -119,6 +119,42 @@ export async function POST(request) {
     return jsonError("Request body must be valid JSON.", 400);
   }
 
+  // Read-only verification for the isolated test database.
+  if (body.action === "verify") {
+    const documentId = body.documentId;
+    if (typeof documentId !== "string" || !/^[A-Za-z0-9_-]{1,100}$/.test(documentId)) {
+      return jsonError("A valid documentId is required for verification.", 400);
+    }
+    try {
+      const db = getDb();
+      const snapshot = await db.collection("products").doc(documentId).get();
+      if (!snapshot.exists) {
+        return NextResponse.json({
+          ok: true,
+          mode: "verified",
+          targetProject: "oodlesnet-test",
+          collection: "products",
+          exists: false,
+          documentId,
+        });
+      }
+      const saved = snapshot.data();
+      return NextResponse.json({
+        ok: true,
+        mode: "verified",
+        targetProject: "oodlesnet-test",
+        collection: "products",
+        exists: true,
+        documentId,
+        productName: saved.name ?? null,
+        brand: saved.brand ?? null,
+        source: saved.source ?? null,
+      });
+    } catch {
+      return jsonError("Test database read-back verification failed.", 500);
+    }
+  }
+
   const validationError = validateProduct(body.product);
   if (validationError) return jsonError(validationError, 400);
 
