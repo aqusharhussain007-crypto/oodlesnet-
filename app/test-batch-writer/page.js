@@ -19,6 +19,7 @@ export default function TestBatchWriterPage() {
   const [token, setToken] = useState("");
   const [format, setFormat] = useState("json");
   const [data, setData] = useState(sampleJson);
+  const [documentId, setDocumentId] = useState("");
   const [confirmWrite, setConfirmWrite] = useState(false);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState("");
@@ -35,15 +36,28 @@ export default function TestBatchWriterPage() {
     setResult("");
     const submittedToken = token.trim();
     try {
+      let submittedData = data;
+      if (documentId.trim()) {
+        if (format === "json") {
+          const records = JSON.parse(data);
+          if (!Array.isArray(records) || records.length !== 1) {
+            throw new Error("The Document ID field applies only when the JSON batch contains exactly one product. For multiple products, set documentId on each product in the JSON data.");
+          }
+          records[0].documentId = documentId.trim();
+          submittedData = JSON.stringify(records);
+        } else {
+          throw new Error("For CSV, set documentId in the CSV documentId column and leave the separate Document ID field blank.");
+        }
+      }
       const response = await fetch("/api/test-batch-writer", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${submittedToken}` },
-        body: JSON.stringify({ format, data, confirmWrite: write }),
+        body: JSON.stringify({ format, data: submittedData, confirmWrite: write }),
       });
       const json = await response.json().catch(() => ({ error: "Response was not valid JSON." }));
       setResult(JSON.stringify({ httpStatus: response.status, ...json }, null, 2));
-    } catch {
-      setResult("Request failed. Check the connection and try again.");
+    } catch (error) {
+      setResult(error instanceof SyntaxError ? "Product data is not valid JSON." : (error.message || "Request failed. Check the connection and try again."));
     } finally {
       setToken("");
       setBusy(false);
@@ -53,6 +67,7 @@ export default function TestBatchWriterPage() {
   function changeFormat(next) {
     setFormat(next);
     setData(next === "json" ? sampleJson : sampleCsv);
+    setDocumentId("");
     setResult("");
   }
 
@@ -69,6 +84,11 @@ export default function TestBatchWriterPage() {
           <option value="json">JSON array</option>
           <option value="csv">CSV</option>
         </select>
+        {format === "json" && <>
+          <label htmlFor="batch-document-id" style={{ display: "block", marginBottom: 8 }}>Optional Document ID (single-product JSON test)</label>
+          <input id="batch-document-id" type="text" autoComplete="off" value={documentId} onChange={(event) => setDocumentId(event.target.value)} placeholder="Leave blank to auto-generate" style={{ boxSizing: "border-box", width: "100%", padding: 12, marginBottom: 16 }} />
+          <p style={{ fontSize: 13, marginTop: -8 }}>For duplicate testing, enter an existing test document ID. This field applies only to a JSON array containing one product.</p>
+        </>}
         <label htmlFor="batch-data" style={{ display: "block", marginBottom: 8 }}>Product data</label>
         <textarea id="batch-data" value={data} onChange={(event) => setData(event.target.value)} rows={16} required style={{ boxSizing: "border-box", width: "100%", padding: 12, fontFamily: "monospace", fontSize: 13, marginBottom: 16 }} />
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
