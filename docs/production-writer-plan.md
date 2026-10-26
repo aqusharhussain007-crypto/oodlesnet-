@@ -51,3 +51,17 @@ Provide a controlled way to add verified products to the production Firestore `p
 ## Current production context observed from repository
 
 The production branch currently reads product data from the Firebase client SDK, and server-side Firebase Admin is used by tracking routes. The Firebase client config names project `oodlesnet-6c19e`. The new writer must be a separate, reviewed addition; the existing tracking routes should not be repurposed as product-write endpoints.
+
+
+## Isolated batch-writer prototype (test branch)
+
+A separate test-only batch prototype is available at `/test-batch-writer` with API route `/api/test-batch-writer`.
+
+- Accepts JSON arrays or CSV, up to 50 products and 500 KB per request.
+- Validates all product records before attempting writes.
+- Dry-run is the default; real writes require the test token and an explicit confirmation checkbox.
+- Uses create-only Firestore writes; duplicate IDs are reported without overwriting existing records.
+- Hard-locked to `oodlesnet-test` and uses the test-only environment variables.
+- CSV requires `name`, `brand`, `categorySlug`, and `store`; the `store` field is a JSON array of offers. `tags` may be a JSON array. Optional fields include `description`, `imageUrl`, and `documentId`.
+- A batch can partially create records if a Firestore conflict or service failure occurs during the write loop; review the per-record results before retrying. Do not blindly retry the whole batch.
+- This prototype has not yet passed deployment and runtime tests. It is not production-ready and must not be merged into `main`.
