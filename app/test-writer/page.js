@@ -29,6 +29,7 @@ export default function TestWriterPage() {
     event.preventDefault();
     const action = event.nativeEvent.submitter?.value || "dry-run";
     const isWrite = action === "write";
+    const isVerify = action === "verify";
     if (isWrite && !confirmTestWrite) {
       setResult("Tick the confirmation box before writing the one test record.");
       return;
@@ -44,10 +45,11 @@ export default function TestWriterPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${submittedToken}`,
         },
-        body: JSON.stringify({
-          confirmWrite: isWrite,
-          product: sampleProduct,
-        }),
+        body: JSON.stringify(
+          isVerify
+            ? { action: "verify", documentId: "LMXGtD37utGDi2yWucUr" }
+            : { confirmWrite: isWrite, product: sampleProduct },
+        ),
       });
       const data = await response.json().catch(() => ({ error: "Response was not valid JSON." }));
       setResult(JSON.stringify({ httpStatus: response.status, ...data }, null, 2));
@@ -80,6 +82,9 @@ export default function TestWriterPage() {
           </button>
           <button type="submit" name="action" value="write" disabled={busy || !token.trim() || !confirmTestWrite} style={{ padding: "12px 18px" }}>
             {busy ? "Working…" : "Write one test record"}
+          </button>
+          <button type="submit" name="action" value="verify" disabled={busy || !token.trim()} style={{ padding: "12px 18px" }}>
+            {busy ? "Checking…" : "Verify saved record"}
           </button>
         </div>
         <label style={{ display: "block", marginTop: 20 }}>
