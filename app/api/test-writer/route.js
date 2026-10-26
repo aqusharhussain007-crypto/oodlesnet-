@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { writeTestWriterAudit } from "@/lib/test-writer-audit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -230,6 +231,24 @@ export async function POST(request) {
     // Never overwrite an existing document from this test endpoint.
     await ref.create(data);
 
+    let audit = { logged: false };
+    try {
+      audit = {
+        logged: true,
+        eventId: await writeTestWriterAudit(db, {
+          operation: "single_product_create",
+          requested: 1,
+          created: 1,
+          duplicates: 0,
+          failed: 0,
+          outcome: "success",
+        }),
+      };
+    } catch {
+      // The product was already created; report audit failure clearly to avoid unsafe retries.
+      audit = { logged: false, warning: "Product created, but audit logging failed. Do not retry this write." };
+    }
+
     return NextResponse.json({
       ok: true,
       mode: "written",
@@ -237,6 +256,7 @@ export async function POST(request) {
       collection: "products",
       documentId: ref.id,
       productName: data.name,
+      audit,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
