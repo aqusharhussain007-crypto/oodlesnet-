@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { randomUUID } from "node:crypto";
 import { writeTestWriterAudit } from "@/lib/test-writer-audit";
 
 export const runtime = "nodejs";
@@ -170,7 +171,7 @@ export async function POST(request) {
     const failed = results.filter((item) => item.status === "failed").length;
 
     let audit = { logged: false };
-    const batchId = crypto.randomUUID();
+    const batchId = randomUUID();
     try {
       audit = {
         logged: true,
