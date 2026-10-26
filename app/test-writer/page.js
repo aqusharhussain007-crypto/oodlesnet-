@@ -2,13 +2,38 @@
 
 import { useState } from "react";
 
+const sampleProduct = {
+  name: "OodlesNet TEST ONLY Sample Product",
+  brand: "OodlesNet Test",
+  categorySlug: "test-products",
+  description: "Clearly labelled test record used to verify the isolated test Firestore writer. Not a real product listing.",
+  imageUrl: "",
+  tags: ["test-only", "writer-verification"],
+  store: [
+    {
+      name: "Example Store (Test)",
+      price: 999,
+      offer: "Test data only",
+      url: "https://example.com/test-product",
+    },
+  ],
+};
+
 export default function TestWriterPage() {
   const [token, setToken] = useState("");
   const [result, setResult] = useState("");
   const [busy, setBusy] = useState(false);
+  const [confirmTestWrite, setConfirmTestWrite] = useState(false);
 
-  async function runDryRun(event) {
+  async function submitRequest(event) {
     event.preventDefault();
+    const action = event.nativeEvent.submitter?.value || "dry-run";
+    const isWrite = action === "write";
+    if (isWrite && !confirmTestWrite) {
+      setResult("Tick the confirmation box before writing the one test record.");
+      return;
+    }
+
     setBusy(true);
     setResult("");
     const submittedToken = token.trim();
@@ -20,23 +45,8 @@ export default function TestWriterPage() {
           Authorization: `Bearer ${submittedToken}`,
         },
         body: JSON.stringify({
-          confirmWrite: false,
-          product: {
-            name: "Test Sample Product",
-            brand: "Test Brand",
-            categorySlug: "test-products",
-            description: "Temporary validation sample; dry-run only.",
-            imageUrl: "",
-            tags: ["test", "dry-run"],
-            store: [
-              {
-                name: "Example Store",
-                price: 999,
-                offer: "Dry-run sample only",
-                url: "https://example.com/test-product",
-              },
-            ],
-          },
+          confirmWrite: isWrite,
+          product: sampleProduct,
         }),
       });
       const data = await response.json().catch(() => ({ error: "Response was not valid JSON." }));
@@ -52,8 +62,8 @@ export default function TestWriterPage() {
   return (
     <main style={{ maxWidth: 640, margin: "40px auto", padding: 20, fontFamily: "Arial, sans-serif" }}>
       <h1>Test Firestore Writer</h1>
-      <p>This page sends a dry-run request only. It uses a fixed sample product and sets confirmWrite to false. It does not save your token in browser storage.</p>
-      <form onSubmit={runDryRun}>
+      <p>This page targets only the isolated oodlesnet-test project. The sample is clearly labelled test data and is not a real product listing.</p>
+      <form onSubmit={submitRequest}>
         <label htmlFor="writer-token" style={{ display: "block", marginBottom: 8 }}>TEST_WRITER_TOKEN</label>
         <input
           id="writer-token"
@@ -64,12 +74,26 @@ export default function TestWriterPage() {
           required
           style={{ boxSizing: "border-box", width: "100%", padding: 12, marginBottom: 16 }}
         />
-        <button type="submit" disabled={busy || !token.trim()} style={{ padding: "12px 18px" }}>
-          {busy ? "Testing…" : "Run dry-run test"}
-        </button>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+          <button type="submit" name="action" value="dry-run" disabled={busy || !token.trim()} style={{ padding: "12px 18px" }}>
+            {busy ? "Testing…" : "Run dry-run"}
+          </button>
+          <button type="submit" name="action" value="write" disabled={busy || !token.trim() || !confirmTestWrite} style={{ padding: "12px 18px" }}>
+            {busy ? "Working…" : "Write one test record"}
+          </button>
+        </div>
+        <label style={{ display: "block", marginTop: 20 }}>
+          <input
+            type="checkbox"
+            checked={confirmTestWrite}
+            onChange={(event) => setConfirmTestWrite(event.target.checked)}
+            style={{ marginRight: 8 }}
+          />
+          I confirm this will create one test-only document in the oodlesnet-test Firestore products collection.
+        </label>
       </form>
       {result && <pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere", marginTop: 24, padding: 14, background: "#eee", color: "#111" }}>{result}</pre>}
-      <p style={{ marginTop: 24, fontSize: 14 }}>Never use this page to submit a real write. Close the page after testing.</p>
+      <p style={{ marginTop: 24, fontSize: 14 }}>The test endpoint uses create-only writes and will not overwrite an existing document. Do not use this form for real product listings.</p>
     </main>
   );
 }
