@@ -13,7 +13,7 @@ const sampleJson = JSON.stringify([{
 }], null, 2);
 
 const sampleCsv = `name,brand,categorySlug,description,imageUrl,tags,store,documentId
-"OodlesNet TEST ONLY CSV Sample","OodlesNet Test","test-products","Test-only batch sample","","[""test-only"",""csv-import""]","[{""name"":""Example Store (Test)"",""price"":499,""offer"":""Test only"",""url"":""https://example.com/test-csv-product""}]","`;
+"OodlesNet TEST ONLY CSV Sample","OodlesNet Test","test-products","Test-only batch sample","","[""test-only"",""csv-import""]","[{""name"":""Example Store (Test)"",""price"":499,""offer"":""Test only"",""url"":""https://example.com/test-csv-product""}]"""`;
 
 export default function TestBatchWriterPage() {
   const [token, setToken] = useState("");
