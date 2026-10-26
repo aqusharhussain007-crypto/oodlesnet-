@@ -20,6 +20,7 @@ export default function TestBatchWriterPage() {
   const [format, setFormat] = useState("json");
   const [data, setData] = useState(sampleJson);
   const [documentId, setDocumentId] = useState("");
+  const [batchId, setBatchId] = useState(() => `batch-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
   const [confirmWrite, setConfirmWrite] = useState(false);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState("");
@@ -52,7 +53,7 @@ export default function TestBatchWriterPage() {
       const response = await fetch("/api/test-batch-writer", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${submittedToken}` },
-        body: JSON.stringify({ format, data: submittedData, confirmWrite: write }),
+        body: JSON.stringify({ format, data: submittedData, batchId: batchId.trim(), confirmWrite: write }),
       });
       const json = await response.json().catch(() => ({ error: "Response was not valid JSON." }));
       setResult(JSON.stringify({ httpStatus: response.status, ...json }, null, 2));
@@ -89,6 +90,9 @@ export default function TestBatchWriterPage() {
           <input id="batch-document-id" type="text" autoComplete="off" value={documentId} onChange={(event) => setDocumentId(event.target.value)} placeholder="Leave blank to auto-generate" style={{ boxSizing: "border-box", width: "100%", padding: 12, marginBottom: 16 }} />
           <p style={{ fontSize: 13, marginTop: -8 }}>For duplicate testing, enter an existing test document ID. This field applies only to a JSON array containing one product.</p>
         </>}
+        <label htmlFor="batch-id" style={{ display: "block", marginBottom: 8 }}>Batch ID (keep this for safe retries)</label>
+        <input id="batch-id" type="text" autoComplete="off" value={batchId} onChange={(event) => setBatchId(event.target.value)} required pattern="[A-Za-z0-9_-]{8,100}" style={{ boxSizing: "border-box", width: "100%", padding: 12, marginBottom: 8 }} />
+        <p style={{ fontSize: 13, marginTop: 0 }}>If a write times out or partially succeeds, retry with the same Batch ID and exactly the same product data. Do not change either. Use a new Batch ID for a new import.</p>
         <label htmlFor="batch-data" style={{ display: "block", marginBottom: 8 }}>Product data</label>
         <textarea id="batch-data" value={data} onChange={(event) => setData(event.target.value)} rows={16} required style={{ boxSizing: "border-box", width: "100%", padding: 12, fontFamily: "monospace", fontSize: 13, marginBottom: 16 }} />
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
@@ -101,7 +105,7 @@ export default function TestBatchWriterPage() {
         </label>
       </form>
       {result && <pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere", marginTop: 24, padding: 14, background: "#eee", color: "#111" }}>{result}</pre>}
-      <p style={{ marginTop: 24, fontSize: 14 }}>Writes are create-only: existing document IDs are rejected, never overwritten. Use dry-run first. Never paste credentials into the data field or chat. This page is not for production products.</p>
+      <p style={{ marginTop: 24, fontSize: 14 }}>Writes are create-only: existing document IDs are never overwritten. Batch IDs enable safe recovery after partial writes. Use dry-run first. Never paste credentials into the data field or chat. This page is not for production products.</p>
     </main>
   );
 }
