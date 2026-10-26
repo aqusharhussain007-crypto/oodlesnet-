@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { writeTestWriterAudit } from "@/lib/test-writer-audit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -167,15 +168,38 @@ export async function POST(request) {
     const created = results.filter((item) => item.status === "created").length;
     const duplicates = results.filter((item) => item.status === "duplicate").length;
     const failed = results.filter((item) => item.status === "failed").length;
+
+    let audit = { logged: false };
+    const batchId = crypto.randomUUID();
+    try {
+      audit = {
+        logged: true,
+        eventId: await writeTestWriterAudit(db, {
+          operation: "batch_product_create",
+          batchId,
+          requested: results.length,
+          created,
+          duplicates,
+          failed,
+          outcome: failed > 0 ? "partial_failure" : duplicates > 0 ? "completed_with_duplicates" : "success",
+        }),
+      };
+    } catch {
+      // Writes may already have succeeded. Do not hide that fact or encourage blind retries.
+      audit = { logged: false, warning: "Batch writes were attempted, but audit logging failed. Review per-record results before any retry." };
+    }
+
     return NextResponse.json({
       ok: failed === 0 && duplicates === 0,
       mode: "written",
       targetProject: "oodlesnet-test",
       collection: "products",
+      batchId,
       requested: results.length,
       created,
       duplicates,
       failed,
+      audit,
       results,
       message: "Create-only writes were attempted. Existing documents were never overwritten.",
     }, { status: failed || duplicates ? 207 : 200 });
