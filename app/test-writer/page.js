@@ -30,7 +30,10 @@ export default function TestWriterPage() {
     const action = event.nativeEvent.submitter?.value || "dry-run";
     const isWrite = action === "write";
     const isVerify = action === "verify";
-    if (isWrite && !confirmTestWrite) {
+    const isDuplicate = action === "duplicate";
+    const isInvalid = action === "invalid";
+    const isBadAuth = action === "bad-auth";
+    if ((isWrite || isDuplicate) && !confirmTestWrite) {
       setResult("Tick the confirmation box before writing the one test record.");
       return;
     }
@@ -43,12 +46,16 @@ export default function TestWriterPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${submittedToken}`,
+          Authorization: `Bearer ${isBadAuth ? "deliberately-wrong-test-token" : submittedToken}`,
         },
         body: JSON.stringify(
           isVerify
             ? { action: "verify", documentId: "LMXGtD37utGDi2yWucUr" }
-            : { confirmWrite: isWrite, product: sampleProduct },
+            : {
+                confirmWrite: isWrite || isDuplicate,
+                ...(isDuplicate ? { documentId: "LMXGtD37utGDi2yWucUr" } : {}),
+                product: isInvalid ? { ...sampleProduct, store: [{ name: "", price: -1, url: "not-a-url" }] } : sampleProduct,
+              },
         ),
       });
       const data = await response.json().catch(() => ({ error: "Response was not valid JSON." }));
@@ -86,6 +93,15 @@ export default function TestWriterPage() {
           <button type="submit" name="action" value="verify" disabled={busy || !token.trim()} style={{ padding: "12px 18px" }}>
             {busy ? "Checking…" : "Verify saved record"}
           </button>
+          <button type="submit" name="action" value="duplicate" disabled={busy || !token.trim() || !confirmTestWrite} style={{ padding: "12px 18px" }}>
+            Test duplicate protection
+          </button>
+          <button type="submit" name="action" value="invalid" disabled={busy || !token.trim()} style={{ padding: "12px 18px" }}>
+            Test invalid data
+          </button>
+          <button type="submit" name="action" value="bad-auth" disabled={busy || !token.trim()} style={{ padding: "12px 18px" }}>
+            Test wrong token
+          </button>
         </div>
         <label style={{ display: "block", marginTop: 20 }}>
           <input
@@ -98,7 +114,7 @@ export default function TestWriterPage() {
         </label>
       </form>
       {result && <pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere", marginTop: 24, padding: 14, background: "#eee", color: "#111" }}>{result}</pre>}
-      <p style={{ marginTop: 24, fontSize: 14 }}>The test endpoint uses create-only writes and will not overwrite an existing document. Do not use this form for real product listings.</p>
+      <p style={{ marginTop: 24, fontSize: 14 }}>Test controls check full read-back, duplicate rejection (409), invalid-data rejection (400), and bad-token rejection (401). Duplicate testing requires the confirmation checkbox but must not create or overwrite data. The endpoint is hard-locked to oodlesnet-test. Do not use this form for real product listings.</p>
     </main>
   );
 }
