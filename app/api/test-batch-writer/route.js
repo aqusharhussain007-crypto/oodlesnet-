@@ -3,6 +3,7 @@ import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { randomUUID } from "node:crypto";
 import { writeTestWriterAudit } from "@/lib/test-writer-audit";
+import { enforceTestWriterRateLimit } from "@/lib/test-writer-rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -103,6 +104,15 @@ export async function POST(request) {
   const token = process.env.TEST_WRITER_TOKEN;
   if (!token) return fail("Test writer authentication is not configured.", 503);
   if (request.headers.get("authorization") !== `Bearer ${token}`) return fail("Unauthorized.", 401);
+
+  // Apply a shared, persistent limit only after authentication succeeds.
+  let rateLimitResponse;
+  try {
+    rateLimitResponse = await enforceTestWriterRateLimit(getDb());
+  } catch {
+    return fail("Test writer rate limiter is unavailable; request was not processed.", 503);
+  }
+  if (rateLimitResponse) return rateLimitResponse;
 
   let body;
   try { body = await request.json(); } catch { return fail("Request body must be valid JSON.", 400); }
