@@ -112,6 +112,9 @@ export async function POST(request) {
     return fail("Request body must be valid JSON.", 400);
   }
   if (!body || typeof body !== "object" || Array.isArray(body)) return fail("Request body must be a JSON object.", 400);
+  // Reject missing credentials before checking server configuration, so anonymous requests get 401.
+  const authorization = request.headers.get("authorization") || "";
+  if (!authorization.startsWith("Bearer ")) return fail("A Firebase ID token is required.", 401);
   let app;
   try {
     app = getProductionAdminApp();
