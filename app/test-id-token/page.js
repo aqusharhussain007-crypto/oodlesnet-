@@ -17,6 +17,7 @@ export default function FirebaseIdTokenTestPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
+  const [uid, setUid] = useState("");
   const [message, setMessage] = useState("");
   const [result, setResult] = useState("");
   const [busy, setBusy] = useState(false);
@@ -27,6 +28,7 @@ export default function FirebaseIdTokenTestPage() {
     setMessage("");
     setResult("");
     setToken("");
+    setUid("");
     try {
       const response = await fetch(
         "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + encodeURIComponent(apiKey.trim()),
@@ -55,6 +57,7 @@ export default function FirebaseIdTokenTestPage() {
       }
       if (!data.idToken) throw new Error("Firebase did not return an ID token.");
       setToken(data.idToken);
+      setUid(data.localId || "UID unavailable");
       setMessage("Signed in. You can now run the dry-run test. The sample will not be written to Firestore.");
     } catch (error) {
       setMessage(error.message || "Request failed.");
@@ -111,6 +114,7 @@ export default function FirebaseIdTokenTestPage() {
       {message && <p role="status" style={{ marginTop: 16, overflowWrap: "anywhere" }}>{message}</p>}
       {token && <section style={{ marginTop: 18, padding: 14, border: "1px solid #888", borderRadius: 8 }}>
         <h2 style={{ fontSize: 20, fontWeight: 700 }}>Authentication succeeded</h2>
+        <p>Test account UID: <code>{uid}</code></p>
         <p>Token is held in memory and is not displayed. Tap below to verify authentication and product validation in dry-run mode.</p>
         <button disabled={busy} type="button" onClick={runDryRun} style={{ padding: 12, fontWeight: 700 }}>{busy ? "Testing…" : "Run safe dry-run test"}</button>
         <p style={{ fontSize: 13 }}>This sends a sample product without confirmWrite=true. It cannot create a Firestore document.</p>
