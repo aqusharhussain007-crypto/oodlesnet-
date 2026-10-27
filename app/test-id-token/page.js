@@ -17,25 +17,33 @@ export default function FirebaseIdTokenTestPage() {
     setToken("");
     try {
       const response = await fetch(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + encodeURIComponent(apiKey),
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + encodeURIComponent(apiKey.trim()),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, returnSecureToken: true }),
+          body: JSON.stringify({
+            email: email.trim(),
+            password,
+            returnSecureToken: true,
+          }),
         }
       );
       const data = await response.json();
       if (!response.ok) {
+        const code = data.error?.message || "";
         const messages = {
+          CONFIGURATION_NOT_FOUND: "Firebase Authentication is not configured for this project yet. In the test project, open Build → Authentication → Get started, then enable Email/Password under Sign-in method.",
           EMAIL_NOT_FOUND: "This email does not exist in the Firebase project for this API key.",
           INVALID_PASSWORD: "Password is incorrect.",
           INVALID_LOGIN_CREDENTIALS: "Email or password is incorrect for this Firebase project.",
           USER_DISABLED: "This account is disabled.",
           TOO_MANY_ATTEMPTS_TRY_LATER: "Too many attempts. Wait before trying again.",
           API_KEY_HTTP_REFERRER_BLOCKED: "This test API key blocks this website. Do not weaken production key restrictions.",
-          OPERATION_NOT_ALLOWED: "Email/Password sign-in is not enabled in this Firebase project.",
+          API_KEY_INVALID: "The API key is invalid. Copy the Web API key from the oodlesnet-test project, not production.",
+          OPERATION_NOT_ALLOWED: "Email/Password sign-in is not enabled in this Firebase project. Enable it in Authentication → Sign-in method.",
+          PROJECT_NOT_FOUND: "The project for this API key was not found. Verify that the key belongs to oodlesnet-test.",
         };
-        throw new Error(messages[data.error?.message] || data.error?.message || "Sign-in failed.");
+        throw new Error(messages[code] || code || "Sign-in failed. Check the test project's Firebase Authentication setup.");
       }
       setToken(data.idToken || "");
       setMessage(data.idToken ? "Sign-in successful. Copy the token only into the isolated test endpoint. Never share it in chat." : "No ID token was returned.");
