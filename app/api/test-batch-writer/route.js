@@ -227,7 +227,16 @@ export async function POST(request) {
     const duplicates = results.filter((item) => item.status === "duplicate").length;
     const failed = results.filter((item) => item.status === "failed").length;
     const status = failed > 0 ? "partial_failure" : duplicates > 0 ? "completed_with_duplicates" : "completed";
-    await batchRef.set({ status, requested: results.length, created: created + recovered, newlyCreated: created, recovered, duplicates, failed, updatedAt: new Date() }, { merge: true });
+    let batchTracking = { saved: false };
+    try {
+      await batchRef.set({ status, requested: results.length, created: created + recovered, newlyCreated: created, recovered, duplicates, failed, updatedAt: new Date() }, { merge: true });
+      batchTracking = { saved: true, status };
+    } catch {
+      batchTracking = {
+        saved: false,
+        warning: "Product write attempts completed, but batch progress could not be saved. Review each result and retry only with the same Batch ID and unchanged data.",
+      };
+    }
 
     let audit = { logged: false };
     try {
@@ -260,6 +269,7 @@ export async function POST(request) {
       recovered,
       duplicates,
       failed,
+      batchTracking,
       audit,
       results,
       message: "Create-only writes were attempted. Reuse this batchId and the exact same data to safely recover a partial batch; existing documents are never overwritten.",
