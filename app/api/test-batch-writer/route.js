@@ -229,6 +229,10 @@ export async function POST(request) {
     const status = failed > 0 ? "partial_failure" : duplicates > 0 ? "completed_with_duplicates" : "completed";
     let batchTracking = { saved: false };
     try {
+      // Fault injection is available only when explicitly enabled in the isolated test deployment.
+      if (body.simulateBatchTrackingFailure === true && process.env.ENABLE_TEST_FAILURE_SIMULATION === "true") {
+        throw new Error("Intentional test-only batch tracking failure.");
+      }
       await batchRef.set({ status, requested: results.length, created: created + recovered, newlyCreated: created, recovered, duplicates, failed, updatedAt: new Date() }, { merge: true });
       batchTracking = { saved: true, status };
     } catch {
