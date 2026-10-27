@@ -80,14 +80,23 @@ async function requireAdmin(request, app) {
 }
 
 export async function GET() {
+  const projectConfigured = process.env.FIREBASE_PROJECT_ID === PRODUCTION_PROJECT_ID;
+  const credentialsConfigured = Boolean(
+    process.env.FIREBASE_CLIENT_EMAIL && normalizePrivateKey(process.env.FIREBASE_PRIVATE_KEY)
+  );
+  const adminAllowlistConfigured = Boolean(
+    (process.env.PRODUCTION_PRODUCT_WRITER_ADMIN_UIDS || "").split(",").some((uid) => uid.trim())
+  );
+
   return NextResponse.json({
     ok: true,
     service: "oodlesnet-production-product-writer",
     projectLocked: PRODUCTION_PROJECT_ID,
     mode: "dry-run by default",
-    writesEnabled: true,
+    configurationReady: projectConfigured && credentialsConfigured && adminAllowlistConfigured,
     maxBodyBytes: MAX_BODY_BYTES,
-    message: "POST requires a verified Firebase ID token from an allowlisted administrator. Actual creation also requires confirmWrite=true.",
+    writeRequirements: ["valid Firebase ID token", "UID in server-side admin allowlist", "confirmWrite=true"],
+    message: "Status only; POST requires verified admin authentication. Without confirmWrite=true, POST performs no write.",
   }, { headers: { "Cache-Control": "no-store" } });
 }
 
