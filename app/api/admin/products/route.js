@@ -76,9 +76,10 @@ async function requireAdmin(request, app) {
     return { error: fail("Firebase ID token is invalid or expired.", 401) };
   }
   const verifiedUid = String(decoded.uid || "").trim();
-  const allowed = allowlist.some((allowedUid) => String(allowedUid || "").trim() === verifiedUid);
+  const normalizeUid = (value) => String(value || "").normalize("NFKC").replace(/[^A-Za-z0-9]/g, "");
+  const allowed = allowlist.some((allowedUid) => normalizeUid(allowedUid) === normalizeUid(verifiedUid));
   if (!allowed) {
-    return { error: NextResponse.json({ ok: false, error: "Administrator access is required.", diagnostic: { verifiedUid, allowlistCount: allowlist.length, uidMatched: false, project: TEST_PROJECT_ID } }, { status: 403, headers: { "Cache-Control": "no-store" } }) };
+    return { error: NextResponse.json({ ok: false, error: "Administrator access is required.", diagnostic: { allowlistCount: allowlist.length, uidMatched: false, project: TEST_PROJECT_ID } }, { status: 403, headers: { "Cache-Control": "no-store" } }) };
   }
   return { uid: verifiedUid };
 }
