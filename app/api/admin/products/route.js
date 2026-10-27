@@ -13,10 +13,18 @@ function fail(message, status) {
   return NextResponse.json({ ok: false, error: message }, { status, headers: { "Cache-Control": "no-store" } });
 }
 
+function normalizePrivateKey(raw) {
+  let key = String(raw || "").trim();
+  if ((key.startsWith('"') && key.endsWith('"')) || (key.startsWith("'") && key.endsWith("'"))) {
+    key = key.slice(1, -1);
+  }
+  return key.replace(/\\n/g, "\n");
+}
+
 function getProductionAdminApp() {
   const projectId = process.env.FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  const privateKey = normalizePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
   if (projectId !== PRODUCTION_PROJECT_ID) {
     throw new Error("Production writer is disabled: Firebase project configuration does not match the fixed production project.");
   }
@@ -95,9 +103,6 @@ export async function POST(request) {
     return fail("Request body must be valid JSON.", 400);
   }
   if (!body || typeof body !== "object" || Array.isArray(body)) return fail("Request body must be a JSON object.", 400);
-  const validationError = validateProduct(body.product);
-  if (validationError) return fail(validationError, 400);
-
   let app;
   try {
     app = getProductionAdminApp();
@@ -106,6 +111,9 @@ export async function POST(request) {
   }
   const auth = await requireAdmin(request, app);
   if (auth.error) return auth.error;
+
+  const validationError = validateProduct(body.product);
+  if (validationError) return fail(validationError, 400);
 
   const product = body.product;
   const data = {
