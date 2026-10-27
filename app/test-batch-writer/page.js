@@ -22,6 +22,7 @@ export default function TestBatchWriterPage() {
   const [documentId, setDocumentId] = useState("");
   const [batchId, setBatchId] = useState(() => `batch-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
   const [confirmWrite, setConfirmWrite] = useState(false);
+  const [simulateBatchTrackingFailure, setSimulateBatchTrackingFailure] = useState(false);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState("");
 
@@ -53,7 +54,7 @@ export default function TestBatchWriterPage() {
       const response = await fetch("/api/test-batch-writer", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${submittedToken}` },
-        body: JSON.stringify({ format, data: submittedData, batchId: batchId.trim(), confirmWrite: write }),
+        body: JSON.stringify({ format, data: submittedData, batchId: batchId.trim(), confirmWrite: write, simulateBatchTrackingFailure }),
       });
       const json = await response.json().catch(() => ({ error: "Response was not valid JSON." }));
       setResult(JSON.stringify({ httpStatus: response.status, ...json }, null, 2));
@@ -99,6 +100,10 @@ export default function TestBatchWriterPage() {
           <button type="submit" value="dry-run" disabled={busy || !token.trim() || !data.trim()} style={{ padding: "12px 18px" }}>{busy ? "Working…" : "Validate / Dry-run"}</button>
           <button type="submit" value="write" disabled={busy || !token.trim() || !data.trim() || !confirmWrite} style={{ padding: "12px 18px" }}>{busy ? "Working…" : "Write test batch"}</button>
         </div>
+        <label style={{ display: "block", marginTop: 16 }}>
+          <input type="checkbox" checked={simulateBatchTrackingFailure} onChange={(event) => setSimulateBatchTrackingFailure(event.target.checked)} style={{ marginRight: 8 }} />
+          Simulate batch progress-save failure (test only; requires ENABLE_TEST_FAILURE_SIMULATION=true in test deployment)
+        </label>
         <label style={{ display: "block", marginTop: 20 }}>
           <input type="checkbox" checked={confirmWrite} onChange={(event) => setConfirmWrite(event.target.checked)} style={{ marginRight: 8 }} />
           I confirm these are test-only records for the oodlesnet-test project.
