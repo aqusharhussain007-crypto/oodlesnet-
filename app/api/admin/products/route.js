@@ -103,6 +103,9 @@ export async function GET() {
 export async function POST(request) {
   const length = Number(request.headers.get("content-length") || 0);
   if (length > MAX_BODY_BYTES) return fail("Request exceeds the 50 KB limit.", 413);
+  // Reject anonymous requests before parsing the request body or checking server configuration.
+  const authorization = request.headers.get("authorization") || "";
+  if (!authorization.startsWith("Bearer ")) return fail("A Firebase ID token is required.", 401);
   let body;
   try {
     const raw = await request.text();
@@ -112,9 +115,6 @@ export async function POST(request) {
     return fail("Request body must be valid JSON.", 400);
   }
   if (!body || typeof body !== "object" || Array.isArray(body)) return fail("Request body must be a JSON object.", 400);
-  // Reject missing credentials before checking server configuration, so anonymous requests get 401.
-  const authorization = request.headers.get("authorization") || "";
-  if (!authorization.startsWith("Bearer ")) return fail("A Firebase ID token is required.", 401);
   let app;
   try {
     app = getProductionAdminApp();
