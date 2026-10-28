@@ -29,6 +29,17 @@ test("parses CSV quoting and store JSON column", () => {
   assert.equal(product.store[0].price, 1000);
 });
 
+test("accepts safe local product image paths used by the existing catalog", () => {
+  const result = validateImportBatch([{ ...validProduct, imageUrl: "/products/sample-phone.jpg" }]);
+  assert.equal(result.ok, true);
+});
+
+test("rejects unsafe local image paths", () => {
+  const result = validateImportBatch([{ ...validProduct, imageUrl: "/products/../private.jpg" }]);
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some((error) => error.includes("imageUrl")));
+});
+
 test("rejects invalid URL, invalid price, and missing document ID", () => {
   const result = validateImportBatch([
     { ...validProduct, documentId: "", store: [{ name: "Store", price: -2, url: "javascript:alert(1)" }] },
