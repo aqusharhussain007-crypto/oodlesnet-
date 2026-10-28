@@ -40,17 +40,26 @@ test("rejects unsafe local image paths", () => {
   assert.ok(result.errors.some((error) => error.includes("imageUrl")));
 });
 
-test("rejects invalid URL, invalid price, and missing document ID", () => {
-  const result = validateImportBatch([
-    { ...validProduct, documentId: "", store: [{ name: "Store", price: -2, url: "javascript:alert(1)" }] },
-  ]);
+test("rejects missing document ID", () => {
+  const result = validateImportBatch([{ ...validProduct, documentId: "" }]);
   assert.equal(result.ok, false);
   assert.ok(result.errors.some((error) => error.includes("documentId")));
+});
+
+test("rejects non-positive prices", () => {
+  const result = validateImportBatch([{ ...validProduct, store: [{ name: "Store", price: -2, url: "https://example.com/product" }] }]);
+  assert.equal(result.ok, false);
   assert.ok(result.errors.some((error) => error.includes("positive numeric price")));
 });
 
+test("rejects unsafe store URLs", () => {
+  const result = validateImportBatch([{ ...validProduct, store: [{ name: "Store", price: 2, url: "javascript:alert(1)" }] }]);
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some((error) => error.includes("valid HTTP(S) URL")));
+});
+
 test("rejects duplicate IDs and duplicate product identity within one file", () => {
-  const result = validateImportBatch([validProduct, { ...validProduct, documentId: "sample-phone-002" }]);
+  const result = validateImportBatch([validProduct, { ...validProduct, documentId: "sample-phone-001" }]);
   assert.equal(result.ok, false);
   assert.ok(result.errors.some((error) => error.includes("duplicate documentId")));
   assert.ok(result.errors.some((error) => error.includes("duplicate name/brand/category")));
