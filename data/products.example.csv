@@ -1,0 +1,2 @@
+documentId,name,brand,categorySlug,description,imageUrl,tags,store
+replace-with-stable-id,Example Product,Example Brand,smartphones,"Replace with verified description.",,"example","[{""name"":""Example Store"",""price"":1000,""offer"":""Replace with verified offer."",""url"":""https://example.com/product""}]"
