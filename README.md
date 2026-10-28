@@ -36,7 +36,7 @@ JSON may be either an array of product objects or an object containing a `produc
 
 ## Previously recorded single-writer tests
 
-The following checks were recorded on 2026-10-26 from user-provided screenshots for the older `/api/test-writer` endpoint. These are **not evidence that the new CSV/JSON parser or bulk endpoint has passed runtime tests**.
+The following checks were recorded on 2026-10-26 from user-provided screenshots for the older `/api/test-writer` endpoint. These are **not evidence that the new CSV/JSON parser or bulk endpoint has passed runtime tests**. The parser's Node.js unit tests were run locally after fixing the test cases: 9 passed, 0 failed. GitHub Actions was not used.
 
 | Check | Recorded result |
 | --- | --- |
@@ -48,7 +48,7 @@ The following checks were recorded on 2026-10-26 from user-provided screenshots 
 
 ## Required checks before considering this branch validated
 
-1. Run `node --test tests/product-import.test.mjs` and resolve all failures.
+1. **Completed locally:** `node --test tests/product-import.test.mjs` — 9 passed, 0 failed. Re-run on the branch when a Node.js environment is available; GitHub Actions was not used.
 2. On the isolated test deployment only, verify unauthenticated request (401), invalid token (401), non-allowlisted UID (403), missing allowlist (503), malformed body / invalid product (400), dry-run with no writes, successful test create, duplicate ID skip (without overwrite), duplicate name skip, and project mismatch fail-closed.
 3. Verify mixed batches report per-row results and that an uncertain network response does not encourage blind retries.
 4. Read back created test documents and verify all fields and store offers.
