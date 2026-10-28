@@ -212,7 +212,7 @@ export async function PATCH(request) {
   if (!body || body.documentId !== expectedDocumentId || body.confirmUpdate !== true) {
     return fail("This repair is restricted to the fixed OnePlus document and requires confirmUpdate=true.", 400);
   }
-  if (body.categorySlug !== "mobile") return fail("Only the approved mobile category is allowed for this repair.", 400);
+  if (body.categorySlug !== "smartphones") return fail("Only the approved smartphones category is allowed for this repair.", 400);
   if (typeof body.imageUrl !== "string" || body.imageUrl.length > 2000 || !validHttpUrl(body.imageUrl)) {
     return fail("A valid HTTP(S) image URL is required.", 400);
   }
@@ -260,7 +260,7 @@ export async function PATCH(request) {
 
     await ref.update({
       imageUrl: body.imageUrl,
-      categorySlug: "mobile",
+      categorySlug: "smartphones",
       store: comparisonStores,
       updatedAt: FieldValue.serverTimestamp(),
     });
@@ -273,7 +273,7 @@ export async function PATCH(request) {
         collection: "products",
         documentId: expectedDocumentId,
         productName: existingName,
-        categorySlug: "mobile",
+        categorySlug: "smartphones",
         storeNames: comparisonStores.map((offer) => offer.name),
         imageHost: new URL(body.imageUrl).hostname,
         createdAt: FieldValue.serverTimestamp(),
@@ -289,7 +289,7 @@ export async function PATCH(request) {
       collection: "products",
       documentId: expectedDocumentId,
       productName: existingName,
-      categorySlug: "mobile",
+      categorySlug: "smartphones",
       imageUrlUpdated: true,
       storeCount: 3,
       stores: ["OnePlus India", "Flipkart", "Croma"],
@@ -299,4 +299,20 @@ export async function PATCH(request) {
   } catch {
     return fail("The product repair failed. Verify Firestore before trying again.", 500);
   }
+}
+
+
+export async function DELETE(request) {
+ const authorization=request.headers.get('authorization')||'';
+ if(!authorization.startsWith('Bearer ')) return fail('A Firebase ID token is required.',401);
+ let body; try { const raw=await request.text(); if(Buffer.byteLength(raw,'utf8')>2000)return fail('Request too large.',413); body=JSON.parse(raw); } catch { return fail('Invalid JSON.',400); }
+ if(!body||body.confirmDelete!==true||body.categorySlug!=='mobile') return fail('Explicit mobile category deletion confirmation required.',400);
+ let app; try { app=getProductionAdminApp(); } catch(error) { return fail(error instanceof Error?error.message:'Configuration error.',503); }
+ const auth=await requireAdmin(request,app); if(auth.error)return auth.error;
+ try { const db=getFirestore(app); const remaining=await db.collection('products').where('categorySlug','==','mobile').limit(1).get(); if(!remaining.empty)return fail('Products still use mobile; nothing deleted.',409);
+ const categories=await db.collection('categories').where('slug','==','mobile').get(); if(categories.empty)return NextResponse.json({ok:true,mode:'already-absent',deletedCount:0,categorySlug:'mobile'},{headers:{'Cache-Control':'no-store'}});
+ const batch=db.batch(); categories.docs.forEach(doc=>batch.delete(doc.ref)); await batch.commit();
+ let auditLogged=true; try { await db.collection('product_writer_audit').add({actorUid:auth.uid,operation:'delete-empty-category',collection:'categories',categorySlug:'mobile',deletedDocumentIds:categories.docs.map(doc=>doc.id),createdAt:FieldValue.serverTimestamp()}); } catch { auditLogged=false; }
+ return NextResponse.json({ok:true,mode:'deleted',targetProject:PRODUCTION_PROJECT_ID,categorySlug:'mobile',deletedCount:categories.size,auditLogged},{headers:{'Cache-Control':'no-store'}});
+ } catch { return fail('Category deletion failed. Verify Firestore before retrying.',500); }
 }

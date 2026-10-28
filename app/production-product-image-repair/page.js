@@ -89,7 +89,7 @@ export default function LiveProductImageRepairPage() {
         body: JSON.stringify({
           documentId: DOCUMENT_ID,
           imageUrl: IMAGE_URL,
-          categorySlug: "mobile",
+          categorySlug: "smartphones",
           confirmUpdate: true,
         }),
         cache: "no-store",
@@ -97,8 +97,20 @@ export default function LiveProductImageRepairPage() {
       const data = await response.json().catch(() => ({}));
       setResult(JSON.stringify({ httpStatus: response.status, ...data }, null, 2));
       if (response.ok && data.ok === true && data.mode === "updated" && data.targetProject === TARGET_PROJECT && data.documentId === DOCUMENT_ID) {
+        
+        // Delete the old category only after the server confirms the product move.
+        const deleteResponse = await fetch("/api/admin/products", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+          body: JSON.stringify({ categorySlug: "mobile", confirmDelete: true }),
+          cache: "no-store",
+        });
+        const deleteData = await deleteResponse.json().catch(() => ({}));
+        setResult(JSON.stringify({ productMove: { httpStatus: response.status, ...data }, mobileCategoryCleanup: { httpStatus: deleteResponse.status, ...deleteData } }, null, 2));
         setUpdated(true);
-        setMessage("Repair confirmed: existing product updated, no duplicate created.");
+        setMessage(deleteResponse.ok && deleteData.ok === true
+          ? "Product moved to smartphones. The old mobile category was removed only after the server verified no products remained in it."
+          : "Product moved to smartphones, but mobile category cleanup was safely blocked or not confirmed. Check the result below; no product was deleted.");
       } else {
         setMessage("No successful repair confirmation received. Do not retry blindly.");
       }
@@ -115,7 +127,7 @@ export default function LiveProductImageRepairPage() {
     <main style={{ maxWidth: 680, margin: "20px auto", padding: 18, fontFamily: "Arial, sans-serif", lineHeight: 1.5, color: "#111" }}>
       <h1 style={{ fontSize: 26, fontWeight: 800 }}>Repair OnePlus Product Image</h1>
       <p><strong>Fixed live project:</strong> {TARGET_PROJECT}</p>
-      <p>This page repairs the existing OnePlus Nord CE5 5G document: fills its missing image, corrects its category to <code>mobile</code>, and adds three retailer offers for price comparison. It does not create a duplicate. Prices may change; Croma's shown price is a last-observed value, not a live guarantee.</p>
+      <p>This page repairs the existing OnePlus Nord CE5 5G document: fills its missing image, moves it into the <code>smartphones</code> category, and adds three retailer offers for price comparison. It does not create a duplicate. Prices may change; Croma's shown price is a last-observed value, not a live guarantee.</p>
       <div style={{ padding: 14, border: "1px solid #999", borderRadius: 10, margin: "16px 0" }}>
         <p><strong>Product image preview</strong></p>
         <img src={IMAGE_URL} alt="OnePlus Nord CE5 5G front and back" style={{ display: "block", width: "100%", maxWidth: 300, height: 300, objectFit: "contain", background: "#fff", borderRadius: 8 }} />
@@ -137,7 +149,7 @@ export default function LiveProductImageRepairPage() {
         <h2 style={{ fontSize: 20, fontWeight: 700 }}>Step 2 — Confirm the narrow repair</h2>
         <p>Signed-in UID: <code>{uid}</code></p>
         <p><strong>Document:</strong> <code>{DOCUMENT_ID}</code></p>
-        <p><strong>Fields changed:</strong> <code>imageUrl</code>, <code>categorySlug = mobile</code>, and the store comparison list.</p>
+        <p><strong>Fields changed:</strong> <code>imageUrl</code>, <code>categorySlug = smartphones</code>, and the store comparison list.</p>
         <ul style={{ paddingLeft: 22 }}>
           <li>OnePlus India — ₹24,999 official starting price</li>
           <li>Flipkart — ₹22,500 observed on 28 Oct 2026 for 8GB/128GB</li>
