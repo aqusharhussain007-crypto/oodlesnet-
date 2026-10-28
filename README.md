@@ -18,6 +18,7 @@ JSON may be either an array of product objects or an object containing a `produc
 
 - `documentId` is required and must be stable for each product.
 - `tags` may be pipe-separated (for example `phone|5g`) or a JSON string array.
+- `imageUrl` may be an HTTP(S) URL or a safe local `/products/...` path used by the existing catalog.
 - `store` must contain a JSON array of offers, each with `name`, positive numeric `price`, HTTP(S) `url`, and optional `offer`.
 - A maximum of 100 products is accepted per file.
 - The example templates contain placeholder data only and must not be imported as real listings.
@@ -52,5 +53,6 @@ The following checks were recorded on 2026-10-26 from user-provided screenshots 
 3. Verify mixed batches report per-row results and that an uncertain network response does not encourage blind retries.
 4. Read back created test documents and verify all fields and store offers.
 5. Confirm test credentials are scoped only to the isolated test project.
+6. Before production integration, reconcile the existing single-product writer’s stricter imageUrl validation with the catalog’s documented local `/products/...` image paths; do not merge this test-only route as a substitute for that review.
 
 Do not merge this branch to `main`, configure production credentials, or write to production until the isolated tests are reviewed and the user explicitly approves the production integration.
