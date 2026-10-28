@@ -140,8 +140,11 @@ async function callTool(name, args) {
     if (id !== undefined && (typeof id !== "string" || !/^[A-Za-z0-9_-]{1,100}$/.test(id))) throw new Error("invalid documentId");
     const ref = id ? products.doc(id) : products.doc();
     await ref.create({ ...data, createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
-    await db.collection("product_writer_audit").add({ operation: "chatgpt-test-create", collection: "products", documentId: ref.id, productName: data.name, createdAt: FieldValue.serverTimestamp() });
-    return { mode: "written", project: PROJECT_ID, collection: "products", documentId: ref.id, productName: data.name };
+    let auditLogged = true;
+    try {
+      await db.collection("product_writer_audit").add({ operation: "chatgpt-test-create", collection: "products", documentId: ref.id, productName: data.name, createdAt: FieldValue.serverTimestamp() });
+    } catch { auditLogged = false; }
+    return { mode: "written", project: PROJECT_ID, collection: "products", documentId: ref.id, productName: data.name, auditLogged, warning: auditLogged ? undefined : "Product was created but audit logging failed; do not retry, verify the document." };
   }
 
   if (name === "update_price") {
@@ -159,8 +162,11 @@ async function callTool(name, args) {
     if (args.confirmWrite !== true) return { mode: "dry-run", project: PROJECT_ID, documentId: id, storeName, oldPrice: current.find((offer) => offer.name === storeName).price, newPrice: price, message: "No write performed. Repeat with confirmWrite=true after review." };
     const updated = current.map((offer) => offer.name === storeName ? { ...offer, price } : offer);
     await ref.update({ store: updated, updatedAt: FieldValue.serverTimestamp() });
-    await db.collection("product_writer_audit").add({ operation: "chatgpt-test-price-update", collection: "products", documentId: id, storeName, newPrice: price, createdAt: FieldValue.serverTimestamp() });
-    return { mode: "written", project: PROJECT_ID, documentId: id, storeName, newPrice: price };
+    let auditLogged = true;
+    try {
+      await db.collection("product_writer_audit").add({ operation: "chatgpt-test-price-update", collection: "products", documentId: id, storeName, newPrice: price, createdAt: FieldValue.serverTimestamp() });
+    } catch { auditLogged = false; }
+    return { mode: "written", project: PROJECT_ID, documentId: id, storeName, newPrice: price, auditLogged, warning: auditLogged ? undefined : "Price was updated but audit logging failed; do not retry, verify the document." };
   }
 
   throw new Error("unknown tool");
