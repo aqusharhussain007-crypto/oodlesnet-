@@ -115,7 +115,7 @@ export default function LiveProductImageRepairPage() {
     <main style={{ maxWidth: 680, margin: "20px auto", padding: 18, fontFamily: "Arial, sans-serif", lineHeight: 1.5, color: "#111" }}>
       <h1 style={{ fontSize: 26, fontWeight: 800 }}>Repair OnePlus Product Image</h1>
       <p><strong>Fixed live project:</strong> {TARGET_PROJECT}</p>
-      <p>This page updates only the existing OnePlus Nord CE5 5G document. It sets its category to <code>mobile</code> so it matches the site's mobile category and fills the missing image. It does not create a product or change its price or store links.</p>
+      <p>This page repairs the existing OnePlus Nord CE5 5G document: fills its missing image, corrects its category to <code>mobile</code>, and adds three retailer offers for price comparison. It does not create a duplicate. Prices may change; Croma's shown price is a last-observed value, not a live guarantee.</p>
       <div style={{ padding: 14, border: "1px solid #999", borderRadius: 10, margin: "16px 0" }}>
         <p><strong>Product image preview</strong></p>
         <img src={IMAGE_URL} alt="OnePlus Nord CE5 5G front and back" style={{ display: "block", width: "100%", maxWidth: 300, height: 300, objectFit: "contain", background: "#fff", borderRadius: 8 }} />
@@ -137,7 +137,13 @@ export default function LiveProductImageRepairPage() {
         <h2 style={{ fontSize: 20, fontWeight: 700 }}>Step 2 — Confirm the narrow repair</h2>
         <p>Signed-in UID: <code>{uid}</code></p>
         <p><strong>Document:</strong> <code>{DOCUMENT_ID}</code></p>
-        <p><strong>Only fields changed:</strong> <code>imageUrl</code> and <code>categorySlug = mobile</code>.</p>
+        <p><strong>Fields changed:</strong> <code>imageUrl</code>, <code>categorySlug = mobile</code>, and the store comparison list.</p>
+        <ul style={{ paddingLeft: 22 }}>
+          <li>OnePlus India — ₹24,999 official starting price</li>
+          <li>Flipkart — ₹22,500 observed on 28 Oct 2026 for 8GB/128GB</li>
+          <li>Croma — ₹24,999 last observed on 26 Sep 2026 for 8GB/128GB Marble Mist; recheck checkout</li>
+        </ul>
+        <p style={{ fontSize: 13 }}>Listings may vary by colour, seller, delivery location, stock and bank offers. Confirm the final price on the retailer site.</p>
         <form onSubmit={repairProduct} style={{ display: "grid", gap: 14, marginTop: 14 }}>
           <label style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
             <input type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} style={{ marginTop: 6, width: 20, height: 20 }} />
