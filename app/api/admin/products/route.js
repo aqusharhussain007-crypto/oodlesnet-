@@ -194,7 +194,7 @@ export async function POST(request) {
 }
 
 
-// Narrow repair operation: only update the known OnePlus document's image and category.
+// Narrow repair operation: update only the known OnePlus document's image, category, and fixed comparison offers.
 export async function PATCH(request) {
   const authorization = request.headers.get("authorization") || "";
   if (!authorization.startsWith("Bearer ")) return fail("A Firebase ID token is required.", 401);
@@ -236,9 +236,32 @@ export async function PATCH(request) {
       return fail("The fixed document does not match the expected product; nothing was changed.", 409);
     }
 
+    // Server-controlled comparison offers: never accept arbitrary store URLs/prices from the browser.
+    const comparisonStores = [
+      {
+        name: "OnePlus India",
+        price: 24999,
+        offer: "Official starting price; verify the selected variant and final checkout price.",
+        url: "https://www.oneplus.in/nord-ce5",
+      },
+      {
+        name: "Flipkart",
+        price: 22500,
+        offer: "Observed on the retailer listing on 28 Oct 2026 for 8GB/128GB; seller availability and final price may change.",
+        url: "https://www.flipkart.com/oneplus-nord-ce5-5g-nexus-blue-256-gb/p/itm9259708fe4e3c",
+      },
+      {
+        name: "Croma",
+        price: 24999,
+        offer: "Last observed at ₹24,999 on 26 Sep 2026 for 8GB/128GB Marble Mist; recheck the current checkout price.",
+        url: "https://www.croma.com/oneplus-nord-ce5-5g-8gb-ram-128gb-marble-mist-/p/316555",
+      },
+    ];
+
     await ref.update({
       imageUrl: body.imageUrl,
       categorySlug: "mobile",
+      store: comparisonStores,
       updatedAt: FieldValue.serverTimestamp(),
     });
 
@@ -246,11 +269,12 @@ export async function PATCH(request) {
     try {
       await db.collection("product_writer_audit").add({
         actorUid: auth.uid,
-        operation: "repair-image-and-category",
+        operation: "repair-image-category-and-store-comparison",
         collection: "products",
         documentId: expectedDocumentId,
         productName: existingName,
         categorySlug: "mobile",
+        storeNames: comparisonStores.map((offer) => offer.name),
         imageHost: new URL(body.imageUrl).hostname,
         createdAt: FieldValue.serverTimestamp(),
       });
@@ -267,6 +291,8 @@ export async function PATCH(request) {
       productName: existingName,
       categorySlug: "mobile",
       imageUrlUpdated: true,
+      storeCount: 3,
+      stores: ["OnePlus India", "Flipkart", "Croma"],
       auditLogged,
       warning: auditLogged ? undefined : "Product was updated, but audit logging failed. Do not retry blindly.",
     }, { headers: { "Cache-Control": "no-store" } });
