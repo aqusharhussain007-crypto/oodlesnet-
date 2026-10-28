@@ -67,6 +67,30 @@ export default function FirebaseIdTokenTestPage() {
     }
   }
 
+  async function runAuthorizationProbe(kind) {
+    setBusy(true);
+    setMessage("");
+    setResult("");
+    try {
+      const headers = { "Content-Type": "application/json" };
+      if (kind === "invalid-token") headers.Authorization = "Bearer definitely-not-a-valid-firebase-id-token";
+      const response = await fetch("/api/admin/products", {
+        method: "POST",
+        headers,
+        body: JSON.stringify(SAMPLE_PRODUCT),
+        cache: "no-store",
+      });
+      const data = await response.json().catch(() => ({}));
+      const expected = response.status === 401;
+      setResult(JSON.stringify({ test: kind, expectedStatus: 401, httpStatus: response.status, passed: expected, ...data }, null, 2));
+      setMessage(expected ? "Authorization rejection passed. No write was performed." : "Unexpected response; inspect the result. No confirmWrite flag was sent.");
+    } catch (error) {
+      setMessage("Could not reach the test writer: " + (error.message || "network error"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function runDryRun() {
     if (!token) return;
     setBusy(true);
@@ -99,6 +123,12 @@ export default function FirebaseIdTokenTestPage() {
       <h1 style={{ fontSize: 26, fontWeight: 700 }}>Firebase ID Token — Isolated Test</h1>
       <p><strong>Use only the Web API key and test account from oodlesnet-test.</strong> Never enter your production password or use the production API key.</p>
       <p>Credentials go directly from your browser to Firebase Authentication. The token stays in this page's memory and is sent only to this deployment's test writer when you tap the dry-run button.</p>
+      <section style={{ margin: "16px 0", padding: 14, border: "1px solid #888", borderRadius: 8 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 700 }}>Safe authorization checks</h2>
+        <p>These send no token or a deliberately invalid token. Both must return HTTP 401 and cannot write data.</p>
+        <button disabled={busy} type="button" onClick={() => runAuthorizationProbe("missing-token")} style={{ padding: 12, fontWeight: 700, marginRight: 8, marginBottom: 8 }}>Test missing token (401)</button>
+        <button disabled={busy} type="button" onClick={() => runAuthorizationProbe("invalid-token")} style={{ padding: 12, fontWeight: 700, marginBottom: 8 }}>Test invalid token (401)</button>
+      </section>
       <form onSubmit={signIn} style={{ display: "grid", gap: 12 }}>
         <label>Test-project Firebase Web API key
           <input required autoComplete="off" value={apiKey} onChange={e => setApiKey(e.target.value)} style={{ display: "block", width: "100%", padding: 10, boxSizing: "border-box" }} />
