@@ -194,7 +194,7 @@ export async function POST(request) {
 }
 
 
-// Narrow repair operation: only update the known OnePlus document's image and category.
+// Narrow repair operation: update only the known OnePlus document's image, category, and fixed comparison offers.
 export async function PATCH(request) {
   const authorization = request.headers.get("authorization") || "";
   if (!authorization.startsWith("Bearer ")) return fail("A Firebase ID token is required.", 401);
