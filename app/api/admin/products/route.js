@@ -192,3 +192,85 @@ export async function POST(request) {
     return fail("Product creation failed. Verify configuration and database availability before retrying.", 500);
   }
 }
+
+
+// Narrow repair operation: only update the known OnePlus document's image and category.
+export async function PATCH(request) {
+  const authorization = request.headers.get("authorization") || "";
+  if (!authorization.startsWith("Bearer ")) return fail("A Firebase ID token is required.", 401);
+
+  let body;
+  try {
+    const raw = await request.text();
+    if (Buffer.byteLength(raw, "utf8") > 5_000) return fail("Request exceeds the 5 KB limit.", 413);
+    body = JSON.parse(raw);
+  } catch {
+    return fail("Request body must be valid JSON.", 400);
+  }
+
+  const expectedDocumentId = "oneplus-nord-ce5-5g-live-20261028";
+  if (!body || body.documentId !== expectedDocumentId || body.confirmUpdate !== true) {
+    return fail("This repair is restricted to the fixed OnePlus document and requires confirmUpdate=true.", 400);
+  }
+  if (body.categorySlug !== "mobile") return fail("Only the approved mobile category is allowed for this repair.", 400);
+  if (typeof body.imageUrl !== "string" || body.imageUrl.length > 2000 || !validHttpUrl(body.imageUrl)) {
+    return fail("A valid HTTP(S) image URL is required.", 400);
+  }
+
+  let app;
+  try {
+    app = getProductionAdminApp();
+  } catch (error) {
+    return fail(error instanceof Error ? error.message : "Production writer configuration error.", 503);
+  }
+  const auth = await requireAdmin(request, app);
+  if (auth.error) return auth.error;
+
+  try {
+    const db = getFirestore(app);
+    const ref = db.collection("products").doc(expectedDocumentId);
+    const existing = await ref.get();
+    if (!existing.exists) return fail("The fixed product document was not found; nothing was changed.", 404);
+    const existingName = existing.get("name");
+    if (existingName !== "OnePlus Nord CE5 5G") {
+      return fail("The fixed document does not match the expected product; nothing was changed.", 409);
+    }
+
+    await ref.update({
+      imageUrl: body.imageUrl,
+      categorySlug: "mobile",
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+
+    let auditLogged = true;
+    try {
+      await db.collection("product_writer_audit").add({
+        actorUid: auth.uid,
+        operation: "repair-image-and-category",
+        collection: "products",
+        documentId: expectedDocumentId,
+        productName: existingName,
+        categorySlug: "mobile",
+        imageHost: new URL(body.imageUrl).hostname,
+        createdAt: FieldValue.serverTimestamp(),
+      });
+    } catch {
+      auditLogged = false;
+    }
+
+    return NextResponse.json({
+      ok: true,
+      mode: "updated",
+      targetProject: PRODUCTION_PROJECT_ID,
+      collection: "products",
+      documentId: expectedDocumentId,
+      productName: existingName,
+      categorySlug: "mobile",
+      imageUrlUpdated: true,
+      auditLogged,
+      warning: auditLogged ? undefined : "Product was updated, but audit logging failed. Do not retry blindly.",
+    }, { headers: { "Cache-Control": "no-store" } });
+  } catch {
+    return fail("The product repair failed. Verify Firestore before trying again.", 500);
+  }
+}
