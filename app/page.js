@@ -281,6 +281,14 @@ const suggestions = useMemo(() => {
               (cat.slug === "smartphone" && p.categorySlug === "smartphones")
           );
 
+          // Keep the newly moved OnePlus visible in the first four homepage cards.
+          if (cat.slug === "smartphone") {
+            items.sort((a, b) =>
+              Number(b.id === "oneplus-nord-ce5-5g-live-20261028") -
+              Number(a.id === "oneplus-nord-ce5-5g-live-20261028")
+            );
+          }
+
           if (items.length === 0) return null;
 
           return (
