@@ -26,7 +26,7 @@ function getTestAdminApp() {
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
   const privateKey = normalizePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
   if (projectId !== TEST_PROJECT_ID) {
-    throw new Error("Test writer is disabled: Firebase project configuration does not match the fixed production project.");
+    throw new Error("Test writer is disabled: Firebase project configuration does not match the fixed test project.");
   }
   if (!clientEmail || !privateKey) throw new Error("Firebase Admin credentials are not configured.");
   const name = "oodlesnet-isolated-auth-test-writer";
@@ -75,13 +75,8 @@ async function requireAdmin(request, app) {
   } catch {
     return { error: fail("Firebase ID token is invalid or expired.", 401) };
   }
-  const verifiedUid = String(decoded.uid || "").trim();
-  const normalizeUid = (value) => String(value || "").normalize("NFKC").replace(/[^A-Za-z0-9]/g, "");
-  const allowed = allowlist.some((allowedUid) => normalizeUid(allowedUid) === normalizeUid(verifiedUid));
-  if (!allowed) {
-    return { error: NextResponse.json({ ok: false, error: "Administrator access is required.", diagnostic: { allowlistCount: allowlist.length, uidMatched: false, project: TEST_PROJECT_ID } }, { status: 403, headers: { "Cache-Control": "no-store" } }) };
-  }
-  return { uid: verifiedUid };
+  if (!allowlist.includes(decoded.uid)) return { error: fail("Administrator access is required.", 403) };
+  return { uid: decoded.uid };
 }
 
 export async function GET() {
