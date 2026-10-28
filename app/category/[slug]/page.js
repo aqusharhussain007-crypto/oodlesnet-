@@ -38,20 +38,18 @@ export async function generateMetadata({ params }) {
 export default async function CategoryPage({ params }) {
   const slug = params.slug;
 
-  const q = query(
-    collection(db, "products"),
-    where("categorySlug", "==", slug)
-  );
-
-  const snap = await getDocs(q);
-
-  const products = snap.docs.map((d) => ({
-    id: d.id,
-    ...d.data(),
-  }));
-
-  const title =
-    slug.charAt(0).toUpperCase() + slug.slice(1);
+  const categorySlugs = slug === "smartphones" || slug === "smartphone"
+    ? ["smartphones", "smartphone"]
+    : [slug];
+  const snapshots = await Promise.all(categorySlugs.map((categorySlug) =>
+    getDocs(query(collection(db, "products"), where("categorySlug", "==", categorySlug)))
+  ));
+  const byId = new Map();
+  snapshots.forEach((snap) => snap.docs.forEach((d) => byId.set(d.id, { id: d.id, ...d.data() })));
+  const products = [...byId.values()];
+  const title = slug === "smartphones" || slug === "smartphone"
+    ? "Smartphones"
+    : slug.charAt(0).toUpperCase() + slug.slice(1);
 
   return (
     <main className="page-container" style={{ padding: 12 }}>

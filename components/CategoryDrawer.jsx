@@ -17,13 +17,18 @@ export default function CategoryDrawer({ onClose }) {
       const snap = await getDocs(collection(db, "categories"));
       const items = snap.docs.map((d) => d.data());
 
-      setCategories([
-        { slug: "all", name: "All" },
-        ...items.map((c) => ({
-          slug: c.slug,
-          name: c.name,
-        })),
-      ]);
+      const seen = new Set();
+      const visible = items.map((c) => ({
+        slug: c.slug === "smartphone" ? "smartphones" : c.slug,
+        name: c.slug === "smartphone" || c.slug === "smartphones" ? "Smartphones" : c.name,
+      })).filter((c) => {
+        if (c.slug === "smartphones") {
+          if (seen.has("smartphones")) return false;
+          seen.add("smartphones");
+        }
+        return true;
+      });
+      setCategories([{ slug: "all", name: "All" }, ...visible]);
     }
     loadCategories();
   }, []);

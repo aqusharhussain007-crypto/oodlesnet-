@@ -293,7 +293,7 @@ const suggestions = useMemo(() => {
 
           return (
             <div key={cat.slug}>
-              <h2 className="section-title">{cat.name}</h2>
+              <h2 className="section-title">{cat.slug === "smartphone" ? "Smartphones" : cat.name}</h2>
 
               <div className="products-grid">
                 {products.length === 0 ? (
@@ -307,7 +307,7 @@ const suggestions = useMemo(() => {
                 {items.length > 4 && (
                   <div
                     onClick={() =>
-                      router.push(`/category/${cat.slug}`)
+                      router.push(`/category/${cat.slug === "smartphone" ? "smartphones" : cat.slug}`)
                     }
                     style={{
                       minHeight: 96,
