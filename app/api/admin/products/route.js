@@ -265,6 +265,22 @@ export async function PATCH(request) {
       updatedAt: FieldValue.serverTimestamp(),
     });
 
+    // Homepage and category drawer load category documents separately from products.
+    // Ensure the Smartphones category exists after the move, without duplicating it.
+    const categoryQuery = await db.collection("categories")
+      .where("slug", "==", "smartphones")
+      .limit(1)
+      .get();
+    let categoryCreated = false;
+    if (categoryQuery.empty) {
+      await db.collection("categories").doc("smartphones").create({
+        slug: "smartphones",
+        name: "Smartphones",
+        order: 1,
+      });
+      categoryCreated = true;
+    }
+
     let auditLogged = true;
     try {
       await db.collection("product_writer_audit").add({
@@ -290,6 +306,8 @@ export async function PATCH(request) {
       documentId: expectedDocumentId,
       productName: existingName,
       categorySlug: "smartphones",
+      categoryDocumentEnsured: true,
+      categoryCreated,
       imageUrlUpdated: true,
       storeCount: 3,
       stores: ["OnePlus India", "Flipkart", "Croma"],
