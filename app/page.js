@@ -268,8 +268,17 @@ const suggestions = useMemo(() => {
 
       {!search &&
         categories.map((cat) => {
+          // Legacy category is "smartphone" (singular); include products already
+          // migrated to "smartphones" and suppress the duplicate plural section.
+          if (
+            cat.slug === "smartphones" &&
+            categories.some((item) => item.slug === "smartphone")
+          ) return null;
+
           const items = filtered.filter(
-            (p) => p.categorySlug === cat.slug
+            (p) =>
+              p.categorySlug === cat.slug ||
+              (cat.slug === "smartphone" && p.categorySlug === "smartphones")
           );
 
           if (items.length === 0) return null;
