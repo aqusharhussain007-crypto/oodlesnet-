@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { validateImportBatch } from "@/lib/product-import.mjs";
 
@@ -41,19 +40,17 @@ function getTestAdminApp() {
   }, name);
 }
 
-async function requireTestAdmin(request, app) {
+function requireTestWriterToken(request) {
+  const expected = process.env.TEST_WRITER_TOKEN || "";
   const header = request.headers.get("authorization") || "";
-  if (!header.startsWith("Bearer ")) return { error: fail("A Firebase ID token is required.", 401) };
-  const allowlist = (process.env.TEST_WRITER_ADMIN_UIDS || "").split(",").map((uid) => uid.trim()).filter(Boolean);
-  if (!allowlist.length) return { error: fail("Test writer admin allowlist is not configured.", 503) };
-  let decoded;
-  try {
-    decoded = await getAuth(app).verifyIdToken(header.slice(7), true);
-  } catch {
-    return { error: fail("Firebase ID token is invalid or expired.", 401) };
-  }
-  if (!allowlist.includes(decoded.uid)) return { error: fail("Administrator access is required.", 403) };
-  return { uid: decoded.uid };
+  const supplied = header.startsWith("Bearer ") ? header.slice(7) : "";
+  if (!expected) return { error: fail("Test writer token is not configured for this Preview deployment.", 503) };
+  if (!supplied || supplied.length !== expected.length) return { error: fail("Unauthorized.", 401) };
+  // Constant-time comparison for equal-length secrets.
+  let diff = 0;
+  for (let i = 0; i < expected.length; i++) diff |= expected.charCodeAt(i) ^ supplied.charCodeAt(i);
+  if (diff !== 0) return { error: fail("Unauthorized.", 401) };
+  return { uid: "test-token-authorized" };
 }
 
 export async function GET() {
@@ -62,6 +59,7 @@ export async function GET() {
     service: "oodlesnet-test-bulk-product-importer",
     projectLocked: TEST_PROJECT_ID,
     diagnostics: {
+      tokenConfigured: Boolean(process.env.TEST_WRITER_TOKEN),
       configuredProjectMatchesTest: process.env.FIREBASE_PROJECT_ID === TEST_PROJECT_ID,
       clientEmailConfigured: Boolean(process.env.FIREBASE_CLIENT_EMAIL),
       privateKeyConfigured: Boolean(process.env.FIREBASE_PRIVATE_KEY),
@@ -70,7 +68,7 @@ export async function GET() {
     mode: "dry-run by default",
     maxProducts: MAX_PRODUCTS,
     maxBodyBytes: MAX_BODY_BYTES,
-    writeRequirements: ["valid Firebase ID token", "UID in TEST_WRITER_ADMIN_UIDS", "confirmWrite=true"],
+    writeRequirements: ["test-only bearer token", "confirmWrite=true"],
   }, { headers: { "Cache-Control": "no-store" } });
 }
 
@@ -79,7 +77,7 @@ export async function POST(request) {
   if (length > MAX_BODY_BYTES) return fail("Request exceeds the 250 KB limit.", 413);
 
   const authorization = request.headers.get("authorization") || "";
-  if (!authorization.startsWith("Bearer ")) return fail("A Firebase ID token is required.", 401);
+  if (!authorization.startsWith("Bearer ")) return fail("A test writer token is required.", 401);
 
   let raw;
   try {
@@ -97,7 +95,7 @@ export async function POST(request) {
   try { app = getTestAdminApp(); } catch (error) {
     return fail(error instanceof Error ? error.message : "Test writer configuration error.", 503);
   }
-  const auth = await requireTestAdmin(request, app);
+  const auth = requireTestWriterToken(request);
   if (auth.error) return auth.error;
 
   const validation = validateImportBatch(body.products);
