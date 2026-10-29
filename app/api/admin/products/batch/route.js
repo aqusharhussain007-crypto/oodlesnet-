@@ -61,6 +61,12 @@ export async function GET() {
     ok: true,
     service: "oodlesnet-test-bulk-product-importer",
     projectLocked: TEST_PROJECT_ID,
+    diagnostics: {
+      configuredProjectMatchesTest: process.env.FIREBASE_PROJECT_ID === TEST_PROJECT_ID,
+      clientEmailConfigured: Boolean(process.env.FIREBASE_CLIENT_EMAIL),
+      privateKeyConfigured: Boolean(process.env.FIREBASE_PRIVATE_KEY),
+      adminAllowlistConfigured: Boolean(process.env.TEST_WRITER_ADMIN_UIDS?.trim()),
+    },
     mode: "dry-run by default",
     maxProducts: MAX_PRODUCTS,
     maxBodyBytes: MAX_BODY_BYTES,
