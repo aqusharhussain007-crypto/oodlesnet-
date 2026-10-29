@@ -1,31 +1,58 @@
-# OodlesNet
+# OodlesNet — isolated product import testing
 
-## Isolated Firestore writer test
+This branch is for review/testing only. It must not be merged into production until its parser and endpoint checks pass on the isolated test deployment.
 
-This documentation applies to the `test/firestore-writer` branch and the separate Vercel project `oodlesnet-test-writer`. It is not a production deployment guide.
+## CSV / JSON bulk importer
 
-### Safety boundaries
-- The API checks that `FIREBASE_PROJECT_ID` equals `oodlesnet-test` before initializing Firebase Admin.
-- Test-only credentials belong only in the separate test Vercel project; never add them to the production `oodlesnet` project.
-- The writer uses Firestore `create()`, so it cannot overwrite an existing document.
-- A write requires bearer authentication and explicit `confirmWrite: true`; otherwise the API performs a dry-run.
-- The verification action is read-only and returns the saved product fields, store offers, and timestamps.
-- The test form's sample is clearly labelled test data. Do not use it for real listings.
+- Page: `/test-bulk-import`
+- API: `POST /api/admin/products/batch`
+- Parser and shared validation: `lib/product-import.mjs`
+- Unit tests: `tests/product-import.test.mjs`
+- Example templates: `data/products.example.csv` and `data/products.example.json`
 
-### Test results recorded on 2026-10-26
-| Check | Expected result | Result |
-| --- | --- | --- |
-| Read-back verification | HTTP 200; full saved record shown | Passed in user-provided screenshot |
-| Duplicate protection | HTTP 409; existing document unchanged | Passed in user-provided screenshot |
-| Invalid product data | HTTP 400 | Passed in user-provided screenshot |
-| Incorrect bearer token | HTTP 401 | Passed in user-provided screenshot |
-| Project isolation guard | API rejects any Firebase project ID other than `oodlesnet-test` | Confirmed by code inspection; no wrong-project runtime test performed |
+### Supported formats
 
-### Manual test page
-Open `/test-writer` on the test deployment. Enter the test token directly in the password field; do not paste it into chat or commit it to source control. Run each test separately. The wrong-token test intentionally uses a dummy token.
+JSON may be either an array of product objects or an object containing a `products` array. CSV columns are:
 
-### Before any production integration
-1. Review the test branch and deployment separately from production.
-2. Decide how production credentials and authorization will be handled; never reuse the test service account or token.
-3. Prepare a production integration plan and review it before making any change to `main`.
-4. Do not merge this test-only writer into production without explicit approval and a separate security review.
+`documentId,name,brand,categorySlug,description,imageUrl,tags,store`
+
+- `documentId` is required and must be stable for each product.
+- `tags` may be pipe-separated (for example `phone|5g`) or a JSON string array.
+- `imageUrl` may be an HTTP(S) URL or a safe local `/products/...` path used by the existing catalog.
+- `store` must contain a JSON array of offers, each with `name`, positive numeric `price`, HTTP(S) `url`, and optional `offer`.
+- A maximum of 100 products is accepted per file.
+- The example templates contain placeholder data only and must not be imported as real listings.
+
+### Safety rules
+
+- The bulk endpoint is hard-locked to Firebase project ID `oodlesnet-test`; it must not accept a project ID from the request.
+- Uses verified Firebase ID tokens and a server-side `TEST_WRITER_ADMIN_UIDS` allowlist.
+- Dry-run is the default. Actual writes require `confirmWrite: true` plus the explicit checkbox on the test page.
+- Invalid rows and duplicate IDs / duplicate name-brand-category combinations inside a file reject the entire file before any writes.
+- Existing document IDs and matching existing name/brand/category records are skipped; writes use Firestore `create()`, never overwrite.
+- A bulk request may partially complete if a later Firestore operation fails. Review each row result and check Firestore before retrying. Never blindly repeat a request after a network error.
+- Audit logging is best-effort and reported per created record; an audit failure does not undo a product write.
+- Test-only credentials must remain in the separate test Vercel project. Never copy test credentials to production or commit secrets.
+
+## Previously recorded single-writer tests
+
+The following checks were recorded on 2026-10-26 from user-provided screenshots for the older `/api/test-writer` endpoint. These are **not evidence that the new CSV/JSON parser or bulk endpoint has passed runtime tests**. The parser's Node.js unit tests were run locally after fixing the test cases: 9 passed, 0 failed. GitHub Actions was not used.
+
+| Check | Recorded result |
+| --- | --- |
+| Read-back verification | Passed |
+| Duplicate protection | Passed; HTTP 409, no overwrite |
+| Invalid product data | Passed; HTTP 400 |
+| Incorrect bearer token | Passed; HTTP 401 |
+| Project isolation guard | Code inspection only; no wrong-project runtime test |
+
+## Required checks before considering this branch validated
+
+1. **Completed locally:** `node --test tests/product-import.test.mjs` — 9 passed, 0 failed. Re-run on the branch when a Node.js environment is available; GitHub Actions was not used.
+2. On the isolated test deployment only, verify unauthenticated request (401), invalid token (401), non-allowlisted UID (403), missing allowlist (503), malformed body / invalid product (400), dry-run with no writes, successful test create, duplicate ID skip (without overwrite), duplicate name skip, and project mismatch fail-closed.
+3. Verify mixed batches report per-row results and that an uncertain network response does not encourage blind retries.
+4. Read back created test documents and verify all fields and store offers.
+5. Confirm test credentials are scoped only to the isolated test project.
+6. Before production integration, reconcile the existing single-product writer’s stricter imageUrl validation with the catalog’s documented local `/products/...` image paths; do not merge this test-only route as a substitute for that review.
+
+Do not merge this branch to `main`, configure production credentials, or write to production until the isolated tests are reviewed and the user explicitly approves the production integration.

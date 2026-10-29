@@ -1,0 +1,24 @@
+{
+  "note": "TEMPLATE ONLY — replace with verified product data before importing. This example uses example.com and is not a real listing.",
+  "products": [
+    {
+      "documentId": "replace-with-stable-id",
+      "name": "Example Product",
+      "brand": "Example Brand",
+      "categorySlug": "smartphones",
+      "description": "Replace with verified description.",
+      "imageUrl": "",
+      "tags": [
+        "example"
+      ],
+      "store": [
+        {
+          "name": "Example Store",
+          "price": 1000,
+          "offer": "Replace with verified offer.",
+          "url": "https://example.com/product"
+        }
+      ]
+    }
+  ]
+}
