@@ -44,6 +44,8 @@ export default function ProductionWriterCheckPage() {
   const [dryRunPassed, setDryRunPassed] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [writeComplete, setWriteComplete] = useState(false);
+  const [pb400Confirmed, setPb400Confirmed] = useState(false);
+  const [pb400Updated, setPb400Updated] = useState(false);
 
   async function signIn(event) {
     event.preventDefault();
@@ -183,6 +185,39 @@ export default function ProductionWriterCheckPage() {
     }
   }
 
+  async function updatePb400Comparison() {
+    if (!token || !pb400Confirmed || pb400Updated || busy) return;
+    setBusy(true);
+    setMessage("");
+    setResult("");
+    try {
+      const response = await fetch("/api/admin/products", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+        body: JSON.stringify({
+          operation: "update-pb400-comparison",
+          documentId: "boat-energyshroom-pb400",
+          confirmUpdate: true,
+        }),
+        cache: "no-store",
+      });
+      const data = await response.json().catch(() => ({}));
+      setResult(JSON.stringify({ httpStatus: response.status, ...data }, null, 2));
+      if (response.ok && data.ok === true && data.mode === "updated" &&
+          data.documentId === "boat-energyshroom-pb400" && data.storeCount === 4 &&
+          data.targetProject === TARGET_PROJECT) {
+        setPb400Updated(true);
+        setMessage("Production confirms the PB400 comparison now has four store offers. Do not submit this update again.");
+      } else {
+        setMessage("No complete success confirmation received. Do not retry blindly; verify the PB400 document in Firestore first.");
+      }
+    } catch {
+      setMessage("The network result may be uncertain. Do not retry; verify the PB400 document in Firestore first.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   const fieldStyle = { display: "block", width: "100%", padding: 12, marginTop: 6, boxSizing: "border-box", fontSize: 14, fontFamily: "monospace" };
 
   return (
@@ -206,6 +241,25 @@ export default function ProductionWriterCheckPage() {
         </form>
         {uid && <p>Signed-in UID: <code>{uid}</code>. Continue only if this is your authorized production administrator account.</p>}
       </section>
+
+      {uid && <section style={{ margin: "16px 0", padding: 16, border: "2px solid #0f766e", borderRadius: 9 }}>
+        <h2 style={{ fontSize: 21, fontWeight: 700 }}>PB400 — Add verified store comparisons</h2>
+        <p>This fixed update changes only the existing boAt Energyshroom PB400 product's store offers. It keeps its name, image, description and <code>power-banks</code> category unchanged.</p>
+        <ul>
+          <li>boAt — ₹1,399</li>
+          <li>Zepto — ₹1,399</li>
+          <li>Reliance Digital — ₹1,799</li>
+          <li>Croma — ₹1,799</li>
+        </ul>
+        <p>Prices were observed on retailer listings on 31 Oct 2026 or within the latest available crawl; stock, delivery PIN code and checkout price may vary. Colour variants are not used to distinguish this same PB400 model.</p>
+        <label style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+          <input type="checkbox" checked={pb400Confirmed} onChange={(e) => setPb400Confirmed(e.target.checked)} disabled={pb400Updated} style={{ marginTop: 5, width: 20, height: 20 }} />
+          <span>I authorize updating the existing PB400 document in LIVE Firestore with these four store offers.</span>
+        </label>
+        <button disabled={busy || !token || !pb400Confirmed || pb400Updated} onClick={updatePb400Comparison} type="button" style={{ width: "100%", marginTop: 14, padding: 14, fontWeight: 800, background: "#075985", color: "white", border: 0, borderRadius: 8 }}>
+          {pb400Updated ? "PB400 comparison updated" : busy ? "Updating…" : "Update PB400 store comparison"}
+        </button>
+      </section>}
 
       {uid && <section style={{ margin: "16px 0", padding: 16, border: "1px solid #888", borderRadius: 9 }}>
         <h2 style={{ fontSize: 21, fontWeight: 700 }}>Step 2 — Review your batch JSON</h2>
