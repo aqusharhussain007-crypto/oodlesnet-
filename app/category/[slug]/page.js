@@ -38,9 +38,13 @@ export async function generateMetadata({ params }) {
 export default async function CategoryPage({ params }) {
   const slug = params.slug;
 
-  const categorySlugs = slug === "smartphones" || slug === "smartphone"
-    ? ["smartphones", "smartphone"]
-    : [slug];
+  // Electronics is the parent category; keep product records in their
+  // original Power Banks and Bluetooth Speakers subcategories.
+  const categorySlugs = slug === "electronics"
+    ? ["power-banks", "bluetooth-speakers"]
+    : slug === "smartphones" || slug === "smartphone"
+      ? ["smartphones", "smartphone"]
+      : [slug];
   const snapshots = await Promise.all(categorySlugs.map((categorySlug) =>
     getDocs(query(collection(db, "products"), where("categorySlug", "==", categorySlug)))
   ));
@@ -49,7 +53,9 @@ export default async function CategoryPage({ params }) {
   const products = [...byId.values()];
   const title = slug === "smartphones" || slug === "smartphone"
     ? "Smartphones"
-    : slug.charAt(0).toUpperCase() + slug.slice(1);
+    : slug === "electronics"
+      ? "Electronics"
+      : slug.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
 
   return (
     <main className="page-container" style={{ padding: 12 }}>
