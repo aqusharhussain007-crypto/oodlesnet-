@@ -351,6 +351,79 @@ export async function PATCH(request) {
     }
   }
 
+
+  // Fixed comparison update for the existing boAt Stone 350 Pro document.
+  // Only the store array and updatedAt are changed; all offer data is server-controlled.
+  if (body?.operation === "update-stone350pro-comparison") {
+    const expectedStoneId = "boat-stone-350-pro";
+    if (body.documentId !== expectedStoneId || body.confirmUpdate !== true) {
+      return fail("Stone 350 Pro update requires the fixed document ID and confirmUpdate=true.", 400);
+    }
+    let app;
+    try {
+      app = getProductionAdminApp();
+    } catch (error) {
+      return fail(error instanceof Error ? error.message : "Production writer configuration error.", 503);
+    }
+    const auth = await requireAdmin(request, app);
+    if (auth.error) return auth.error;
+    try {
+      const db = getFirestore(app);
+      const ref = db.collection("products").doc(expectedStoneId);
+      const existing = await ref.get();
+      if (!existing.exists) return fail("The Stone 350 Pro document was not found; nothing was changed.", 404);
+      if (existing.get("name") !== "boAt Stone 350 Pro" ||
+          existing.get("brand") !== "boAt" ||
+          existing.get("categorySlug") !== "bluetooth-speakers") {
+        return fail("The fixed document does not match the expected Stone 350 Pro product; nothing was changed.", 409);
+      }
+      const comparisonStores = [
+        {
+          name: "boAt",
+          price: 1999,
+          offer: "Official boAt listing price observed on 31 Oct 2026. Product page currently shows restocking soon; check availability and coupon at checkout.",
+          url: "https://www.boat-lifestyle.com/products/stone-350-pro-portable-speaker",
+        },
+        {
+          name: "Flipkart",
+          price: 2199,
+          offer: "Exact Stone 350 Pro 14W listing; currently shown out of stock on the product page. Check seller and PIN-code availability before buying.",
+          url: "https://www.flipkart.com/boat-stone-350-pro-14-w-bluetooth-speaker/p/itm4f82022e918f7",
+        },
+      ];
+      await ref.update({ store: comparisonStores, updatedAt: FieldValue.serverTimestamp() });
+      let auditLogged = true;
+      try {
+        await db.collection("product_writer_audit").add({
+          actorUid: auth.uid,
+          operation: "update-stone350pro-store-comparison",
+          collection: "products",
+          documentId: expectedStoneId,
+          productName: existing.get("name"),
+          storeNames: comparisonStores.map((offer) => offer.name),
+          createdAt: FieldValue.serverTimestamp(),
+        });
+      } catch {
+        auditLogged = false;
+      }
+      return NextResponse.json({
+        ok: true,
+        mode: "updated",
+        targetProject: PRODUCTION_PROJECT_ID,
+        collection: "products",
+        documentId: expectedStoneId,
+        productName: existing.get("name"),
+        categorySlug: "bluetooth-speakers",
+        storeCount: comparisonStores.length,
+        stores: comparisonStores.map((offer) => ({ name: offer.name, price: offer.price })),
+        auditLogged,
+        warning: auditLogged ? undefined : "Product was updated, but audit logging failed. Do not retry blindly.",
+      }, { headers: { "Cache-Control": "no-store" } });
+    } catch {
+      return fail("Stone 350 Pro comparison update failed. Verify Firestore before trying again.", 500);
+    }
+  }
+
   const expectedDocumentId = "oneplus-nord-ce5-5g-live-20261028";
   if (!body || body.documentId !== expectedDocumentId || body.confirmUpdate !== true) {
     return fail("This repair is restricted to the fixed OnePlus document and requires confirmUpdate=true.", 400);
