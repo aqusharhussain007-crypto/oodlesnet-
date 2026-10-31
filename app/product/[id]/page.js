@@ -459,20 +459,71 @@ export default function ProductPage({ params }) {
                     <>
                       {/* VIEW OFFERS */}
                       <button
+                        type="button"
+                        aria-expanded={openOffer === index}
                         onClick={() =>
                           setOpenOffer(openOffer === index ? null : index)
                         }
                         style={{
                           width: "100%",
-                          padding: "10px 12px",
-                          borderRadius: 12,
-                          border: "1px dashed #10b981",
-                          background: "#ecfdf5",
-                          fontWeight: 700,
-                          color: "#065f46",
+                          minHeight: 58,
+                          padding: "9px 11px",
+                          borderRadius: 15,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: 9,
+                          border: "1px solid rgba(91,174,255,0.72)",
+                          background: "linear-gradient(115deg, rgba(7,25,53,0.98), rgba(0,67,128,0.94))",
+                          color: "#f4f9ff",
+                          fontWeight: 800,
+                          fontSize: 13,
+                          textAlign: "left",
+                          boxShadow: "0 0 0 1px rgba(0,145,255,0.12), 0 6px 16px rgba(0,105,255,0.18), inset 0 1px 0 rgba(255,255,255,0.16)",
+                          cursor: "pointer",
+                          transition: "transform 180ms ease, box-shadow 180ms ease",
                         }}
                       >
-                        🎁 View available offers
+                        <span
+                          aria-hidden="true"
+                          style={{
+                            width: 34,
+                            height: 34,
+                            flexShrink: 0,
+                            display: "grid",
+                            placeItems: "center",
+                            borderRadius: 11,
+                            background: "linear-gradient(145deg,#f0f7ff,#cfe5ff)",
+                            color: "#1769d2",
+                            boxShadow: "0 2px 9px rgba(0,0,0,0.2)",
+                            fontSize: 18,
+                          }}
+                        >
+                          🎁
+                        </span>
+                        <span style={{ flex: 1, minWidth: 0, textAlign: "center" }}>
+                          View available offers
+                        </span>
+                        <span
+                          aria-hidden="true"
+                          style={{
+                            width: 34,
+                            height: 34,
+                            flexShrink: 0,
+                            display: "grid",
+                            placeItems: "center",
+                            borderRadius: "50%",
+                            border: "1px solid rgba(115,190,255,0.82)",
+                            background: "linear-gradient(145deg,rgba(0,145,255,0.34),rgba(35,105,255,0.26))",
+                            boxShadow: "0 0 12px rgba(0,145,255,0.28)",
+                            transform: openOffer === index ? "rotate(180deg)" : "rotate(0deg)",
+                            transition: "transform 220ms ease",
+                          }}
+                        >
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="m6 9 6 6 6-6" />
+                          </svg>
+                        </span>
                       </button>
 
                       {/* OFFER PANEL */}
@@ -482,7 +533,7 @@ export default function ProductPage({ params }) {
                           borderRadius: 12,
                           background:
                             openOffer === index ? "#f8fffc" : "#fff",
-                          border: "1px solid #e5e7eb",
+                          border: "1px solid #bfdbfe",
                           maxHeight: openOffer === index ? 260 : 0,
                           overflowY: "auto",
                           boxShadow:
