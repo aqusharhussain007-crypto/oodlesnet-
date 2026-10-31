@@ -4,6 +4,6 @@ export default function robots() {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://oodlesnet.vercel.app/sitemap.xml",
+    sitemap: "https://www.oodlesnet.com/sitemap.xml",
   };
 }
