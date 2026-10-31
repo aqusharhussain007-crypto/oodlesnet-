@@ -282,7 +282,7 @@ const suggestions = useMemo(() => {
 
           const items = filtered.filter((p) =>
             cat.slug === "electronics"
-              ? electronicsSubcategories.includes(p.categorySlug)
+              ? p.categorySlug === "electronics" || electronicsSubcategories.includes(p.categorySlug)
               : p.categorySlug === cat.slug ||
                 (cat.slug === "smartphone" && p.categorySlug === "smartphones")
           );
