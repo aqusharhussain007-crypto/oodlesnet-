@@ -429,7 +429,10 @@ export default function ProductPage({ params }) {
                     >
                       {getStoreMark(store.name)}
                     </span>
-                    <span style={{ flex: 1, minWidth: 0, textAlign: "center", fontSize: 14, fontWeight: 800, letterSpacing: 0.1 }}>
+                    <span
+                      className={Number(store.price) === cheapest && !loadingStore ? "best-price-buy-label" : ""}
+                      style={{ flex: 1, minWidth: 0, textAlign: "center", fontSize: 14, fontWeight: 800, letterSpacing: 0.1 }}
+                    >
                       {loadingStore === store.name ? "Redirecting…" : `Buy on ${store.name}`}
                     </span>
                     <span
@@ -709,32 +712,25 @@ export default function ProductPage({ params }) {
       <style jsx>{`
         .buy-action-button {
           position: relative;
-          isolation: isolate;
         }
-        .buy-action-button::after {
-          content: "";
-          position: absolute;
-          inset: -4px;
-          border: 2px solid rgba(16,185,129,0.72);
-          border-radius: 20px;
-          pointer-events: none;
-          z-index: -1;
-          animation: buyCapsulePulse 2s ease-in-out infinite;
+        .best-price-buy-label {
+          animation: bestBuyTextPulse 1.8s ease-in-out infinite;
+          transform-origin: center;
         }
-        @keyframes buyCapsulePulse {
+        @keyframes bestBuyTextPulse {
           0%, 100% {
-            opacity: 0.48;
+            color: #ffffff;
+            text-shadow: 0 0 2px rgba(16,185,129,0.18);
             transform: scale(1);
-            box-shadow: 0 0 5px rgba(16,185,129,0.28), inset 0 0 3px rgba(16,185,129,0.12);
           }
           50% {
-            opacity: 1;
-            transform: scale(1.012);
-            box-shadow: 0 0 15px rgba(16,185,129,0.62), 0 0 25px rgba(16,185,129,0.24), inset 0 0 5px rgba(16,185,129,0.18);
+            color: #d1fae5;
+            text-shadow: 0 0 7px rgba(52,211,153,0.95), 0 0 14px rgba(16,185,129,0.62);
+            transform: scale(1.035);
           }
         }
         @media (prefers-reduced-motion: reduce) {
-          .buy-action-button::after { animation: none; opacity: 0.8; }
+          .best-price-buy-label { animation: none; color: #d1fae5; }
         }
         .button-spinner {
           width: 18px;
