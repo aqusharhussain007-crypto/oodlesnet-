@@ -104,25 +104,77 @@ export default function CategoryDrawer({ onClose }) {
             overflowY: "auto",
           }}
         >
-          {categories.map((c) => (
-            <button
-              key={c.slug}
-              onClick={() => handleSelect(c.slug)}
-              style={{
-                width: "100%",
-                padding: "12px 14px",
-                borderRadius: 14,
-                border: "1px solid #ddd",
-                background: "#fff",
-                fontWeight: 700,
-                color: "#0077aa",
-                cursor: "pointer",
-                textAlign: "left",
-              }}
-            >
-              {c.name}
-            </button>
-          ))}
+          {categories.map((c) => {
+            const electronicsChildren = [
+              { slug: "power-banks", name: "Power Banks" },
+              { slug: "bluetooth-speakers", name: "Bluetooth Speakers" },
+            ];
+            if (electronicsChildren.some((child) => child.slug === c.slug)) return null;
+
+            if (c.slug === "electronics") {
+              return (
+                <div key={c.slug} style={{ display: "grid", gap: 8 }}>
+                  <button
+                    onClick={() => handleSelect("electronics")}
+                    style={{
+                      width: "100%",
+                      padding: "12px 14px",
+                      borderRadius: 14,
+                      border: "1px solid #ddd",
+                      background: "#fff",
+                      fontWeight: 800,
+                      color: "#0077aa",
+                      cursor: "pointer",
+                      textAlign: "left",
+                    }}
+                  >
+                    {c.name}
+                  </button>
+                  <div style={{ display: "grid", gap: 7, paddingLeft: 18 }}>
+                    {electronicsChildren.map((child) => (
+                      <button
+                        key={child.slug}
+                        onClick={() => handleSelect(child.slug)}
+                        style={{
+                          width: "100%",
+                          padding: "10px 14px",
+                          borderRadius: 12,
+                          border: "1px solid #d9eeee",
+                          background: "#f2fffc",
+                          fontWeight: 600,
+                          color: "#087f8c",
+                          cursor: "pointer",
+                          textAlign: "left",
+                        }}
+                      >
+                        ↳ {child.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+
+            return (
+              <button
+                key={c.slug}
+                onClick={() => handleSelect(c.slug)}
+                style={{
+                  width: "100%",
+                  padding: "12px 14px",
+                  borderRadius: 14,
+                  border: "1px solid #ddd",
+                  background: "#fff",
+                  fontWeight: 700,
+                  color: "#0077aa",
+                  cursor: "pointer",
+                  textAlign: "left",
+                }}
+              >
+                {c.name}
+              </button>
+            );
+          })}
         </div>
       </div>
 
