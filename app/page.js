@@ -60,6 +60,7 @@ export default function Home() {
   const [ads, setAds] = useState([]);
   const [adsLoaded, setAdsLoaded] = useState(false);
   const [recent, setRecent] = useState([]);
+  const [loadingCategory, setLoadingCategory] = useState("");
 
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -311,27 +312,55 @@ const suggestions = useMemo(() => {
                 )}
 
                 {items.length > 4 && (
-                  <div
-                    onClick={() =>
-                      router.push(`/category/${cat.slug === "smartphone" ? "smartphones" : cat.slug}`)
-                    }
+                  <button
+                    type="button"
+                    disabled={Boolean(loadingCategory)}
+                    onClick={() => {
+                      if (loadingCategory) return;
+                      const targetSlug = cat.slug === "smartphone" ? "smartphones" : cat.slug;
+                      setLoadingCategory(cat.slug);
+                      window.setTimeout(() => router.push(`/category/${targetSlug}`), 160);
+                    }}
                     style={{
                       minHeight: 96,
-                      borderRadius: 18,
+                      width: "100%",
+                      padding: "15px 18px",
+                      borderRadius: 20,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      gap: 10,
+                      gap: 12,
                       fontWeight: 900,
                       fontSize: 16,
-                      color: "#fff",
-                      cursor: "pointer",
-                      background:
-                        "linear-gradient(135deg,#0099cc,#009966)",
+                      color: "#f4f9ff",
+                      cursor: loadingCategory ? "wait" : "pointer",
+                      border: "1px solid rgba(91,174,255,0.72)",
+                      background: "linear-gradient(115deg, rgba(5,24,55,0.98), rgba(0,74,145,0.94))",
+                      boxShadow: "0 0 0 1px rgba(0,145,255,0.16), 0 10px 26px rgba(0,105,255,0.24), inset 0 1px 0 rgba(255,255,255,0.2)",
+                      backdropFilter: "blur(14px)",
+                      WebkitBackdropFilter: "blur(14px)",
+                      opacity: loadingCategory && loadingCategory !== cat.slug ? 0.65 : 1,
+                      transition: "transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease",
                     }}
                   >
-                    See all in {cat.name} <ArrowIcon />
-                  </div>
+                    <span>{loadingCategory === cat.slug ? `Loading ${cat.name}…` : `See all in ${cat.name}`}</span>
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        width: 38,
+                        height: 38,
+                        flexShrink: 0,
+                        display: "grid",
+                        placeItems: "center",
+                        borderRadius: "50%",
+                        border: "1px solid rgba(115,190,255,0.78)",
+                        background: "linear-gradient(145deg, rgba(0,145,255,0.32), rgba(35,105,255,0.24))",
+                        boxShadow: "0 0 14px rgba(0,145,255,0.3)",
+                      }}
+                    >
+                      {loadingCategory === cat.slug ? <span className="button-spinner" /> : <ArrowIcon />}
+                    </span>
+                  </button>
                 )}
               </div>
             </div>
