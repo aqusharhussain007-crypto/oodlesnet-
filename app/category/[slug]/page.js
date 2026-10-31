@@ -8,28 +8,59 @@ import SkeletonLoader from "@/components/SkeletonLoader";
 export async function generateMetadata({ params }) {
   const slug = params.slug;
 
-  const titles = {
-    mobile: "Best Mobile Price Comparison in India",
-    laptop: "Best Laptop Deals & Price Comparison",
-    electronics: "Compare Electronics Prices Online",
+  const categorySeo = {
+    mobile: {
+      title: "Mobile Phone Price Comparison in India",
+      description:
+        "Compare mobile phone prices from online stores in India. Discover competitive prices and deals on OodlesNet.",
+    },
+    smartphone: {
+      title: "Smartphone Price Comparison in India",
+      description:
+        "Compare smartphone prices across online stores in India and discover current deals on OodlesNet.",
+    },
+    smartphones: {
+      title: "Smartphone Price Comparison in India",
+      description:
+        "Compare smartphone prices across online stores in India and discover current deals on OodlesNet.",
+    },
+    laptop: {
+      title: "Laptop Price Comparison & Deals in India",
+      description:
+        "Compare laptop prices from online stores in India. Explore available laptop deals on OodlesNet.",
+    },
+    electronics: {
+      title: "Electronics Price Comparison in India",
+      description:
+        "Compare electronics prices, including power banks and Bluetooth speakers, across online stores in India.",
+    },
+    "power-banks": {
+      title: "Power Bank Price Comparison in India",
+      description:
+        "Compare power bank prices and offers across online stores in India. Find options that match your needs on OodlesNet.",
+    },
+    "bluetooth-speakers": {
+      title: "Bluetooth Speaker Price Comparison in India",
+      description:
+        "Compare Bluetooth speaker prices across online stores in India and discover available deals on OodlesNet.",
+    },
   };
 
-  const descriptions = {
-    mobile:
-      "Compare mobile prices across Amazon, Meesho, Ajio and more. Find the lowest mobile prices in India.",
-    laptop:
-      "Compare laptop prices online. Find best laptop deals and offers in India.",
-    electronics:
-      "Compare electronics prices and find the best online deals in India.",
+  const fallbackName = slug
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+
+  const seo = categorySeo[slug] || {
+    title: `${fallbackName} Price Comparison in India`,
+    description: `Compare ${fallbackName.toLowerCase()} prices across online stores in India. Discover products and deals on OodlesNet.`,
   };
 
   return {
-    title: titles[slug] || `Compare ${slug} Prices | OodlesNet`,
-    description:
-      descriptions[slug] ||
-      "Compare prices and find the best deals online on OodlesNet.",
+    title: seo.title,
+    description: seo.description,
     alternates: {
-      canonical: `https://oodlesnet.vercel.app/category/${slug}`,
+      canonical: `/category/${slug}`,
     },
   };
 }
@@ -89,5 +120,4 @@ export default async function CategoryPage({ params }) {
       )}
     </main>
   );
-    }
-      
+}
