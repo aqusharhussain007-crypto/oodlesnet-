@@ -386,6 +386,7 @@ export default function ProductPage({ params }) {
                 >
                   {/* BUY BUTTON */}
                   <button
+                    className="buy-action-button"
                     type="button"
                     disabled={Boolean(loadingStore)}
                     onClick={() => handleBuy(store)}
@@ -706,6 +707,20 @@ export default function ProductPage({ params }) {
 
       {/* Animations */}
       <style jsx>{`
+        .buy-action-button {
+          animation: buyPulse 2.6s ease-in-out infinite;
+        }
+        @keyframes buyPulse {
+          0%, 100% {
+            box-shadow: 0 0 0 1px rgba(0,198,255,0.12), 0 7px 20px rgba(0,105,255,0.24), 0 0 0 rgba(16,185,129,0), inset 0 1px 0 rgba(255,255,255,0.18);
+          }
+          50% {
+            box-shadow: 0 0 0 1px rgba(0,198,255,0.16), 0 7px 20px rgba(0,105,255,0.24), 0 0 13px rgba(16,185,129,0.34), inset 0 1px 0 rgba(255,255,255,0.18);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .buy-action-button { animation: none; }
+        }
         .button-spinner {
           width: 18px;
           height: 18px;
