@@ -268,6 +268,11 @@ const suggestions = useMemo(() => {
 
       {!search &&
         categories.map((cat) => {
+          // Electronics is the parent homepage section for these subcategories.
+          // Products retain their own categorySlug, so their subcategory pages remain intact.
+          const electronicsSubcategories = ["power-banks", "bluetooth-speakers"];
+          if (electronicsSubcategories.includes(cat.slug)) return null;
+
           // Legacy category is "smartphone" (singular); include products already
           // migrated to "smartphones" and suppress the duplicate plural section.
           if (
@@ -275,10 +280,11 @@ const suggestions = useMemo(() => {
             categories.some((item) => item.slug === "smartphone")
           ) return null;
 
-          const items = filtered.filter(
-            (p) =>
-              p.categorySlug === cat.slug ||
-              (cat.slug === "smartphone" && p.categorySlug === "smartphones")
+          const items = filtered.filter((p) =>
+            cat.slug === "electronics"
+              ? electronicsSubcategories.includes(p.categorySlug)
+              : p.categorySlug === cat.slug ||
+                (cat.slug === "smartphone" && p.categorySlug === "smartphones")
           );
 
           // Keep the newly moved OnePlus visible in the first four homepage cards.
