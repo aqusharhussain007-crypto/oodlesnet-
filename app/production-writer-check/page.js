@@ -3,6 +3,33 @@
 import { useState } from "react";
 
 const FIREBASE_WEB_API_KEY = "AIzaSyDAGbs7GATXSzzWzPw_1Zf49ZDgG56mVpw";
+const TARGET_PROJECT = "oodlesnet-6c19e";
+const SAMPLE_BATCH = [
+  {
+    documentId: "boat-stone-350-pro",
+    product: {
+      name: "boAt Stone 350 Pro",
+      brand: "boAt",
+      categorySlug: "bluetooth-speakers",
+      description: "Portable Bluetooth speaker with 14W output, up to 12 hours playback, RGB LED lighting, Bluetooth 5.3 and IPX5 water resistance.",
+      imageUrl: "https://www.boat-lifestyle.com/cdn/shop/files/STONE350PRO_Blue_07_1500x.jpg?v=1720589782",
+      tags: ["bluetooth-speaker", "portable-speaker", "boat", "14w", "ipx5", "bluetooth-5-3"],
+      store: [{ name: "boAt", price: 1999, offer: "Official website listed price; price and stock may change", url: "https://www.boat-lifestyle.com/products/stone-350-pro-portable-speaker" }]
+    }
+  },
+  {
+    documentId: "boat-energyshroom-pb400",
+    product: {
+      name: "boAt Energyshroom PB400 20000mAh Power Bank",
+      brand: "boAt",
+      categorySlug: "power-banks",
+      description: "20000mAh power bank with 22.5W fast charging, USB-A and two-way USB-C output, and Smart IC protection.",
+      imageUrl: "https://www.boat-lifestyle.com/cdn/shop/files/mainimage_2245f22b-a9b1-4a16-a53f-0a2f6966ef2c_1500x.jpg?v=1754034135",
+      tags: ["power-bank", "20000mah", "boat", "22-5w-fast-charging", "smart-ic", "usb-c"],
+      store: [{ name: "boAt", price: 1399, offer: "Official website listed price; price and stock may change", url: "https://www.boat-lifestyle.com/products/energyshroom-pb400-powerbank-with-20000mah-battery-capacity-with-smart-ic-protection" }]
+    }
+  }
+];
 
 export default function ProductionWriterCheckPage() {
   const [email, setEmail] = useState("");
@@ -12,15 +39,11 @@ export default function ProductionWriterCheckPage() {
   const [message, setMessage] = useState("");
   const [result, setResult] = useState("");
   const [busy, setBusy] = useState(false);
-  const [name, setName] = useState("Motorola Edge 70 Fusion");
-  const [brand, setBrand] = useState("Motorola");
-  const [categorySlug, setCategorySlug] = useState("smartphones");
-  const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [storeName, setStoreName] = useState("Motorola India");
-  const [price, setPrice] = useState("");
-  const [storeUrl, setStoreUrl] = useState("");
-  const [tags, setTags] = useState("smartphone, 5G, Motorola");
+  const [batchText, setBatchText] = useState(JSON.stringify(SAMPLE_BATCH, null, 2));
+  const [validatedBatch, setValidatedBatch] = useState("");
+  const [dryRunPassed, setDryRunPassed] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
+  const [writeComplete, setWriteComplete] = useState(false);
 
   async function signIn(event) {
     event.preventDefault();
@@ -29,6 +52,10 @@ export default function ProductionWriterCheckPage() {
     setResult("");
     setToken("");
     setUid("");
+    setValidatedBatch("");
+    setDryRunPassed(false);
+    setConfirmed(false);
+    setWriteComplete(false);
     try {
       const response = await fetch(
         "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + encodeURIComponent(FIREBASE_WEB_API_KEY),
@@ -57,13 +84,38 @@ export default function ProductionWriterCheckPage() {
       if (!data.idToken || !data.localId) throw new Error("Firebase did not return the expected sign-in details.");
       setToken(data.idToken);
       setUid(data.localId);
-      setMessage("Signed in. Password cleared. The token remains in page memory only.");
+      setMessage("Signed in to live Firebase. Password cleared; the ID token stays in page memory only.");
     } catch (error) {
       setMessage(error.message || "Sign-in failed.");
     } finally {
       setPassword("");
       setBusy(false);
     }
+  }
+
+  function parseBatch() {
+    let entries;
+    try {
+      entries = JSON.parse(batchText);
+    } catch {
+      throw new Error("The batch must be valid JSON.");
+    }
+    if (!Array.isArray(entries) || entries.length < 1 || entries.length > 100) {
+      throw new Error("Enter a JSON array containing between 1 and 100 products.");
+    }
+    for (let i = 0; i < entries.length; i += 1) {
+      const entry = entries[i];
+      if (!entry || typeof entry !== "object" || Array.isArray(entry) || !entry.product || typeof entry.product !== "object") {
+        throw new Error("Entry " + (i + 1) + " must contain documentId and product.");
+      }
+      if (entry.documentId !== undefined && (typeof entry.documentId !== "string" || !/^[A-Za-z0-9_-]{1,100}$/.test(entry.documentId))) {
+        throw new Error("Entry " + (i + 1) + " has an invalid documentId.");
+      }
+      if (!entry.product.name || !entry.product.brand || !entry.product.categorySlug || !Array.isArray(entry.product.store)) {
+        throw new Error("Entry " + (i + 1) + " is missing required product fields.");
+      }
+    }
+    return entries;
   }
 
   async function runDryRun(event) {
@@ -75,73 +127,105 @@ export default function ProductionWriterCheckPage() {
     setBusy(true);
     setMessage("");
     setResult("");
+    setDryRunPassed(false);
+    setValidatedBatch("");
+    setConfirmed(false);
+    setWriteComplete(false);
     try {
-      const product = {
-        name: name.trim(),
-        brand: brand.trim(),
-        categorySlug: categorySlug.trim(),
-        description: description.trim(),
-        imageUrl: imageUrl.trim(),
-        tags: tags.split(",").map((tag) => tag.trim()).filter(Boolean),
-        store: [{ name: storeName.trim(), price: Number(price), url: storeUrl.trim() }],
-      };
-      const payload = { documentId: "dry-run-" + name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 70), product };
-      // Intentionally omit confirmWrite entirely. This page cannot create a product.
+      const entries = parseBatch();
+      const frozenBatch = JSON.stringify(entries);
       const response = await fetch("/api/admin/products", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ products: entries }),
         cache: "no-store",
       });
       const data = await response.json().catch(() => ({}));
       setResult(JSON.stringify({ httpStatus: response.status, ...data }, null, 2));
-      setMessage(response.ok && data.mode === "dry-run"
-        ? "Dry-run passed. No product was written."
-        : "Dry-run did not pass. Review the response below. No product was written by this page.");
+      if (response.ok && data.ok === true && data.mode === "dry-run" && data.validated === true && data.count === entries.length && data.targetProject === TARGET_PROJECT) {
+        setValidatedBatch(frozenBatch);
+        setDryRunPassed(true);
+        setMessage("Batch dry-run passed for " + entries.length + " products. Nothing has been written. Review the result, then explicitly confirm if you want to create this exact batch.");
+      } else {
+        setMessage("Batch dry-run failed or returned an unexpected response. No product was written.");
+      }
     } catch (error) {
-      setMessage("Could not complete dry-run: " + (error.message || "network error"));
+      setMessage(error.message || "Dry-run failed. No product was written.");
     } finally {
       setBusy(false);
     }
   }
 
-  const fieldStyle = { display: "block", width: "100%", padding: 10, marginTop: 4, boxSizing: "border-box" };
+  async function writeBatch() {
+    if (!token || !dryRunPassed || !validatedBatch || !confirmed || writeComplete) return;
+    setBusy(true);
+    setMessage("");
+    try {
+      const entries = JSON.parse(validatedBatch);
+      const response = await fetch("/api/admin/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+        body: JSON.stringify({ products: entries, confirmWrite: true }),
+        cache: "no-store",
+      });
+      const data = await response.json().catch(() => ({}));
+      setResult(JSON.stringify({ httpStatus: response.status, ...data }, null, 2));
+      if (response.ok && data.ok === true && data.mode === "written" && data.targetProject === TARGET_PROJECT && data.created === entries.length && data.failed === 0) {
+        setWriteComplete(true);
+        setMessage("Production confirms that all " + data.created + " products were created. Do not submit this batch again.");
+      } else {
+        setMessage("No complete success confirmation received. Do not retry blindly; check Firestore first.");
+      }
+    } catch {
+      setMessage("The network result may be uncertain. Do not retry; check the product documents in Firestore first.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const fieldStyle = { display: "block", width: "100%", padding: 12, marginTop: 6, boxSizing: "border-box", fontSize: 14, fontFamily: "monospace" };
 
   return (
-    <main style={{ maxWidth: 640, margin: "24px auto", padding: 20, fontFamily: "Arial, sans-serif", lineHeight: 1.5, color: "#111" }}>
-      <h1 style={{ fontSize: 26, fontWeight: 700 }}>Production Smartphone — Dry Run</h1>
-      <p><strong>Target project:</strong> oodlesnet-6c19e</p>
-      <p>This page signs in directly with Firebase Authentication. Your password is cleared after sign-in; the ID token is never displayed or stored. Only the token is sent to the protected writer endpoint.</p>
-      <p style={{ padding: 12, border: "1px solid #b45309", borderRadius: 8 }}><strong>SAFE MODE:</strong> this page never sends <code>confirmWrite: true</code>. It cannot create a product. Enter a verified price and exact product-page URL from the retailer before testing.</p>
+    <main style={{ maxWidth: 760, margin: "20px auto", padding: 18, fontFamily: "Arial, sans-serif", lineHeight: 1.5, color: "#111" }}>
+      <h1 style={{ fontSize: 27, fontWeight: 800 }}>Production Product Batch Importer</h1>
+      <p><strong>Fixed target:</strong> {TARGET_PROJECT}</p>
+      <p><strong>Batch capacity:</strong> 1–100 products per request; maximum request size 1 MB.</p>
+      <p>Your password is cleared after sign-in. The Firebase ID token is never displayed or stored; it remains in page memory and is sent only to the protected production API.</p>
+      <p style={{ padding: 12, border: "2px solid #b45309", borderRadius: 8 }}><strong>Production writer:</strong> Dry-run is always the first step. No product is created until you tick the explicit confirmation and press the separate live-write button. Writes are atomic and existing document IDs are never overwritten.</p>
 
-      <section style={{ margin: "16px 0", padding: 14, border: "1px solid #888", borderRadius: 8 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700 }}>Step 1 — Sign in</h2>
+      <section style={{ margin: "16px 0", padding: 16, border: "1px solid #888", borderRadius: 9 }}>
+        <h2 style={{ fontSize: 21, fontWeight: 700 }}>Step 1 — Sign in to production Firebase</h2>
         <form onSubmit={signIn} style={{ display: "grid", gap: 12 }}>
-          <label>Production Firebase admin email
-            <input required type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} style={fieldStyle} />
+          <label>Firebase administrator email
+            <input required type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} style={{ ...fieldStyle, fontFamily: "Arial" }} />
           </label>
-          <label>Production Firebase admin password
-            <input required type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} style={fieldStyle} />
+          <label>Firebase administrator password
+            <input required type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ ...fieldStyle, fontFamily: "Arial" }} />
           </label>
-          <button disabled={busy} type="submit" style={{ padding: 12, fontWeight: 700 }}>{busy ? "Please wait…" : "Sign in"}</button>
+          <button disabled={busy} type="submit" style={{ padding: 13, fontWeight: 700 }}>{busy ? "Please wait…" : "Sign in to production Firebase"}</button>
         </form>
-        {uid && <p>Signed-in UID: <code>{uid}</code>. Confirm this is your authorized production UID.</p>}
+        {uid && <p>Signed-in UID: <code>{uid}</code>. Continue only if this is your authorized production administrator account.</p>}
       </section>
 
-      {uid && <section style={{ margin: "16px 0", padding: 14, border: "1px solid #888", borderRadius: 8 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700 }}>Step 2 — Product details</h2>
-        <form onSubmit={runDryRun} style={{ display: "grid", gap: 10 }}>
-          <label>Product name<input required value={name} onChange={(e) => setName(e.target.value)} style={fieldStyle} /></label>
-          <label>Brand<input required value={brand} onChange={(e) => setBrand(e.target.value)} style={fieldStyle} /></label>
-          <label>Category slug<input required value={categorySlug} onChange={(e) => setCategorySlug(e.target.value)} style={fieldStyle} /></label>
-          <label>Description (optional)<textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} style={fieldStyle} /></label>
-          <label>Image URL (optional)<input type="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} style={fieldStyle} /></label>
-          <label>Store name<input required value={storeName} onChange={(e) => setStoreName(e.target.value)} style={fieldStyle} /></label>
-          <label>Verified price in ₹<input required type="number" min="1" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} style={fieldStyle} /></label>
-          <label>Exact product page URL<input required type="url" value={storeUrl} onChange={(e) => setStoreUrl(e.target.value)} placeholder="https://retailer.in/exact-product-page" style={fieldStyle} /></label>
-          <label>Search tags, separated by commas<input value={tags} onChange={(e) => setTags(e.target.value)} style={fieldStyle} /></label>
-          <button disabled={busy || !token} type="submit" style={{ padding: 12, fontWeight: 700 }}>{busy ? "Validating…" : "Run product dry-run (no write)"}</button>
+      {uid && <section style={{ margin: "16px 0", padding: 16, border: "1px solid #888", borderRadius: 9 }}>
+        <h2 style={{ fontSize: 21, fontWeight: 700 }}>Step 2 — Review your batch JSON</h2>
+        <p>Paste a JSON array of 1–100 entries. Each entry has a <code>documentId</code> and a <code>product</code> object. The two previously test-written boAt products are preloaded as an editable example.</p>
+        <textarea aria-label="Product batch JSON" value={batchText} onChange={(e) => { setBatchText(e.target.value); setDryRunPassed(false); setValidatedBatch(""); setConfirmed(false); setWriteComplete(false); }} rows={24} spellCheck={false} style={fieldStyle} />
+        <form onSubmit={runDryRun} style={{ marginTop: 14 }}>
+          <button disabled={busy || !token || writeComplete} type="submit" style={{ width: "100%", padding: 14, fontWeight: 800 }}>{busy ? "Validating…" : "Run batch dry-run (no write)"}</button>
         </form>
+      </section>}
+
+      {dryRunPassed && !writeComplete && <section style={{ margin: "16px 0", padding: 16, border: "2px solid #15803d", borderRadius: 9 }}>
+        <h2 style={{ fontSize: 21, fontWeight: 700 }}>Step 3 — Explicit production confirmation</h2>
+        <p>The exact batch that passed dry-run is held in page memory. Editing the JSON cancels this approval and requires another dry-run.</p>
+        <label style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+          <input type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} style={{ marginTop: 5, width: 20, height: 20 }} />
+          <span>I authorize creating this exact batch in the LIVE Firestore project <strong>{TARGET_PROJECT}</strong>.</span>
+        </label>
+        <button disabled={busy || !confirmed || !dryRunPassed} onClick={writeBatch} type="button" style={{ width: "100%", marginTop: 14, padding: 14, fontWeight: 800, background: "#075985", color: "white", border: 0, borderRadius: 8 }}>
+          {busy ? "Writing batch…" : "Create confirmed batch in LIVE Firestore"}
+        </button>
       </section>}
 
       {message && <p role="status" style={{ marginTop: 16, overflowWrap: "anywhere" }}>{message}</p>}
