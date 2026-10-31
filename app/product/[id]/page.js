@@ -84,6 +84,8 @@ export default function ProductPage({ params }) {
 
   const [expanded, setExpanded] = useState(false);
   const [openOffer, setOpenOffer] = useState(null);
+  const [loadingStore, setLoadingStore] = useState("");
+  const [loadingCategory, setLoadingCategory] = useState(false);
 
   const [relatedCategory, setRelatedCategory] = useState([]);
   const [relatedBrand, setRelatedBrand] = useState([]);
@@ -173,7 +175,22 @@ export default function ProductPage({ params }) {
   const cheapest = prices.length ? Math.min(...prices) : null;
 
   function handleBuy(store) {
-    window.location.href = `/out/${store.name.toLowerCase()}?pid=${product.id}`;
+    if (loadingStore) return;
+    setLoadingStore(store.name);
+    window.setTimeout(() => {
+      window.location.href = `/out/${store.name.toLowerCase()}?pid=${product.id}`;
+    }, 180);
+  }
+
+  function getStoreMark(name) {
+    const key = String(name || "").toLowerCase();
+    if (key.includes("flipkart")) return "F";
+    if (key.includes("amazon")) return "a";
+    if (key.includes("boat")) return "boAt";
+    if (key.includes("meesho")) return "M";
+    if (key.includes("ajio")) return "AJ";
+    if (key.includes("croma")) return "C";
+    return String(name || "S").slice(0, 2).toUpperCase();
   }
 
   function handleShare() {
@@ -369,39 +386,73 @@ export default function ProductPage({ params }) {
                 >
                   {/* BUY BUTTON */}
                   <button
+                    type="button"
+                    disabled={Boolean(loadingStore)}
                     onClick={() => handleBuy(store)}
+                    aria-label={loadingStore === store.name ? `Redirecting to ${store.name}` : `Buy on ${store.name}`}
                     style={{
                       width: "100%",
-                      padding: "14px 0",
-                      fontWeight: 800,
-                      borderRadius: 14,
-                      border: "none",
-                      color: "#fff",
-                      background:
-                        store.name.toLowerCase() === "amazon"
-                          ? "linear-gradient(90deg,#ff9900,#ff6600)"
-                          : store.name.toLowerCase() === "meesho"
-                          ? "linear-gradient(90deg,#ff3f8e,#ff77a9)"
-                          : store.name.toLowerCase() === "ajio"
-                          ? "linear-gradient(90deg,#005bea,#00c6fb)"
-                          : "linear-gradient(90deg,#00c6ff,#00ff99)",
-                      boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
+                      minHeight: 58,
+                      padding: "8px 10px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 9,
+                      borderRadius: 16,
+                      border: "1px solid rgba(45, 255, 205, 0.55)",
+                      color: "#f4fffe",
+                      background: "linear-gradient(115deg, rgba(5, 24, 48, 0.97), rgba(0, 78, 82, 0.94))",
+                      boxShadow: "0 0 0 1px rgba(0,198,255,0.12), 0 7px 20px rgba(0,210,170,0.22), inset 0 1px 0 rgba(255,255,255,0.18)",
+                      backdropFilter: "blur(12px)",
+                      WebkitBackdropFilter: "blur(12px)",
+                      cursor: loadingStore ? "wait" : "pointer",
+                      opacity: loadingStore && loadingStore !== store.name ? 0.65 : 1,
+                      transition: "transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease",
                     }}
                   >
-                    {Number(store.price) === cheapest && (
-                      <span
-                        style={{
-                          display: "inline-block",
-                          width: 18,
-                          height: 6,
-                          marginRight: 8,
-                          borderRadius: 999,
-                          backgroundColor: "#22c55e",
-                          animation: "blink 1.2s infinite",
-                        }}
-                      />
-                    )}
-                    Buy on {store.name}
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        width: 34,
+                        height: 34,
+                        flexShrink: 0,
+                        display: "grid",
+                        placeItems: "center",
+                        borderRadius: 11,
+                        color: store.name.toLowerCase().includes("flipkart") ? "#1769e8" : store.name.toLowerCase().includes("amazon") ? "#111827" : "#00a982",
+                        background: "linear-gradient(145deg, #ffffff, #dceff1)",
+                        fontSize: getStoreMark(store.name) === "boAt" ? 10 : 16,
+                        fontWeight: 900,
+                        letterSpacing: "-0.5px",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.22)",
+                      }}
+                    >
+                      {getStoreMark(store.name)}
+                    </span>
+                    <span style={{ flex: 1, minWidth: 0, textAlign: "center", fontSize: 14, fontWeight: 800, letterSpacing: 0.1 }}>
+                      {loadingStore === store.name ? "Redirecting…" : `Buy on ${store.name}`}
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        width: 34,
+                        height: 34,
+                        flexShrink: 0,
+                        display: "grid",
+                        placeItems: "center",
+                        borderRadius: "50%",
+                        border: "1px solid rgba(95,255,220,0.65)",
+                        background: "linear-gradient(145deg, rgba(0,198,255,0.28), rgba(0,255,153,0.2))",
+                        boxShadow: "0 0 12px rgba(0,255,190,0.25)",
+                      }}
+                    >
+                      {loadingStore === store.name ? (
+                        <span className="button-spinner" />
+                      ) : (
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M5 12h14M13 6l6 6-6 6" />
+                        </svg>
+                      )}
+                    </span>
                   </button>
 
                   {offers.length > 0 && (
@@ -522,32 +573,73 @@ export default function ProductPage({ params }) {
 
         {/* See all CTA */}
         {product?.categorySlug && (
-          <div
-            onClick={() => router.push(`/category/${product.categorySlug}`)}
+          <button
+            type="button"
+            disabled={loadingCategory}
+            onClick={() => {
+              if (loadingCategory) return;
+              setLoadingCategory(true);
+              window.setTimeout(() => router.push(`/category/${product.categorySlug}`), 160);
+            }}
             style={{
+              width: "100%",
               marginTop: 28,
-              padding: "18px 20px",
+              padding: "15px 18px 15px 22px",
               borderRadius: 20,
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
+              justifyContent: "space-between",
               gap: 12,
               fontWeight: 900,
               fontSize: 16,
-              color: "#fff",
-              cursor: "pointer",
-              background: "linear-gradient(135deg,#0099cc,#009966)",
-              boxShadow: "0 10px 24px rgba(0,0,0,0.25)",
+              color: "#f4fffe",
+              cursor: loadingCategory ? "wait" : "pointer",
+              border: "1px solid rgba(53,255,207,0.58)",
+              background: "linear-gradient(115deg, rgba(5,29,55,0.96), rgba(0,91,91,0.92))",
+              boxShadow: "0 0 0 1px rgba(0,198,255,0.12), 0 10px 26px rgba(0,210,170,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              transition: "transform 180ms ease, box-shadow 180ms ease",
             }}
           >
-            See all in {product.categorySlug}
-            <ArrowIcon />
-          </div>
+            <span>{loadingCategory ? "Loading category…" : `See all in ${product.categorySlug}`}</span>
+            <span
+              aria-hidden="true"
+              style={{
+                width: 38,
+                height: 38,
+                flexShrink: 0,
+                display: "grid",
+                placeItems: "center",
+                borderRadius: "50%",
+                border: "1px solid rgba(95,255,220,0.7)",
+                background: "linear-gradient(145deg, rgba(0,198,255,0.3), rgba(0,255,153,0.22))",
+                boxShadow: "0 0 14px rgba(0,255,190,0.28)",
+              }}
+            >
+              {loadingCategory ? <span className="button-spinner" /> : (
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              )}
+            </span>
+          </button>
         )}
       </div>
 
       {/* Animations */}
       <style jsx>{`
+        .button-spinner {
+          width: 18px;
+          height: 18px;
+          border: 2px solid rgba(255,255,255,0.35);
+          border-top-color: #ffffff;
+          border-right-color: #00ffd0;
+          border-radius: 50%;
+          display: inline-block;
+          animation: buttonSpin 0.7s linear infinite;
+        }
+        @keyframes buttonSpin { to { transform: rotate(360deg); } }
         @keyframes arrowMove {
           0% { transform: translateX(0); }
           50% { transform: translateX(6px); }
