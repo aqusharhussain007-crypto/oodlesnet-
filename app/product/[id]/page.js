@@ -460,10 +460,22 @@ export default function ProductPage({ params }) {
                       {/* VIEW OFFERS */}
                       <button
                         type="button"
-                        aria-expanded={openOffer === index}
-                        onClick={() =>
-                          setOpenOffer(openOffer === index ? null : index)
-                        }
+                        aria-expanded={openOffer?.index === index}
+                        onClick={(event) => {
+                          if (openOffer?.index === index) {
+                            setOpenOffer(null);
+                            return;
+                          }
+                          const rect = event.currentTarget.getBoundingClientRect();
+                          setOpenOffer({
+                            index,
+                            offers,
+                            top: rect.bottom + 8,
+                            left: Math.max(12, Math.min(rect.left, window.innerWidth - rect.width - 12)),
+                            width: rect.width,
+                            maxHeight: Math.max(100, Math.min(260, window.innerHeight - rect.bottom - 24)),
+                          });
+                        }}
                         style={{
                           width: "100%",
                           minHeight: 58,
@@ -473,13 +485,13 @@ export default function ProductPage({ params }) {
                           alignItems: "center",
                           justifyContent: "space-between",
                           gap: 9,
-                          border: "1px solid rgba(91,174,255,0.72)",
-                          background: "linear-gradient(115deg, rgba(7,25,53,0.98), rgba(0,67,128,0.94))",
+                          border: "1px solid rgba(52,211,170,0.78)",
+                          background: "linear-gradient(115deg, rgba(5,45,48,0.98), rgba(0,112,100,0.95))",
                           color: "#f4f9ff",
                           fontWeight: 800,
                           fontSize: 13,
                           textAlign: "left",
-                          boxShadow: "0 0 0 1px rgba(0,145,255,0.12), 0 6px 16px rgba(0,105,255,0.18), inset 0 1px 0 rgba(255,255,255,0.16)",
+                          boxShadow: "0 0 0 1px rgba(20,184,140,0.14), 0 6px 16px rgba(0,170,135,0.2), inset 0 1px 0 rgba(255,255,255,0.16)",
                           cursor: "pointer",
                           transition: "transform 180ms ease, box-shadow 180ms ease",
                         }}
@@ -514,9 +526,9 @@ export default function ProductPage({ params }) {
                             placeItems: "center",
                             borderRadius: "50%",
                             border: "1px solid rgba(115,190,255,0.82)",
-                            background: "linear-gradient(145deg,rgba(0,145,255,0.34),rgba(35,105,255,0.26))",
-                            boxShadow: "0 0 12px rgba(0,145,255,0.28)",
-                            transform: openOffer === index ? "rotate(180deg)" : "rotate(0deg)",
+                            background: "linear-gradient(145deg,rgba(16,185,150,0.36),rgba(5,150,130,0.28))",
+                            boxShadow: "0 0 12px rgba(16,185,150,0.3)",
+                            transform: openOffer?.index === index ? "rotate(180deg)" : "rotate(0deg)",
                             transition: "transform 220ms ease",
                           }}
                         >
@@ -526,54 +538,7 @@ export default function ProductPage({ params }) {
                         </span>
                       </button>
 
-                      {/* OFFER PANEL */}
-                      <div
-                        style={{
-                          padding: 12,
-                          borderRadius: 12,
-                          background:
-                            openOffer === index ? "#f8fffc" : "#fff",
-                          border: "1px solid #bfdbfe",
-                          maxHeight: openOffer === index ? 260 : 0,
-                          overflowY: "auto",
-                          boxShadow:
-                            openOffer === index
-                              ? "0 10px 24px rgba(0,0,0,0.18)"
-                              : "0 4px 10px rgba(0,0,0,0.08)",
-                          opacity: openOffer === index ? 1 : 0,
-                          transform:
-                            openOffer === index
-                              ? "translateY(0)"
-                              : "translateY(-8px)",
-                          transition:
-                            "max-height 320ms cubic-bezier(0.16,1,0.3,1), opacity 220ms ease, transform 320ms cubic-bezier(0.16,1,0.3,1)",
-                          pointerEvents:
-                            openOffer === index ? "auto" : "none",
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 10,
-                        }}
-                      >
-                        {offers.map((line, i) => (
-                          <div
-                            key={i}
-                            style={{
-                              padding: "10px 12px",
-                              borderRadius: 10,
-                              background: "#f9fafb",
-                              border: "1px solid #e5e7eb",
-                              fontSize: 14,
-                              color: "#374151",
-                              lineHeight: 1.4,
-                              whiteSpace: "normal",
-                              wordBreak: "break-word",
-                              overflowWrap: "anywhere",
-                            }}
-                          >
-                            {line}
-                          </div>
-                        ))}
-                      </div>
+
                     </>
                   )}
                 </div>
@@ -581,6 +546,67 @@ export default function ProductPage({ params }) {
             );
           })}
         </div>
+
+        {openOffer && (
+          <>
+            <button
+              type="button"
+              aria-label="Close available offers"
+              onClick={() => setOpenOffer(null)}
+              style={{
+                position: "fixed",
+                inset: 0,
+                zIndex: 9998,
+                border: "none",
+                padding: 0,
+                background: "transparent",
+                cursor: "default",
+              }}
+            />
+            <div
+              role="region"
+              aria-label="Available retailer offers"
+              style={{
+                position: "fixed",
+                top: openOffer.top,
+                left: openOffer.left,
+                width: openOffer.width,
+                maxHeight: openOffer.maxHeight,
+                overflowY: "auto",
+                zIndex: 9999,
+                padding: 12,
+                borderRadius: 16,
+                border: "1px solid rgba(52,211,170,0.72)",
+                background: "linear-gradient(145deg,#f0fdfa,#ffffff)",
+                boxShadow: "0 16px 38px rgba(0,35,45,0.28), 0 0 0 1px rgba(16,185,150,0.12)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 10,
+                animation: "offerOverlayIn 180ms ease-out",
+              }}
+            >
+              {openOffer.offers.map((line, i) => (
+                <div
+                  key={i}
+                  style={{
+                    padding: "10px 12px",
+                    borderRadius: 10,
+                    background: "#ffffff",
+                    border: "1px solid #b7eadc",
+                    fontSize: 14,
+                    color: "#174b45",
+                    lineHeight: 1.4,
+                    whiteSpace: "normal",
+                    wordBreak: "break-word",
+                    overflowWrap: "anywhere",
+                  }}
+                >
+                  {line}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
             
         {/* Related sections */}
         {relatedCategory.length > 0 && (
@@ -691,6 +717,7 @@ export default function ProductPage({ params }) {
           animation: buttonSpin 0.7s linear infinite;
         }
         @keyframes buttonSpin { to { transform: rotate(360deg); } }
+        @keyframes offerOverlayIn { from { opacity: 0; transform: translateY(-6px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
         @keyframes arrowMove {
           0% { transform: translateX(0); }
           50% { transform: translateX(6px); }
