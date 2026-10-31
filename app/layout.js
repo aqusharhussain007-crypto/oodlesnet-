@@ -23,7 +23,10 @@ export const metadata = {
   ],
 
   verification: {
-    google: "rSQNNpBiW-oZrVrExVKSDt9QIQslHEufnnppAMTHAeI",
+    google: [
+      "rSQNNpBiW-oZrVrExVKSDt9QIQslHEufnnppAMTHAeI",
+      "wpEDPk0zYhmRjCy9cQlrxqj89ChuS9NNO9qIF2ixd0Q",
+    ],
   },
 
   openGraph: {
