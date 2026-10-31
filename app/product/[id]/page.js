@@ -398,10 +398,10 @@ export default function ProductPage({ params }) {
                       alignItems: "center",
                       gap: 9,
                       borderRadius: 16,
-                      border: "1px solid rgba(45, 255, 205, 0.55)",
+                      border: "1px solid rgba(91, 174, 255, 0.72)",
                       color: "#f4fffe",
-                      background: "linear-gradient(115deg, rgba(5, 24, 48, 0.97), rgba(0, 78, 82, 0.94))",
-                      boxShadow: "0 0 0 1px rgba(0,198,255,0.12), 0 7px 20px rgba(0,210,170,0.22), inset 0 1px 0 rgba(255,255,255,0.18)",
+                      background: "linear-gradient(115deg, rgba(5, 24, 55, 0.98), rgba(0, 74, 145, 0.94))",
+                      boxShadow: "0 0 0 1px rgba(0,198,255,0.12), 0 7px 20px rgba(0,105,255,0.24), inset 0 1px 0 rgba(255,255,255,0.18)",
                       backdropFilter: "blur(12px)",
                       WebkitBackdropFilter: "blur(12px)",
                       cursor: loadingStore ? "wait" : "pointer",
@@ -440,9 +440,9 @@ export default function ProductPage({ params }) {
                         display: "grid",
                         placeItems: "center",
                         borderRadius: "50%",
-                        border: "1px solid rgba(95,255,220,0.65)",
-                        background: "linear-gradient(145deg, rgba(0,198,255,0.28), rgba(0,255,153,0.2))",
-                        boxShadow: "0 0 12px rgba(0,255,190,0.25)",
+                        border: "1px solid rgba(115,190,255,0.78)",
+                        background: "linear-gradient(145deg, rgba(0,145,255,0.32), rgba(35,105,255,0.24))",
+                        boxShadow: "0 0 12px rgba(0,145,255,0.3)",
                       }}
                     >
                       {loadingStore === store.name ? (
@@ -594,9 +594,9 @@ export default function ProductPage({ params }) {
               fontSize: 16,
               color: "#f4fffe",
               cursor: loadingCategory ? "wait" : "pointer",
-              border: "1px solid rgba(53,255,207,0.58)",
-              background: "linear-gradient(115deg, rgba(5,29,55,0.96), rgba(0,91,91,0.92))",
-              boxShadow: "0 0 0 1px rgba(0,198,255,0.12), 0 10px 26px rgba(0,210,170,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
+              border: "1px solid rgba(91,174,255,0.72)",
+              background: "linear-gradient(115deg, rgba(5,24,55,0.98), rgba(0,74,145,0.94))",
+              boxShadow: "0 0 0 1px rgba(0,198,255,0.12), 0 10px 26px rgba(0,105,255,0.24), inset 0 1px 0 rgba(255,255,255,0.2)",
               backdropFilter: "blur(14px)",
               WebkitBackdropFilter: "blur(14px)",
               transition: "transform 180ms ease, box-shadow 180ms ease",
@@ -612,9 +612,9 @@ export default function ProductPage({ params }) {
                 display: "grid",
                 placeItems: "center",
                 borderRadius: "50%",
-                border: "1px solid rgba(95,255,220,0.7)",
-                background: "linear-gradient(145deg, rgba(0,198,255,0.3), rgba(0,255,153,0.22))",
-                boxShadow: "0 0 14px rgba(0,255,190,0.28)",
+                border: "1px solid rgba(115,190,255,0.82)",
+                background: "linear-gradient(145deg, rgba(0,145,255,0.34), rgba(35,105,255,0.26))",
+                boxShadow: "0 0 14px rgba(0,145,255,0.32)",
               }}
             >
               {loadingCategory ? <span className="button-spinner" /> : (
@@ -634,7 +634,7 @@ export default function ProductPage({ params }) {
           height: 18px;
           border: 2px solid rgba(255,255,255,0.35);
           border-top-color: #ffffff;
-          border-right-color: #00ffd0;
+          border-right-color: #65b8ff;
           border-radius: 50%;
           display: inline-block;
           animation: buttonSpin 0.7s linear infinite;
