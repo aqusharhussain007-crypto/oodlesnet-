@@ -714,23 +714,27 @@ export default function ProductPage({ params }) {
           position: relative;
         }
         .best-price-buy-label {
+          color: #ffffff;
+          font-weight: 900;
           animation: bestBuyTextPulse 1.8s ease-in-out infinite;
           transform-origin: center;
+          -webkit-font-smoothing: antialiased;
+          text-shadow: 0 0 3px rgba(16,185,129,0.35);
         }
         @keyframes bestBuyTextPulse {
           0%, 100% {
             color: #ffffff;
-            text-shadow: 0 0 2px rgba(16,185,129,0.18);
+            text-shadow: 0 0 3px rgba(16,185,129,0.35);
             transform: scale(1);
           }
           50% {
-            color: #d1fae5;
-            text-shadow: 0 0 7px rgba(52,211,153,0.95), 0 0 14px rgba(16,185,129,0.62);
-            transform: scale(1.035);
+            color: #86efac;
+            text-shadow: 0 0 5px rgba(74,222,128,0.48);
+            transform: scale(1.025);
           }
         }
         @media (prefers-reduced-motion: reduce) {
-          .best-price-buy-label { animation: none; color: #d1fae5; }
+          .best-price-buy-label { animation: none; color: #86efac; }
         }
         .button-spinner {
           width: 18px;
