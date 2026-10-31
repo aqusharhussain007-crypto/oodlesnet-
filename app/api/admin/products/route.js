@@ -256,6 +256,101 @@ export async function PATCH(request) {
     return fail("Request body must be valid JSON.", 400);
   }
 
+  // Explicit, fixed repair for the existing boAt Energyshroom PB400 product.
+  // Store URLs and prices are server-controlled; callers cannot supply arbitrary offers.
+  if (body?.operation === "update-pb400-comparison") {
+    const expectedPb400Id = "boat-energyshroom-pb400";
+    if (body.documentId !== expectedPb400Id || body.confirmUpdate !== true) {
+      return fail("PB400 update requires the fixed document ID and confirmUpdate=true.", 400);
+    }
+
+    let app;
+    try {
+      app = getProductionAdminApp();
+    } catch (error) {
+      return fail(error instanceof Error ? error.message : "Production writer configuration error.", 503);
+    }
+    const auth = await requireAdmin(request, app);
+    if (auth.error) return auth.error;
+
+    try {
+      const db = getFirestore(app);
+      const ref = db.collection("products").doc(expectedPb400Id);
+      const existing = await ref.get();
+      if (!existing.exists) return fail("The PB400 document was not found; nothing was changed.", 404);
+      if (
+        existing.get("name") !== "boAt Energyshroom PB400 20000mAh Power Bank" ||
+        existing.get("brand") !== "boAt" ||
+        existing.get("categorySlug") !== "power-banks"
+      ) {
+        return fail("The fixed document does not match the expected PB400 product; nothing was changed.", 409);
+      }
+
+      const comparisonStores = [
+        {
+          name: "boAt",
+          price: 1399,
+          offer: "Official boAt listing observed at ₹1,399 on 31 Oct 2026; verify selected colour, stock and checkout price.",
+          url: "https://www.boat-lifestyle.com/products/energyshroom-pb400-powerbank-with-20000mah-battery-capacity-with-smart-ic-protection",
+        },
+        {
+          name: "Zepto",
+          price: 1399,
+          offer: "PB400 20,000mAh, 22.5W listing observed at ₹1,399; colour and local PIN-code availability may vary.",
+          url: "https://www.zepto.com/pn/boat-20000mah-power-bank-w-2-way-22-5w-fast-charging-smart-power-management-pb400-steel-blue/pvid/73f8d4ff-bc06-4474-bb90-befcecac207e",
+        },
+        {
+          name: "Reliance Digital",
+          price: 1799,
+          offer: "EnergyShroom PB400 20,000mAh, 22.5W listing observed at ₹1,799; colour and delivery availability may vary.",
+          url: "https://www.reliancedigital.in/product/boat-energyshroom-20000-mah-power-bank-steel-blue-pb400-lqg9dl-7535200",
+        },
+        {
+          name: "Croma",
+          price: 1799,
+          offer: "Energyshroom PB400 20,000mAh, 22.5W listing observed at ₹1,799; colour and stock may vary.",
+          url: "https://www.croma.com/boat-energyshroom-pb400-20000-mah-22-5w-fast-charging-power-bank-2-type-a-1-micro-usb-and-1-type-c-port-sleek-aluminium-casing-steel-blue-/p/302756",
+        },
+      ];
+
+      await ref.update({
+        store: comparisonStores,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+
+      let auditLogged = true;
+      try {
+        await db.collection("product_writer_audit").add({
+          actorUid: auth.uid,
+          operation: "update-pb400-store-comparison",
+          collection: "products",
+          documentId: expectedPb400Id,
+          productName: existing.get("name"),
+          storeNames: comparisonStores.map((offer) => offer.name),
+          createdAt: FieldValue.serverTimestamp(),
+        });
+      } catch {
+        auditLogged = false;
+      }
+
+      return NextResponse.json({
+        ok: true,
+        mode: "updated",
+        targetProject: PRODUCTION_PROJECT_ID,
+        collection: "products",
+        documentId: expectedPb400Id,
+        productName: existing.get("name"),
+        categorySlug: "power-banks",
+        storeCount: comparisonStores.length,
+        stores: comparisonStores.map((offer) => ({ name: offer.name, price: offer.price })),
+        auditLogged,
+        warning: auditLogged ? undefined : "Product was updated, but audit logging failed. Do not retry blindly.",
+      }, { headers: { "Cache-Control": "no-store" } });
+    } catch {
+      return fail("PB400 comparison update failed. Verify Firestore before trying again.", 500);
+    }
+  }
+
   const expectedDocumentId = "oneplus-nord-ce5-5g-live-20261028";
   if (!body || body.documentId !== expectedDocumentId || body.confirmUpdate !== true) {
     return fail("This repair is restricted to the fixed OnePlus document and requires confirmUpdate=true.", 400);
