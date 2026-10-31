@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const PRODUCTION_PROJECT_ID = "oodlesnet-6c19e";
-const MAX_BODY_BYTES = 50_000;
+const MAX_BODY_BYTES = 1_000_000;
 
 function fail(message, status) {
   return NextResponse.json({ ok: false, error: message }, { status, headers: { "Cache-Control": "no-store" } });
@@ -95,6 +95,7 @@ export async function GET() {
     mode: "dry-run by default",
     configurationReady: projectConfigured && credentialsConfigured && adminAllowlistConfigured,
     maxBodyBytes: MAX_BODY_BYTES,
+    maxProductsPerRequest: 100,
     writeRequirements: ["valid Firebase ID token", "UID in server-side admin allowlist", "confirmWrite=true"],
     message: "Status only; POST requires verified admin authentication. Without confirmWrite=true, POST performs no write.",
   }, { headers: { "Cache-Control": "no-store" } });
@@ -102,19 +103,29 @@ export async function GET() {
 
 export async function POST(request) {
   const length = Number(request.headers.get("content-length") || 0);
-  if (length > MAX_BODY_BYTES) return fail("Request exceeds the 50 KB limit.", 413);
+  if (length > MAX_BODY_BYTES) return fail("Request exceeds the 1 MB limit.", 413);
   // Reject anonymous requests before parsing the request body or checking server configuration.
   const authorization = request.headers.get("authorization") || "";
   if (!authorization.startsWith("Bearer ")) return fail("A Firebase ID token is required.", 401);
+
   let body;
   try {
     const raw = await request.text();
-    if (Buffer.byteLength(raw, "utf8") > MAX_BODY_BYTES) return fail("Request exceeds the 50 KB limit.", 413);
+    if (Buffer.byteLength(raw, "utf8") > MAX_BODY_BYTES) return fail("Request exceeds the 1 MB limit.", 413);
     body = JSON.parse(raw);
   } catch {
     return fail("Request body must be valid JSON.", 400);
   }
   if (!body || typeof body !== "object" || Array.isArray(body)) return fail("Request body must be a JSON object.", 400);
+
+  // Backward compatible: accept the former single-product body or a batch of 1–100 entries.
+  const entries = Array.isArray(body.products)
+    ? body.products
+    : [{ documentId: body.documentId, product: body.product }];
+  if (entries.length < 1 || entries.length > 100) {
+    return fail("products must contain between 1 and 100 products.", 400);
+  }
+
   let app;
   try {
     app = getProductionAdminApp();
@@ -124,49 +135,79 @@ export async function POST(request) {
   const auth = await requireAdmin(request, app);
   if (auth.error) return auth.error;
 
-  const validationError = validateProduct(body.product);
-  if (validationError) return fail(validationError, 400);
+  const seenDocumentIds = new Set();
+  const prepared = [];
+  for (let index = 0; index < entries.length; index += 1) {
+    const entry = entries[index];
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+      return fail("Each products entry must be an object containing product and optional documentId.", 400);
+    }
+    const validationError = validateProduct(entry.product);
+    if (validationError) return fail("Product " + (index + 1) + ": " + validationError, 400);
 
-  const product = body.product;
-  const data = {
-    name: product.name.trim(),
-    brand: product.brand.trim(),
-    categorySlug: product.categorySlug,
-    description: product.description || "",
-    imageUrl: product.imageUrl || "",
-    tags: Array.isArray(product.tags) ? product.tags : [],
-    impressions: 0,
-    views: 0,
-    store: product.store.map((offer) => ({
-      name: offer.name.trim(),
-      price: Number(offer.price),
-      offer: offer.offer || "",
-      url: offer.url,
-    })),
-    source: "admin-product-writer",
-  };
+    const documentId = entry.documentId;
+    if (documentId !== undefined) {
+      if (typeof documentId !== "string" || !/^[A-Za-z0-9_-]{1,100}$/.test(documentId)) {
+        return fail("Product " + (index + 1) + ": documentId may contain only letters, numbers, underscores, and hyphens (max 100).", 400);
+      }
+      if (seenDocumentIds.has(documentId)) {
+        return fail("Duplicate documentId in this batch: " + documentId, 400);
+      }
+      seenDocumentIds.add(documentId);
+    }
 
-  const documentId = body.documentId;
-  if (documentId !== undefined && (typeof documentId !== "string" || !/^[A-Za-z0-9_-]{1,100}$/.test(documentId))) {
-    return fail("documentId may contain only letters, numbers, underscores, and hyphens (max 100).", 400);
+    const product = entry.product;
+    const data = {
+      name: product.name.trim(),
+      brand: product.brand.trim(),
+      categorySlug: product.categorySlug,
+      description: product.description || "",
+      imageUrl: product.imageUrl || "",
+      tags: Array.isArray(product.tags) ? product.tags : [],
+      impressions: 0,
+      views: 0,
+      store: product.store.map((offer) => ({
+        name: offer.name.trim(),
+        price: Number(offer.price),
+        offer: offer.offer || "",
+        url: offer.url,
+      })),
+      source: "admin-product-writer",
+    };
+    prepared.push({ documentId, data });
   }
 
   if (body.confirmWrite !== true) {
     return NextResponse.json({
-      ok: true, mode: "dry-run", targetProject: PRODUCTION_PROJECT_ID,
-      collection: "products", validated: true,
-      product: { name: data.name, brand: data.brand, categorySlug: data.categorySlug, storeOffers: data.store.length },
-      message: "No data was written. Set confirmWrite=true to create the product.",
+      ok: true,
+      mode: "dry-run",
+      targetProject: PRODUCTION_PROJECT_ID,
+      collection: "products",
+      validated: true,
+      count: prepared.length,
+      products: prepared.map(({ documentId, data }) => ({
+        documentId: documentId || null,
+        name: data.name,
+        brand: data.brand,
+        categorySlug: data.categorySlug,
+        storeOffers: data.store.length,
+      })),
+      message: "No data was written. Set confirmWrite=true to create all products in this batch.",
     }, { headers: { "Cache-Control": "no-store" } });
   }
 
   try {
     const db = getFirestore(app);
-    const ref = documentId ? db.collection("products").doc(documentId) : db.collection("products").doc();
-    await ref.create({ ...data, createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
-    let auditLogged = true;
-    try {
-      await db.collection("product_writer_audit").add({
+    const batch = db.batch();
+    const created = prepared.map(({ documentId, data }) => {
+      const ref = documentId ? db.collection("products").doc(documentId) : db.collection("products").doc();
+      batch.create(ref, {
+        ...data,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      const auditRef = db.collection("product_writer_audit").doc();
+      batch.create(auditRef, {
         actorUid: auth.uid,
         operation: "create",
         collection: "products",
@@ -174,22 +215,29 @@ export async function POST(request) {
         productName: data.name,
         createdAt: FieldValue.serverTimestamp(),
       });
-    } catch {
-      auditLogged = false;
-    }
+      return { documentId: ref.id, productName: data.name };
+    });
+    // A single atomic commit prevents partial batches; existing documents are never overwritten.
+    await batch.commit();
+
     return NextResponse.json({
-      ok: true, mode: "written", targetProject: PRODUCTION_PROJECT_ID,
-      collection: "products", documentId: ref.id, productName: data.name,
-      auditLogged,
-      warning: auditLogged ? undefined : "Product was created, but audit logging failed. Do not retry; verify the product in Firestore.",
+      ok: true,
+      mode: "written",
+      targetProject: PRODUCTION_PROJECT_ID,
+      collection: "products",
+      created: created.length,
+      skipped: 0,
+      failed: 0,
+      auditLogged: true,
+      products: created,
     }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     const code = error && typeof error === "object" ? error.code : undefined;
     const message = error instanceof Error ? error.message.toLowerCase() : "";
     if (code === 6 || code === "already-exists" || message.includes("already exists")) {
-      return fail("That document ID already exists. Existing products are never overwritten.", 409);
+      return fail("At least one document ID already exists. The entire batch was rejected; no products were written.", 409);
     }
-    return fail("Product creation failed. Verify configuration and database availability before retrying.", 500);
+    return fail("Product batch creation failed. Verify configuration and database availability before retrying.", 500);
   }
 }
 
