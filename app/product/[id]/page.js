@@ -708,18 +708,33 @@ export default function ProductPage({ params }) {
       {/* Animations */}
       <style jsx>{`
         .buy-action-button {
-          animation: buyPulse 2.6s ease-in-out infinite;
+          position: relative;
+          isolation: isolate;
         }
-        @keyframes buyPulse {
+        .buy-action-button::after {
+          content: "";
+          position: absolute;
+          inset: -4px;
+          border: 2px solid rgba(16,185,129,0.72);
+          border-radius: 20px;
+          pointer-events: none;
+          z-index: -1;
+          animation: buyCapsulePulse 2s ease-in-out infinite;
+        }
+        @keyframes buyCapsulePulse {
           0%, 100% {
-            box-shadow: 0 0 0 1px rgba(0,198,255,0.12), 0 7px 20px rgba(0,105,255,0.24), 0 0 0 rgba(16,185,129,0), inset 0 1px 0 rgba(255,255,255,0.18);
+            opacity: 0.48;
+            transform: scale(1);
+            box-shadow: 0 0 5px rgba(16,185,129,0.28), inset 0 0 3px rgba(16,185,129,0.12);
           }
           50% {
-            box-shadow: 0 0 0 1px rgba(0,198,255,0.16), 0 7px 20px rgba(0,105,255,0.24), 0 0 13px rgba(16,185,129,0.34), inset 0 1px 0 rgba(255,255,255,0.18);
+            opacity: 1;
+            transform: scale(1.012);
+            box-shadow: 0 0 15px rgba(16,185,129,0.62), 0 0 25px rgba(16,185,129,0.24), inset 0 0 5px rgba(16,185,129,0.18);
           }
         }
         @media (prefers-reduced-motion: reduce) {
-          .buy-action-button { animation: none; }
+          .buy-action-button::after { animation: none; opacity: 0.8; }
         }
         .button-spinner {
           width: 18px;
