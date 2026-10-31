@@ -2,7 +2,7 @@
 
 import SkeletonLoader from "@/components/SkeletonLoader";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 import ProductCard from "@/components/ProductCard";
@@ -84,12 +84,49 @@ export default function ProductPage({ params }) {
 
   const [expanded, setExpanded] = useState(false);
   const [openOffer, setOpenOffer] = useState(null);
+  const [offerPosition, setOfferPosition] = useState(null);
+  const offerButtonRef = useRef(null);
   const [loadingStore, setLoadingStore] = useState("");
   const [loadingCategory, setLoadingCategory] = useState(false);
 
   const [relatedCategory, setRelatedCategory] = useState([]);
   const [relatedBrand, setRelatedBrand] = useState([]);
   const [relatedPrice, setRelatedPrice] = useState([]);
+
+  useEffect(() => {
+    if (!openOffer) {
+      setOfferPosition(null);
+      return;
+    }
+
+    const updateOfferPosition = () => {
+      const anchor = offerButtonRef.current;
+      if (!anchor) return;
+
+      const rect = anchor.getBoundingClientRect();
+      const gap = 8;
+      const viewportPadding = 12;
+      const spaceBelow = window.innerHeight - rect.bottom - gap - viewportPadding;
+      const spaceAbove = rect.top - gap - viewportPadding;
+      const openBelow = spaceBelow >= Math.min(180, spaceAbove) || spaceBelow >= 180;
+      const availableHeight = Math.max(100, Math.min(260, openBelow ? spaceBelow : spaceAbove));
+
+      setOfferPosition({
+        top: openBelow ? rect.bottom + gap : Math.max(viewportPadding, rect.top - gap - availableHeight),
+        left: Math.max(viewportPadding, Math.min(rect.left, window.innerWidth - rect.width - viewportPadding)),
+        width: Math.min(rect.width, window.innerWidth - viewportPadding * 2),
+        maxHeight: availableHeight,
+      });
+    };
+
+    updateOfferPosition();
+    window.addEventListener("resize", updateOfferPosition);
+    window.addEventListener("scroll", updateOfferPosition, true);
+    return () => {
+      window.removeEventListener("resize", updateOfferPosition);
+      window.removeEventListener("scroll", updateOfferPosition, true);
+    };
+  }, [openOffer]);
 
   useEffect(() => {
     if (!product) return;
@@ -465,20 +502,13 @@ export default function ProductPage({ params }) {
                       <button
                         type="button"
                         aria-expanded={openOffer?.index === index}
-                        onClick={(event) => {
+                        ref={offerButtonRef}
+                        onClick={() => {
                           if (openOffer?.index === index) {
                             setOpenOffer(null);
                             return;
                           }
-                          const rect = event.currentTarget.getBoundingClientRect();
-                          setOpenOffer({
-                            index,
-                            offers,
-                            top: rect.bottom + 8,
-                            left: Math.max(12, Math.min(rect.left, window.innerWidth - rect.width - 12)),
-                            width: rect.width,
-                            maxHeight: Math.max(100, Math.min(260, window.innerHeight - rect.bottom - 24)),
-                          });
+                          setOpenOffer({ index, offers });
                         }}
                         style={{
                           width: "100%",
@@ -572,10 +602,10 @@ export default function ProductPage({ params }) {
               aria-label="Available retailer offers"
               style={{
                 position: "fixed",
-                top: openOffer.top,
-                left: openOffer.left,
-                width: openOffer.width,
-                maxHeight: openOffer.maxHeight,
+                top: offerPosition?.top ?? 12,
+                left: offerPosition?.left ?? 12,
+                width: offerPosition?.width ?? "calc(100vw - 24px)",
+                maxHeight: offerPosition?.maxHeight ?? 180,
                 overflowY: "auto",
                 zIndex: 9999,
                 padding: 12,
@@ -714,23 +744,21 @@ export default function ProductPage({ params }) {
           position: relative;
         }
         .best-price-buy-label {
+          display: inline-block;
           color: #ffffff;
           font-weight: 900;
           animation: bestBuyTextPulse 1.8s ease-in-out infinite;
-          transform-origin: center;
           -webkit-font-smoothing: antialiased;
-          text-shadow: 0 0 3px rgba(16,185,129,0.35);
+          text-shadow: 0 0 2px rgba(16,185,129,0.22);
         }
         @keyframes bestBuyTextPulse {
           0%, 100% {
             color: #ffffff;
-            text-shadow: 0 0 3px rgba(16,185,129,0.35);
-            transform: scale(1);
+            text-shadow: 0 0 2px rgba(16,185,129,0.22);
           }
           50% {
             color: #86efac;
-            text-shadow: 0 0 5px rgba(74,222,128,0.48);
-            transform: scale(1.025);
+            text-shadow: 0 0 4px rgba(74,222,128,0.38);
           }
         }
         @media (prefers-reduced-motion: reduce) {
