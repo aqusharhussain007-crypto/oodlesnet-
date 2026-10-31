@@ -4,14 +4,17 @@ import Footer from "@/components/Footer";
 import DrawerProvider from "@/components/DrawerProvider";
 
 export const metadata = {
-  metadataBase: new URL("https://oodlesnet.in"), // use your real domain
+  metadataBase: new URL("https://www.oodlesnet.com"),
+  alternates: {
+    canonical: "/",
+  },
   title: {
     default: "OodlesNet – Compare Prices & Buy Smarter",
     template: "%s | OodlesNet",
   },
   description:
-    "Compare prices across Amazon, Flipkart, Meesho and more.",
-    keywords: [
+    "Compare product prices across Amazon, Flipkart, Meesho, Ajio and other Indian stores. Discover deals and find the right price on OodlesNet.",
+  keywords: [
     "price comparison india",
     "compare prices online",
     "best deals india",
@@ -26,10 +29,10 @@ export const metadata = {
   openGraph: {
     type: "website",
     siteName: "OodlesNet",
-    url: "https://oodlesnet.vercel.app",
+    url: "https://www.oodlesnet.com/",
     title: "OodlesNet – Compare Prices & Find Best Deals in India",
     description:
-      "Compare prices across Amazon, Meesho, Ajio and more. Find lowest prices and trending deals on OodlesNet.",
+      "Compare prices across Amazon, Flipkart, Meesho, Ajio and more. Find competitive prices and trending deals on OodlesNet.",
     images: [
       {
         url: "/logo.png",
@@ -44,7 +47,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "OodlesNet – Compare Prices & Find Best Deals in India",
     description:
-      "Compare prices across top Indian stores and find the best deals.",
+      "Compare prices across top Indian stores and find competitive deals.",
     images: ["/logo.png"],
   },
 };
@@ -69,5 +72,4 @@ export default function RootLayout({ children }) {
       </body>
     </html>
   );
-    }
-  
+}
