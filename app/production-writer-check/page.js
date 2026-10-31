@@ -46,6 +46,8 @@ export default function ProductionWriterCheckPage() {
   const [writeComplete, setWriteComplete] = useState(false);
   const [pb400Confirmed, setPb400Confirmed] = useState(false);
   const [pb400Updated, setPb400Updated] = useState(false);
+  const [stone350Confirmed, setStone350Confirmed] = useState(false);
+  const [stone350Updated, setStone350Updated] = useState(false);
 
   async function signIn(event) {
     event.preventDefault();
@@ -218,6 +220,34 @@ export default function ProductionWriterCheckPage() {
     }
   }
 
+
+  async function updateStone350ProComparison() {
+    if (!token || !stone350Confirmed || stone350Updated || busy) return;
+    setBusy(true);
+    setMessage("");
+    setResult("");
+    try {
+      const response = await fetch("/api/admin/products", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+        body: JSON.stringify({ operation: "update-stone350pro-comparison", documentId: "boat-stone-350-pro", confirmUpdate: true }),
+        cache: "no-store",
+      });
+      const data = await response.json().catch(() => ({}));
+      setResult(JSON.stringify({ httpStatus: response.status, ...data }, null, 2));
+      if (response.ok && data.ok === true && data.mode === "updated" && data.documentId === "boat-stone-350-pro" && data.storeCount === 2 && data.targetProject === TARGET_PROJECT) {
+        setStone350Updated(true);
+        setMessage("Production confirms the Stone 350 Pro comparison now has two store offers. Do not submit this update again.");
+      } else {
+        setMessage("No complete success confirmation received. Do not retry blindly; verify the Stone 350 Pro document in Firestore first.");
+      }
+    } catch {
+      setMessage("The network result may be uncertain. Do not retry; verify the Stone 350 Pro document in Firestore first.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   const fieldStyle = { display: "block", width: "100%", padding: 12, marginTop: 6, boxSizing: "border-box", fontSize: 14, fontFamily: "monospace" };
 
   return (
@@ -258,6 +288,23 @@ export default function ProductionWriterCheckPage() {
         </label>
         <button disabled={busy || !token || !pb400Confirmed || pb400Updated} onClick={updatePb400Comparison} type="button" style={{ width: "100%", marginTop: 14, padding: 14, fontWeight: 800, background: "#075985", color: "white", border: 0, borderRadius: 8 }}>
           {pb400Updated ? "PB400 comparison updated" : busy ? "Updating…" : "Update PB400 store comparison"}
+        </button>
+      </section>}
+
+      {uid && <section style={{ margin: "16px 0", padding: 16, border: "2px solid #0f766e", borderRadius: 9 }}>
+        <h2 style={{ fontSize: 21, fontWeight: 700 }}>Stone 350 Pro — Update store comparison</h2>
+        <p>This fixed update changes only the existing boAt Stone 350 Pro document's store offers. Its name, image, description and <code>bluetooth-speakers</code> category remain unchanged.</p>
+        <ul>
+          <li>boAt — ₹1,999 (official page currently says restocking soon)</li>
+          <li>Flipkart — ₹2,199 (exact-model listing currently shown out of stock)</li>
+        </ul>
+        <p>These are observed listing prices, not confirmed in-stock offers. Check stock, seller, PIN-code availability and final checkout price before buying.</p>
+        <label style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+          <input type="checkbox" checked={stone350Confirmed} onChange={(e) => setStone350Confirmed(e.target.checked)} disabled={stone350Updated} style={{ marginTop: 5, width: 20, height: 20 }} />
+          <span>I authorize updating only the store offers for the existing Stone 350 Pro product in LIVE Firestore.</span>
+        </label>
+        <button disabled={busy || !token || !stone350Confirmed || stone350Updated} onClick={updateStone350ProComparison} type="button" style={{ width: "100%", marginTop: 14, padding: 14, fontWeight: 800, background: "#075985", color: "white", border: 0, borderRadius: 8 }}>
+          {stone350Updated ? "Stone 350 Pro comparison updated" : busy ? "Updating…" : "Update Stone 350 Pro store comparison"}
         </button>
       </section>}
 
