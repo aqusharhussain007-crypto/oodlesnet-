@@ -41,7 +41,7 @@ export default async function CategoryPage({ params }) {
   // Electronics is the parent category; keep product records in their
   // original Power Banks and Bluetooth Speakers subcategories.
   const categorySlugs = slug === "electronics"
-    ? ["power-banks", "bluetooth-speakers"]
+    ? ["electronics", "power-banks", "bluetooth-speakers"]
     : slug === "smartphones" || slug === "smartphone"
       ? ["smartphones", "smartphone"]
       : [slug];
