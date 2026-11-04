@@ -18,6 +18,7 @@ export default function FirestoreAdminPage() {
   const [documentId, setDocumentId] = useState("");
   const [jsonData, setJsonData] = useState("");
   const [preview, setPreview] = useState(null);
+  const [selectedRecordId, setSelectedRecordId] = useState("");
 
   async function login(event) {
     event.preventDefault();
@@ -73,6 +74,7 @@ export default function FirestoreAdminPage() {
     setPreview(null);
     setDocumentId("");
     setJsonData("");
+    setSelectedRecordId("");
   }
 
   async function prepareChange() {
@@ -180,6 +182,25 @@ export default function FirestoreAdminPage() {
           </div>
           <p style={{ color: "#aab4c5" }}>Read view: displays live records. Write tools below require a dry-run and a separate confirmation.</p>
           <p>{documents.length} records displayed</p>
+          {collection === "products" && documents.length > 0 && (
+            <div style={{ display: "grid", gap: 8 }}>
+              <label>Choose a loaded product
+                <select value={selectedRecordId} onChange={e => setSelectedRecordId(e.target.value)} style={fieldStyle}>
+                  <option value="">Select product by name and ID</option>
+                  {documents.map(doc => <option key={doc.id} value={doc.id}>{(doc.data?.name || "Unnamed product") + " — " + doc.id}</option>)}
+                </select>
+              </label>
+              <button disabled={!selectedRecordId || busy} onClick={() => {
+                const selected = documents.find(doc => doc.id === selectedRecordId);
+                if (!selected) return;
+                setOperation("update");
+                setDocumentId(selected.id);
+                setJsonData(JSON.stringify(selected.data, null, 2));
+                setPreview(null);
+                setStatus("Loaded the exact existing product ID and complete JSON. No database changes have been made.");
+              }} style={buttonStyle}>Load selected product into edit form (no changes)</button>
+            </div>
+          )}
           <pre style={preStyle}>{JSON.stringify(documents, null, 2)}</pre>
           {hasMore && <button disabled={busy} onClick={() => requestRecords(collection, cursor)} style={buttonStyle}>Load next 50</button>}
           <hr style={{ borderColor: "#334155", margin: "12px 0" }} />
