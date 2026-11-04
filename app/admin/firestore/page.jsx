@@ -123,7 +123,7 @@ export default function FirestoreAdminPage() {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + idToken },
         body: JSON.stringify({
-          operation, collection, ...(documentId.trim() ? { documentId: documentId.trim() } : {}),
+          operation, collection, documentId: operation === "create" ? preview.documentId : documentId.trim(),
           ...(operation !== "delete" ? { data } : {}),
           confirm: true, ...(operation === "delete" ? { confirmDelete: true } : {})
         }),
