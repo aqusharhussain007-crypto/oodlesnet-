@@ -89,6 +89,22 @@ export default function ProductPage({ params }) {
   const [loadingStore, setLoadingStore] = useState("");
   const [loadingCategory, setLoadingCategory] = useState(false);
 
+  // Clear transient button state when the user returns from a retailer page.
+  // Mobile browsers may restore this page from the back-forward cache.
+  useEffect(() => {
+    const resetStoreLoading = () => setLoadingStore("");
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") resetStoreLoading();
+    };
+
+    window.addEventListener("pageshow", resetStoreLoading);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      window.removeEventListener("pageshow", resetStoreLoading);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
   const [relatedCategory, setRelatedCategory] = useState([]);
   const [relatedBrand, setRelatedBrand] = useState([]);
   const [relatedPrice, setRelatedPrice] = useState([]);
