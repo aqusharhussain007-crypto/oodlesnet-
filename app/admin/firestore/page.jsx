@@ -19,6 +19,7 @@ export default function FirestoreAdminPage() {
   const [jsonData, setJsonData] = useState("");
   const [preview, setPreview] = useState(null);
   const [selectedRecordId, setSelectedRecordId] = useState("");
+  const [batchFileName, setBatchFileName] = useState("");
 
   async function login(event) {
     event.preventDefault();
@@ -84,7 +85,7 @@ export default function FirestoreAdminPage() {
       try { data = JSON.parse(jsonData); }
       catch { setStatus("Enter valid JSON before preparing the change."); return; }
     }
-    if (operation !== "create" && !documentId.trim()) {
+    if (operation !== "create" && operation !== "batch-update" && !documentId.trim()) {
       setStatus("Enter the existing Firestore document ID.");
       return;
     }
@@ -97,7 +98,7 @@ export default function FirestoreAdminPage() {
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + idToken },
         body: JSON.stringify({
           operation, collection, ...(documentId.trim() ? { documentId: documentId.trim() } : {}),
-          ...(operation !== "delete" ? { data } : {}),
+          ...(operation === "batch-update" ? { records: data } : operation !== "delete" ? { data } : {}),
           confirm: false, ...(operation === "delete" ? { confirmDelete: true } : {})
         }),
       });
@@ -115,7 +116,7 @@ export default function FirestoreAdminPage() {
   async function applyChange() {
     if (!preview || !idToken) return;
     const phrase = operation === "delete" ? "DELETE" : "APPLY";
-    const target = preview.documentId || "new auto-generated document";
+    const target = preview.count ? preview.count + " products" : preview.documentId || "new auto-generated document";
     if (!window.confirm("Final confirmation: " + operation.toUpperCase() + " in " + collection + " (" + target + ")? This affects the LIVE production database. Choose OK only if you intend to proceed.")) return;
     setBusy(true);
     setStatus("Applying approved change…");
@@ -126,7 +127,7 @@ export default function FirestoreAdminPage() {
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + idToken },
         body: JSON.stringify({
           operation, collection, documentId: operation === "create" ? preview.documentId : documentId.trim(),
-          ...(operation !== "delete" ? { data } : {}),
+          ...(operation === "batch-update" ? { records: data } : operation !== "delete" ? { data } : {}),
           confirm: true, ...(operation === "delete" ? { confirmDelete: true } : {})
         }),
       });
@@ -207,11 +208,11 @@ export default function FirestoreAdminPage() {
           <h2 style={{ fontSize: 21, fontWeight: 700 }}>Manage {collection}</h2>
           <label>Operation
             <select value={operation} onChange={e => { setOperation(e.target.value); setPreview(null); }} style={fieldStyle}>
-              <option value="create">Add new record</option><option value="update">Edit existing record</option><option value="delete">Delete record</option>
+              <option value="create">Add new record</option><option value="update">Edit existing record</option><option value="batch-update">Bulk update products (1–100)</option><option value="delete">Delete record</option>
             </select>
           </label>
-          {operation !== "create" && <label>Existing document ID<input value={documentId} onChange={e => { setDocumentId(e.target.value); setPreview(null); }} placeholder="Paste exact Firestore document ID" style={fieldStyle} /></label>}
-          {operation !== "delete" && <label>Record data (JSON)
+          {operation !== "create" && operation !== "batch-update" && <label>Existing document ID<input value={documentId} onChange={e => { setDocumentId(e.target.value); setPreview(null); }} placeholder="Paste exact Firestore document ID" style={fieldStyle} /></label>}
+          {operation !== "delete" && <label>{operation === "batch-update" ? "Batch data (JSON array: [{id, data}, ...])" : "Record data (JSON)"}
             <textarea value={jsonData} onChange={e => { setJsonData(e.target.value); setPreview(null); }} placeholder={example} rows={collection === "products" ? 14 : 8} spellCheck={false} style={{ ...fieldStyle, fontFamily: "monospace", fontSize: 13, minHeight: 180 }} />
           </label>}
           <p style={{ color: "#fbbf24", fontSize: 13 }}>Important: This changes the LIVE production database. Verify every field, price, image URL and store link before applying. Product system fields (views/impressions) are protected.</p>
