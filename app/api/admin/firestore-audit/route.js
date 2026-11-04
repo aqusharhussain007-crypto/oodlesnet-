@@ -96,6 +96,101 @@ function validateCategory(c) {
 }
 function validDocumentId(id) { return typeof id === "string" && /^[A-Za-z0-9_-]{1,100}$/.test(id); }
 
+
+async function handleBatchUpdate(body, db, uid) {
+  if (body.collection !== "products") return response({ ok: false, error: "Bulk update is currently limited to products." }, 400);
+  if (!Array.isArray(body.records) || body.records.length < 1 || body.records.length > 100) {
+    return response({ ok: false, error: "records must contain 1–100 products." }, 400);
+  }
+  const seen = new Set();
+  const prepared = [];
+  for (let index = 0; index < body.records.length; index++) {
+    const item = body.records[index];
+    if (!item || typeof item !== "object" || Array.isArray(item) || !validDocumentId(item.id)) {
+      return response({ ok: false, error: "Record " + (index + 1) + " must include its exact Firestore document ID." }, 400);
+    }
+    if (seen.has(item.id)) return response({ ok: false, error: "Duplicate document ID: " + item.id }, 400);
+    seen.add(item.id);
+    if (!item.data || typeof item.data !== "object" || Array.isArray(item.data)) {
+      return response({ ok: false, error: "Record " + (index + 1) + " data must be an object." }, 400);
+    }
+    const ref = db.collection("products").doc(item.id);
+    prepared.push({ id: item.id, ref, data: item.data });
+  }
+
+  try {
+    const refs = prepared.map(item => item.ref);
+    const snapshots = await db.getAll(...refs);
+    const checked = [];
+    for (let index = 0; index < prepared.length; index++) {
+      const item = prepared[index];
+      const snap = snapshots[index];
+      if (!snap.exists) return response({ ok: false, error: "Product not found: " + item.id + ". No products were changed." }, 404);
+      const existing = snap.data();
+      const protectedFields = ["impressions", "views", "source", "createdAt"];
+      const updateData = Object.fromEntries(Object.entries(item.data).filter(([key]) => !protectedFields.includes(key)));
+      if (!Object.keys(updateData).length) return response({ ok: false, error: "No editable fields in product " + item.id + "." }, 400);
+      const merged = { ...existing, ...updateData };
+      const validationError = validateProduct(merged);
+      if (validationError) return response({ ok: false, error: "Product " + item.id + ": " + validationError }, 400);
+      checked.push({
+        id: item.id, ref: item.ref, existing, updateData,
+        changedFields: [...Object.keys(updateData), ...(Object.prototype.hasOwnProperty.call(existing, "categorySlug ") ? ["categorySlug (legacy field removal)"] : [])]
+      });
+    }
+
+    if (body.confirm !== true) {
+      return response({
+        ok: true, mode: "dry-run", project: PROJECT_ID, collection: "products",
+        count: checked.length, valid: checked.length, invalid: 0,
+        products: checked.map(item => ({ documentId: item.id, name: item.updateData.name || item.existing.name || "", changedFields: item.changedFields })),
+        message: "All products passed validation. No database changes were made. Review the complete list, then confirm the batch."
+      });
+    }
+
+    await db.runTransaction(async transaction => {
+      const fresh = await transaction.getAll(...refs);
+      for (let index = 0; index < checked.length; index++) {
+        if (!fresh[index].exists) throw new Error("BATCH_MISSING:" + checked[index].id);
+        const current = fresh[index].data();
+        const updateData = checked[index].updateData;
+        const merged = { ...current, ...updateData };
+        const validationError = validateProduct(merged);
+        if (validationError) throw new Error("BATCH_INVALID:" + checked[index].id + ":" + validationError);
+      }
+      for (let index = 0; index < checked.length; index++) {
+        const item = checked[index];
+        const current = fresh[index].data();
+        const backupRef = db.collection("firestore_admin_backups").doc();
+        const auditRef = db.collection("product_writer_audit").doc();
+        transaction.create(backupRef, {
+          collection: "products", documentId: item.id, operation: "update-backup",
+          originalData: current, actorUid: uid, createdAt: new Date()
+        });
+        transaction.update(item.ref, {
+          ...item.updateData,
+          ...(Object.prototype.hasOwnProperty.call(current, "categorySlug ") ? { "categorySlug ": FieldValue.delete() } : {}),
+          updatedAt: new Date()
+        });
+        transaction.create(auditRef, {
+          actorUid: uid, operation: "update", collection: "products", documentId: item.id,
+          backupId: backupRef.id, changedFields: Object.keys(item.updateData), batchSize: checked.length,
+          createdAt: new Date()
+        });
+      }
+    });
+    return response({
+      ok: true, mode: "batch-updated", project: PROJECT_ID, collection: "products",
+      count: checked.length, backupAndAuditPerProduct: true,
+      documentIds: checked.map(item => item.id)
+    });
+  } catch (error) {
+    if (String(error?.message || "").startsWith("BATCH_MISSING:")) return response({ ok: false, error: "A product disappeared during confirmation (" + error.message.split(":")[1] + "). No batch writes were committed." }, 409);
+    if (String(error?.message || "").startsWith("BATCH_INVALID:")) return response({ ok: false, error: "A product changed and no longer passes validation: " + error.message.slice("BATCH_INVALID:".length) }, 409);
+    return response({ ok: false, error: "Batch operation failed. Verify Firestore before retrying; transaction changes are atomic." }, 500);
+  }
+}
+
 export async function POST(request) {
   const length = Number(request.headers.get("content-length") || 0);
   if (length > 250000) return response({ ok: false, error: "Request exceeds 250 KB." }, 413);
@@ -113,6 +208,7 @@ export async function POST(request) {
   if (auth.error) return auth.error;
 
   const { operation, collection, documentId, data } = body;
+  if (operation === "batch-update") return handleBatchUpdate(body, db, auth.uid);
   if (!COLLECTIONS.has(collection)) return response({ ok: false, error: "Only products and categories are permitted." }, 400);
   if (!["create", "update", "delete"].includes(operation)) return response({ ok: false, error: "operation must be create, update, or delete." }, 400);
   if (operation !== "create" && !validDocumentId(documentId)) return response({ ok: false, error: "Valid documentId required." }, 400);
