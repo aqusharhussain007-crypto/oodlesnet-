@@ -134,10 +134,15 @@ export async function POST(request) {
     if (error) return response({ ok: false, error }, 400);
   } else if (operation === "update") {
     if (!data || typeof data !== "object" || Array.isArray(data) || !Object.keys(data).length) return response({ ok: false, error: "Non-empty update data required." }, 400);
-    if (collection === "products" && ["impressions", "views", "source", "createdAt"].some(k => Object.prototype.hasOwnProperty.call(data, k))) return response({ ok: false, error: "System-managed product fields cannot be changed." }, 400);
-    const merged = { ...existing, ...data };
+    // Full-record edits may include protected fields copied from the read view.
+    // Ignore those submitted values and leave the existing Firestore values untouched.
+    const protectedFields = collection === "products" ? ["impressions", "views", "source", "createdAt"] : [];
+    const updateData = Object.fromEntries(Object.entries(data).filter(([key]) => !protectedFields.includes(key)));
+    if (!Object.keys(updateData).length) return response({ ok: false, error: "No editable fields were supplied." }, 400);
+    const merged = { ...existing, ...updateData };
     const error = collection === "products" ? validateProduct(merged) : validateCategory(merged);
     if (error) return response({ ok: false, error }, 400);
+    body.safeUpdateData = updateData;
   } else {
     if (body.confirmDelete !== true) return response({ ok: false, error: "confirmDelete=true is required for deletion." }, 400);
     if (collection === "categories") {
@@ -150,7 +155,7 @@ export async function POST(request) {
   if (body.confirm !== true) return response({
     ok: true, mode: "dry-run", project: PROJECT_ID, collection, operation,
     documentId: ref.id, existingDocument: operation !== "create",
-    changedFields: operation === "delete" ? Object.keys(existing || {}) : Object.keys(data || {}),
+    changedFields: operation === "delete" ? Object.keys(existing || {}) : Object.keys(body.safeUpdateData || data || {}),
     message: "No database changes were made. Review this preview, then repeat with confirm=true."
   });
 
@@ -167,7 +172,7 @@ export async function POST(request) {
       : { ...data, createdAt: new Date(), updatedAt: new Date() };
     batch.create(ref, createData);
   } else if (operation === "update") {
-    batch.update(ref, { ...data, updatedAt: new Date() });
+    batch.update(ref, { ...(body.safeUpdateData || data), updatedAt: new Date() });
   } else {
     batch.delete(ref);
   }
