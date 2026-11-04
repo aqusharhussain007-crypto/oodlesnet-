@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const FIREBASE_API_KEY = "AIzaSyDAGbs7GATXSzzWzPw_1ZZf49ZDgG56mVpw";
+const FIREBASE_API_KEY = "AIzaSyDAGbs7GATXSzzWzPw_1Zf49ZDgG56mVpw";
 
 export default function FirestoreAdminPage() {
   const [email, setEmail] = useState("");
