@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
-import { FieldPath, getFirestore } from "firebase-admin/firestore";
+import { FieldPath, FieldValue, getFirestore } from "firebase-admin/firestore";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -155,7 +155,7 @@ export async function POST(request) {
   if (body.confirm !== true) return response({
     ok: true, mode: "dry-run", project: PROJECT_ID, collection, operation,
     documentId: ref.id, existingDocument: operation !== "create",
-    changedFields: operation === "delete" ? Object.keys(existing || {}) : Object.keys(body.safeUpdateData || data || {}),
+    changedFields: operation === "delete" ? Object.keys(existing || {}) : [...Object.keys(body.safeUpdateData || data || {}), ...(collection === "products" && Object.prototype.hasOwnProperty.call(existing || {}, "categorySlug ") ? ["categorySlug (legacy field removal)"] : [])],
     message: "No database changes were made. Review this preview, then repeat with confirm=true."
   });
 
@@ -172,7 +172,7 @@ export async function POST(request) {
       : { ...data, createdAt: new Date(), updatedAt: new Date() };
     batch.create(ref, createData);
   } else if (operation === "update") {
-    batch.update(ref, { ...(body.safeUpdateData || data), updatedAt: new Date() });
+    batch.update(ref, { ...(body.safeUpdateData || data), ...(collection === "products" && Object.prototype.hasOwnProperty.call(existing || {}, "categorySlug ") ? { "categorySlug ": FieldValue.delete() } : {}), updatedAt: new Date() });
   } else {
     batch.delete(ref);
   }
