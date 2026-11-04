@@ -208,13 +208,13 @@ export async function POST(request) {
   if (auth.error) return auth.error;
 
   const { operation, collection, documentId, data } = body;
+  const db = getFirestore(app);
   if (operation === "batch-update") return handleBatchUpdate(body, db, auth.uid);
   if (!COLLECTIONS.has(collection)) return response({ ok: false, error: "Only products and categories are permitted." }, 400);
   if (!["create", "update", "delete"].includes(operation)) return response({ ok: false, error: "operation must be create, update, or delete." }, 400);
   if (operation !== "create" && !validDocumentId(documentId)) return response({ ok: false, error: "Valid documentId required." }, 400);
   if (operation === "create" && documentId !== undefined && !validDocumentId(documentId)) return response({ ok: false, error: "Invalid documentId." }, 400);
 
-  const db = getFirestore(app);
   const ref = documentId ? db.collection(collection).doc(documentId) : db.collection(collection).doc();
   let existing = null;
   if (operation !== "create") {
