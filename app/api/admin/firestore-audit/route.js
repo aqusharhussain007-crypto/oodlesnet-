@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { FieldPath, FieldValue, getFirestore } from "firebase-admin/firestore";
+import preparedCorrectionBatch from "../../../../data/oodlesnet-correction-batch-66.json";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -211,6 +212,7 @@ export async function POST(request) {
   const { operation, collection, documentId, data } = body;
   const db = getFirestore(app);
   if (operation === "batch-update") return handleBatchUpdate(body, db, auth.uid);
+  if (operation === "batch-update-prepared") return handleBatchUpdate({ collection: "products", records: preparedCorrectionBatch, confirm: body.confirm === true }, db, auth.uid);
   if (!COLLECTIONS.has(collection)) return response({ ok: false, error: "Only products and categories are permitted." }, 400);
   if (!["create", "update", "delete"].includes(operation)) return response({ ok: false, error: "operation must be create, update, or delete." }, 400);
   if (operation !== "create" && !validDocumentId(documentId)) return response({ ok: false, error: "Valid documentId required." }, 400);
