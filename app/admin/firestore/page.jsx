@@ -85,7 +85,7 @@ export default function FirestoreAdminPage() {
       try { data = JSON.parse(jsonData); }
       catch { setStatus("Enter valid JSON before preparing the change."); return; }
     }
-    if (operation !== "create" && operation !== "batch-update" && !documentId.trim()) {
+    if (operation !== "create" && operation !== "batch-update" && operation !== "batch-update-prepared" && !documentId.trim()) {
       setStatus("Enter the existing Firestore document ID.");
       return;
     }
@@ -211,7 +211,7 @@ export default function FirestoreAdminPage() {
               <option value="create">Add new record</option><option value="update">Edit existing record</option><option value="batch-update">Bulk update products (1–100) — JSON</option><option value="batch-update-prepared">Apply prepared 66-product correction batch</option><option value="delete">Delete record</option>
             </select>
           </label>
-          {operation !== "create" && operation !== "batch-update" && <label>Existing document ID<input value={documentId} onChange={e => { setDocumentId(e.target.value); setPreview(null); }} placeholder="Paste exact Firestore document ID" style={fieldStyle} /></label>}
+          {operation !== "create" && operation !== "batch-update" && operation !== "batch-update-prepared" && <label>Existing document ID<input value={documentId} onChange={e => { setDocumentId(e.target.value); setPreview(null); }} placeholder="Paste exact Firestore document ID" style={fieldStyle} /></label>}
           {operation !== "delete" && operation !== "batch-update-prepared" && <label>{operation === "batch-update" ? "Batch data (JSON array: [{id, data}, ...])" : "Record data (JSON)"}
             <textarea value={jsonData} onChange={e => { setJsonData(e.target.value); setPreview(null); }} placeholder={example} rows={collection === "products" ? 14 : 8} spellCheck={false} style={{ ...fieldStyle, fontFamily: "monospace", fontSize: 13, minHeight: 180 }} />
           </label>}
