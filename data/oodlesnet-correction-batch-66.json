@@ -1133,9 +1133,9 @@
           "url": "https://www.flipkart.com/boat-stone-350-music-streaming-jiosaavn-12hrs-battery-ipx7-tws-feature-10-w-bluetooth-speaker/p/itmba477fc3ec7ae"
         },
         {
-          "name": "Flipkart",
-          "offer": "Click on buy to see offer",
-          "price": 1698,
+          "name": "Myntra",
+          "offer": "Listed price; confirm final checkout price and availability.",
+          "price": 1799,
           "url": "https://www.myntra.com/speakers/boat/boat-stone-350-type-c-speaker-with-upto-12-hrs-non-stop-playback/25662828/buy"
         }
       ]
@@ -1818,10 +1818,10 @@
           "price": 1499
         },
         {
-          "name": "Myntra",
-          "offer": "Click on buy to see offer",
-          "price": 1698,
-          "url": "https://www.myntra.com/speakers/boat/boat-stone-350-type-c-speaker-with-upto-12-hrs-non-stop-playback/25662828/buy"
+          "name": "boAt",
+          "offer": "Official listing price; confirm availability and checkout price.",
+          "price": 1599,
+          "url": "https://www.boat-lifestyle.com/products/boat-rockerz-301-anc"
         }
       ]
     }
@@ -1870,7 +1870,7 @@
       "brand": "Philips",
       "categorySlug": "appliances",
       "description": "Philips Stainless Steel Viva Collection HL7701/00 Mixer Grinder (750W, 4 Jars)\n\nA reliable, no-nonsense mixer grinder built for everyday Indian cooking. The 750W motor is powerful enough for regular grinding, blending, and chutney making without frequent overheating. Stainless steel jars feel sturdy and handle both wet and dry ingredients well.\n\nWhat it’s best for:\n\n🍛 Daily home cooking (masalas, batters, chutneys)\n\n🏠 Medium-size families\n\n🔌 Users who want durability over fancy features.\n\nBottom line:\nA dependable mixer grinder from a trusted brand. Choose this if you want consistent performance, strong motor power, and long-term reliability rather than extra attachments or flashy design.",
-      "imageUrl": "https://media-ik.croma.com/prod/https://media.tatacroma.com/Croma%20Assets/Small%20Appliances/Food%20Processors/Images/196409_1_bh0hrx.png?tr=w-1000",
+      "imageUrl": "https://media.tatacroma.com/Croma%20Assets/Small%20Appliances/Food%20Processors/Images/196409_1_bh0hrx.png",
       "tags": [
         "mixer",
         "kitchen",
@@ -2035,7 +2035,7 @@
           "url": "https://www.amazon.in/s?k=jack+%26+jones+men+basic+tshirt"
         },
         {
-          "name": "Flipkart",
+          "name": "Amazon",
           "offer": "Click on buy to see offer",
           "price": 419,
           "url": "https://www.amazon.in/JACK-JONES-Cotton-Regular-Tshirt/dp/B0CK2FS1ZY"
