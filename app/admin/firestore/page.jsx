@@ -81,7 +81,7 @@ export default function FirestoreAdminPage() {
   async function prepareChange() {
     if (!idToken) return;
     let data;
-    if (operation !== "delete") {
+    if (operation !== "delete" && operation !== "batch-update-prepared") {
       try { data = JSON.parse(jsonData); }
       catch { setStatus("Enter valid JSON before preparing the change."); return; }
     }
@@ -98,7 +98,7 @@ export default function FirestoreAdminPage() {
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + idToken },
         body: JSON.stringify({
           operation, collection, ...(documentId.trim() ? { documentId: documentId.trim() } : {}),
-          ...(operation === "batch-update" ? { records: data } : operation !== "delete" ? { data } : {}),
+          ...(operation === "batch-update" ? { records: data } : operation !== "delete" && operation !== "batch-update-prepared" ? { data } : {}),
           confirm: false, ...(operation === "delete" ? { confirmDelete: true } : {})
         }),
       });
@@ -121,13 +121,13 @@ export default function FirestoreAdminPage() {
     setBusy(true);
     setStatus("Applying approved change…");
     try {
-      const data = operation === "delete" ? undefined : JSON.parse(jsonData);
+      const data = operation === "delete" || operation === "batch-update-prepared" ? undefined : JSON.parse(jsonData);
       const response = await fetch("/api/admin/firestore-audit", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + idToken },
         body: JSON.stringify({
           operation, collection, documentId: operation === "create" ? preview.documentId : documentId.trim(),
-          ...(operation === "batch-update" ? { records: data } : operation !== "delete" ? { data } : {}),
+          ...(operation === "batch-update" ? { records: data } : operation !== "delete" && operation !== "batch-update-prepared" ? { data } : {}),
           confirm: true, ...(operation === "delete" ? { confirmDelete: true } : {})
         }),
       });
@@ -136,7 +136,7 @@ export default function FirestoreAdminPage() {
       setPreview(null);
       setJsonData("");
       setDocumentId("");
-      setStatus("Success: " + result.mode + " " + collection + " document " + result.documentId + ". Backup: " + (result.backupId || "not required") + ". Audit logged.");
+      setStatus("Success: " + result.mode + " — " + (result.count || 1) + " product(s) updated. Backup and audit records created.");
       await requestRecords(collection);
     } catch (error) {
       setStatus(error?.message || "Change failed. Check the record before retrying.");
@@ -208,13 +208,14 @@ export default function FirestoreAdminPage() {
           <h2 style={{ fontSize: 21, fontWeight: 700 }}>Manage {collection}</h2>
           <label>Operation
             <select value={operation} onChange={e => { setOperation(e.target.value); setPreview(null); }} style={fieldStyle}>
-              <option value="create">Add new record</option><option value="update">Edit existing record</option><option value="batch-update">Bulk update products (1–100)</option><option value="delete">Delete record</option>
+              <option value="create">Add new record</option><option value="update">Edit existing record</option><option value="batch-update">Bulk update products (1–100) — JSON</option><option value="batch-update-prepared">Apply prepared 66-product correction batch</option><option value="delete">Delete record</option>
             </select>
           </label>
           {operation !== "create" && operation !== "batch-update" && <label>Existing document ID<input value={documentId} onChange={e => { setDocumentId(e.target.value); setPreview(null); }} placeholder="Paste exact Firestore document ID" style={fieldStyle} /></label>}
-          {operation !== "delete" && <label>{operation === "batch-update" ? "Batch data (JSON array: [{id, data}, ...])" : "Record data (JSON)"}
+          {operation !== "delete" && operation !== "batch-update-prepared" && <label>{operation === "batch-update" ? "Batch data (JSON array: [{id, data}, ...])" : "Record data (JSON)"}
             <textarea value={jsonData} onChange={e => { setJsonData(e.target.value); setPreview(null); }} placeholder={example} rows={collection === "products" ? 14 : 8} spellCheck={false} style={{ ...fieldStyle, fontFamily: "monospace", fontSize: 13, minHeight: 180 }} />
           </label>}
+          {operation === "batch-update-prepared" && <p style={{ color: "#93c5fd", fontSize: 13 }}>Prepared batch: 66 existing product IDs; 201 retailer offers. Three offers without usable URLs are excluded. Product IDs and counters are preserved.</p>}
           <p style={{ color: "#fbbf24", fontSize: 13 }}>Important: This changes the LIVE production database. Verify every field, price, image URL and store link before applying. Product system fields (views/impressions) are protected.</p>
           <button disabled={busy} onClick={prepareChange} style={buttonStyle}>{busy ? "Please wait…" : "1. Validate / preview (no changes)"}</button>
           {preview && <div style={{ background: "#17243a", padding: 14, borderRadius: 10, overflowWrap: "anywhere" }}>
