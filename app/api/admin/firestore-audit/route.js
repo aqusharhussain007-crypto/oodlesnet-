@@ -170,6 +170,7 @@ async function handleBatchUpdate(body, db, uid) {
         transaction.update(item.ref, {
           ...item.updateData,
           ...(Object.prototype.hasOwnProperty.call(current, "categorySlug ") ? { "categorySlug ": FieldValue.delete() } : {}),
+          ...(Object.prototype.hasOwnProperty.call(current, "impression") && !Object.prototype.hasOwnProperty.call(current, "impressions") ? { impressions: Number(current.impression) || 0, impression: FieldValue.delete() } : {}),
           updatedAt: new Date()
         });
         transaction.create(auditRef, {
@@ -268,7 +269,12 @@ export async function POST(request) {
       : { ...data, createdAt: new Date(), updatedAt: new Date() };
     batch.create(ref, createData);
   } else if (operation === "update") {
-    batch.update(ref, { ...(body.safeUpdateData || data), ...(collection === "products" && Object.prototype.hasOwnProperty.call(existing || {}, "categorySlug ") ? { "categorySlug ": FieldValue.delete() } : {}), updatedAt: new Date() });
+    batch.update(ref, {
+      ...(body.safeUpdateData || data),
+      ...(collection === "products" && Object.prototype.hasOwnProperty.call(existing || {}, "categorySlug ") ? { "categorySlug ": FieldValue.delete() } : {}),
+      ...(collection === "products" && Object.prototype.hasOwnProperty.call(existing || {}, "impression") && !Object.prototype.hasOwnProperty.call(existing || {}, "impressions") ? { impressions: Number(existing.impression) || 0, impression: FieldValue.delete() } : {}),
+      updatedAt: new Date()
+    });
   } else {
     batch.delete(ref);
   }
