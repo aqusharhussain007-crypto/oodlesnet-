@@ -481,36 +481,30 @@
   {
     "id": "5o6sM0fDpjXxj2bRDDP9",
     "data": {
-      "name": "The Derma Co 10% Niacinamide Serum",
+      "name": "The Derma Co 10% Niacinamide Face Serum with 2% Zinc PCA (30ml)",
       "brand": "The Derma Co",
       "categorySlug": "beauty",
-      "description": "Bestseller niacinamide serum; formulation consistent.",
+      "description": "The Derma Co 10% Niacinamide Face Serum with 2% Zinc PCA, 30ml. The current official formulation uses 10% niacinamide and 2% Zinc PCA; helps fade acne marks and control excess sebum. Official product listing price observed ₹515; 1mg listing ₹509.",
       "imageUrl": "https://m.media-amazon.com/images/I/61Mmj2DozXL._AC_UF1000,1000_QL80_FMwebp_.jpg",
       "searchKey": "the derma co 10 percent niacinamide serum skincare face serum acne care beauty",
       "store": [
         {
+          "name": "The Derma Co",
+          "price": 515,
+          "offer": "Official 30ml listing price ₹515 (MRP ₹599); check current offer at checkout",
+          "url": "https://thedermaco.com/collections/face-serum/products/10-percent-niacinamide-serum"
+        },
+        {
+          "name": "Tata 1mg",
+          "price": 509,
+          "offer": "30ml listing price ₹509 (MRP ₹599); promotional coupons may apply",
+          "url": "https://www.1mg.com/otc/the-derma-co-10-niacinamide-face-serum-for-acne-marks-otc706068"
+        },
+        {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
           "price": 224,
+          "offer": "Old search destination retained; pack size and current price not verified",
           "url": "https://www.amazon.in/s?k=the+derma+co+niacinamide+serum"
-        },
-        {
-          "name": "Flipkart",
-          "offer": "Click on buy to see offer",
-          "price": 212,
-          "url": "https://www.flipkart.com/search?q=derma+co+niacinamide+serum"
-        },
-        {
-          "name": "Myntra",
-          "offer": "Click on buy to see offer",
-          "price": 558,
-          "url": "https://www.myntra.com/the-derma-co-serum"
-        },
-        {
-          "name": "Nykaa",
-          "offer": "Click on buy to see offer",
-          "price": 539,
-          "url": "https://www.nykaa.com/search/result/?q=derma%20co%20niacinamide"
         }
       ]
     }
@@ -518,30 +512,18 @@
   {
     "id": "6CxuwDqeQxq8nwYKIJoG",
     "data": {
-      "name": "Cetaphil Gentle Skin Cleanser",
+      "name": "Cetaphil Gentle Skin Cleanser (118ml)",
       "brand": "Cetaphil",
       "categorySlug": "beauty",
-      "description": "Dermatologist-recommended cleanser; size may vary. Price very depending on pack size and store",
+      "description": "Cetaphil Gentle Skin Cleanser for dry to normal, sensitive skin. Creamy, non-foaming cleanser with glycerin, panthenol and niacinamide to cleanse while helping preserve the skin's moisture barrier. 118ml size reference; 125ml is a separate pack option.",
       "imageUrl": "https://m.media-amazon.com/images/I/61Ke4uzk1PL._AC_UF1000,1000_QL80_FMwebp_.jpg",
       "searchKey": "cetaphil gentle skin cleanser skincare face wash sensitive skin beauty",
       "store": [
         {
-          "name": "Amazon",
-          "offer": "Click on buy to see offer",
-          "price": 371,
-          "url": "https://www.amazon.in/s?k=cetaphil+gentle+skin+cleanser"
-        },
-        {
-          "name": "Flipkart",
-          "offer": "Click on buy to see offer",
-          "price": 360,
-          "url": "https://www.flipkart.com/search?q=cetaphil+cleanser"
-        },
-        {
-          "name": "Myntra",
-          "offer": "Click on buy to see offer",
-          "price": 390,
-          "url": "https://www.myntra.com/cetaphil-cleanser"
+          "name": "Tata 1mg",
+          "price": 399,
+          "offer": "118ml listing price ₹399 (MRP ₹459); select 118ml size before checkout",
+          "url": "https://www.1mg.com/otc/cetaphil-gentle-skin-cleanser-for-dry-to-normal-sensitive-skin-otc1140674"
         }
       ]
     }
