@@ -965,22 +965,22 @@
   {
     "id": "LmZaEA2fmi639AgLaFcm",
     "data": {
-      "name": "iQOO Z10 Lite 5G (Cyber Green, 6GB RAM, 128GB Storage) | 6000 mAh Battery.",
+      "name": "iQOO Z10 Lite 5G (Cyber Green, 6GB RAM, 128GB Storage)",
       "brand": "iQOO",
       "categorySlug": "smartphone",
-      "description": "iQOO Z10 Lite 5G (Cyber Green, 6GB RAM, 128GB Storage) | 6000 mAh Battery | Dimensity 6300 5G Processor with 433K+* AnTuTu Score | IP64 Rated & Military Grade Shock-Resistance*\nMemory Storage Capacity128 GB\nOperating SystemFuntouch OS 15 Based On Android 15\nRAM Memory Installed Size6 GB\nCPU ModelOthers\nCPU Speed2.4 GHz\nSegment's biggest battery 5G smartphone* - Powered by a massive 6000mAh battery & 15W FlashCharge, keeping you ahead of the day with uninterrupted energy for entertainment, work, and everything in between\nDimensity 6300 5G Processor with 433K+* AnTuTu Score - A highly power efficient 6nm chip with CPU speeds upgraded to reach 2.4 GHz delivering a lag-free everyday experience with low power consumption.\nIP64 Rated & Military Grade Shock-Resistance* - Fearless against the dust, rain, Forging Ahead. No need to worry about unexpected splashes in life with IP64 protection. Also, enjoy Protection from accidental drops from pockets or desks with Military grade shock resistance.\n50MP Sony AI Camera - Snap stunning photos with advanced AI features like AI erase, AI Photo enhance, AI document mode & many more.\n1000 nits High Brightness Display - Enjoy the ultimate viewing experience with 6.74\" (17.13 cm) Large display, 90Hz Refresh Rate & 1000 nits High brightness mode.",
+      "description": "Cyber Green variant with 6GB RAM and 128GB storage. MediaTek Dimensity 6300 5G chipset; 6.74-inch HD+ LCD display with 90Hz refresh rate and up to 1000 nits brightness; 50MP main + 2MP secondary rear cameras; 5MP front camera; 6000mAh battery with 15W charging; IP64 dust and splash resistance; Funtouch OS 15 based on Android 15. Retailer prices and stock are not currently verified; confirm the 6GB/128GB variant before purchase.",
       "imageUrl": "https://rukminim1.flixcart.com/image/720/720/xif0q/mobile/n/n/l/z10-lite-5g-i2409-iqoo-original-imahjc5ebg6mhsvt.jpeg?q=90",
       "searchKey": "phone mobile smartphone 5g android budget",
       "store": [
         {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
+          "offer": "Listed price is unverified; confirm Cyber Green 6GB/128GB variant and current stock on retailer page",
           "price": 12999,
           "url": "https://www.amazon.in/gp/aw/d/B0FC5XK9WZ"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
+          "offer": "Listed price is unverified; confirm Cyber Green 6GB/128GB variant and current stock on retailer page",
           "price": 13148,
           "url": "https://www.flipkart.com/iqoo-z10-lite-5g-cyber-green-128-gb/p/itmb57aad9fe876e"
         }
@@ -990,34 +990,40 @@
   {
     "id": "NfYW6TBgs3OrONG962tH",
     "data": {
-      "name": "Lakmé 9 to 5 Primer + Matte Lipstick",
-      "brand": "Lakme",
+      "name": "Lakmé 9 to 5 Primer + Matte Lipstick (3.6g)",
+      "brand": "Lakmé",
       "categorySlug": "beauty",
-      "description": "Popular lipstick range; shade & packaging may vary by store.",
+      "description": "Lakmé 9 to 5 Primer + Matte Lipstick, net quantity 3.6g. Built-in primer with a matte finish; official product page lists multiple shades (including Brick Brown, Blush Nude, Pink Rouge and others). Shade availability varies and must be selected on the retailer page. Official Lakmé page reference price: ₹468 (MRP ₹550); retailer prices below are unverified and may refer to different shades.",
       "imageUrl": "https://m.media-amazon.com/images/I/51txZRmOHuL._AC_UF1000,1000_QL80_FMwebp_.jpg",
       "searchKey": "makeup lipstick matte primer long lasting beauty cosmetic",
       "store": [
         {
+          "name": "Lakmé Official",
+          "offer": "Official page reference ₹468; shade availability varies",
+          "price": 468,
+          "url": "https://www.lakmeindia.com/products/lakme-9-to-5-primer-matte-lipstick"
+        },
+        {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
+          "offer": "Price and shade not verified; select exact shade and confirm current price",
           "price": 325,
           "url": "https://www.amazon.in/s?k=lakme+9to5+primer+matte+lipstick"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
+          "offer": "Price and shade not verified; select exact shade and confirm current price",
           "price": 331,
           "url": "https://www.flipkart.com/search?q=lakme+9to5+primer+matte+lipstick"
         },
         {
           "name": "Myntra",
-          "offer": "Click on buy to see offer",
+          "offer": "Price and shade not verified; select exact shade and confirm current price",
           "price": 338,
           "url": "https://www.myntra.com/lakme-9to5-lipstick"
         },
         {
           "name": "Ajio",
-          "offer": "Click on buy to see offer",
+          "offer": "Price and shade not verified; select exact shade and confirm current price",
           "price": 384,
           "url": "https://www.ajio.com/search/?query=%3Arelevance%3Apricerange%3ABelow%20Rs.500&text=Lakme%209%20To%205&responseSource=vertex&classifier=intent&gridColumns=2&searchInput=Lakme%209%20To%205&currSearch=Lakme%209%20To%205&includeUnratedProducts=false"
         }
@@ -1027,22 +1033,28 @@
   {
     "id": "OxFXn4jLR0yDubSM7QLB",
     "data": {
-      "name": "Redmi Note SE 5G",
+      "name": "Redmi Note 14 SE 5G (Crimson Art, 6GB RAM, 128GB Storage)",
       "brand": "Redmi",
       "categorySlug": "smartphone",
-      "description": "Redmi Note 14 SE 5G, Crimson Art (6GB, 128GB)\nOperating SystemANDROID 15\nRAM Memory Installed Size6 GB\nCPU ModelCortex A7\nCPU Speed2 GHz.\nMemory Storage Capacity128 GB",
+      "description": "Crimson Art colour, 6GB RAM and 128GB storage. 6.67-inch AMOLED display with 120Hz refresh rate; MediaTek Dimensity 7025-Ultra processor; 50MP main camera with OIS + 8MP ultra-wide + 2MP macro rear cameras; 20MP front camera; 5110mAh battery; Android 14 with HyperOS. Xiaomi India product listing reference price: ₹19,999. Retailer prices below are not verified as current; confirm exact 6GB/128GB Crimson Art variant and availability.",
       "imageUrl": "https://rukminim1.flixcart.com/image/720/720/xif0q/mobile/n/f/f/-original-imahg2z9grq5bnak.jpeg?q=90",
       "searchKey": "phone mobile smartphone 5g android budget",
       "store": [
         {
+          "name": "Xiaomi Official",
+          "offer": "Official India listing reference ₹19,999; check live stock and offers",
+          "price": 19999,
+          "url": "https://www.mi.com/in/product/redmi-note-14-se-5g/"
+        },
+        {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
+          "offer": "Existing price is unverified; confirm Crimson Art 6GB/128GB variant and current stock",
           "price": 15101,
           "url": "https://www.amazon.in/Redmi-Note-14-SE-Crimson/dp/B0FR2G7KJT"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
+          "offer": "Existing price is unverified; confirm Crimson Art 6GB/128GB variant and current stock",
           "price": 13499,
           "url": "https://www.flipkart.com/redmi-note-14-se-5g-crimson-art-128-gb/p/itm10fbd7f3a50f1"
         }
