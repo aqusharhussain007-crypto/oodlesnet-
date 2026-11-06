@@ -39,12 +39,12 @@
   {
     "id": "05yLnYsmCrcERWgby905",
     "data": {
-      "name": "Realme Buds T200",
+      "name": "Realme Buds T200 Lite",
       "brand": "Realme",
       "categorySlug": "electronics",
-      "description": "Lite Bluetooth in Ear Earbuds,4 Mic, AI ENC for Calls,48 Hours Total Playback with Fast Charging and Low Latency Gaming TWS,Google Fast Pair, with mic.\n  Features:\n\nOrientation Type: In Ear\nConnectivity: Bluetooth, Version 5.4\nBattery Life: 48 Hours\nFast Charging: Yes\nNoise Cancellation: Environmental Noise Cancellation\nVoice Assistant: No\nUSP: Ultra Low Latency, Google Fast Pair, 12.4mm Dynamic Bass Driver",
+      "description": "Realme Buds T200 Lite true wireless earbuds with 12.4 mm dynamic bass drivers, up to 48 hours total playback, AI ENC for calls, Bluetooth 5.4, IPX4 water resistance and USB Type-C charging. Colour/variant: Volt Black unless otherwise specified.",
       "imageUrl": "https://m.media-amazon.com/images/I/61MOG3nzwQL._AC_UF1000,1000_QL80_FMwebp_.jpg",
-      "searchKey": "realme buds t200 earbuds tws wireless earphones bluetooth audio",
+      "searchKey": "realme buds t200 lite true wireless earbuds volt black bluetooth 5.4 12.4mm 48 hours ai enc",
       "store": [
         {
           "name": "Amazon",
@@ -69,6 +69,12 @@
           "offer": "Click on buy to see offer",
           "price": 1399,
           "url": "https://www.croma.com/realme-buds-t200-lite-tws-earbuds-with-environmental-noise-cancellation-ipx4-water-resistant-dual-device-connection-volt-black-/p/315026"
+        },
+        {
+          "name": "Reliance Digital",
+          "price": 1699,
+          "offer": "Listed price; verify delivery and checkout price",
+          "url": "https://www.reliancedigital.in/product/realme-buds-t200-lite-bluetooth-in-ear-earbuds-ai-enc-for-calls-48-hours-total-playback-with-fast-charging-and-low-latency-gaming-tws-google-fast-pair-ipx-4-water-resistant-with-mic-volt-black-m8frva-8980954"
         }
       ]
     }
