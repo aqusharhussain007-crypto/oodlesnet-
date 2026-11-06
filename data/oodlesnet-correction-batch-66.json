@@ -1116,32 +1116,38 @@
       "name": "boAt Stone 350 10W Bluetooth Speaker",
       "brand": "boAt",
       "categorySlug": "electronics",
-      "description": "boAt Stone 350 portable Bluetooth speaker with 10W rated output, Bluetooth 5.0, IPX7 water resistance, 2200mAh battery, up to 12 hours claimed playback, TWS pairing, AUX and TF-card playback, and built-in microphone. Official boAt listing reference price observed: ₹1,499; official page showed restocking soon, so availability is not guaranteed. Confirm the Stone 350 model (not Stone 350 Pro or Stone 352).",
+      "description": "Portable Bluetooth speaker with 10W stereo sound, 2200mAh battery, up to 12 hours playback, IPX7 water resistance, Bluetooth 5.0, TWS pairing, TF-card and AUX compatibility, and built-in microphone. Official boAt listing displayed ₹1,399 for the Red variant, marked sold out/restocking when checked. Confirm colour availability before purchase.",
       "imageUrl": "https://m.media-amazon.com/images/I/71jlw4lqU9L._AC_UF1000,1000_QL80_FMwebp_.jpg",
       "searchKey": "portable bluetooth speaker wireless audio music speaker",
       "store": [
         {
           "name": "boAt Official",
+          "offer": "₹1,399 displayed for Red variant; sold out/restocking when checked",
+          "price": 1399,
+          "url": "https://www.boat-lifestyle.com/products/stone-350"
+        },
+        {
+          "name": "boAt Official",
           "price": 1499,
-          "offer": "Official listing observed at ₹1,499; page showed restocking soon",
+          "offer": "Existing price and stock not verified; confirm colour and checkout price",
           "url": "https://www.boat-lifestyle.com/products/stone-350"
         },
         {
           "name": "Amazon",
           "price": 1990,
-          "offer": "Existing price not refreshed; verify Stone 350 (not Pro) and current stock",
+          "offer": "Existing price and stock not verified; confirm colour and checkout price",
           "url": "https://www.amazon.in/boAt-Stone-Bluetooth-Speaker-Blue/dp/B0CJRVK8F4"
         },
         {
           "name": "Flipkart",
           "price": 1799,
-          "offer": "Existing price not refreshed; confirm exact Stone 350 model",
+          "offer": "Existing price and stock not verified; confirm colour and checkout price",
           "url": "https://www.flipkart.com/boat-stone-350-music-streaming-jiosaavn-12hrs-battery-ipx7-tws-feature-10-w-bluetooth-speaker/p/itmba477fc3ec7ae"
         },
         {
           "name": "Myntra",
           "price": 1799,
-          "offer": "Existing price not refreshed; verify model and Type-C variant details",
+          "offer": "Existing price and stock not verified; confirm colour and checkout price",
           "url": "https://www.myntra.com/speakers/boat/boat-stone-350-type-c-speaker-with-upto-12-hrs-non-stop-playback/25662828/buy"
         }
       ]
