@@ -651,21 +651,27 @@
       "name": "Samsung Galaxy A35 5G (8GB RAM, 128GB)",
       "brand": "Samsung",
       "categorySlug": "smartphone",
-      "description": "Two days long life battery",
+      "description": "Samsung Galaxy A35 5G with 8GB RAM and 128GB storage, 6.6-inch FHD+ Super AMOLED 120Hz display, Exynos 1380 processor, 50MP OIS main camera and 5000mAh battery. The Samsung India buying page currently shows the 8GB/128GB combination but prompts for a stock alert rather than confirming availability.",
       "imageUrl": "https://m.media-amazon.com/images/I/71zkJpXBBDL.jpg",
-      "searchKey": "mobile phone smartphone 5g android midrange",
+      "searchKey": "Samsung Galaxy A35 5G 8GB 128GB Awesome Navy Iceblue",
       "store": [
         {
-          "offer": "Click on buy to see offers",
-          "url": "https://www.flipkart.com/samsung-galaxy-a35-5g-awesome-navy-128-gb/p/itm12fccc5bfbaac",
-          "name": "Flipkart",
-          "price": 18999
+          "name": "Samsung India",
+          "price": 26399,
+          "offer": "Official configurator shows 8GB/128GB but requests a stock alert; not currently confirmed in stock",
+          "url": "https://www.samsung.com/in/smartphones/galaxy-a35/buy/?modelCode=SM-A356ELBJ"
         },
         {
-          "name": "Amazon",
-          "price": 19980,
-          "offer": "See all offers & discounts on store.\n \nExchange Your Old Phone\nSave upto ₹18,850Save upto ₹18,850\n \nAdd Accessories\nSave extra when bought togetherSave extra when bought together\n \nAmazon protect\nCashless repairs, claims via AmazonCashless repairs, claims via Ama…\n1 Year Extended Warranty by OneAssist\n4.0 4.0 (303)\nAdded benefits beyond brand warranty",
-          "url": "https://www.amazon.in/samsung-Awesome-Iceblue-Storage-Without/dp/B0CXMCX9MD"
+          "name": "LOT Mobiles",
+          "price": 26399,
+          "offer": "8GB/128GB Awesome Navy listed at ₹26,399 but marked out of stock",
+          "url": "https://www.lotmobiles.com/our-brands/samsung/"
+        },
+        {
+          "name": "Flipkart",
+          "price": 18999,
+          "offer": "Existing 128GB listing retained; price not recently refreshed, confirm colour, seller and availability",
+          "url": "https://www.flipkart.com/samsung-galaxy-a35-5g-awesome-navy-128-gb/p/itm12fccc5bfbaac"
         }
       ]
     }
@@ -673,36 +679,30 @@
   {
     "id": "ERFW2Zp2h8JNLU68A4Vh",
     "data": {
-      "name": "JBL Go 4 Portable Bluetooth Speaker",
+      "name": "JBL Go 4 4.2W Ultra-Portable Bluetooth Speaker",
       "brand": "JBL",
       "categorySlug": "electronics",
-      "description": "JBL Go 4 4.2W Portable Bluetooth Speaker — Opinionated Description\n\nThe JBL Go 4 is a compact Bluetooth speaker that punches way above its size. With 4.2W JBL Original Pro Sound, it delivers clear mids and crisp highs — ideal for music on the go, small gatherings, and outdoor moments. The bass isn’t thunderous (don’t expect a party-room boom), but it’s balanced and pleasant for everyday listening.\n\nWhy people like it:\n\n🎵 Sound clarity over raw volume — great for vocals & podcasts\n\n🔋 Portable & pocket-friendly — easy to carry around\n\n📱 Quick Bluetooth pairing — smooth connection with phones\n\n💧 Splash-resistant (depends on model) — good for patio/café use\n\nWho it suits best:\n\nCasual listeners who want better sound than phone speakers\n\nTravelers and commuters who need convenience\n\nUsers who prefer JBL signature sound in a tiny form factor.\n\nIn short:\nA super-portable, easy-to-use speaker with clean, balanced sound — perfect for daily music and casual gatherings. Great choice if you want JBL quality without spending big.",
+      "description": "JBL Go 4 ultra-portable Bluetooth 5.3 speaker with 4.2W output, JBL Pro Sound, up to 7 hours of playback plus up to 2 hours with Playtime Boost, IP67 waterproof and dustproof protection, and Auracast multi-speaker support. Colour varies by retailer.",
       "imageUrl": "https://m.media-amazon.com/images/I/71HdLDJEEUL._AC_SL1500_.jpg",
-      "searchKey": "portable bluetooth speaker wireless audio music speaker compact",
+      "searchKey": "JBL Go 4 4.2W Bluetooth 5.3 IP67 portable speaker",
       "store": [
         {
-          "name": "Amazon",
-          "offer": "Click on buy to see offer",
-          "price": 3498,
-          "url": "https://www.amazon.in/JBL-Wireless-Portable-Bluetooth-Speaker/dp/B0CX5C6WP3"
+          "name": "JBL India",
+          "price": 3499,
+          "offer": "Official price ₹3,499 (MRP ₹5,499); verify selected colour and delivery",
+          "url": "https://in.jbl.com/GO-4.html?dwvar_GO-4_color=Black-GLOBAL-Current"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
-          "price": 3498,
-          "url": "https://www.flipkart.com/jbl-go-4-wireless-ultra-portable-pro-sound-water-dust-proof-4-2-w-bluetooth-speaker/p/itmfe43422223bdb"
+          "price": 3499,
+          "offer": "Listing price ₹3,499; page shows out of stock/not deliverable for selected location at time checked",
+          "url": "https://www.flipkart.com/jbl-go-4-wireless-ultra-portable-4-2-w-bluetooth-speaker/p/itm3e21817e57665"
         },
         {
-          "name": "Myntra",
-          "offer": "Click on buy to see offer",
-          "price": 3520,
-          "url": "https://www.myntra.com/speakers/jbl/jbl-go-4-black-ultra-portable-water--dust-proof-42-w-bluetooth-speaker/29876768/buy"
-        },
-        {
-          "name": "Croma",
-          "offer": "Click on buy to see offer",
-          "price": 3999,
-          "url": "https://www.croma.com/jbl-go-4-4-2w-portable-bluetooth-speaker-ip67-waterproof-7-hours-playtime-stereo-channel-purple-/p/307057"
+          "name": "Zepto",
+          "price": 2999,
+          "offer": "Blue variant ₹2,999; check colour, local availability and delivery before purchase",
+          "url": "https://www.zepto.com/pn/jbl-go-4%2C-wireless-ultra-portable-bluetooth-speaker-%28without-mic%2C-blue%29/pvid/c3324abb-ade2-4a70-b37b-29380b2069f9"
         }
       ]
     }
