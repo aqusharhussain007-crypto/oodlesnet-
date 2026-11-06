@@ -617,30 +617,30 @@
   {
     "id": "ADbYJQSzCvAItWvjMxIU",
     "data": {
-      "name": "Nike Downshifter 12 Men Running Shoes",
+      "name": "Nike Downshifter 12 Men's Road Running Shoes",
       "brand": "Nike",
       "categorySlug": "fashion",
-      "description": "Lightweight running shoes; sizes vary by seller.",
+      "description": "Nike Downshifter 12 men's road-running shoes with breathable mesh upper, supportive fit and cushioned foam midsole. Colour and available UK sizes vary by listing. Avoid mixing with Downshifter 13 or 14 models.",
       "imageUrl": "https://rukminim2.flixcart.com/image/720/720/xif0q/shoe/h/h/f/-original-imahgbrwzygkddjx.jpeg?q=90",
-      "searchKey": "running shoes men sports footwear athletic sneakers",
+      "searchKey": "Nike Downshifter 12 men road running shoes mesh upper",
       "store": [
         {
-          "name": "Flipkart",
-          "offer": "Click on buy to see offer",
-          "price": 3995,
-          "url": "https://www.flipkart.com/search?q=nike+downshifter+12+men"
-        },
-        {
           "name": "Myntra",
-          "offer": "Click on buy to see offer",
-          "price": 3995,
-          "url": "https://www.myntra.com/nike-downshifter-12"
+          "price": 3596,
+          "offer": "Exact Downshifter 12 men's listing ₹3,596; sizes 6–12 shown, confirm size and stock",
+          "url": "https://www.myntra.com/shoes/nike/nike-men-downshifter-12-road-running-shoes/25503842/buy"
         },
         {
-          "name": "Ajio",
-          "offer": "Click on buy to see offer",
-          "price": 2037,
-          "url": "https://www.ajio.com/search/?text=Nike%20Downshifter%2012%20Men%20Running%20Shoes"
+          "name": "Tata CLiQ",
+          "price": 3795,
+          "offer": "Exact Downshifter 12 Baby Blue listing ₹3,795; currently out of stock",
+          "url": "https://www.tatacliq.com/nike-mens-downshifter-12-baby-blue-running-shoes/p-mp000000017068136"
+        },
+        {
+          "name": "Flipkart",
+          "price": 3995,
+          "offer": "Search destination retained; exact colour, size and current price not independently verified",
+          "url": "https://www.flipkart.com/search?q=nike+downshifter+12+men"
         }
       ]
     }
