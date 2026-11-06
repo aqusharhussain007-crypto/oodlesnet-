@@ -351,36 +351,36 @@
   {
     "id": "54Vr8Mn71sqllL28sQui",
     "data": {
-      "name": "Adidas Men Grand Court Sneakers",
+      "name": "Adidas Men Grand Court Base 2.0 Sneakers",
       "brand": "Adidas",
       "categorySlug": "fashion",
-      "description": "Prices and product details may vary by store. You’ll be redirected to the seller for final selection.",
+      "description": "Adidas Grand Court Base 2.0 men's court-inspired sneakers with synthetic upper, lace closure and rubber outsole. Exact colour and size depend on retailer selection; confirm before purchase.",
       "imageUrl": "https://m.media-amazon.com/images/I/7155cCjUMML._AC_UL1500_.jpg",
       "searchKey": "adidas men grand court sneakers casual footwear men shoes",
       "store": [
         {
-          "name": "Amazon",
-          "price": 2000,
-          "offer": "Click on buy to see offer",
-          "url": "https://www.amazon.in/Adidas-Synthetic-Running-Legink-FTWWHT/dp/B098FH7FT2"
+          "name": "Adidas",
+          "price": 3299,
+          "offer": "Official India listing price observed; currently sold out, check availability",
+          "url": "https://www.adidas.co.in/grand-court-base-2.0-shoes/JH8611.html"
         },
         {
           "name": "Flipkart",
-          "price": 2059,
-          "url": "https://www.flipkart.com/adidas-blockz-sneaker-sneakers-men/p/itmd2c14f361bc48",
-          "offer": "Click on buy to see offer"
+          "price": 2639,
+          "offer": "Listing price observed for Grand Court Base 2.0; size/colour dependent",
+          "url": "https://www.flipkart.com/adidas-sneakers-men/p/itm823ad12c3f824"
         },
         {
           "name": "Myntra",
-          "offer": "Click on buy to see offer",
-          "price": 2051,
-          "url": "https://www.myntra.com/31381503"
+          "price": 2309,
+          "offer": "Listing price observed; verify selected colour, size and stock",
+          "url": "https://www.myntra.com/sports-shoes/adidas/adidas-grand-court-base-20-men-sports-shoes/31019584/buy"
         },
         {
           "name": "Ajio",
-          "offer": "Click on buy to see offer",
-          "price": 2051,
-          "url": "https://www.ajio.com/adidas-halo-run-lace-up-running-shoes/p/469718814_black"
+          "price": 5279,
+          "offer": "Listing price observed for Grand Court Base 2.0; currently out of stock",
+          "url": "https://www.ajio.com/adidas-men-grand-court-base-2-0-tennis-shoes/p/469496027006"
         }
       ]
     }
