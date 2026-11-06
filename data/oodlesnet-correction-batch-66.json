@@ -1064,41 +1064,47 @@
   {
     "id": "RDBPemyekRFStcBgC7oa",
     "data": {
-      "name": "Levi's Men's 511 Slim Fit Mid-Rise Blue Jeans",
+      "name": "Levi's Men's 511 Slim Fit Jeans",
       "brand": "Levi's",
       "categorySlug": "fashion",
-      "description": "Levi's 511 Slim Fit Mid-Rise Blue Jeans. Official Levi's India listing describes a slim fit from hip to ankle, mid-rise waist and stretch denim (79% cotton, 20% polyester, 1% elastane). Sizes and washes vary by listing. Official Levi's India reference price observed: ₹1,503 for Blue / size 28 / length 32; price and availability vary by size.",
+      "description": "Levi's 511 men's slim-fit mid-rise jeans. Slim through the seat and thigh with a narrow leg; wash, colour, fabric and stretch vary by style. Official Levi's India listings show 511 styles at ₹1,799 for a light-indigo cotton stretch blend and ₹1,705 for a black style. Existing marketplace links may represent different washes and colours; confirm exact style, waist and length before comparing prices.",
       "imageUrl": "https://rukminim2.flixcart.com/image/720/720/xif0q/jean/w/s/w/-original-imahfwuvnchafvnh.jpeg?q=90",
       "searchKey": "men slim fit jeans denim casual wear clothing fashion",
       "store": [
         {
           "name": "Levi's Official",
+          "offer": "Light Indigo 511 reference ₹1,799; style and size affect price",
+          "price": 1799,
+          "url": "https://levi.in/collections/slim-straight-fits/products/mens-511-mid-rise-slim-fit-cotton-stretch-blend-jeans-a70870368"
+        },
+        {
+          "name": "Levi's Official",
           "price": 1503,
-          "offer": "Observed ₹1,503 for Blue / size 28 / length 32; size-specific price and stock may vary",
+          "offer": "Price unverified; confirm exact wash, colour, waist and length",
           "url": "https://levi.in/products/mens-511-blue-slim-fit-jeans-a70870126"
         },
         {
           "name": "Amazon",
           "price": 1440,
-          "offer": "Existing price not refreshed; verify wash, size and 511 fit",
+          "offer": "Price unverified; confirm exact wash, colour, waist and length",
           "url": "https://www.amazon.in/Levis-Mid-Rise-Heavy-Stretchable-Vintage/dp/B0B7XXP9HZ"
         },
         {
           "name": "Flipkart",
           "price": 1449,
-          "offer": "Existing price not refreshed; verify exact wash and size",
+          "offer": "Price unverified; confirm exact wash, colour, waist and length",
           "url": "https://www.flipkart.com/levi-s-511-slim-men-blue-jeans/p/itmda2c5c9b6653e"
         },
         {
           "name": "Myntra",
           "price": 1559,
-          "offer": "Existing price not refreshed; confirm exact 511 blue slim-fit listing and size",
+          "offer": "Price unverified; confirm exact wash, colour, waist and length",
           "url": "https://www.myntra.com/jeans/levis/levis-men-511-slim-fit-heavy-fade-stretchable-jeans/32869240/buy"
         },
         {
           "name": "Ajio",
           "price": 1500,
-          "offer": "Existing price not refreshed; confirm wash, size and stock",
+          "offer": "Price unverified; confirm exact wash, colour, waist and length",
           "url": "https://www.ajio.com/levi-s-men-511-mid-wash-slim-fit-mid-rise-jeans/p/469573202_blue?"
         }
       ]
