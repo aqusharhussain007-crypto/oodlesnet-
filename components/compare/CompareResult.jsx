@@ -81,7 +81,7 @@ export default function CompareResult({
       </div>
 
       <h4 style={{ marginTop: 24, marginBottom: 10, fontSize: 16, fontWeight: 900 }}>
-        Side-by-side specifications
+        Compare product specifications
       </h4>
       <div style={{ overflowX: "auto", width: "100%" }}>
         <table style={{ width: "100%", minWidth: 420, borderCollapse: "collapse", fontSize: 13 }}>
