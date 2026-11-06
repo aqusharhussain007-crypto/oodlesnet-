@@ -4,11 +4,12 @@ export default function CompareResult({
   productB,
   onReset,
 }) {
-  const { totals, winner } = result;
+  const { totals, winner, maxScore = 4 } = result;
 
-  const maxScore = 5;
-  const percentA = (totals.A / maxScore) * 100;
-  const percentB = (totals.B / maxScore) * 100;
+  const safeMaxScore =
+    Number.isFinite(maxScore) && maxScore > 0 ? maxScore : 4;
+  const percentA = Math.max(0, Math.min(100, (totals.A / safeMaxScore) * 100));
+  const percentB = Math.max(0, Math.min(100, (totals.B / safeMaxScore) * 100));
 
   let winnerProduct = null;
   if (winner === "A") winnerProduct = productA;
@@ -25,24 +26,28 @@ export default function CompareResult({
         boxShadow: "0 10px 24px rgba(0,0,0,0.12)",
       }}
     >
+      <p style={{ fontSize: 12, color: "#64748b", marginBottom: 10 }}>
+        Better listed value based on available prices and offers — not a
+        technical quality rating.
+      </p>
+
       {winner === "tie" ? (
         <p style={{ fontWeight: 900 }}>
-          🤝 Both products offer similar value right now.
+          🤝 Both products have a similar listed-value score.
         </p>
       ) : (
         <p style={{ fontWeight: 900, fontSize: 16 }}>
-          🏆 Better value right now:
+          🏆 Higher listed-value score:
           <br />
           <span style={{ color: "#16a34a" }}>
-            {winnerProduct.name}
+            {winnerProduct?.name || "Selected product"}
           </span>
         </p>
       )}
 
-      {/* SCORE BARS */}
       <div style={{ marginTop: 14 }}>
         <div style={{ fontSize: 13, fontWeight: 700 }}>
-          {productA.name}
+          {productA.name} — {totals.A}/{safeMaxScore}
         </div>
         <div
           style={{
@@ -63,7 +68,7 @@ export default function CompareResult({
         </div>
 
         <div style={{ fontSize: 13, fontWeight: 700 }}>
-          {productB.name}
+          {productB.name} — {totals.B}/{safeMaxScore}
         </div>
         <div
           style={{
@@ -84,6 +89,7 @@ export default function CompareResult({
       </div>
 
       <button
+        type="button"
         onClick={onReset}
         style={{
           marginTop: 16,
@@ -99,5 +105,4 @@ export default function CompareResult({
       </button>
     </div>
   );
-                   }
-      
+}
