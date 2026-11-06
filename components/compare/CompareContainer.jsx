@@ -11,9 +11,38 @@ export default function CompareContainer({ currentProduct }) {
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(true);
 
+  if (!currentProduct?.id) return null;
+
+  function handleSelect(product) {
+    setProductB(product);
+    setResult(null);
+    setError(null);
+  }
+
+  function handleCompare() {
+    if (!productB) return;
+
+    const comparison = compareProducts(currentProduct, productB);
+    if (comparison.error) {
+      setError(comparison.error);
+      setResult(null);
+      return;
+    }
+
+    setError(null);
+    setResult(comparison);
+  }
+
+  function reset() {
+    setProductB(null);
+    setResult(null);
+    setError(null);
+  }
+
   if (!open) {
     return (
       <button
+        type="button"
         onClick={() => setOpen(true)}
         style={{
           marginTop: 20,
@@ -31,26 +60,9 @@ export default function CompareContainer({ currentProduct }) {
     );
   }
 
-  function handleCompare() {
-    if (!productB) return;
-    const res = compareProducts(currentProduct, productB);
-    if (res.error) {
-      setError(res.error);
-      setResult(null);
-      return;
-    }
-    setError(null);
-    setResult(res);
-  }
-
-  function reset() {
-    setProductB(null);
-    setResult(null);
-    setError(null);
-  }
-
   return (
-    <div
+    <section
+      aria-label="Compare products"
       style={{
         marginTop: 28,
         padding: 18,
@@ -61,8 +73,8 @@ export default function CompareContainer({ currentProduct }) {
         position: "relative",
       }}
     >
-      {/* CLOSE BUTTON */}
       <button
+        type="button"
         onClick={() => setOpen(false)}
         aria-label="Close comparison"
         style={{
@@ -82,28 +94,18 @@ export default function CompareContainer({ currentProduct }) {
         ✕
       </button>
 
-      {/* TITLE */}
-      <h3
-        style={{
-          fontSize: 18,
-          fontWeight: 900,
-          color: "#0f766e",
-          marginBottom: 12,
-        }}
-      >
+      <h3 style={{ fontSize: 18, fontWeight: 900, color: "#0f766e", marginBottom: 12, paddingRight: 36 }}>
         Compare <strong>{currentProduct.name}</strong> with
       </h3>
 
-      {/* SELECTOR */}
       <CompareSelector
-        selected={productB}
-        onSelect={setProductB}
-        excludeId={currentProduct.id}
-        category={currentProduct.categorySlug}
+        currentProduct={currentProduct}
+        selectedId={productB?.id || ""}
+        onSelect={handleSelect}
       />
 
-      {/* COMPARE BUTTON */}
       <button
+        type="button"
         disabled={!productB}
         onClick={handleCompare}
         style={{
@@ -115,12 +117,8 @@ export default function CompareContainer({ currentProduct }) {
           fontWeight: 900,
           fontSize: 15,
           color: "#fff",
-          background: productB
-            ? "linear-gradient(135deg,#0f4c81,#10b981)"
-            : "#9ca3af",
-          boxShadow: productB
-            ? "0 8px 18px rgba(16,185,129,0.45)"
-            : "none",
+          background: productB ? "linear-gradient(135deg,#0f4c81,#10b981)" : "#9ca3af",
+          boxShadow: productB ? "0 8px 18px rgba(16,185,129,0.45)" : "none",
           cursor: productB ? "pointer" : "not-allowed",
         }}
       >
@@ -128,16 +126,16 @@ export default function CompareContainer({ currentProduct }) {
       </button>
 
       {error === "CATEGORY_MISMATCH" && (
-  <p style={{ color: "#b45309", marginTop: 10, fontWeight: 700 }}>
-    Comparison works best within the same category.
-  </p>
-)}
+        <p role="alert" style={{ color: "#b45309", marginTop: 10, fontWeight: 700 }}>
+          These products belong to different categories and cannot be compared.
+        </p>
+      )}
 
-{error === "TYPE_MISMATCH" && (
-  <p style={{ color: "#b91c1c", marginTop: 10, fontWeight: 700 }}>
-    These products are not the same type and can’t be compared.
-  </p>
-)}
+      {error === "TYPE_MISMATCH" && (
+        <p role="alert" style={{ color: "#b91c1c", marginTop: 10, fontWeight: 700 }}>
+          These products are not the same product type and cannot be compared.
+        </p>
+      )}
 
       {result && (
         <CompareResult
@@ -147,7 +145,6 @@ export default function CompareContainer({ currentProduct }) {
           onReset={reset}
         />
       )}
-    </div>
+    </section>
   );
 }
-  
