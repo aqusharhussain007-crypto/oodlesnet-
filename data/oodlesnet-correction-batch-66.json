@@ -1064,35 +1064,41 @@
   {
     "id": "RDBPemyekRFStcBgC7oa",
     "data": {
-      "name": "Levi’s Men Slim Fit Jeans",
+      "name": "Levi's Men's 511 Slim Fit Mid-Rise Blue Jeans",
       "brand": "Levi's",
       "categorySlug": "fashion",
-      "description": "Levi's men slim fit jeans. Price and other details may vary based on product size and colour.",
+      "description": "Levi's 511 Slim Fit Mid-Rise Blue Jeans. Official Levi's India listing describes a slim fit from hip to ankle, mid-rise waist and stretch denim (79% cotton, 20% polyester, 1% elastane). Sizes and washes vary by listing. Official Levi's India reference price observed: ₹1,503 for Blue / size 28 / length 32; price and availability vary by size.",
       "imageUrl": "https://rukminim2.flixcart.com/image/720/720/xif0q/jean/w/s/w/-original-imahfwuvnchafvnh.jpeg?q=90",
       "searchKey": "men slim fit jeans denim casual wear clothing fashion",
       "store": [
         {
+          "name": "Levi's Official",
+          "price": 1503,
+          "offer": "Observed ₹1,503 for Blue / size 28 / length 32; size-specific price and stock may vary",
+          "url": "https://levi.in/products/mens-511-blue-slim-fit-jeans-a70870126"
+        },
+        {
           "name": "Amazon",
           "price": 1440,
-          "offer": "Click on buy to see offer",
+          "offer": "Existing price not refreshed; verify wash, size and 511 fit",
           "url": "https://www.amazon.in/Levis-Mid-Rise-Heavy-Stretchable-Vintage/dp/B0B7XXP9HZ"
         },
         {
-          "price": 1449,
-          "url": "https://www.flipkart.com/levi-s-511-slim-men-blue-jeans/p/itmda2c5c9b6653e",
           "name": "Flipkart",
-          "offer": "Click on buy to see offer"
+          "price": 1449,
+          "offer": "Existing price not refreshed; verify exact wash and size",
+          "url": "https://www.flipkart.com/levi-s-511-slim-men-blue-jeans/p/itmda2c5c9b6653e"
         },
         {
-          "price": 1559,
           "name": "Myntra",
-          "url": "https://www.myntra.com/jeans/levis/levis-men-511-slim-fit-heavy-fade-stretchable-jeans/32869240/buy",
-          "offer": "Click on buy to see offer"
+          "price": 1559,
+          "offer": "Existing price not refreshed; confirm exact 511 blue slim-fit listing and size",
+          "url": "https://www.myntra.com/jeans/levis/levis-men-511-slim-fit-heavy-fade-stretchable-jeans/32869240/buy"
         },
         {
           "name": "Ajio",
           "price": 1500,
-          "offer": "Click on buy to see offer",
+          "offer": "Existing price not refreshed; confirm wash, size and stock",
           "url": "https://www.ajio.com/levi-s-men-511-mid-wash-slim-fit-mid-rise-jeans/p/469573202_blue?"
         }
       ]
@@ -1101,29 +1107,35 @@
   {
     "id": "UgfQ2jN0e4zkl0Uq34ml",
     "data": {
-      "name": "boAt Stone 350 Bluetooth Speaker",
+      "name": "boAt Stone 350 10W Bluetooth Speaker",
       "brand": "boAt",
       "categorySlug": "electronics",
-      "description": "Bluetooth Speaker with 10W RMS Stereo Sound, IPX7 Water Resistance, TWS Feature, Up to 12H Total Playtime, Multi-Compatibility. Playback- The speaker offers up to a total of 12 hours of playtime per single charge at 60% volume level. True Wireless- It supports TWS functionality, meaning you can connect two Stone 350s together and simultaneously play music on both of them for twice the impact. Brand boAt Speaker Maximum Output Power 10 Watts Connectivity Technology Bluetooth Audio Output Mode stereo Mounting Type Tabletop Mount Model Name stone 350.",
+      "description": "boAt Stone 350 portable Bluetooth speaker with 10W rated output, Bluetooth 5.0, IPX7 water resistance, 2200mAh battery, up to 12 hours claimed playback, TWS pairing, AUX and TF-card playback, and built-in microphone. Official boAt listing reference price observed: ₹1,499; official page showed restocking soon, so availability is not guaranteed. Confirm the Stone 350 model (not Stone 350 Pro or Stone 352).",
       "imageUrl": "https://m.media-amazon.com/images/I/71jlw4lqU9L._AC_UF1000,1000_QL80_FMwebp_.jpg",
       "searchKey": "portable bluetooth speaker wireless audio music speaker",
       "store": [
         {
+          "name": "boAt Official",
+          "price": 1499,
+          "offer": "Official listing observed at ₹1,499; page showed restocking soon",
+          "url": "https://www.boat-lifestyle.com/products/stone-350"
+        },
+        {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
           "price": 1990,
+          "offer": "Existing price not refreshed; verify Stone 350 (not Pro) and current stock",
           "url": "https://www.amazon.in/boAt-Stone-Bluetooth-Speaker-Blue/dp/B0CJRVK8F4"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
           "price": 1799,
+          "offer": "Existing price not refreshed; confirm exact Stone 350 model",
           "url": "https://www.flipkart.com/boat-stone-350-music-streaming-jiosaavn-12hrs-battery-ipx7-tws-feature-10-w-bluetooth-speaker/p/itmba477fc3ec7ae"
         },
         {
           "name": "Myntra",
-          "offer": "Listed price; confirm final checkout price and availability.",
           "price": 1799,
+          "offer": "Existing price not refreshed; verify model and Type-C variant details",
           "url": "https://www.myntra.com/speakers/boat/boat-stone-350-type-c-speaker-with-upto-12-hrs-non-stop-playback/25662828/buy"
         }
       ]
@@ -1135,25 +1147,25 @@
       "name": "Puma Men Graphic Print T-shirt",
       "brand": "Puma",
       "categorySlug": "fashion",
-      "description": "casual everyday graphic tee with soft cotton fabric and bold branding — perfect for daily wear or gym sessions. Fits true to size.",
+      "description": "Puma men's graphic-print T-shirt. The supplied image appears to show a black graphic tee, but the exact Puma style code, fabric composition, fit and graphic could not be matched confidently to a specific official product. Retailer links are broad search/category destinations; prices are unverified and may refer to different styles. Select and verify the exact design, size and colour on the retailer page.",
       "imageUrl": "https://assets-jiocdn.ajio.com/medias/sys_master/root1/20251008/EWvQ/68e65cb98bfb9009ac5df0a6/-473Wx593H-700714928-black-MODEL7.jpg",
       "searchKey": "men graphic print t shirt casual wear clothing fashion",
       "store": [
         {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
+          "offer": "Unverified search/category result; exact Puma design, size and current price must be confirmed",
           "price": 559,
           "url": "https://www.amazon.in/s?k=puma+men+graphic+print+tshirt"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
+          "offer": "Unverified search/category result; exact Puma design, size and current price must be confirmed",
           "price": 525,
           "url": "https://www.flipkart.com/search?q=puma+men+graphic+print+tshirt"
         },
         {
           "name": "Myntra",
-          "offer": "Click on buy to see offer",
+          "offer": "Unverified search/category result; exact Puma design, size and current price must be confirmed",
           "price": 524,
           "url": "https://www.myntra.com/puma-graphic-tshirts"
         }
