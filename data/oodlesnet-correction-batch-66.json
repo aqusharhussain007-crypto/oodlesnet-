@@ -329,20 +329,20 @@
       "name": "Redmi Note 14",
       "brand": "Redmi",
       "categorySlug": "smartphone",
-      "description": "Mystique White, 6GB RAM 128GB Storage | Global Debut MTK Dimensity 7025 Ultra | 2100 nits Segment Brightest 120Hz AMOLED | 50MP Sony LYT 600 OIS+EIS Triple Camera.\nBrandRedmi\nOperating SystemAndroid 14\nRAM Memory Installed Size6 GB\nCPU ModelOthers\nCPU Speed2.5 GHz\nMemory Storage Capacity128 GB",
+      "description": "Redmi Note 14 5G in Mystique White, 6GB RAM and 128GB storage. MediaTek Dimensity 7025-Ultra, 6.67-inch 120Hz AMOLED display, 50MP Sony LYT-600 main camera with OIS, 5110mAh battery and 45W charging. Android 14 with Xiaomi HyperOS.",
       "imageUrl": "https://m.media-amazon.com/images/I/71IIxHUk3pL._AC_UF1000,1000_QL80_FMwebp_.jpg",
-      "searchKey": "redmi note 14 phone mobile smartphone 5g android budget",
+      "searchKey": "Redmi Note 14 5G Mystique White 6GB 128GB Dimensity 7025 Ultra",
       "store": [
         {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
+          "offer": "Mystique White 6GB/128GB reference price ₹16,499; confirm seller, stock and checkout price",
           "price": 16499,
           "url": "https://www.amazon.in/Redmi-Note-14-5G-Dimensity/dp/B0DPFSH2X3"
         },
         {
           "url": "https://www.flipkart.com/redmi-note-14-5g-mystique-white-128-gb/p/itm11a447d125328",
-          "offer": "Click on buy to see offer",
-          "price": 16679,
+          "offer": "Mystique White 6GB/128GB reference price ₹16,499; confirm seller, stock and checkout price",
+          "price": 16499,
           "name": "Flipkart"
         }
       ]
@@ -388,36 +388,30 @@
   {
     "id": "5EcsClM9nsmFNgYOLADB",
     "data": {
-      "name": "Mamaearth Vitamin C Face Wash",
+      "name": "Mamaearth Vitamin C Face Wash with Vitamin C and Turmeric (100ml)",
       "brand": "Mamaearth",
       "categorySlug": "beauty",
-      "description": "Mamaearth Vitamin C Face Wash with Vitamin C and Turmeric for Skin Illumination. Product price very,depending on size, seller, quantity and store.",
+      "description": "Mamaearth Vitamin C Face Wash with Vitamin C and Turmeric. The linked official product page lists a 100ml variant at ₹251; retailer prices depend on pack size and availability.",
       "imageUrl": "https://m.media-amazon.com/images/I/51Uyf5TWGwL._AC_UF1000,1000_QL80_FMwebp_.jpg",
       "searchKey": "mamaearth vitamin c face wash skincare cleanser brightening beauty",
       "store": [
         {
+          "name": "Mamaearth",
+          "price": 251,
+          "offer": "Official 100ml variant listed at ₹251; confirm current stock and checkout total",
+          "url": "https://mamaearth.in/products/vitamin-c-face-wash-with-vitamin-c-and-turmeric-150ml"
+        },
+        {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
           "price": 177,
+          "offer": "Search destination retained; pack size and current price not verified",
           "url": "https://www.amazon.in/s?k=mamaearth+vitamin+c+face+wash"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
           "price": 229,
+          "offer": "Search destination retained; pack size and current price not verified",
           "url": "https://www.flipkart.com/search?q=mamaearth+vitamin+c+face+wash"
-        },
-        {
-          "name": "Myntra",
-          "offer": "Click on buy to see offer",
-          "price": 242,
-          "url": "https://www.myntra.com/mamaearth-face-wash"
-        },
-        {
-          "name": "Nykaa",
-          "offer": "Click on buy to see offer",
-          "price": 247,
-          "url": "https://www.nykaa.com/search/result/?q=mamaearth%20vitamin%20c%20face%20wash"
         }
       ]
     }
@@ -425,30 +419,30 @@
   {
     "id": "5P8yGY9x2sbJdQI7K2Nb",
     "data": {
-      "name": "Neutrogena Ultra Sheer Dry-Touch Sunscreen SPF 50+",
+      "name": "Neutrogena Ultra Sheer Dry-Touch Sunscreen SPF 50+ (30g)",
       "brand": "Neutrogena",
       "categorySlug": "beauty",
-      "description": "High-demand sunscreen; pack size may vary.",
+      "description": "Neutrogena Ultra Sheer Dry-Touch Sunblock Sunscreen SPF 50+, PA+++, broad-spectrum UVA/UVB protection with water-resistant formula and dry-touch finish. The 30g/30ml listing is the size reference; larger 80g packs are separate offers.",
       "imageUrl": "https://m.media-amazon.com/images/I/81XvTmXGUfL._AC_UF1000,1000_QL80_FMwebp_.jpg",
       "searchKey": "neutrogena ultra sheer dry touch sunscreen spf 50 skincare sun protection beauty",
       "store": [
         {
+          "name": "Tata 1mg",
+          "price": 299,
+          "offer": "30g pack listed at ₹299; ₹269 promotional price may apply on eligible orders",
+          "url": "https://www.1mg.com/otc/neutrogena-ultra-sheer-dry-touch-sunblock-sunscreen-spf-50-pa-uva-uvb-protection-water-resistant-otc390500"
+        },
+        {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
           "price": 289,
+          "offer": "Search destination retained; pack size and current price not verified",
           "url": "https://www.amazon.in/s?k=neutrogena+ultra+sheer+sunscreen+spf+50"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
           "price": 290,
+          "offer": "Search destination retained; pack size and current price not verified",
           "url": "https://www.flipkart.com/search?q=neutrogena+ultra+sheer+sunscreen"
-        },
-        {
-          "name": "Myntra",
-          "offer": "Click on buy to see offer",
-          "price": 293,
-          "url": "https://www.myntra.com/neutrogena-sunscreen"
         }
       ]
     }
@@ -456,36 +450,30 @@
   {
     "id": "5Wlj7GpAVIMbR5yEHkos",
     "data": {
-      "name": "Biotique Bio Morning Nectar Moisturizer",
+      "name": "Biotique Morning Nectar Nourish & Hydrate Moisturizer (120ml)",
       "brand": "Biotique",
       "categorySlug": "beauty",
-      "description": "Price and quantity very depending on stores Biotique Morning Nectar Flawless Skin Moisturizer Lotion L Prevents Dark Spots, Blackheads And Blemishes L Visibly Flawless Skin L Nourishes",
+      "description": "Biotique Morning Nectar Nourish & Hydrate Moisturizer with honey, ashwagandha and botanical extracts. Official product page lists the 120ml pack at ₹300; 190ml and larger packs are separate variants.",
       "imageUrl": "https://m.media-amazon.com/images/I/71wUhQVqYmL._AC_UF1000,1000_QL80_FMwebp_.jpg",
       "searchKey": "biotique bio morning nectar moisturizer skincare face cream hydration beauty",
       "store": [
         {
+          "name": "Biotique",
+          "price": 300,
+          "offer": "Official 120ml pack listed at ₹300; verify availability and checkout total",
+          "url": "https://www.biotique.com/products/morning-nectar-nourish-hydrate-moisturizer"
+        },
+        {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
           "price": 212,
+          "offer": "Search destination retained; pack size and current price not verified",
           "url": "https://www.amazon.in/s?k=biotique+bio+morning+nectar"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
           "price": 234,
+          "offer": "Search destination retained; pack size and current price not verified",
           "url": "https://www.flipkart.com/search?q=biotique+bio+morning+nectar"
-        },
-        {
-          "name": "Myntra",
-          "offer": "Click on buy to see offer",
-          "price": 357,
-          "url": "https://www.myntra.com/biotique-moisturizer"
-        },
-        {
-          "name": "Nykaa",
-          "offer": "Click on buy to see offer",
-          "price": 319,
-          "url": "https://www.nykaa.com/search/result/?q=biotique%20morning%20nectar"
         }
       ]
     }
