@@ -131,7 +131,7 @@ export function compareProducts(a, b) {
     compatibility,
     scores: { A: scoreA, B: scoreB },
     totals: { A: totalA, B: totalB },
-    maxScore: 5,
+    maxScore: 4,
     winner,
     priceComparison: { A: priceA, B: priceB },
     retailerCoverage: { A: getStoreCount(a), B: getStoreCount(b) },
