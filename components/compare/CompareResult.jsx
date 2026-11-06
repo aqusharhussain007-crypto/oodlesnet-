@@ -4,10 +4,10 @@ export default function CompareResult({
   productB,
   onReset,
 }) {
-  const { totals, winner, maxScore = 4 } = result;
+  const { totals, winner, maxScore = 3 } = result;
 
   const safeMaxScore =
-    Number.isFinite(maxScore) && maxScore > 0 ? maxScore : 4;
+    Number.isFinite(maxScore) && maxScore > 0 ? maxScore : 3;
   const percentA = Math.max(0, Math.min(100, (totals.A / safeMaxScore) * 100));
   const percentB = Math.max(0, Math.min(100, (totals.B / safeMaxScore) * 100));
 
