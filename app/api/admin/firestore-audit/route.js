@@ -116,7 +116,7 @@ async function handleBatchUpdate(body, db, uid) {
       return response({ ok: false, error: "Record " + (index + 1) + " data must be an object." }, 400);
     }
     const ref = db.collection("products").doc(item.id);
-    prepared.push({ id: item.id, ref, data: item.data });
+    prepared.push({ id: item.id, ref, data: item.data, deleteFields: item.deleteFields });
   }
 
   try {
@@ -161,6 +161,7 @@ async function handleBatchUpdate(body, db, uid) {
         const current = fresh[index].data();
         const updateData = checked[index].updateData;
         const merged = { ...current, ...updateData };
+        for (const key of checked[index].deleteFields) delete merged[key];
         const validationError = validateProduct(merged);
         if (validationError) throw new Error("BATCH_INVALID:" + checked[index].id + ":" + validationError);
       }
@@ -182,7 +183,7 @@ async function handleBatchUpdate(body, db, uid) {
         });
         transaction.create(auditRef, {
           actorUid: uid, operation: "update", collection: "products", documentId: item.id,
-          backupId: backupRef.id, changedFields: Object.keys(item.updateData), batchSize: checked.length,
+          backupId: backupRef.id, changedFields: [...Object.keys(item.updateData), ...item.deleteFields.map(key => key + " (legacy field removal)")], batchSize: checked.length,
           createdAt: new Date()
         });
       }
