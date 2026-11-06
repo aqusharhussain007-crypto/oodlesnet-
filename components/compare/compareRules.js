@@ -2,7 +2,6 @@ import {
   getLowestPrice,
   getStoreCount,
   hasOffers,
-  getConfidenceScore,
 } from "./compareUtils";
 
 const TYPE_KEYWORDS = {
@@ -113,14 +112,6 @@ export function compareProducts(a, b) {
     hasOffers(a) ? (scoreA.offers = 1) : (scoreB.offers = 1);
   }
 
-  const confidenceA = getConfidenceScore(a);
-  const confidenceB = getConfidenceScore(b);
-  if (confidenceA !== confidenceB) {
-    confidenceA > confidenceB
-      ? (scoreA.confidence = 1)
-      : (scoreB.confidence = 1);
-  }
-
   const totalA = Object.values(scoreA).reduce((sum, value) => sum + value, 0);
   const totalB = Object.values(scoreB).reduce((sum, value) => sum + value, 0);
 
@@ -131,7 +122,7 @@ export function compareProducts(a, b) {
     compatibility,
     scores: { A: scoreA, B: scoreB },
     totals: { A: totalA, B: totalB },
-    maxScore: 4,
+    maxScore: 3,
     winner,
     priceComparison: { A: priceA, B: priceB },
     retailerCoverage: { A: getStoreCount(a), B: getStoreCount(b) },
