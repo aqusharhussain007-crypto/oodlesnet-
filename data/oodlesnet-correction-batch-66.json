@@ -1280,10 +1280,10 @@
   {
     "id": "ZlkYEb5JjLcT9h89T2q2",
     "data": {
-      "name": "BAJAJ Military Series Evoque 1000 Watt 4 Jars Juicer Mixer Grinder",
+      "name": "Bajaj Military Series Evoque 1000W Mixer Grinder (4 Jars)",
       "brand": "Bajaj",
       "categorySlug": "appliances",
-      "description": "BAJAJ Military Series Evoque 1000W Juicer Mixer Grinder (4 Jars)\n\nA powerful and versatile kitchen essential built for Indian homes. With a 1000-watt motor, this mixer grinder can handle tough grinding and juicing jobs — from masalas and batter to fibrous vegetables and fruits — without frequent stalls. The 4 sturdy jars cover all everyday needs, making it a reliable choice for daily cooking.\n\nWhy this works well:\n\n💪 High motor power: 1000 W motor handles heavy grinding with less strain\n\n🍹 All-in-one utility: Includes jars for wet grinding, dry grinding, chutneys and juices\n\n🏠 Everyday usability: Great for medium to large families with varied cooking needs\n\nBottom line:\nA solid, high-power mixer grinder that feels dependable for everyday and heavy-use cooking. Pick this if you want performance and reliability without breaking the bank.",
+      "description": "Bajaj Military Series Evoque 1000W mixer grinder with four jars: 1.5L liquidising jar, 1.2L dry-grinding jar, 0.5L chutney jar and 1.5L blender jar with fruit filter. Features a 20,000 RPM motor, DuraCut blades and pulse mode. Bajaj's official product collection lists this model at ₹10,890 but marks it unavailable; Vijay Sales confirms the model and jar configuration. Existing marketplace prices are unverified.",
       "imageUrl": "https://m.media-amazon.com/images/I/71BGGEX0nCL._AC_SL1500_.jpg",
       "tags": [
         "kitchen",
@@ -1294,26 +1294,20 @@
       "searchKey": "juicer mixer grinder kitchen appliance food prep hybrid blender mixer grinder home use",
       "store": [
         {
-          "name": "Amazon",
-          "offer": "Click on buy to see offer",
+          "name": "Bajaj Official",
+          "offer": "₹10,890 listed; official page marks product unavailable",
+          "price": 10890,
+          "url": "https://www.bajaj.com/collections/bajaj-mixers"
+        },
+        {
+          "name": "Vijay Sales",
+          "offer": "Exact model and 4-jar configuration confirmed; price not shown in retrieved listing",
           "price": 5665,
-          "url": "https://www.amazon.in/Bajaj-Stainless-Unbeatable-Toughness-Warranty%E3%80%90Jet/dp/B0CZTKDZZ6"
-        },
-        {
-          "name": "Flipkart",
-          "offer": "Click on buy to see offer",
-          "price": 5490,
-          "url": "https://www.flipkart.com/bajaj-military-1000-w-mixer-grinder/p/itmc188885d2b6a7"
-        },
-        {
-          "name": "Myntra",
-          "offer": "Click on buy to see offer",
-          "price": 5799,
-          "url": "https://www.myntra.com/juicer-mixer-grinder/bajaj/bajaj-military-series-evoque-black--grey-1000w-4-jar-mixer-grinder/32824986/buy"
+          "url": "https://www.vijaysales.com/p/230502/bajaj-military-series-evoque-1000w-mixer-grinder-with-4-jar-3-speed-control-with-pulse-effect-mixie-230502-jet-black"
         },
         {
           "name": "Croma",
-          "offer": "Click on buy to see offer",
+          "offer": "Existing price not refreshed; confirm exact Evoque model and current stock",
           "price": 5999,
           "url": "https://www.croma.com/bajaj-military-series-evoque-1000-watt-4-jars-juicer-mixer-grinder-efficient-grinding-jet-black-/p/306520"
         }
@@ -1323,22 +1317,22 @@
   {
     "id": "b2RSSYInRyNT5WDpofnc",
     "data": {
-      "name": "Samsung Galaxy M36 5G",
+      "name": "Samsung Galaxy M36 5G (6GB RAM, 128GB Storage)",
       "brand": "Samsung",
       "categorySlug": "smartphone",
-      "description": "Samsung Galaxy M36 5G with large display, 5G support and long battery life.",
+      "description": "Galaxy M36 5G, 6GB RAM and 128GB storage. 6.7-inch FHD+ Super AMOLED display with up to 120Hz refresh rate; Exynos 1380 octa-core processor; 50MP OIS + 8MP ultra-wide + 2MP macro rear cameras; 13MP front camera; 5000mAh battery with 25W charging; One UI 7 based on Android 15 at launch, with Samsung's stated six generations of Android OS upgrades and six years of security updates. Samsung's launch reference price for 6GB/128GB was ₹16,499; live price and colour availability vary.",
       "imageUrl": "https://s3.ap-south-1.amazonaws.com/cb360static/uploads/47891b02-91c9-450a-87e4-82935b5724ad--Samsung%20Galaxy%20M36%20%286%29.avif",
       "searchKey": "phone mobile smartphone 5g android budget midrange",
       "store": [
         {
           "name": "Amazon",
           "url": "https://www.amazon.in/Samsung-Storage-Enhanced-Unmatched-Nightography/dp/B0FDB9H277?utm_source=chatgpt.com",
-          "offer": "Cash back and EMI Offer available",
+          "offer": "Price not refreshed; verify 6GB/128GB variant, colour and stock before checkout",
           "price": 17499
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
+          "offer": "Price not refreshed; verify 6GB/128GB variant, colour and stock before checkout",
           "price": 16490,
           "url": "https://www.flipkart.com/samsung-m36-5g-light-green-128-gb/p/itm4cf1eae54334f"
         }
@@ -1348,10 +1342,10 @@
   {
     "id": "boat-energyshroom-pb400",
     "data": {
-      "name": "boAt Energyshroom PB400 20000mAh Power Bank",
+      "name": "boAt Energyshroom PB400 20000mAh 22.5W Power Bank",
       "brand": "boAt",
       "categorySlug": "electronics",
-      "description": "20000mAh power bank with 22.5W fast charging, USB-A and two-way USB-C output, and Smart IC protection.",
+      "description": "20,000mAh (74Wh) lithium-polymer power bank with 22.5W fast charging, two USB-A output ports, one two-way USB-C port and one micro-USB input. Rated capacity 13,500mAh at 5V/2A; supports charging up to three devices simultaneously and 12-layer Smart IC protection; weight 449g. Official boAt page displayed ₹1,399 for Martian Red but marked Restocking Soon. Colour and delivery availability may vary.",
       "imageUrl": "https://www.boat-lifestyle.com/cdn/shop/files/mainimage_2245f22b-a9b1-4a16-a53f-0a2f6966ef2c_1500x.jpg?v=1754034135",
       "tags": [
         "power-bank",
@@ -1365,25 +1359,25 @@
         {
           "name": "boAt",
           "price": 1399,
-          "offer": "Official boAt listing observed at ₹1,399 on 31 Oct 2026; verify selected colour, stock and checkout price.",
+          "offer": "Official page displayed ₹1,399 for Martian Red; marked Restocking Soon",
           "url": "https://www.boat-lifestyle.com/products/energyshroom-pb400-powerbank-with-20000mah-battery-capacity-with-smart-ic-protection"
         },
         {
           "name": "Zepto",
           "price": 1399,
-          "offer": "PB400 20,000mAh, 22.5W listing observed at ₹1,399; colour and local PIN-code availability may vary.",
+          "offer": "Existing price may vary by colour and PIN code; verify stock and checkout price",
           "url": "https://www.zepto.com/pn/boat-20000mah-power-bank-w-2-way-22-5w-fast-charging-smart-power-management-pb400-steel-blue/pvid/73f8d4ff-bc06-4474-bb90-befcecac207e"
         },
         {
           "name": "Reliance Digital",
           "price": 1799,
-          "offer": "EnergyShroom PB400 20,000mAh, 22.5W listing observed at ₹1,799; colour and delivery availability may vary.",
+          "offer": "Existing price may vary by colour and PIN code; verify stock and checkout price",
           "url": "https://www.reliancedigital.in/product/boat-energyshroom-20000-mah-power-bank-steel-blue-pb400-lqg9dl-7535200"
         },
         {
           "name": "Croma",
           "price": 1799,
-          "offer": "Energyshroom PB400 20,000mAh, 22.5W listing observed at ₹1,799; colour and stock may vary.",
+          "offer": "Existing price may vary by colour and PIN code; verify stock and checkout price",
           "url": "https://www.croma.com/boat-energyshroom-pb400-20000-mah-22-5w-fast-charging-power-bank-2-type-a-1-micro-usb-and-1-type-c-port-sleek-aluminium-casing-steel-blue-/p/302756"
         }
       ]
@@ -1392,10 +1386,10 @@
   {
     "id": "boat-stone-350-pro",
     "data": {
-      "name": "boAt Stone 350 Pro",
+      "name": "boAt Stone 350 Pro 14W Bluetooth Speaker",
       "brand": "boAt",
       "categorySlug": "electronics",
-      "description": "Portable Bluetooth speaker with 14W output, up to 12 hours playback, RGB LED lighting, Bluetooth 5.3 and IPX5 water resistance.",
+      "description": "Portable Bluetooth speaker with 14W output, 2-inch driver, up to 12 hours playback at 60% volume, 3600mAh battery, Bluetooth 5.3, IPX5 water resistance, RGB lighting, AUX and TF-card playback, built-in microphone and TWS pairing. Official boAt page displayed ₹1,999 (₹1,699 with FESTIVE300 coupon) but showed Restocking Soon when checked.",
       "imageUrl": "https://www.boat-lifestyle.com/cdn/shop/files/STONE350PRO_Blue_07_1500x.jpg?v=1720589782",
       "tags": [
         "bluetooth-speaker",
@@ -1409,13 +1403,13 @@
         {
           "name": "boAt",
           "price": 1999,
-          "offer": "Official boAt listing price observed on 31 Oct 2026. Product page currently shows restocking soon; check availability and coupon at checkout.",
+          "offer": "Official price ₹1,999; ₹1,699 with FESTIVE300 coupon; marked Restocking Soon",
           "url": "https://www.boat-lifestyle.com/products/stone-350-pro-portable-speaker"
         },
         {
           "name": "Flipkart",
           "price": 2199,
-          "offer": "Exact Stone 350 Pro 14W listing; currently shown out of stock on the product page. Check seller and PIN-code availability before buying.",
+          "offer": "Flipkart listing marked out of stock when checked; verify seller and PIN-code availability",
           "url": "https://www.flipkart.com/boat-stone-350-pro-14-w-bluetooth-speaker/p/itm4f82022e918f7"
         }
       ]
@@ -1424,34 +1418,34 @@
   {
     "id": "d1L08SKYjB3MBojU4SYa",
     "data": {
-      "name": "Puma Smash v2 Men Sneakers",
+      "name": "PUMA Smash V2 Perf Men's Lace-Up Casual Sneakers",
       "brand": "Puma",
       "categorySlug": "fashion",
-      "description": "Classic casual sneakers; color and seller may vary.",
+      "description": "PUMA Smash V2 Perf men's low-top lace-up casual shoes. The AJIO exact-model listing describes a regular fit, leather upper and rubber outsole; listed MRP ₹3,999, with final price varying by size and offers. Other marketplace search links may show different colourways or Smash V2 variants; confirm the exact product code, colour and size.",
       "imageUrl": "https://rukminim2.flixcart.com/image/720/720/xif0q/shoe/y/7/g/-original-imahjgrxz82rxy89.jpeg?q=90",
       "searchKey": "men smash v2 sneakers casual footwear athletic shoes fashion",
       "store": [
         {
+          "name": "AJIO",
+          "offer": "Exact Smash V2 Perf listing; ₹3,999 MRP, size and offers may change",
+          "price": 3999,
+          "url": "https://www.ajio.com/puma-smash-v2-perf-lace-up-casual-shoes/p/460525947009"
+        },
+        {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
+          "offer": "Search result price unverified; confirm exact Smash V2 Perf colour and size",
           "price": 1763,
           "url": "https://www.amazon.in/s?k=puma+smash+v2+men"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
+          "offer": "Search result price unverified; confirm exact Smash V2 Perf colour and size",
           "price": 1775,
           "url": "https://www.flipkart.com/search?q=puma+smash+v2+men"
         },
         {
-          "name": "Ajio",
-          "offer": "Click on buy to see offer",
-          "price": 1485,
-          "url": "https://www.ajio.com/search/?text=puma%20smash%20v2"
-        },
-        {
           "name": "Myntra",
-          "offer": "Click on buy to see offer",
+          "offer": "Search result price unverified; confirm exact Smash V2 Perf colour and size",
           "price": 2564,
           "url": "https://www.myntra.com/puma-smash-v2"
         }
@@ -1461,10 +1455,10 @@
   {
     "id": "dtuMMQMcQJBmol55KUeb",
     "data": {
-      "name": "REDMI Note 15 5G (Glacier Blue, 8GB RAM 128GB Storage)",
+      "name": "Redmi Note 15 5G (Glacier Blue, 8GB RAM, 128GB Storage)",
       "brand": "Redmi",
       "categorySlug": "smartphone",
-      "description": "REDMI Note 15 5G (Glacier Blue, 8GB RAM 128GB Storage) | 108MP OIS Camera | Snapdragon 6 Gen 3 | 17.2cm Tough Curved AMOLED Screen | Segment’s Slimmest Phone | 5520mAh Si/C Battery | 45W Fast Charging.\nRAM Memory Installed Size8 GB\nOperating SystemAndroid 15, Xiaomi HyperOS\nMemory Storage Capacity128 GB\nModel NameREDMI Note 15 5G\nNetwork Service ProviderUnlocked for All Carriers\n6.7\" 120Hz AMOLED, 3200-nits peak brightness. Smooth, vibrant, and visible even under harsh sunlight.\nA slim 7.35mm build with a tough curved AMOLED brings a premium in-hand feel with an immersive viewing experience.\nSnapdragon 6 Gen 3 + 5520mAh EV-Grade battery + 45W fast charging gives you faster performance, longer hours, quick top-ups.",
+      "description": "Glacier Blue variant with 8GB RAM and 128GB storage. Qualcomm Snapdragon 6 Gen 3 processor; 6.77-inch AMOLED display, 120Hz refresh rate and up to 3200-nit peak brightness; 108MP main + 8MP ultra-wide rear cameras; 20MP front camera; 5520mAh battery with 45W Turbo Charging; IP65/IP66 dust and water resistance; Xiaomi HyperOS 3 per current official specifications. Verify exact variant and current retailer price at checkout.",
       "imageUrl": "https://m.media-amazon.com/images/I/81SxS-bDvVL._AC_UF1000,1000_QL80_FMwebp_.jpg",
       "tags": [
         "mobile phones",
@@ -1474,13 +1468,13 @@
       "store": [
         {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
+          "offer": "Current price not verified; confirm Glacier Blue 8GB/128GB variant and stock",
           "price": 22999,
           "url": "https://www.amazon.in/Glacier-Snapdragon-Segments-Slimmest-Charging/dp/B0G5G7LCJQ"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
+          "offer": "Current price not verified; confirm Glacier Blue 8GB/128GB variant and stock",
           "price": 23192,
           "url": "https://www.flipkart.com/redmi-note-15-5g-glacier-blue-128-gb/p/itm7cb24e3c40189"
         }
@@ -1490,22 +1484,22 @@
   {
     "id": "f9XYZqfqE34ouho8YGEQ",
     "data": {
-      "name": "realme P4X Smartphone",
+      "name": "realme P4x 5G (Matte Silver, 6GB RAM, 128GB Storage)",
       "brand": "Realme",
       "categorySlug": "smartphone",
-      "description": "realme P4X Smartphone 6.72 inch 144Hz Display 7000mAh Titan Bettery 45W Fast Charge 6GB RAM 128GB ROM Dimensity 7400 Ultra 5G Chipset IP64 Waterproof Dual SIM.\nBrandrealme\nMemory Storage Capacity128 GB\nOperating SystemAndroid 15\nRAM Memory Installed Size6 GB\nCPU ModelG3\nCPU Speed2.6 GHz",
+      "description": "Matte Silver variant with 6GB RAM and 128GB storage. MediaTek Dimensity 7400 Ultra 5G chipset; 6.72-inch FHD+ LCD with 144Hz refresh rate and up to 1000-nit peak brightness; 50MP + 2MP rear cameras and 8MP front camera; 7000mAh battery with 45W fast charging; IP64 resistance; Android 15 with realme UI 6.0. The exact Amazon listing confirms Matte Silver 6GB/128GB. Existing prices are not verified as current.",
       "imageUrl": "https://m.media-amazon.com/images/I/71jQQEp8bkL._AC_UF1000,1000_QL80_FMwebp_.jpg",
       "searchKey": "phone mobile smartphone 5g android midrange budget",
       "store": [
         {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
+          "offer": "Price not refreshed; verify Matte Silver 6GB/128GB variant and live stock",
           "price": 15298,
           "url": "https://www.amazon.in/realme-Smartphone-Display-Dimensity-Waterproof/dp/B0G3X99MZS"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
+          "offer": "Price not refreshed; verify Matte Silver 6GB/128GB variant and live stock",
           "price": 14999,
           "url": "https://www.flipkart.com/realme-p4x-5g-matte-silver-128-gb/p/itm575b1540859e4"
         }
@@ -1515,24 +1509,24 @@
   {
     "id": "fRjgA7xZWSinASl8PseN",
     "data": {
-      "name": "WOW Skin Science Apple Cider Vinegar Shampoo",
+      "name": "WOW Skin Science Apple Cider Vinegar Shampoo (1000ml)",
       "brand": "WOW Skin Science",
       "categorySlug": "beauty",
-      "description": "WOW Skin Science Apple Cider Vinegar Shampoo very in sizes, price, quantity, depending on store.",
+      "description": "WOW Skin Science Apple Cider Vinegar Shampoo, 1000ml bottle. Pack size matters: current retailer pages show different sizes and formulations. Nykaa's exact 1000ml page displayed ₹549 (MRP ₹999) but marked Notify Me; Flipkart's 1000ml listing displayed ₹599. Confirm that the listing is the 1000ml Apple Cider Vinegar variant, not 200ml/300ml/500ml or another WOW shampoo.",
       "imageUrl": "https://rukminim1.flixcart.com/image/720/720/xif0q/shampoo/9/r/l/1000-apple-cider-vinegar-no-parabens-sulphate-shampoo-1000ml-wow-original-imahgnsmu68w9tyu.jpeg?q=90",
       "searchKey": "apple cider vinegar shampoo hair care cleansing beauty personal care",
       "store": [
         {
-          "name": "Flipkart",
-          "offer": "Click on buy to see offer",
-          "price": 340,
-          "url": "https://www.flipkart.com/search?q=wow+apple+cider+vinegar+shampoo"
+          "name": "Nykaa",
+          "offer": "Exact 1000ml page displayed ₹549 (MRP ₹999); currently Notify Me / unavailable",
+          "price": 549,
+          "url": "https://www.nykaa.com/wow-skin-science-apple-cider-vinegar-shampoo/p/4493491"
         },
         {
-          "name": "Nykaa",
-          "offer": "Click on buy to see offer",
-          "price": 909,
-          "url": "https://www.nykaa.com/search/result/?q=wow%20apple%20cider%20vinegar%20shampoo"
+          "name": "Flipkart",
+          "offer": "1000ml listing displayed ₹599; confirm variant and live availability",
+          "price": 599,
+          "url": "https://www.flipkart.com/search?q=wow+apple+cider+vinegar+shampoo+1000ml"
         }
       ]
     }
