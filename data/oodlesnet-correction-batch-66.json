@@ -534,20 +534,26 @@
       "name": "Apple iPhone 15 (128 GB) – Blue",
       "brand": "Apple",
       "categorySlug": "smartphone",
-      "description": "Apple iPhone 15 with 128 GB storage, powerful performance, advanced camera system and premium design",
+      "description": "Apple iPhone 15, Blue, 128GB storage. A16 Bionic chip, 6.1-inch Super Retina XDR OLED display, 48MP main camera and 12MP ultra-wide camera. Verify seller warranty and current checkout price.",
       "imageUrl": "https://m.media-amazon.com/images/I/71d7rfSl0wL._SX679_.jpg",
       "store": [
         {
-          "offer": "Limited time deal",
-          "price": 79999,
-          "name": "Amazon",
-          "url": "https://www.amazon.in/dp/B0CHX2F5QT"
+          "name": "Flipkart",
+          "price": 69999,
+          "offer": "Blue 128GB listing price observed ₹69,999; seller TrueComRetail, verify checkout and warranty",
+          "url": "https://www.flipkart.com/apple-iphone-15-blue-128-gb/p/itm387c20f1f5347"
         },
         {
-          "url": "https://www.flipkart.com/apple-iphone-15-blue-128-gb/p/itm3b4a2e2f6c9f4",
-          "name": "Flipkart",
-          "price": 80999,
-          "offer": "Debit card discount"
+          "name": "Vijay Sales",
+          "price": 59900,
+          "offer": "Blue 128GB listing price observed ₹59,900; delivery and stock depend on PIN code",
+          "url": "https://www.vijaysales.com/c/iphones/model/buy-apple-iphone-15-iphones?model=Apple0iPhone015"
+        },
+        {
+          "name": "Amazon",
+          "price": 79999,
+          "offer": "Existing Amazon destination retained; current price not independently refreshed",
+          "url": "https://www.amazon.in/dp/B0CHX2F5QT"
         }
       ]
     }
@@ -555,36 +561,30 @@
   {
     "id": "9qOFAPSY1SJkofsXOZv3",
     "data": {
-      "name": "Swiss Beauty Liquid Concealer",
+      "name": "Swiss Beauty Perfect Liquid Concealer (6g)",
       "brand": "Swiss Beauty",
       "categorySlug": "beauty",
-      "description": "|Easily Blendable Concealer For Face Makeup With Matte Finish",
+      "description": "Swiss Beauty Perfect Liquid Concealer with jojoba oil, full coverage and matte finish. Available in multiple shades; the selected shade must be confirmed by the buyer. Official listing price ₹249 for 6g.",
       "imageUrl": "https://m.media-amazon.com/images/I/517NPk7BknL._AC_UF1000,1000_QL80_FMwebp_.jpg",
       "searchKey": "makeup concealer liquid face coverage beauty cosmetic",
       "store": [
         {
-          "name": "Amazon",
-          "offer": "Click on buy to see offer",
-          "price": 212,
-          "url": "https://www.amazon.in/s?k=swiss+beauty+liquid+concealer"
-        },
-        {
-          "name": "Flipkart",
-          "offer": "Click on buy to see offer",
-          "price": 211,
-          "url": "https://www.flipkart.com/search?q=swiss+beauty+concealer"
-        },
-        {
-          "name": "Myntra",
-          "offer": "Click on buy to see offer",
-          "price": 211,
-          "url": "https://www.myntra.com/swiss-beauty-concealer"
+          "name": "Swiss Beauty",
+          "price": 249,
+          "offer": "Official 6g listing ₹249; shade selection required, coupon offers may apply",
+          "url": "https://swissbeauty.in/products/liquid-concealer"
         },
         {
           "name": "Nykaa",
-          "offer": "Click on buy to see offer",
-          "price": 224,
-          "url": "https://www.nykaa.com/search/result/?q=swiss%20beauty%20concealer"
+          "price": 187,
+          "offer": "02 Sand Sable 5.6g listing ₹187; selected shade shown out of stock at time checked",
+          "url": "https://www.nykaa.com/swiss-beauty-liquid-concealer/p/419682?pps=13&productId=419682"
+        },
+        {
+          "name": "Zepto",
+          "price": 204,
+          "offer": "Selected 6g shades listed from ₹204; availability and shade vary by location",
+          "url": "https://www.zepto.com/brand/swiss-beauty?spvid=10d8f078-beed-4b98-8303-d01a4c5359bc"
         }
       ]
     }
