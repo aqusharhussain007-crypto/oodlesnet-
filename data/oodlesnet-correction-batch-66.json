@@ -105,9 +105,9 @@
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
-          "price": 5819,
-          "url": "https://www.flipkart.com/havells-stealth-air-2-year-warranty-anti-dust-1250-mm-ceiling-fan/p/itm6b532307e4790"
+          "offer": "Listed price observed; confirm final checkout price",
+          "price": 7749,
+          "url": "https://www.flipkart.com/havells-stealth-air-bldc-1200-mm-3-blade-ceiling-fan/p/itme919eeab6cc3b"
         },
         {
           "name": "Myntra",
@@ -1740,27 +1740,27 @@
       "store": [
         {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
+          "offer": "Price not independently refreshed; verify at checkout",
           "price": 3499,
           "url": "https://www.amazon.in/Eureka-Forbes-Quick-Clean-DX/dp/B00F3ABSXU"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
-          "price": 3499,
-          "url": "https://www.flipkart.com/eureka-forbes-quick-clean-dx-dry-vacuum-cleaner-reusable-dust-bag/p/itm8c01cff3347cb"
+          "offer": "Listed price observed; confirm final checkout price",
+          "price": 3699,
+          "url": "https://www.flipkart.com/eureka-forbes-quick-clean-dx-vacuum-cleaner/p/itmd4ntnhspfnbg5"
         },
         {
           "name": "Myntra",
-          "offer": "Click on buy to see offer",
-          "price": 3499,
+          "offer": "Listed price observed; confirm final checkout price",
+          "price": 3699,
           "url": "https://www.myntra.com/vacuum-cleaner/eureka%2Bforbes/quick-clean-dx-vacuum-cleaner-with-1200w-powerful-suction-3-free-reusable-dust-bag/36742081/buy"
         },
         {
-          "name": "Croma",
-          "offer": "Click on buy to see offer",
-          "price": 4999,
-          "url": "https://www.croma.com/eureka-forbes-swift-clean-1200w-dry-vacuum-cleaner-with-auto-cord-winder-efficient-alert-system-red-black-/p/220907"
+          "name": "Eureka Forbes",
+          "offer": "Official store listed price; confirm final checkout price",
+          "price": 3699,
+          "url": "https://www.eurekaforbes.com/dp/GFCDQCLDX00000/forbes-quick-clean-dx-canister-vacuum-cleaner"
         }
       ]
     }
