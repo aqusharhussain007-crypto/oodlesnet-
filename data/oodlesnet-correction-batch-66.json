@@ -1627,30 +1627,30 @@
   {
     "id": "kybnC98jS4xHahkCl5ZV",
     "data": {
-      "name": "Nike revolution 8 running shoes",
+      "name": "Nike Men's Revolution 8 Road Running Shoes",
       "brand": "Nike",
       "categorySlug": "fashion",
-      "description": "The Revolution 8 is an evolution of your faithful favorite Every stride is cushioned. Plus, the mesh upper is even more breathable than the previous iteration, so you can run in cool, collected comfort",
+      "description": "Men's Revolution 8 road-running shoes with breathable mesh upper, foam midsole cushioning, flexible forefoot and rubber outsole. Prices vary by colour and size. Nykaa Fashion showed ₹2,148 for White UK9 but that option and displayed sizes were sold out; price-comparison results showed a Standard option at Tata CLiQ for ₹2,212. Confirm size, colour and stock.",
       "imageUrl": "https://rukminim2.flixcart.com/image/720/720/xif0q/shoe/4/y/c/-original-imahgcs7znzr9jgg.jpeg?q=90",
       "searchKey": "men revolution 8 running shoes athletic footwear casual sport sneakers fashion",
       "store": [
         {
+          "name": "Nykaa Fashion",
+          "offer": "₹2,148 displayed; White option / listed sizes sold out when checked",
+          "price": 2148,
+          "url": "https://www.nykaafashion.com/nike-revolution-8-men-s-road-running-shoes/p/25271428"
+        },
+        {
+          "name": "Tata CLiQ",
+          "offer": "Standard option reference ₹2,212; confirm size and stock",
+          "price": 2212,
+          "url": "https://www.tatacliq.com/search/?searchCategory=all&text=nike%20revolution%208%20men"
+        },
+        {
           "name": "Flipkart",
           "price": 3651,
-          "offer": "Click on buy to see offer",
+          "offer": "Search result; exact colour, size and price unverified",
           "url": "https://www.flipkart.com/search?q=nike+revolution+8+men&marketplace=FLIPKART&as-show=on&pageUID=1767781140940"
-        },
-        {
-          "name": "Myntra",
-          "offer": "Click on buy to see offer",
-          "price": 4295,
-          "url": "https://www.myntra.com/nike-revolution-8-shoes?extra_search_param=isautosuggestentry%3atrue%3a%3aid%3a2297-nike-revolution-8-shoes&rawQuery=Nike%20Revolution%208%20Shoes"
-        },
-        {
-          "name": "Ajio",
-          "offer": "Click on buy to see offer",
-          "price": 3264,
-          "url": "https://www.ajio.com/search/?text=Nike%20Revolution%208%20Running%20Shoes&responseSource=vertex"
         }
       ]
     }
@@ -1658,35 +1658,35 @@
   {
     "id": "lL7eUaSs9emiKm4SQy6i",
     "data": {
-      "name": "Puma Essentials Logo Hoodie",
+      "name": "PUMA Men's Essentials Logo Hoodie",
       "brand": "Puma",
       "categorySlug": "fashion",
-      "description": "Regular Fit\nWash Care\nMachine wash cold\nMood\nCasual",
+      "description": "PUMA Essentials men's logo hoodie. Existing Amazon destination identifies an Essentials Comfort Hoodie in Indigo; fit, fabric blend, colour and size vary by SKU. Other marketplace links are broad search/category pages and may show different hoodies. Match exact product code, colour and size; listed prices are unverified.",
       "imageUrl": "https://m.media-amazon.com/images/I/71MsqXKjbkL._AC_UL1500_.jpg",
       "searchKey": "men essentials logo hoodie casual wear clothing fashion streetwear",
       "store": [
         {
           "name": "Amazon",
           "price": 1599,
-          "offer": "Click on buy to see offer",
+          "offer": "Price unverified; match exact Essentials hoodie SKU, colour and size",
           "url": "https://www.amazon.in/Puma-Essentials-Comfort-Hoodie-Indigo/dp/B0DJDFKP2L"
         },
         {
           "name": "Flipkart",
           "price": 1469,
-          "offer": "Click on buy to see offer",
+          "offer": "Price unverified; match exact Essentials hoodie SKU, colour and size",
           "url": "https://www.flipkart.com/search?q=puma+essentials+hoodie&sort=price_asc&pageUID=1767783145481"
         },
         {
           "name": "Myntra",
           "price": 1584,
-          "offer": "Click on buy to see offer",
+          "offer": "Price unverified; match exact Essentials hoodie SKU, colour and size",
           "url": "https://www.myntra.com/puma-hoodies"
         },
         {
           "name": "Ajio",
           "price": 1359,
-          "offer": "Click on buy to see offer",
+          "offer": "Price unverified; match exact Essentials hoodie SKU, colour and size",
           "url": "https://www.ajio.com/search/?query=%3Arelevance%3Apricerange%3ARs.1001-1500&text=puma%20hoodie&classifier=intent&gridColumns=2&searchInput=puma%20hoodie&currSearch=puma%20hoodie&includeUnratedProducts=false"
         }
       ]
@@ -1695,34 +1695,34 @@
   {
     "id": "lVtT5bHEgQGEFpsY04GE",
     "data": {
-      "name": "Maybelline Fit Me Matte + Poreless Foundation",
+      "name": "Maybelline New York Fit Me Matte + Poreless Foundation (30ml)",
       "brand": "Maybelline",
       "categorySlug": "beauty",
-      "description": "Bestseller foundation; shade and pack size may vary.",
+      "description": "Maybelline New York Fit Me Matte + Poreless liquid foundation, 30ml. Matte, pore-blurring finish; shade selection is essential and prices vary by shade and seller. Existing retailer URLs are search pages, not exact shade listings. Compare only after selecting the same shade and 30ml pack.",
       "imageUrl": "https://rukminim1.flixcart.com/image/720/720/xif0q/foundation/g/i/r/-original-imah62bpqsn6fyhp.jpeg?q=90",
       "searchKey": "foundation fit me matte poreless beauty makeup face coverage cosmetic",
       "store": [
         {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
+          "offer": "Stored price unverified; select same shade and 30ml pack before comparing",
           "price": 207,
           "url": "https://www.amazon.in/s?k=maybelline+fit+me+matte+poreless+foundation"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
+          "offer": "Stored price unverified; select same shade and 30ml pack before comparing",
           "price": 207,
           "url": "https://www.flipkart.com/search?q=maybelline+fit+me+foundation"
         },
         {
           "name": "Myntra",
-          "offer": "Click on buy to see offer",
+          "offer": "Stored price unverified; select same shade and 30ml pack before comparing",
           "price": 220,
           "url": "https://www.myntra.com/maybelline-fit-me-foundation"
         },
         {
           "name": "Ajio",
-          "offer": "Click on buy to see offer",
+          "offer": "Stored price unverified; select same shade and 30ml pack before comparing",
           "price": 214,
           "url": "https://www.ajio.com/search/?text=Maybelline%20Fit%20Me%20Matte%20+%20Poreless%20Foundation"
         }
@@ -1810,28 +1810,28 @@
   {
     "id": "orZ39jrxI2FUGLyx0SXX",
     "data": {
-      "name": "Boat 2025 Launch Rockerz 301 ANC",
+      "name": "boAt Rockerz 301 ANC Bluetooth Neckband",
       "brand": "BoAt",
       "categorySlug": "electronics",
-      "description": "Wireless neckband earphones with punchy bass, up to ~40 hrs playback, environmental noise cancellation (ENC), fast charging and Bluetooth 5.2 — great for music and calls.\n\nSpecifications.\nBoat 2025 Launch Rockerz 301 ANC, (~30dB) ANC, 13mm Drivers,ENx, 40ms Low Latency, Hall Switch, Stream Ad Free Music via App Support, Bluetooth Neckband, Wireless with Mic Earphones (Onyx Black",
+      "description": "Wireless neckband with up to 30dB active noise cancellation, 13mm drivers, ENx environmental noise cancellation for calls, up to 40 hours playback (manufacturer claim), 40ms low-latency mode, Hall Switch and Bluetooth. This is a neckband, not true-wireless earbuds. Confirm current retailer price and availability.",
       "imageUrl": "https://m.media-amazon.com/images/I/61rXeQIF0XL._AC_SL1500_.jpg",
       "searchKey": "earbuds wireless bluetooth audio anc technology",
       "store": [
         {
-          "offer": "Click on buy to see offer",
+          "offer": "Price and stock not refreshed; verify Rockerz 301 ANC model and current availability",
           "url": "https://www.amazon.in/Rockerz-Bluetooth-Neckband-Wireless-Earphones/dp/B0FM37T5JX",
           "name": "Amazon",
           "price": 1990
         },
         {
           "url": "https://www.flipkart.com/boat-rockerz-301-anc-13mm-drivers-hall-switch-30db-anc-stream-ad-free-music-via-app-bluetooth/p/itm7a57a5184b514",
-          "offer": "Click on buy to see offer",
+          "offer": "Price and stock not refreshed; verify Rockerz 301 ANC model and current availability",
           "name": "Flipkart",
           "price": 1499
         },
         {
           "name": "boAt",
-          "offer": "Official listing price; confirm availability and checkout price.",
+          "offer": "Price and stock not refreshed; verify Rockerz 301 ANC model and current availability",
           "price": 1599,
           "url": "https://www.boat-lifestyle.com/products/boat-rockerz-301-anc"
         }
@@ -1841,34 +1841,34 @@
   {
     "id": "sXZPvWh1P9KXjLRelNVq",
     "data": {
-      "name": "Adidas Men Essentials Linear T-shirt",
+      "name": "adidas Men's Essentials Linear Logo T-shirt",
       "brand": "Adidas",
       "categorySlug": "fashion",
-      "description": "Iconic Adidas logo tee made with breathable cotton for all-day comfort. Great for casual outings or workouts.",
+      "description": "adidas men's Essentials Linear logo T-shirt. Supplied image appears to show product code KG9440; match that code, colour, fabric and size on retailer pages. Generic search/category links may return other adidas Essentials T-shirts; stored prices are not verified as like-for-like.",
       "imageUrl": "https://rukminim1.flixcart.com/image/720/720/xif0q/t-shirt/w/9/s/m-kg9440-adidas-original-imahfe4kwyshzmsp.jpeg?q=90",
       "searchKey": "men essentials linear t shirt casual wear clothing fashion basics tee",
       "store": [
         {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
+          "offer": "Price unverified; match KG9440 product code, colour and size",
           "price": 559,
           "url": "https://www.amazon.in/s?k=adidas+men+essentials+linear+tshirt"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
+          "offer": "Price unverified; match KG9440 product code, colour and size",
           "price": 649,
           "url": "https://www.flipkart.com/search?q=adidas+men+essentials+linear+tshirt"
         },
         {
           "name": "Myntra",
-          "offer": "Click on buy to see offer",
+          "offer": "Price unverified; match KG9440 product code, colour and size",
           "price": 539,
           "url": "https://www.myntra.com/adidas-essentials-tshirt"
         },
         {
           "name": "Ajio",
-          "offer": "Click on buy to see offer",
+          "offer": "Price unverified; match KG9440 product code, colour and size",
           "price": 959,
           "url": "https://www.ajio.com/search/?text=adidas%20essentials%20tshirt"
         }
@@ -1878,10 +1878,10 @@
   {
     "id": "spjutQTr9PZAckRKuYrR",
     "data": {
-      "name": "Philips Stainless Steel Viva Collection HL7701/00 Mixer Grinder, 750 Watts, 4 Jars",
+      "name": "Philips Viva Collection HL7701/00 750W Mixer Grinder (4 Jars)",
       "brand": "Philips",
       "categorySlug": "appliances",
-      "description": "Philips Stainless Steel Viva Collection HL7701/00 Mixer Grinder (750W, 4 Jars)\n\nA reliable, no-nonsense mixer grinder built for everyday Indian cooking. The 750W motor is powerful enough for regular grinding, blending, and chutney making without frequent overheating. Stainless steel jars feel sturdy and handle both wet and dry ingredients well.\n\nWhat it’s best for:\n\n🍛 Daily home cooking (masalas, batters, chutneys)\n\n🏠 Medium-size families\n\n🔌 Users who want durability over fancy features.\n\nBottom line:\nA dependable mixer grinder from a trusted brand. Choose this if you want consistent performance, strong motor power, and long-term reliability rather than extra attachments or flashy design.",
+      "description": "Philips Viva Collection HL7701-series mixer grinder, 750W, four jars including a pulp-extractor jar. Philips India official listing located for model HL7701/01 at ₹5,295 but marked out of stock; the record says HL7701/00, so suffix/market variant must be verified before assuming they are identical. Existing marketplace prices are unverified.",
       "imageUrl": "https://media.tatacroma.com/Croma%20Assets/Small%20Appliances/Food%20Processors/Images/196409_1_bh0hrx.png",
       "tags": [
         "mixer",
@@ -1893,19 +1893,19 @@
       "store": [
         {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
+          "offer": "Price unverified; confirm exact HL7701 suffix and four-jar model",
           "price": 5590,
           "url": "https://www.amazon.in/Philips-Collection-HL7701-00-750-Watt/dp/B010LE4R94"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
+          "offer": "Price unverified; confirm exact HL7701 suffix and four-jar model",
           "price": 4679,
           "url": "https://www.flipkart.com/philips-new-750-w-mixer-grinder/p/itm8384449427ba4"
         },
         {
           "name": "Croma",
-          "offer": "Click on buy to see offer",
+          "offer": "Price unverified; confirm exact HL7701 suffix and four-jar model",
           "price": 5099,
           "url": "https://www.croma.com/philips-viva-collection-750-watt-4-jars-mixer-grinder-19500-rpm-auto-cut-off-protection-white-blue-/p/196409"
         }
@@ -1915,22 +1915,22 @@
   {
     "id": "vlcw14vlplA9yZujBf7B",
     "data": {
-      "name": "Motorola Edge 60 Fusion 5G, Pantone Mykonos Blue (8GB, 256GB)",
+      "name": "Motorola Edge 60 Fusion 5G (Pantone Mykonos Blue, 8GB RAM, 256GB Storage)",
       "brand": "Motorola",
       "categorySlug": "smartphone",
-      "description": "Brand  Motorola\nRAM Memory Installed Size8 GB\nOperating SystemAndroid 15\nSpecific Uses For ProductStreaming, Gaming\nCPU Model8031\nCPU Speed2.4 GHz\n8 GB RAM | 256 GB ROM | Expandable Upto 1 TB\n16.94 cm (6.67 inch) Display\n50MP + 13MP | 32MP Front Camera\n5500 mAh Battery\nDimensity 7400 Processor\n68W Charger",
+      "description": "Pantone Mykonos Blue, 8GB RAM and 256GB storage. MediaTek Dimensity 7400; 6.67-inch 1.5K pOLED quad-curved 120Hz display; 50MP Sony LYTIA 700C main camera with OIS + 13MP ultra-wide/macro; 32MP front camera; 5500mAh battery with 68W TurboPower; Android 15 at launch. Motorola's official India page confirms core model specifications. Existing retailer prices need live verification.",
       "imageUrl": "https://rukminim1.flixcart.com/image/720/720/xif0q/mobile/h/l/g/-original-imahgympttnkvw7t.jpeg?q=90",
       "searchKey": "phone mobile smartphone 5g android premium midrange",
       "store": [
         {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
+          "offer": "Price unverified; confirm Mykonos Blue 8GB/256GB variant and current stock",
           "price": 21690,
           "url": "https://www.amazon.in/Motorola-Edge-60-Fusion-5G/dp/B0FG86CZSC"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
+          "offer": "Price unverified; confirm Mykonos Blue 8GB/256GB variant and current stock",
           "price": 21999,
           "url": "https://www.flipkart.com/motorola-edge-60-fusion-5g-pantone-mykonos-blue-256-gb/p/itmdbb95e3f12ab6"
         }
