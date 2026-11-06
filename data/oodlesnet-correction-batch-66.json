@@ -1073,14 +1073,8 @@
       "store": [
         {
           "name": "Levi's Official",
-          "offer": "Light Indigo 511 reference ₹1,799; style and size affect price",
-          "price": 1799,
-          "url": "https://levi.in/collections/slim-straight-fits/products/mens-511-mid-rise-slim-fit-cotton-stretch-blend-jeans-a70870368"
-        },
-        {
-          "name": "Levi's Official",
           "price": 1503,
-          "offer": "Price unverified; confirm exact wash, colour, waist and length",
+          "offer": "Official 511 Blue product page; stored ₹1,503 price not currently verified. Confirm wash, waist and length.",
           "url": "https://levi.in/products/mens-511-blue-slim-fit-jeans-a70870126"
         },
         {
@@ -1124,12 +1118,6 @@
           "name": "boAt Official",
           "offer": "₹1,399 displayed for Red variant; sold out/restocking when checked",
           "price": 1399,
-          "url": "https://www.boat-lifestyle.com/products/stone-350"
-        },
-        {
-          "name": "boAt Official",
-          "price": 1499,
-          "offer": "Existing price and stock not verified; confirm colour and checkout price",
           "url": "https://www.boat-lifestyle.com/products/stone-350"
         },
         {
