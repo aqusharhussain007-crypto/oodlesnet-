@@ -592,24 +592,24 @@
   {
     "id": "A3ogN1msOZNDmVjm5oT0",
     "data": {
-      "name": "OnePlus Nord CE 5",
+      "name": "OnePlus Nord CE5 5G Marble Mist 8GB/128GB",
       "brand": "OnePlus",
       "categorySlug": "smartphone",
-      "description": "An allrounder purformence smart phone for all day use",
+      "description": "OnePlus Nord CE5 5G in Marble Mist with 8GB RAM and 128GB storage. MediaTek Dimensity 8350 Apex, 6.77-inch 120Hz AMOLED display, 7100mAh battery, 80W charging and 50MP Sony main camera with OIS. This is the 128GB variant.",
       "imageUrl": "https://www.oodlesnet.com/products/oneplus_nord_ce5_thumb.jpg",
-      "searchKey": "phone mobile smartphone 5g android midrange",
+      "searchKey": "OnePlus Nord CE5 5G Marble Mist 8GB 128GB",
       "store": [
         {
-          "price": 28999,
-          "url": "https://www.amazon.in/OnePlus-Nord-CE5-Marble-Mist/dp/B0FCMKSH2M?utm_source=chatgpt.com",
-          "name": "Amazon",
-          "offer": "Extended warranty period"
+          "name": "Flipkart",
+          "price": 24994,
+          "offer": "Marble Mist 8GB/128GB listing; verify seller, availability and checkout price",
+          "url": "https://www.flipkart.com/oneplus-nord-ce5-5g-marble-mist-128-gb/p/itm9259708fe4e3c"
         },
         {
-          "name": "Flipkart",
-          "offer": "Click on buy to see offer",
-          "price": 24994,
-          "url": "https://www.flipkart.com/oneplus-nord-ce5-5g-marble-mist-128-gb/p/itm9259708fe4e3c"
+          "name": "Amazon",
+          "price": 24999,
+          "offer": "Current Amazon destination identifies 256GB, not this 128GB variant. Search for exact 8GB/128GB variant before purchase",
+          "url": "https://www.amazon.in/s?k=OnePlus+Nord+CE5+Marble+Mist+8GB+128GB"
         }
       ]
     }
