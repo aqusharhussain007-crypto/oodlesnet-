@@ -1187,24 +1187,24 @@
   {
     "id": "WjHN0QH0Sd8Nip6ISYrP",
     "data": {
-      "name": "L’Oréal Paris Revitalift Hyaluronic Acid Serum",
+      "name": "L'Oréal Paris Revitalift 1.5% Hyaluronic Acid Serum (30ml)",
       "brand": "L’Oréal Paris",
       "categorySlug": "beauty",
-      "description": "Popular hydration serum; pack size may vary by seller.",
+      "description": "L'Oréal Paris Revitalift Filler serum with 1.5% pure hyaluronic acid, combining three types of hyaluronic acid for hydration and a plumping effect. Official product page offers 15ml and 30ml sizes; this record is standardized to 30ml. Nykaa displayed ₹749 (regular price ₹999) for the 30ml option when checked. Confirm size and current offer at checkout.",
       "imageUrl": "https://m.media-amazon.com/images/I/51dyKxcQAaL._AC_UF1000,1000_QL80_FMwebp_.jpg",
       "searchKey": "skincare hyaluronic acid serum anti aging face care beauty",
       "store": [
         {
-          "name": "Flipkart",
-          "offer": "Click on buy to see offer",
-          "price": 649,
-          "url": "https://www.flipkart.com/search?q=loreal+revitalift+serum"
+          "name": "Nykaa",
+          "offer": "30ml listed at ₹749 (regular ₹999) when checked",
+          "price": 749,
+          "url": "https://www.nykaa.com/l-oreal-paris-revitalift-1-5-hyaluronic-acid-serum/p/1112060"
         },
         {
-          "name": "Amazon",
-          "offer": "Click on buy to see offer",
-          "price": 589,
-          "url": "https://www.amazon.in/s?k=loreal+revitalift+hyaluronic+acid+serum"
+          "name": "L'Oréal Paris Official",
+          "offer": "Official product page; select 30ml size; live price varies",
+          "price": 999,
+          "url": "https://www.lorealparis.co.in/hyaluronic-acid/revitalift-1-5-percent-hyaluronic-acid-serum-30ml"
         }
       ]
     }
@@ -1212,22 +1212,28 @@
   {
     "id": "Y0J15uqcJe1c9gHpEMsI",
     "data": {
-      "name": "realme NARZO 90x 5G",
+      "name": "realme NARZO 90x 5G (Nitro Blue, 6GB RAM, 128GB Storage)",
       "brand": "Realme",
       "categorySlug": "smartphone",
-      "description": "realme NARZO 90x 5G (Nitro Blue,6GB+128GB) | 7000mAh + 60W Biggest Battery & Fastest Charging in The Segment* | 144Hz Bright Display | Sony 50MP AI Rear Camera | AI Assist | 400% Ultra Boom Speaker.\nBrandrealme\nOperating SystemAndroid 15\nRAM Memory Installed Size6 GB\nCPU Speed2.4 GHz\nMemory Storage Capacity128 GB\nScreen Size17.3 Centimetres\n7000mAh Titan Battery + 60W Fast Charge: Massive 7000mAh battery delivers all-day power even at 50% charge. Get 50% in just 35 minutes with 60W fast charging—no battery anxiety.\n6-Year Long-Lasting Battery Life: Stay connected even at 1% with hours of standby and call time. 6-Year Health Battery with anti-aging tech ensures long-term durability.\n144Hz 1200nit Ultra Bright Display: Enjoy ultra-smooth visuals on a 144Hz display with 1200nit brightness. Wet-Hand Touch and eye-care modes ensure comfort in every condition.\nSony 50MP AI Rear Camera: Capture sharp, detailed shots with the 50MP Sony AI main camera. Dual-View Video and AI selfies bring creativity to every moment.\nAI Edit Genie & Smart AI Modes: Edit photos instantly—just describe and let AI do the magic. Smarter outdoor performance with boosted smoothness, network, and brightness.\n400% Ultra Boom Speaker: Experience powerful 400% louder sound with clear, crisp output. Perfect for music, calls, and videos—even outdoors.\nIP65 Dust & Water Resistance: Built to handle splashes, dust, and daily challenges with ease. Reliable durability for rain, travel, and everyday adventures.",
+      "description": "Nitro Blue variant with 6GB RAM and 128GB storage. MediaTek Dimensity 6300 5G processor; 6.8-inch HD+ LCD display with 144Hz refresh rate and up to 1200 nits HBM brightness; 50MP Sony rear camera and 8MP front camera; 7000mAh battery with 60W SUPERVOOC charging; IP65 dust and water resistance; Android 15 with realme UI 6.0. Official realme product page supports Nitro Blue and 6GB+128GB configurations. Prices vary by colour and storage; verify the selected Nitro Blue 6GB/128GB option at checkout.",
       "imageUrl": "https://rukminim1.flixcart.com/image/720/720/xif0q/mobile/q/7/x/narzo-90x-5g-rmx5264-realme-original-imahj5zjyv2nmsd6.jpeg?q=90",
       "searchKey": "phone mobile smartphone 5g android budget",
       "store": [
         {
+          "name": "realme Official",
+          "offer": "Official product listing; price varies by selected colour and storage; verify Nitro Blue 6GB/128GB",
+          "price": 21499,
+          "url": "https://buy.realme.com/in/goods/805?from=storebanner"
+        },
+        {
           "name": "Amazon",
-          "offer": "Click on buy to see offer",
+          "offer": "Existing price is unverified; confirm Nitro Blue 6GB/128GB and live stock",
           "price": 13999,
           "url": "https://www.amazon.in/realme-7000mAh-Biggest-Battery-Charging/dp/B0G4BLW168"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
+          "offer": "Existing price is unverified; confirm Nitro Blue 6GB/128GB and live stock",
           "price": 13540,
           "url": "https://www.flipkart.com/realme-narzo-90x-5g-nitro-blue-128-gb/p/itma63c5c5ce781a"
         }
@@ -1237,10 +1243,10 @@
   {
     "id": "Yron4Ff8g5ouXKDJXXFq",
     "data": {
-      "name": "Prestige PKGB 1.8 Litre Electric Glass Kettle| Automatic Power cut off",
+      "name": "Prestige PKGB 1.8L Borosilicate Glass Electric Kettle",
       "brand": "Prestige",
       "categorySlug": "appliances",
-      "description": "Prestige PKGB 1.8 Litre Electric Glass Kettle – Description\n\nPrestige PKGB 1.8 Litre Electric Glass Kettle offers fast and safe boiling with a stylish transparent glass body and LED power indicator. Ideal for tea, coffee, instant noodles, and quick hot water needs, it features an automatic shut-off and boil-dry protection for worry-free daily use. A practical choice for homes, offices, and hostels.",
+      "description": "Prestige PKGB 1.8L electric kettle with borosilicate glass body, blue LED power indicator, automatic power cut-off, dry-heat protection, concealed heating element, 360-degree swivel base and cool-touch handle. Rated power 1350W; 1-year warranty. Official TTK Prestige listing displayed a selling price from ₹1,395 (MRP ₹1,860) when checked. Flipkart exact model listing displayed ₹1,799. Prices and stock can change.",
       "imageUrl": "https://m.media-amazon.com/images/I/71WAliPMXqL._AC_SL1500_.jpg",
       "tags": [
         "kitchen-appliances",
@@ -1251,22 +1257,22 @@
       "searchKey": "electric glass kettle kitchen appliance water heater tea coffee home use",
       "store": [
         {
-          "name": "Amazon",
-          "offer": "Click on buy to see offer",
+          "name": "Prestige Official",
+          "offer": "₹1,395 displayed (MRP ₹1,860) when checked",
           "price": 1395,
-          "url": "https://www.amazon.in/Prestige-PKGB-1-8-Indicator-Borosilicate/dp/B0DP7PBY17"
+          "url": "https://shop.ttkprestige.com/prestige-pkgb-1-8-glass-electric-kettle-1-8-l-copper-transparent.html"
         },
         {
           "name": "Flipkart",
-          "offer": "Click on buy to see offer",
-          "price": 1763,
+          "offer": "Exact PKGB 1.8L listing displayed ₹1,799 when checked",
+          "price": 1799,
           "url": "https://www.flipkart.com/prestige-pkgb-1-8l-borosilicate-glass-automatic-power-cut-off-concealed-element-electric-kettle/p/itm81f41b703be6f"
         },
         {
-          "name": "Myntra",
-          "offer": "Click on buy to see offer",
-          "price": 1400,
-          "url": "https://www.myntra.com/electric-kettle/prestige/-prestige-electric-kettle-18-l-/31776518/buy"
+          "name": "Amazon",
+          "offer": "Existing price not refreshed; confirm exact PKGB 1.8L model and current stock",
+          "price": 1395,
+          "url": "https://www.amazon.in/Prestige-PKGB-1-8-Indicator-Borosilicate/dp/B0DP7PBY17"
         }
       ]
     }
