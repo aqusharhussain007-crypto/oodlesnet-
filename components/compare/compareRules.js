@@ -3,6 +3,7 @@ import {
   getStoreCount,
   hasOffers,
 } from "./compareUtils";
+import { getComparisonSpecRows, getProductVariant } from "./compareSpecTemplates";
 
 const TYPE_KEYWORDS = {
   earbuds: ["earbuds", "ear bud", "tws", "in-ear", "in ear"],
@@ -126,5 +127,10 @@ export function compareProducts(a, b) {
     winner,
     priceComparison: { A: priceA, B: priceB },
     retailerCoverage: { A: getStoreCount(a), B: getStoreCount(b) },
+    specifications: {
+      A: getComparisonSpecRows(a, compatibility.type),
+      B: getComparisonSpecRows(b, compatibility.type),
+    },
+    variants: { A: getProductVariant(a), B: getProductVariant(b) },
   };
 }
