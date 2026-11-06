@@ -129,14 +129,19 @@ async function handleBatchUpdate(body, db, uid) {
       if (!snap.exists) return response({ ok: false, error: "Product not found: " + item.id + ". No products were changed." }, 404);
       const existing = snap.data();
       const protectedFields = ["impressions", "views", "source", "createdAt"];
+      const deleteFields = item.deleteFields === undefined ? [] : item.deleteFields;
+      if (!Array.isArray(deleteFields) || deleteFields.some(key => key !== "barnd")) {
+        return response({ ok: false, error: "Only the approved legacy field barnd may be deleted." }, 400);
+      }
       const updateData = Object.fromEntries(Object.entries(item.data).filter(([key]) => !protectedFields.includes(key)));
-      if (!Object.keys(updateData).length) return response({ ok: false, error: "No editable fields in product " + item.id + "." }, 400);
+      if (!Object.keys(updateData).length && !deleteFields.length) return response({ ok: false, error: "No editable fields in product " + item.id + "." }, 400);
       const merged = { ...existing, ...updateData };
+      for (const key of deleteFields) delete merged[key];
       const validationError = validateProduct(merged);
       if (validationError) return response({ ok: false, error: "Product " + item.id + ": " + validationError }, 400);
       checked.push({
-        id: item.id, ref: item.ref, existing, updateData,
-        changedFields: [...Object.keys(updateData), ...(Object.prototype.hasOwnProperty.call(existing, "categorySlug ") ? ["categorySlug (legacy field removal)"] : [])]
+        id: item.id, ref: item.ref, existing, updateData, deleteFields,
+        changedFields: [...Object.keys(updateData), ...deleteFields.map(key => key + " (legacy field removal)"), ...(Object.prototype.hasOwnProperty.call(existing, "categorySlug ") ? ["categorySlug (legacy field removal)"] : [])]
       });
     }
 
@@ -170,6 +175,7 @@ async function handleBatchUpdate(body, db, uid) {
         });
         transaction.update(item.ref, {
           ...item.updateData,
+          ...Object.fromEntries(item.deleteFields.map(key => [key, FieldValue.delete()])),
           ...(Object.prototype.hasOwnProperty.call(current, "categorySlug ") ? { "categorySlug ": FieldValue.delete() } : {}),
           ...(Object.prototype.hasOwnProperty.call(current, "impression") && !Object.prototype.hasOwnProperty.call(current, "impressions") ? { impressions: Number(current.impression) || 0, impression: FieldValue.delete() } : {}),
           updatedAt: new Date()
