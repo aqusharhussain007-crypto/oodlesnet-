@@ -63,17 +63,6 @@ export default function CompareResult({
   const variantA = Array.isArray(variants.A) ? variants.A : [];
   const variantB = Array.isArray(variants.B) ? variants.B : [];
 
-  const variantRows = [
-    ...new Map(
-      [...variantA, ...variantB]
-        .filter((item) => item && typeof item.key === "string" && item.key.trim())
-        .map((item) => [
-          item.key,
-          { key: item.key, label: item.label || item.key },
-        ])
-    ).values(),
-  ];
-
   const specRows = [
     ...new Map(
       [...rowsA, ...rowsB]
@@ -85,10 +74,25 @@ export default function CompareResult({
     ).values(),
   ];
 
-  const variantValue = (items, key) =>
-    items.find((item) => item && item.key === key)?.value ?? null;
-  const specValue = (items, key) =>
-    items.find((item) => item && item.key === key)?.value ?? null;
+  const variantRows = [
+    ...new Map(
+      [...variantA, ...variantB]
+        .filter((item) => item && typeof item.key === "string" && item.key.trim())
+        .filter((item) => !specRows.some((field) => field.key === item.key))
+        .map((item) => [
+          item.key,
+          { key: item.key, label: item.label || item.key },
+        ])
+    ).values(),
+  ];
+
+  const valueFor = (specItems, variantItems, key) => {
+    const specValue = specItems.find((item) => item && item.key === key)?.value;
+    if (specValue !== undefined && specValue !== null && specValue !== "") {
+      return specValue;
+    }
+    return variantItems.find((item) => item && item.key === key)?.value ?? null;
+  };
   const retailerA = safeCount(result.retailerCoverage?.A);
   const retailerB = safeCount(result.retailerCoverage?.B);
 
@@ -196,10 +200,10 @@ export default function CompareResult({
                   {field.label} (variant)
                 </th>
                 <td style={{ padding: 10, borderBottom: "1px solid #e5e7eb" }}>
-                  {safeDisplayValue(variantValue(variantA, field.key))}
+                  {safeDisplayValue(valueFor(rowsA, variantA, field.key))}
                 </td>
                 <td style={{ padding: 10, borderBottom: "1px solid #e5e7eb" }}>
-                  {safeDisplayValue(variantValue(variantB, field.key))}
+                  {safeDisplayValue(valueFor(rowsB, variantB, field.key))}
                 </td>
               </tr>
             ))}
@@ -209,10 +213,10 @@ export default function CompareResult({
                   {field.label}
                 </th>
                 <td style={{ padding: 10, borderBottom: "1px solid #e5e7eb" }}>
-                  {safeDisplayValue(specValue(rowsA, field.key))}
+                  {safeDisplayValue(valueFor(rowsA, variantA, field.key))}
                 </td>
                 <td style={{ padding: 10, borderBottom: "1px solid #e5e7eb" }}>
-                  {safeDisplayValue(specValue(rowsB, field.key))}
+                  {safeDisplayValue(valueFor(rowsB, variantB, field.key))}
                 </td>
               </tr>
             ))}
