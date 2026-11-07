@@ -23,6 +23,12 @@ const TYPE_KEYWORDS = {
   cleanser: ["cleanser", "face wash"],
 };
 
+const TYPE_ALIASES = {
+  smartphones: "smartphone",
+  power_banks: "power_bank",
+  bluetooth_speakers: "bluetooth_speaker",
+};
+
 function normalizeCategory(value) {
   return String(value || "")
     .trim()
@@ -32,11 +38,21 @@ function normalizeCategory(value) {
     .replace(/-+/g, "-");
 }
 
+function normalizeType(value) {
+  const normalized = normalizeCategory(value).replace(/-/g, "_");
+  return TYPE_ALIASES[normalized] || normalized;
+}
+
 function inferType(product) {
   const explicit = product?.productType || product?.type || product?.subcategory;
-  if (explicit) return normalizeCategory(explicit).replace(/-/g, "_");
+  if (explicit) return normalizeType(explicit);
 
-  const text = [product?.name, product?.searchKey, product?.brand, ...(Array.isArray(product?.tags) ? product.tags : [])]
+  const text = [
+    product?.name,
+    product?.searchKey,
+    product?.brand,
+    ...(Array.isArray(product?.tags) ? product.tags : []),
+  ]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
@@ -45,10 +61,9 @@ function inferType(product) {
     if (keywords.some((keyword) => text.includes(keyword))) return type;
   }
 
-  // A granular category slug can serve as a safe fallback type.
   const category = normalizeCategory(product?.categorySlug);
   if (["power-banks", "bluetooth-speakers"].includes(category)) {
-    return category.replace(/-/g, "_").replace(/s$/, "");
+    return normalizeType(category);
   }
 
   return "unknown";
@@ -62,7 +77,6 @@ export function canCompare(a, b) {
   const categoryA = normalizeCategory(a.categorySlug);
   const categoryB = normalizeCategory(b.categorySlug);
 
-  // Preserve known legacy category aliases without accepting unrelated categories.
   const categoryAliases = {
     smartphone: "smartphones",
     smartphones: "smartphones",
@@ -77,13 +91,16 @@ export function canCompare(a, b) {
   const typeA = inferType(a);
   const typeB = inferType(b);
 
-  // If both types are known they must match. Unknown types remain selectable
-  // within the same category until structured category specifications exist.
-  if (typeA !== "unknown" && typeB !== "unknown" && typeA !== typeB) {
+  // Do not compare products unless both can be assigned a supported type.
+  if (typeA === "unknown" || typeB === "unknown") {
+    return { allowed: false, error: "UNSUPPORTED_TYPE" };
+  }
+
+  if (typeA !== typeB) {
     return { allowed: false, error: "TYPE_MISMATCH" };
   }
 
-  return { allowed: true, type: typeA === "unknown" ? typeB : typeA };
+  return { allowed: true, type: typeA };
 }
 
 export function compareProducts(a, b) {
@@ -93,7 +110,6 @@ export function compareProducts(a, b) {
   const scoreA = {};
   const scoreB = {};
 
-  // Price: a lower valid listed price earns up to two points.
   const priceA = getLowestPrice(a);
   const priceB = getLowestPrice(b);
 
@@ -106,9 +122,7 @@ export function compareProducts(a, b) {
     }
   }
 
-  // Retailer count is displayed as coverage, not treated as product quality.
-  // The old availability point unfairly rewarded products with more listings.
-
+  // Retailer count is coverage information, not a product-quality score.
   if (hasOffers(a) !== hasOffers(b)) {
     hasOffers(a) ? (scoreA.offers = 1) : (scoreB.offers = 1);
   }
