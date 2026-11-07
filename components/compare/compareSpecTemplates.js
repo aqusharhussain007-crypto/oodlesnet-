@@ -153,13 +153,14 @@ function hasValue(value) {
   if (value === undefined || value === null) return false;
   if (typeof value === "string") return value.trim() !== "";
   if (Array.isArray(value)) return value.some(hasValue);
+  if (typeof value === "object") return Object.keys(value).length > 0;
   return true;
 }
 
 function displayableValue(value) {
   if (!hasValue(value)) return null;
   if (Array.isArray(value)) {
-    const items = value.map(displayableValue).filter(Boolean);
+    const items = value.map(displayableValue).filter((item) => item !== null);
     return items.length ? items.join(", ") : null;
   }
   if (value && typeof value === "object") {
