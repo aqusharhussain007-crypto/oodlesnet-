@@ -76,7 +76,6 @@ export default function CompareTestPage() {
   const [productBId, setProductBId] = useState(DEMO_PRODUCTS[1].id);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
-  const [selectorProduct, setSelectorProduct] = useState(null);
 
   const productA = useMemo(
     () => DEMO_PRODUCTS.find((product) => product.id === productAId),
@@ -136,33 +135,19 @@ export default function CompareTestPage() {
           {DEMO_PRODUCTS.map((product) => <option key={product.id} value={product.id}>{product.name}</option>)}
         </select>
 
-        <label htmlFor="demo-product-b" style={{ display: "block", fontWeight: 800, marginBottom: 7 }}>Product B</label>
-        <select id="demo-product-b" value={productBId} onChange={(event) => changeProductB(event.target.value)} style={{ width: "100%", padding: 12, borderRadius: 10, border: "1px solid #94a3b8", background: "#fff" }}>
-          {DEMO_PRODUCTS.map((product) => <option key={product.id} value={product.id}>{product.name}</option>)}
-        </select>
+        <div style={{ marginTop: 16 }}>
+          <CompareSelector
+            currentProduct={productA}
+            selectedId={productBId}
+            onSelect={(product) => changeProductB(product?.id || "")}
+            demoProducts={DEMO_PRODUCTS}
+          />
+        </div>
 
         <button type="button" onClick={runComparison} style={{ width: "100%", marginTop: 16, padding: 14, border: 0, borderRadius: 12, color: "#fff", fontWeight: 900, fontSize: 16, background: "linear-gradient(135deg,#0f4c81,#10b981)" }}>
           Compare products
         </button>
         {error && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{error}</p>}
-      </section>
-
-      <section style={{ marginTop: 20, padding: 18, border: "1px solid #99f6e4", borderRadius: 18, background: "#f8fffd" }}>
-        <h2 style={{ margin: "0 0 8px", fontSize: 20, fontWeight: 900 }}>Actual product selector test</h2>
-        <p style={{ margin: "0 0 14px", color: "#64748b", fontSize: 13, lineHeight: 1.5 }}>
-          This uses the real CompareSelector component with synthetic demo data. Firestore is bypassed; no database reads or writes occur.
-        </p>
-        <CompareSelector
-          currentProduct={DEMO_PRODUCTS[0]}
-          selectedId={selectorProduct?.id || ""}
-          onSelect={setSelectorProduct}
-          demoProducts={DEMO_PRODUCTS}
-        />
-        {selectorProduct && (
-          <p style={{ margin: "10px 0 0", color: "#047857", fontWeight: 700 }}>
-            Selected: {selectorProduct.name}
-          </p>
-        )}
       </section>
 
       {result && <CompareResult result={result} productA={productA} productB={productB} onReset={() => setResult(null)} />}
