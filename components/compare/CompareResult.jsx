@@ -39,8 +39,9 @@ const rowHeadingStyle = {
   position: "sticky",
   left: 0,
   zIndex: 1,
-  minWidth: 132,
-  width: "30%",
+  minWidth: 120,
+  width: 120,
+  maxWidth: 120,
   textAlign: "left",
   padding: 12,
   borderBottom: "1px solid #e5e7eb",
@@ -206,21 +207,22 @@ export default function CompareResult({
       <div style={{ overflowX: "auto", width: "100%", borderRadius: 10, overscrollBehaviorX: "contain" }}>
         <table
           style={{
-            width: "100%",
-            minWidth: 560,
+            width: 540,
+            minWidth: 540,
+            tableLayout: "fixed",
             borderCollapse: "collapse",
             fontSize: 13,
           }}
         >
           <thead>
             <tr>
-              <th scope="col" style={{ position: "sticky", left: 0, zIndex: 3, minWidth: 132, width: "30%", textAlign: "left", padding: 12, background: "#eaf0f7", boxShadow: "2px 0 4px rgba(15, 23, 42, 0.06)" }}>
+              <th scope="col" style={{ position: "sticky", left: 0, zIndex: 3, minWidth: 120, width: 120, maxWidth: 120, textAlign: "left", padding: 12, background: "#eaf0f7", boxShadow: "2px 0 4px rgba(15, 23, 42, 0.06)" }}>
                 Specification
               </th>
-              <th scope="col" style={{ textAlign: "left", padding: 12, minWidth: 190, background: "#f1f5f9" }}>
+              <th scope="col" style={{ textAlign: "left", padding: 12, width: 210, minWidth: 210, background: "#f1f5f9" }}>
                 {productAName}
               </th>
-              <th scope="col" style={{ textAlign: "left", padding: 10, background: "#f1f5f9" }}>
+              <th scope="col" style={{ textAlign: "left", padding: 12, width: 210, minWidth: 210, background: "#f1f5f9" }}>
                 {productBName}
               </th>
             </tr>
