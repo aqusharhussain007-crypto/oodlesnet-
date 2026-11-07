@@ -58,6 +58,16 @@ const DEMO_PRODUCTS = [
     store: [{ name: "Demo Store", price: null }],
     specs: { display: "6.4-inch LCD (demo)", ram: "6 GB", storage: "128 GB" },
   },
+  {
+    id: "demo-tablet-d",
+    name: "Demo Tablet D",
+    brand: "Demo",
+    categorySlug: "tablets",
+    productType: "tablet",
+    description: "Synthetic incompatible-category sample for testing comparison safeguards.",
+    store: [{ name: "Demo Store", price: 9999, offer: "", url: "#" }],
+    specs: { display: "10-inch LCD (demo)", storage: "64 GB" },
+  },
 ];
 
 export default function CompareTestPage() {
