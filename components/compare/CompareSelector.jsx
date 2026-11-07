@@ -13,6 +13,7 @@ export default function CompareSelector({
   currentProduct,
   selectedId,
   onSelect,
+  demoProducts,
 }) {
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(Boolean(currentProduct?.id));
@@ -35,6 +36,19 @@ export default function CompareSelector({
       setLoadError(false);
 
       try {
+        if (Array.isArray(demoProducts)) {
+          const compatible = demoProducts
+            .filter((product) => product && product.id !== currentProduct.id)
+            .filter((product) => canCompare(currentProduct, product).allowed)
+            .sort((a, b) =>
+              String(a.name || "").localeCompare(String(b.name || ""))
+            );
+
+          setOptions(compatible);
+          setLoading(false);
+          return;
+        }
+
         const productsRef = collection(db, "products");
         const normalizedCategory = String(categorySlug).trim().toLowerCase();
         const productsQuery =
@@ -73,7 +87,7 @@ export default function CompareSelector({
     return () => {
       active = false;
     };
-  }, [currentProduct?.id, currentProduct?.categorySlug, retryCount]);
+  }, [currentProduct?.id, currentProduct?.categorySlug, retryCount, demoProducts]);
 
   function handleChange(event) {
     const nextId = event.target.value;
