@@ -94,7 +94,12 @@ export default function CompareTestPage() {
     const comparison = compareProducts(productA, productB);
     if (comparison.error) {
       setResult(null);
-      setError(comparison.error);
+      const messages = {
+        CATEGORY_MISMATCH: "These products belong to different categories. Choose two products from the same category.",
+        UNSUPPORTED_TYPE: "This product category is not supported for comparison yet.",
+        INVALID_PRODUCT: "One of the selected products is incomplete or invalid.",
+      };
+      setError(messages[comparison.error] || "We couldn't compare these products. Please check your selections.");
       return;
     }
     setError("");
