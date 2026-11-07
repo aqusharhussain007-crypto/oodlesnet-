@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 import { canCompare } from "./compareRules";
 
 /**
- * Loads compatible products and returns the complete selected product object.
- * The parent can therefore compare real product data rather than an ID string.
+ * Loads products from the current product category only, then applies the
+ * same compatibility rules used by the comparison engine.
  */
 export default function CompareSelector({
   currentProduct,
@@ -15,16 +15,19 @@ export default function CompareSelector({
   onSelect,
 }) {
   const [options, setOptions] = useState([]);
-  const [loading, setLoading] = useState(Boolean(currentProduct));
+  const [loading, setLoading] = useState(Boolean(currentProduct?.id));
   const [loadError, setLoadError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     let active = true;
 
     async function loadOptions() {
-      if (!currentProduct?.id) {
+      const categorySlug = currentProduct?.categorySlug;
+      if (!currentProduct?.id || !categorySlug) {
         setOptions([]);
         setLoading(false);
+        setLoadError(false);
         return;
       }
 
@@ -32,14 +35,27 @@ export default function CompareSelector({
       setLoadError(false);
 
       try {
-        const snapshot = await getDocs(collection(db, "products"));
+        const productsRef = collection(db, "products");
+        const normalizedCategory = String(categorySlug).trim().toLowerCase();
+        const productsQuery =
+          normalizedCategory === "smartphone" ||
+          normalizedCategory === "smartphones"
+            ? query(
+                productsRef,
+                where("categorySlug", "in", ["smartphone", "smartphones"])
+              )
+            : query(productsRef, where("categorySlug", "==", categorySlug));
+
+        const snapshot = await getDocs(productsQuery);
         if (!active) return;
 
         const compatible = snapshot.docs
           .map((document) => ({ id: document.id, ...document.data() }))
           .filter((product) => product.id !== currentProduct.id)
           .filter((product) => canCompare(currentProduct, product).allowed)
-          .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
+          .sort((a, b) =>
+            String(a.name || "").localeCompare(String(b.name || ""))
+          );
 
         setOptions(compatible);
       } catch (error) {
@@ -57,11 +73,11 @@ export default function CompareSelector({
     return () => {
       active = false;
     };
-  }, [currentProduct?.id]);
+  }, [currentProduct?.id, currentProduct?.categorySlug, retryCount]);
 
   function handleChange(event) {
     const nextId = event.target.value;
-    onSelect(options.find((product) => product.id === nextId) || null);
+    onSelect?.(options.find((product) => product.id === nextId) || null);
   }
 
   return (
@@ -88,7 +104,7 @@ export default function CompareSelector({
           {loading
             ? "Loading comparable products..."
             : loadError
-            ? "Could not load products. Please try again."
+            ? "Could not load products. Please retry."
             : options.length === 0
             ? "No compatible products available"
             : "Select a product to compare"}
@@ -100,10 +116,29 @@ export default function CompareSelector({
           </option>
         ))}
       </select>
+
       {loadError && (
-        <p role="status" style={{ color: "#b91c1c", marginTop: 8, fontSize: 13 }}>
-          Product options could not be loaded. Refresh the page to try again.
-        </p>
+        <div role="status" style={{ marginTop: 8 }}>
+          <p style={{ color: "#b91c1c", fontSize: 13 }}>
+            Product options could not be loaded.
+          </p>
+          <button
+            type="button"
+            onClick={() => setRetryCount((count) => count + 1)}
+            disabled={loading}
+            style={{
+              marginTop: 6,
+              padding: "8px 12px",
+              borderRadius: 10,
+              border: "1px solid #10b981",
+              background: "#ecfdf5",
+              color: "#065f46",
+              fontWeight: 700,
+            }}
+          >
+            Retry loading products
+          </button>
+        </div>
       )}
     </div>
   );
