@@ -107,6 +107,43 @@ const POWER_BANK_DEMOS = [
   },
 ];
 
+const BLUETOOTH_SPEAKER_DEMOS = [
+  {
+    id: "demo-speaker-a",
+    name: "Demo Bluetooth Speaker A",
+    brand: "Demo",
+    categorySlug: "bluetooth-speakers",
+    productType: "bluetooth_speaker",
+    description: "Synthetic Bluetooth speaker for category-template testing.",
+    store: [{ name: "Demo Store", price: 2499, offer: "Sample offer", url: "#" }],
+    specs: {
+      outputPower: "20 W",
+      channels: "2.0 stereo",
+      batteryLife: "12 hours",
+      connectivity: "Bluetooth 5.3, AUX, USB-C",
+      waterResistance: "IPX7",
+      dimensions: "180 × 75 × 75 mm",
+      weight: "650 g",
+    },
+  },
+  {
+    id: "demo-speaker-b",
+    name: "Demo Bluetooth Speaker B",
+    brand: "Demo",
+    categorySlug: "bluetooth-speakers",
+    productType: "bluetooth_speaker",
+    description: "Synthetic speaker with intentionally incomplete specifications.",
+    store: [{ name: "Demo Store", price: 1999, offer: "", url: "#" }],
+    specs: {
+      outputPower: "12 W",
+      channels: "Mono",
+      batteryLife: "8 hours",
+      connectivity: "Bluetooth 5.0",
+      waterResistance: "Not specified",
+    },
+  },
+];
+
 export default function CompareTestPage() {
   const [productAId, setProductAId] = useState(DEMO_PRODUCTS[0].id);
   const [productBId, setProductBId] = useState(DEMO_PRODUCTS[1].id);
@@ -115,6 +152,9 @@ export default function CompareTestPage() {
   const [powerBankB, setPowerBankB] = useState(null);
   const [powerBankResult, setPowerBankResult] = useState(null);
   const [powerBankError, setPowerBankError] = useState("");
+  const [speakerB, setSpeakerB] = useState(null);
+  const [speakerResult, setSpeakerResult] = useState(null);
+  const [speakerError, setSpeakerError] = useState("");
 
   const productA = useMemo(
     () => DEMO_PRODUCTS.find((product) => product.id === productAId),
@@ -223,6 +263,50 @@ export default function CompareTestPage() {
         </button>
         {powerBankError && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{powerBankError}</p>}
       </section>
+
+      <section style={{ marginTop: 24, padding: 18, border: "1px solid #99f6e4", borderRadius: 18, background: "#f8fffd" }}>
+        <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 900 }}>Bluetooth speaker category test</h2>
+        <p style={{ margin: "0 0 14px", color: "#64748b", fontSize: 13, lineHeight: 1.5 }}>
+          Synthetic speaker data tests the category-specific specification template. No Firestore access or writes.
+        </p>
+        <CompareSelector
+          currentProduct={BLUETOOTH_SPEAKER_DEMOS[0]}
+          selectedId={speakerB?.id || ""}
+          onSelect={(product) => {
+            setSpeakerB(product);
+            setSpeakerResult(null);
+            setSpeakerError("");
+          }}
+          demoProducts={BLUETOOTH_SPEAKER_DEMOS}
+        />
+        <button
+          type="button"
+          disabled={!speakerB}
+          onClick={() => {
+            const comparison = compareProducts(BLUETOOTH_SPEAKER_DEMOS[0], speakerB);
+            if (comparison.error) {
+              setSpeakerResult(null);
+              setSpeakerError(comparison.error);
+            } else {
+              setSpeakerError("");
+              setSpeakerResult(comparison);
+            }
+          }}
+          style={{ width: "100%", marginTop: 14, padding: 14, border: 0, borderRadius: 12, color: "#fff", fontWeight: 900, fontSize: 16, background: "linear-gradient(135deg,#0f4c81,#10b981)", opacity: speakerB ? 1 : 0.55 }}
+        >
+          Compare speakers
+        </button>
+        {speakerError && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{speakerError}</p>}
+      </section>
+
+      {speakerResult && (
+        <CompareResult
+          result={speakerResult}
+          productA={BLUETOOTH_SPEAKER_DEMOS[0]}
+          productB={speakerB}
+          onReset={() => setSpeakerResult(null)}
+        />
+      )}
 
       {powerBankResult && (
         <CompareResult
