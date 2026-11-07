@@ -144,6 +144,41 @@ const BLUETOOTH_SPEAKER_DEMOS = [
   },
 ];
 
+
+const SMARTWATCH_DEMOS = [
+  {
+    id: "demo-watch-a",
+    name: "Demo Smartwatch A",
+    brand: "Demo",
+    categorySlug: "smartwatches",
+    productType: "smartwatch",
+    description: "Synthetic smartwatch for category-template testing.",
+    store: [{ name: "Demo Store", price: 2999, offer: "Sample offer", url: "#" }],
+    specs: {
+      display: "1.8-inch AMOLED (demo)",
+      healthSensors: "Heart rate, SpO2 (demo)",
+      gps: "Built-in GPS",
+      batteryLife: "7 days (demo)",
+      waterResistance: "5 ATM (demo)",
+      compatibility: "Android and iOS (demo)",
+    },
+  },
+  {
+    id: "demo-watch-b",
+    name: "Demo Smartwatch B",
+    brand: "Demo",
+    categorySlug: "smartwatches",
+    productType: "smartwatch",
+    description: "Synthetic smartwatch with intentionally incomplete specifications.",
+    store: [{ name: "Demo Store", price: 2499, offer: "", url: "#" }],
+    specs: {
+      display: "1.5-inch LCD (demo)",
+      healthSensors: "Heart rate (demo)",
+      batteryLife: "10 days (demo)",
+      compatibility: "Android only (demo)",
+    },
+  },
+];
 export default function CompareTestPage() {
   const [productAId, setProductAId] = useState(DEMO_PRODUCTS[0].id);
   const [productBId, setProductBId] = useState(DEMO_PRODUCTS[1].id);
@@ -155,6 +190,9 @@ export default function CompareTestPage() {
   const [speakerB, setSpeakerB] = useState(null);
   const [speakerResult, setSpeakerResult] = useState(null);
   const [speakerError, setSpeakerError] = useState("");
+  const [watchB, setWatchB] = useState(null);
+  const [watchResult, setWatchResult] = useState(null);
+  const [watchError, setWatchError] = useState("");
 
   const productA = useMemo(
     () => DEMO_PRODUCTS.find((product) => product.id === productAId),
@@ -299,12 +337,56 @@ export default function CompareTestPage() {
         {speakerError && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{speakerError}</p>}
       </section>
 
+      <section style={{ marginTop: 24, padding: 18, border: "1px solid #99f6e4", borderRadius: 18, background: "#f8fffd" }}>
+        <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 900 }}>Smartwatch category test</h2>
+        <p style={{ margin: "0 0 14px", color: "#64748b", fontSize: 13, lineHeight: 1.5 }}>
+          Synthetic smartwatch data tests display, health sensors, GPS, battery, water resistance and compatibility fields. No Firestore access or writes.
+        </p>
+        <CompareSelector
+          currentProduct={SMARTWATCH_DEMOS[0]}
+          selectedId={watchB?.id || ""}
+          onSelect={(product) => {
+            setWatchB(product);
+            setWatchResult(null);
+            setWatchError("");
+          }}
+          demoProducts={SMARTWATCH_DEMOS}
+        />
+        <button
+          type="button"
+          disabled={!watchB}
+          onClick={() => {
+            const comparison = compareProducts(SMARTWATCH_DEMOS[0], watchB);
+            if (comparison.error) {
+              setWatchResult(null);
+              setWatchError(comparison.error);
+            } else {
+              setWatchError("");
+              setWatchResult(comparison);
+            }
+          }}
+          style={{ width: "100%", marginTop: 14, padding: 14, border: 0, borderRadius: 12, color: "#fff", fontWeight: 900, fontSize: 16, background: "linear-gradient(135deg,#0f4c81,#10b981)", opacity: watchB ? 1 : 0.55 }}
+        >
+          Compare smartwatches
+        </button>
+        {watchError && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{watchError}</p>}
+      </section>
+
       {speakerResult && (
         <CompareResult
           result={speakerResult}
           productA={BLUETOOTH_SPEAKER_DEMOS[0]}
           productB={speakerB}
           onReset={() => setSpeakerResult(null)}
+        />
+      )}
+
+      {watchResult && (
+        <CompareResult
+          result={watchResult}
+          productA={SMARTWATCH_DEMOS[0]}
+          productB={watchB}
+          onReset={() => setWatchResult(null)}
         />
       )}
 
