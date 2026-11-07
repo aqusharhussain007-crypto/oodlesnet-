@@ -42,9 +42,24 @@ export function getLowestPrice(product) {
 }
 
 export function getStoreCount(product) {
-  const names = getValidStoreOffers(product).map((store) =>
-    store.name.trim().toLowerCase()
-  );
+  const stores = Array.isArray(product)
+    ? product
+    : Array.isArray(product?.store)
+    ? product.store
+    : [];
+
+  // Coverage counts named retailer entries even when their price is missing.
+  const names = stores
+    .filter(
+      (store) =>
+        store &&
+        typeof store === "object" &&
+        !Array.isArray(store) &&
+        typeof store.name === "string" &&
+        store.name.trim().length > 0
+    )
+    .map((store) => store.name.trim().toLowerCase());
+
   return new Set(names).size;
 }
 
