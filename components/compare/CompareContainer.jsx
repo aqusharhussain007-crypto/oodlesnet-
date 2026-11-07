@@ -1,9 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { compareProducts } from "./compareRules";
 import CompareSelector from "./CompareSelector";
 import CompareResult from "./CompareResult";
+
+const ERROR_MESSAGES = {
+  CATEGORY_MISMATCH: "These products belong to different categories and cannot be compared.",
+  TYPE_MISMATCH: "These products are not the same product type and cannot be compared.",
+  UNSUPPORTED_TYPE: "The product type is not identified well enough for a reliable comparison.",
+  INVALID_PRODUCT: "One of the selected products is missing required information. Please select again.",
+  COMPARISON_FAILED: "The comparison could not be completed. Please select the products again.",
+};
 
 export default function CompareContainer({ currentProduct }) {
   const [productB, setProductB] = useState(null);
@@ -11,7 +19,16 @@ export default function CompareContainer({ currentProduct }) {
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(true);
 
+  useEffect(() => {
+    setProductB(null);
+    setResult(null);
+    setError(null);
+    setOpen(true);
+  }, [currentProduct?.id]);
+
   if (!currentProduct?.id) return null;
+
+  const currentProductName = currentProduct.name || "Selected product";
 
   function handleSelect(product) {
     setProductB(product);
@@ -22,15 +39,21 @@ export default function CompareContainer({ currentProduct }) {
   function handleCompare() {
     if (!productB) return;
 
-    const comparison = compareProducts(currentProduct, productB);
-    if (comparison.error) {
-      setError(comparison.error);
-      setResult(null);
-      return;
-    }
+    try {
+      const comparison = compareProducts(currentProduct, productB);
+      if (comparison.error) {
+        setError(comparison.error);
+        setResult(null);
+        return;
+      }
 
-    setError(null);
-    setResult(comparison);
+      setError(null);
+      setResult(comparison);
+    } catch (comparisonError) {
+      console.error("Product comparison failed:", comparisonError);
+      setError("COMPARISON_FAILED");
+      setResult(null);
+    }
   }
 
   function reset() {
@@ -94,8 +117,16 @@ export default function CompareContainer({ currentProduct }) {
         ✕
       </button>
 
-      <h3 style={{ fontSize: 18, fontWeight: 900, color: "#0f766e", marginBottom: 12, paddingRight: 36 }}>
-        Compare <strong>{currentProduct.name}</strong> with
+      <h3
+        style={{
+          fontSize: 18,
+          fontWeight: 900,
+          color: "#0f766e",
+          marginBottom: 12,
+          paddingRight: 36,
+        }}
+      >
+        Compare <strong>{currentProductName}</strong> with
       </h3>
 
       <CompareSelector
@@ -117,23 +148,28 @@ export default function CompareContainer({ currentProduct }) {
           fontWeight: 900,
           fontSize: 15,
           color: "#fff",
-          background: productB ? "linear-gradient(135deg,#0f4c81,#10b981)" : "#9ca3af",
-          boxShadow: productB ? "0 8px 18px rgba(16,185,129,0.45)" : "none",
+          background: productB
+            ? "linear-gradient(135deg,#0f4c81,#10b981)"
+            : "#9ca3af",
+          boxShadow: productB
+            ? "0 8px 18px rgba(16,185,129,0.45)"
+            : "none",
           cursor: productB ? "pointer" : "not-allowed",
         }}
       >
         Compare now
       </button>
 
-      {error === "CATEGORY_MISMATCH" && (
-        <p role="alert" style={{ color: "#b45309", marginTop: 10, fontWeight: 700 }}>
-          These products belong to different categories and cannot be compared.
-        </p>
-      )}
-
-      {error === "TYPE_MISMATCH" && (
-        <p role="alert" style={{ color: "#b91c1c", marginTop: 10, fontWeight: 700 }}>
-          These products are not the same product type and cannot be compared.
+      {error && (
+        <p
+          role="alert"
+          style={{
+            color: error === "CATEGORY_MISMATCH" ? "#b45309" : "#b91c1c",
+            marginTop: 10,
+            fontWeight: 700,
+          }}
+        >
+          {ERROR_MESSAGES[error] || ERROR_MESSAGES.COMPARISON_FAILED}
         </p>
       )}
 
