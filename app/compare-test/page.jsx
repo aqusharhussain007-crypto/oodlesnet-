@@ -71,11 +71,50 @@ const DEMO_PRODUCTS = [
   },
 ];
 
+const POWER_BANK_DEMOS = [
+  {
+    id: "demo-powerbank-a",
+    name: "Demo Power Bank A",
+    brand: "Demo",
+    categorySlug: "power-banks",
+    productType: "power_bank",
+    description: "Synthetic power bank for category-template testing.",
+    store: [{ name: "Demo Store", price: 1299, offer: "Sample offer", url: "#" }],
+    specs: {
+      capacity: "20000 mAh",
+      outputPower: "22.5 W",
+      ports: "USB-A × 2, USB-C × 1",
+      input: "USB-C 18 W",
+      fastCharging: "Supported",
+      weight: "420 g",
+    },
+  },
+  {
+    id: "demo-powerbank-b",
+    name: "Demo Power Bank B",
+    brand: "Demo",
+    categorySlug: "power-banks",
+    productType: "power_bank",
+    description: "Synthetic power bank with intentionally incomplete specifications.",
+    store: [{ name: "Demo Store", price: 1599, offer: "", url: "#" }],
+    specs: {
+      capacity: "10000 mAh",
+      outputPower: "20 W",
+      ports: "USB-A × 1, USB-C × 1",
+      input: "USB-C",
+      fastCharging: "Not specified",
+    },
+  },
+];
+
 export default function CompareTestPage() {
   const [productAId, setProductAId] = useState(DEMO_PRODUCTS[0].id);
   const [productBId, setProductBId] = useState(DEMO_PRODUCTS[1].id);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+  const [powerBankB, setPowerBankB] = useState(null);
+  const [powerBankResult, setPowerBankResult] = useState(null);
+  const [powerBankError, setPowerBankError] = useState("");
 
   const productA = useMemo(
     () => DEMO_PRODUCTS.find((product) => product.id === productAId),
@@ -149,6 +188,50 @@ export default function CompareTestPage() {
         </button>
         {error && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{error}</p>}
       </section>
+
+      <section style={{ marginTop: 24, padding: 18, border: "1px solid #99f6e4", borderRadius: 18, background: "#f8fffd" }}>
+        <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 900 }}>Power bank category test</h2>
+        <p style={{ margin: "0 0 14px", color: "#64748b", fontSize: 13, lineHeight: 1.5 }}>
+          Synthetic power bank data tests the category-specific specification template. No Firestore access or writes.
+        </p>
+        <CompareSelector
+          currentProduct={POWER_BANK_DEMOS[0]}
+          selectedId={powerBankB?.id || ""}
+          onSelect={(product) => {
+            setPowerBankB(product);
+            setPowerBankResult(null);
+            setPowerBankError("");
+          }}
+          demoProducts={POWER_BANK_DEMOS}
+        />
+        <button
+          type="button"
+          disabled={!powerBankB}
+          onClick={() => {
+            const comparison = compareProducts(POWER_BANK_DEMOS[0], powerBankB);
+            if (comparison.error) {
+              setPowerBankResult(null);
+              setPowerBankError(comparison.error);
+            } else {
+              setPowerBankError("");
+              setPowerBankResult(comparison);
+            }
+          }}
+          style={{ width: "100%", marginTop: 14, padding: 14, border: 0, borderRadius: 12, color: "#fff", fontWeight: 900, fontSize: 16, background: "linear-gradient(135deg,#0f4c81,#10b981)", opacity: powerBankB ? 1 : 0.55 }}
+        >
+          Compare power banks
+        </button>
+        {powerBankError && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{powerBankError}</p>}
+      </section>
+
+      {powerBankResult && (
+        <CompareResult
+          result={powerBankResult}
+          productA={POWER_BANK_DEMOS[0]}
+          productB={powerBankB}
+          onReset={() => setPowerBankResult(null)}
+        />
+      )}
 
       {result && <CompareResult result={result} productA={productA} productB={productB} onReset={() => setResult(null)} />}
 
