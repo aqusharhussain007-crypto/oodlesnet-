@@ -80,15 +80,38 @@ export default function CompareSelector({
     onSelect?.(options.find((product) => product.id === nextId) || null);
   }
 
+  const statusMessage = loading
+    ? "Loading compatible products…"
+    : loadError
+    ? "Product options could not be loaded. Please retry."
+    : options.length === 0
+    ? "No other compatible products are currently available in this category."
+    : `${options.length} compatible product${options.length === 1 ? "" : "s"} available.`;
+
   return (
-    <div>
+    <div aria-busy={loading}>
+      <label
+        htmlFor="compare-product-selector"
+        style={{
+          display: "block",
+          marginBottom: 7,
+          color: "#164e63",
+          fontSize: 14,
+          fontWeight: 800,
+        }}
+      >
+        Choose a product
+      </label>
       <select
+        id="compare-product-selector"
         value={selectedId || ""}
         disabled={loading || options.length === 0}
         onChange={handleChange}
         aria-label="Choose a compatible product to compare"
+        aria-describedby="compare-selector-help"
         style={{
           width: "100%",
+          minHeight: 48,
           padding: "12px 14px",
           borderRadius: 14,
           border: "2px solid #10b981",
@@ -116,6 +139,21 @@ export default function CompareSelector({
           </option>
         ))}
       </select>
+
+      <p
+        id="compare-selector-help"
+        role="status"
+        aria-live="polite"
+        style={{
+          margin: "7px 2px 0",
+          minHeight: 18,
+          color: loadError ? "#b91c1c" : "#64748b",
+          fontSize: 12,
+          lineHeight: 1.5,
+        }}
+      >
+        {statusMessage}
+      </p>
 
       {loadError && (
         <div role="status" style={{ marginTop: 8 }}>
