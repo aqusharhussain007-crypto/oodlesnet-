@@ -1,39 +1,96 @@
+function safeDisplayValue(value) {
+  if (value === undefined || value === null) return "Not available";
+  if (typeof value === "string" && value.trim() === "") return "Not available";
+  if (Array.isArray(value)) {
+    const formatted = value.map(safeDisplayValue).filter((item) => item !== "Not available");
+    return formatted.length ? formatted.join(", ") : "Not available";
+  }
+  if (typeof value === "object") {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return "Not available";
+    }
+  }
+  return String(value);
+}
+
+function safeCount(value) {
+  return Number.isFinite(value) && value >= 0 ? value : 0;
+}
+
 export default function CompareResult({
   result,
   productA,
   productB,
   onReset,
 }) {
-  const { totals, winner, maxScore = 3, specifications = {}, variants = {} } = result;
+  if (
+    !result ||
+    !productA ||
+    !productB ||
+    !result.totals ||
+    typeof result.totals !== "object"
+  ) {
+    return (
+      <div role="alert" style={{ marginTop: 16, color: "#b91c1c" }}>
+        Comparison data is incomplete. Please select the products again.
+      </div>
+    );
+  }
 
-  const safeMaxScore =
-    Number.isFinite(maxScore) && maxScore > 0 ? maxScore : 3;
-  const percentA = Math.max(0, Math.min(100, (totals.A / safeMaxScore) * 100));
-  const percentB = Math.max(0, Math.min(100, (totals.B / safeMaxScore) * 100));
+  const totalA = safeCount(result.totals.A);
+  const totalB = safeCount(result.totals.B);
+  const maxScore =
+    Number.isFinite(result.maxScore) && result.maxScore > 0
+      ? result.maxScore
+      : 3;
+  const percentA = Math.max(0, Math.min(100, (totalA / maxScore) * 100));
+  const percentB = Math.max(0, Math.min(100, (totalB / maxScore) * 100));
+  const winner = ["A", "B"].includes(result.winner) ? result.winner : "tie";
+  const productAName = productA.name || "Product A";
+  const productBName = productB.name || "Product B";
+  const winnerProduct = winner === "A" ? productA : winner === "B" ? productB : null;
 
-  let winnerProduct = null;
-  if (winner === "A") winnerProduct = productA;
-  if (winner === "B") winnerProduct = productB;
-
+  const specifications =
+    result.specifications && typeof result.specifications === "object"
+      ? result.specifications
+      : {};
+  const variants =
+    result.variants && typeof result.variants === "object" ? result.variants : {};
   const rowsA = Array.isArray(specifications.A) ? specifications.A : [];
   const rowsB = Array.isArray(specifications.B) ? specifications.B : [];
-  const specRows = rowsA.length ? rowsA : rowsB;
   const variantA = Array.isArray(variants.A) ? variants.A : [];
   const variantB = Array.isArray(variants.B) ? variants.B : [];
+
   const variantRows = [
     ...new Map(
-      [...variantA, ...variantB].map((item) => [
-        item.key,
-        { key: item.key, label: item.label || item.key },
-      ])
+      [...variantA, ...variantB]
+        .filter((item) => item && typeof item.key === "string" && item.key.trim())
+        .map((item) => [
+          item.key,
+          { key: item.key, label: item.label || item.key },
+        ])
     ).values(),
   ];
+
+  const specRows = [
+    ...new Map(
+      [...rowsA, ...rowsB]
+        .filter((item) => item && typeof item.key === "string" && item.key.trim())
+        .map((item) => [
+          item.key,
+          { key: item.key, label: item.label || item.key },
+        ])
+    ).values(),
+  ];
+
   const variantValue = (items, key) =>
-    items.find((item) => item.key === key)?.value ?? null;
-  const displayValue = (value) =>
-    value === undefined || value === null || String(value).trim() === ""
-      ? "Not available"
-      : String(value);
+    items.find((item) => item && item.key === key)?.value ?? null;
+  const specValue = (items, key) =>
+    items.find((item) => item && item.key === key)?.value ?? null;
+  const retailerA = safeCount(result.retailerCoverage?.A);
+  const retailerB = safeCount(result.retailerCoverage?.B);
 
   return (
     <div
@@ -67,16 +124,43 @@ export default function CompareResult({
 
       <div style={{ marginTop: 14 }}>
         <div style={{ fontSize: 13, fontWeight: 700 }}>
-          {productA.name} — {totals.A}/{safeMaxScore}
+          {productAName} — {totalA}/{maxScore}
         </div>
-        <div style={{ height: 10, borderRadius: 999, background: "#e5e7eb", overflow: "hidden", marginBottom: 10 }}>
-          <div style={{ width: `${percentA}%`, height: "100%", background: "#2563eb" }} />
+        <div
+          style={{
+            height: 10,
+            borderRadius: 999,
+            background: "#e5e7eb",
+            overflow: "hidden",
+            marginBottom: 10,
+          }}
+        >
+          <div
+            style={{
+              width: `${percentA}%`,
+              height: "100%",
+              background: "#2563eb",
+            }}
+          />
         </div>
         <div style={{ fontSize: 13, fontWeight: 700 }}>
-          {productB.name} — {totals.B}/{safeMaxScore}
+          {productBName} — {totalB}/{maxScore}
         </div>
-        <div style={{ height: 10, borderRadius: 999, background: "#e5e7eb", overflow: "hidden" }}>
-          <div style={{ width: `${percentB}%`, height: "100%", background: "#16a34a" }} />
+        <div
+          style={{
+            height: 10,
+            borderRadius: 999,
+            background: "#e5e7eb",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              width: `${percentB}%`,
+              height: "100%",
+              background: "#16a34a",
+            }}
+          />
         </div>
       </div>
 
@@ -84,27 +168,52 @@ export default function CompareResult({
         Compare product specifications
       </h4>
       <div style={{ overflowX: "auto", width: "100%" }}>
-        <table style={{ width: "100%", minWidth: 420, borderCollapse: "collapse", fontSize: 13 }}>
+        <table
+          style={{
+            width: "100%",
+            minWidth: 420,
+            borderCollapse: "collapse",
+            fontSize: 13,
+          }}
+        >
           <thead>
             <tr>
-              <th scope="col" style={{ textAlign: "left", padding: 10, background: "#f1f5f9" }}>Specification</th>
-              <th scope="col" style={{ textAlign: "left", padding: 10, background: "#f1f5f9" }}>{productA.name}</th>
-              <th scope="col" style={{ textAlign: "left", padding: 10, background: "#f1f5f9" }}>{productB.name}</th>
+              <th scope="col" style={{ textAlign: "left", padding: 10, background: "#f1f5f9" }}>
+                Specification
+              </th>
+              <th scope="col" style={{ textAlign: "left", padding: 10, background: "#f1f5f9" }}>
+                {productAName}
+              </th>
+              <th scope="col" style={{ textAlign: "left", padding: 10, background: "#f1f5f9" }}>
+                {productBName}
+              </th>
             </tr>
           </thead>
           <tbody>
             {variantRows.map((field) => (
               <tr key={`variant-${field.key}`}>
-                <th scope="row" style={{ textAlign: "left", padding: 10, borderBottom: "1px solid #e5e7eb" }}>{field.label} (variant)</th>
-                <td style={{ padding: 10, borderBottom: "1px solid #e5e7eb" }}>{displayValue(variantValue(variantA, field.key))}</td>
-                <td style={{ padding: 10, borderBottom: "1px solid #e5e7eb" }}>{displayValue(variantValue(variantB, field.key))}</td>
+                <th scope="row" style={{ textAlign: "left", padding: 10, borderBottom: "1px solid #e5e7eb" }}>
+                  {field.label} (variant)
+                </th>
+                <td style={{ padding: 10, borderBottom: "1px solid #e5e7eb" }}>
+                  {safeDisplayValue(variantValue(variantA, field.key))}
+                </td>
+                <td style={{ padding: 10, borderBottom: "1px solid #e5e7eb" }}>
+                  {safeDisplayValue(variantValue(variantB, field.key))}
+                </td>
               </tr>
             ))}
-            {specRows.map((field, index) => (
-              <tr key={field.key || index}>
-                <th scope="row" style={{ textAlign: "left", padding: 10, borderBottom: "1px solid #e5e7eb" }}>{field.label}</th>
-                <td style={{ padding: 10, borderBottom: "1px solid #e5e7eb" }}>{displayValue(rowsA.find((item) => item.key === field.key)?.value)}</td>
-                <td style={{ padding: 10, borderBottom: "1px solid #e5e7eb" }}>{displayValue(rowsB.find((item) => item.key === field.key)?.value)}</td>
+            {specRows.map((field) => (
+              <tr key={`spec-${field.key}`}>
+                <th scope="row" style={{ textAlign: "left", padding: 10, borderBottom: "1px solid #e5e7eb" }}>
+                  {field.label}
+                </th>
+                <td style={{ padding: 10, borderBottom: "1px solid #e5e7eb" }}>
+                  {safeDisplayValue(specValue(rowsA, field.key))}
+                </td>
+                <td style={{ padding: 10, borderBottom: "1px solid #e5e7eb" }}>
+                  {safeDisplayValue(specValue(rowsB, field.key))}
+                </td>
               </tr>
             ))}
             {!variantRows.length && !specRows.length && (
@@ -126,14 +235,14 @@ export default function CompareResult({
         Retailer coverage
       </h4>
       <p style={{ fontSize: 13, color: "#475569" }}>
-        {productA.name}: {result.retailerCoverage?.A ?? 0} listed stores
+        {productAName}: {retailerA} listed stores
         {" · "}
-        {productB.name}: {result.retailerCoverage?.B ?? 0} listed stores
+        {productBName}: {retailerB} listed stores
       </p>
 
       <button
         type="button"
-        onClick={onReset}
+        onClick={() => onReset?.()}
         style={{
           marginTop: 16,
           padding: "10px 16px",
