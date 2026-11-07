@@ -143,8 +143,6 @@ export const COMPARISON_SPEC_TEMPLATES = {
 const VARIANT_FIELDS = [
   { key: "modelNumber", label: "Model number" },
   { key: "variant", label: "Variant" },
-  { key: "colour", label: "Colour" },
-  { key: "color", label: "Color" },
   { key: "ram", label: "RAM" },
   { key: "storage", label: "Storage" },
   { key: "capacity", label: "Capacity" },
@@ -152,29 +150,80 @@ const VARIANT_FIELDS = [
 ];
 
 function hasValue(value) {
-  return value !== undefined && value !== null && String(value).trim() !== "";
+  if (value === undefined || value === null) return false;
+  if (typeof value === "string") return value.trim() !== "";
+  if (Array.isArray(value)) return value.some(hasValue);
+  return true;
+}
+
+function displayableValue(value) {
+  if (!hasValue(value)) return null;
+  if (Array.isArray(value)) {
+    const items = value.map(displayableValue).filter(Boolean);
+    return items.length ? items.join(", ") : null;
+  }
+  if (value && typeof value === "object") {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return null;
+    }
+  }
+  return value;
+}
+
+function isPlainObject(value) {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
 }
 
 export function getComparisonSpecRows(product, productType) {
   const template = COMPARISON_SPEC_TEMPLATES[productType] || [];
-  const specs =
-    product?.specs && typeof product.specs === "object" ? product.specs : {};
+  const specs = isPlainObject(product?.specs) ? product.specs : {};
 
   return template.map((field) => ({
     ...field,
-    value: hasValue(specs[field.key]) ? specs[field.key] : null,
+    value: displayableValue(specs[field.key]),
   }));
 }
 
 export function getProductVariant(product) {
   const explicit = product?.variantDetails;
-  if (explicit && typeof explicit === "object") {
-    return Object.entries(explicit)
-      .filter(([, value]) => hasValue(value))
-      .map(([key, value]) => ({ key, value }));
+  if (isPlainObject(explicit)) {
+    const entries = Object.entries(explicit).filter(([, value]) => hasValue(value));
+    if (entries.length) {
+      const colourEntry =
+        entries.find(([key]) => key.toLowerCase() === "colour") ||
+        entries.find(([key]) => key.toLowerCase() === "color");
+      const otherEntries = entries.filter(
+        ([key]) => !["colour", "color"].includes(key.toLowerCase())
+      );
+      const normalized = [
+        ...otherEntries.map(([key, value]) => ({ key, label: key, value: displayableValue(value) })),
+        ...(colourEntry
+          ? [{ key: "colour", label: "Colour", value: displayableValue(colourEntry[1]) }]
+          : []),
+      ];
+      return normalized.filter((item) => item.value !== null);
+    }
   }
 
-  return VARIANT_FIELDS
+  const variants = VARIANT_FIELDS
     .filter((field) => hasValue(product?.[field.key]))
-    .map((field) => ({ key: field.key, label: field.label, value: product[field.key] }));
+    .map((field) => ({
+      ...field,
+      value: displayableValue(product[field.key]),
+    }));
+
+  const colour = hasValue(product?.colour)
+    ? product.colour
+    : product?.color;
+  if (hasValue(colour)) {
+    variants.push({
+      key: "colour",
+      label: "Colour",
+      value: displayableValue(colour),
+    });
+  }
+
+  return variants;
 }
