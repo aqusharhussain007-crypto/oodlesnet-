@@ -275,7 +275,7 @@ export default function CompareTestPage() {
         </p>
       </div>
 
-      <section style={{ marginTop: 20, padding: 18, border: "1px solid #cbd5e1", borderRadius: 18, background: "#fff" }}>
+      <section id="smartphone-selectors" style={{ marginTop: 20, padding: 18, border: "1px solid #cbd5e1", borderRadius: 18, background: "#fff" }}>
         <label htmlFor="demo-product-a" style={{ display: "block", fontWeight: 800, marginBottom: 7 }}>Product A</label>
         <select id="demo-product-a" value={productAId} onChange={(event) => changeProductA(event.target.value)} style={{ width: "100%", padding: 12, borderRadius: 10, border: "1px solid #94a3b8", marginBottom: 16, background: "#fff" }}>
           {DEMO_PRODUCTS.map((product) => <option key={product.id} value={product.id}>{product.name}</option>)}
@@ -296,9 +296,9 @@ export default function CompareTestPage() {
         {error && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{error}</p>}
       </section>
 
-      {result && <div ref={smartphoneResultRef} style={{ scrollMarginTop: 96 }}><CompareResult result={result} productA={productA} productB={productB} onReset={() => setResult(null)} /></div>}
+      {result && <div ref={smartphoneResultRef} style={{ scrollMarginTop: 96 }}><CompareResult result={result} productA={productA} productB={productB} onReset={() => setResult(null)} onChangeProducts={() => { setResult(null); document.getElementById("smartphone-selectors")?.scrollIntoView({ behavior: "smooth", block: "center" }); }} /></div>}
 
-      <section style={{ marginTop: 24, padding: 18, border: "1px solid #99f6e4", borderRadius: 18, background: "#f8fffd" }}>
+      <section id="powerbank-selectors" style={{ marginTop: 24, padding: 18, border: "1px solid #99f6e4", borderRadius: 18, background: "#f8fffd" }}>
         <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 900 }}>Power bank category test</h2>
         <p style={{ margin: "0 0 14px", color: "#64748b", fontSize: 13, lineHeight: 1.5 }}>
           Synthetic power bank data tests the category-specific specification template. No Firestore access or writes.
@@ -334,9 +334,9 @@ export default function CompareTestPage() {
         {powerBankError && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{powerBankError}</p>}
       </section>
 
-      {powerBankResult && <div ref={powerBankResultRef} style={{ scrollMarginTop: 96 }}><CompareResult result={powerBankResult} productA={POWER_BANK_DEMOS[0]} productB={powerBankB} onReset={() => setPowerBankResult(null)} /></div>}
+      {powerBankResult && <div ref={powerBankResultRef} style={{ scrollMarginTop: 96 }}><CompareResult result={powerBankResult} productA={POWER_BANK_DEMOS[0]} productB={powerBankB} onReset={() => setPowerBankResult(null)} onChangeProducts={() => { setPowerBankResult(null); document.getElementById("powerbank-selectors")?.scrollIntoView({ behavior: "smooth", block: "center" }); }} /></div>}
 
-      <section style={{ marginTop: 24, padding: 18, border: "1px solid #99f6e4", borderRadius: 18, background: "#f8fffd" }}>
+      <section id="speaker-selectors" style={{ marginTop: 24, padding: 18, border: "1px solid #99f6e4", borderRadius: 18, background: "#f8fffd" }}>
         <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 900 }}>Bluetooth speaker category test</h2>
         <p style={{ margin: "0 0 14px", color: "#64748b", fontSize: 13, lineHeight: 1.5 }}>
           Synthetic speaker data tests the category-specific specification template. No Firestore access or writes.
@@ -372,9 +372,9 @@ export default function CompareTestPage() {
         {speakerError && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{speakerError}</p>}
       </section>
 
-      {speakerResult && <div ref={speakerResultRef} style={{ scrollMarginTop: 96 }}><CompareResult result={speakerResult} productA={BLUETOOTH_SPEAKER_DEMOS[0]} productB={speakerB} onReset={() => setSpeakerResult(null)} /></div>}
+      {speakerResult && <div ref={speakerResultRef} style={{ scrollMarginTop: 96 }}><CompareResult result={speakerResult} productA={BLUETOOTH_SPEAKER_DEMOS[0]} productB={speakerB} onReset={() => setSpeakerResult(null)} onChangeProducts={() => { setSpeakerResult(null); document.getElementById("speaker-selectors")?.scrollIntoView({ behavior: "smooth", block: "center" }); }} /></div>}
 
-      <section style={{ marginTop: 24, padding: 18, border: "1px solid #99f6e4", borderRadius: 18, background: "#f8fffd" }}>
+      <section id="watch-selectors" style={{ marginTop: 24, padding: 18, border: "1px solid #99f6e4", borderRadius: 18, background: "#f8fffd" }}>
         <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 900 }}>Smartwatch category test</h2>
         <p style={{ margin: "0 0 14px", color: "#64748b", fontSize: 13, lineHeight: 1.5 }}>
           Synthetic smartwatch data tests display, health sensors, GPS, battery, water resistance and compatibility fields. No Firestore access or writes.
@@ -410,7 +410,7 @@ export default function CompareTestPage() {
         {watchError && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{watchError}</p>}
       </section>
 
-      {watchResult && <div ref={watchResultRef} style={{ scrollMarginTop: 96 }}><CompareResult result={watchResult} productA={SMARTWATCH_DEMOS[0]} productB={watchB} onReset={() => setWatchResult(null)} /></div>}
+      {watchResult && <div ref={watchResultRef} style={{ scrollMarginTop: 96 }}><CompareResult result={watchResult} productA={SMARTWATCH_DEMOS[0]} productB={watchB} onReset={() => setWatchResult(null)} onChangeProducts={() => { setWatchResult(null); document.getElementById("watch-selectors")?.scrollIntoView({ behavior: "smooth", block: "center" }); }} /></div>}
 
       <p style={{ marginTop: 20, fontSize: 13, color: "#64748b", lineHeight: 1.5 }}>
         Demo prices and specifications are invented test values, not real product information. Any score shown is only a test of the current comparison rules.
