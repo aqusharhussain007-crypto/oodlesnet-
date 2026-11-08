@@ -51,6 +51,21 @@ export async function GET(request) {
         hasSpecs: !!data.specs && typeof data.specs === "object",
       };
     }).sort((a, b) => a.documentId.localeCompare(b.documentId));
+    const verificationIds = ["36MaFYdnIalGYYwZhZbq", "wYJ88jdBndp0VqtyE0Tu"];
+    const specVerification = verificationIds.map((id) => {
+      const doc = snapshot.docs.find((entry) => entry.id === id);
+      if (!doc) return { documentId: id, exists: false };
+      const data = doc.data();
+      const specs = data.specs && typeof data.specs === "object" && !Array.isArray(data.specs) ? data.specs : {};
+      return {
+        documentId: id,
+        exists: true,
+        name: data.name || null,
+        brand: data.brand || null,
+        specCount: Object.keys(specs).length,
+        specs,
+      };
+    });
     return NextResponse.json({
       ok: true,
       project: "oodlesnet-test",
@@ -58,7 +73,8 @@ export async function GET(request) {
       count: products.length,
       inspectedBy: uid,
       products,
-      note: "Read-only inventory. No records were changed.",
+      specVerification,
+      note: "Read-only inventory and smartphone specification read-back. No records were changed.",
     }, { headers: { "Cache-Control": "no-store" } });
   } catch {
     return fail("Could not read the test products collection.", 500);
