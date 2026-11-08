@@ -54,6 +54,7 @@ export default function CompareResult({
   productA,
   productB,
   onReset,
+  onChangeProducts,
 }) {
   if (
     !result ||
@@ -331,21 +332,38 @@ export default function CompareResult({
         {productBName}: {retailerB} listed stores
       </p>
 
-      <button
-        type="button"
-        onClick={() => onReset?.()}
-        style={{
-          marginTop: 16,
-          padding: "10px 16px",
-          borderRadius: 999,
-          border: "1px solid #10b981",
-          background: "#ecfdf5",
-          fontWeight: 800,
-          color: "#065f46",
-        }}
-      >
-        Compare another
-      </button>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 16 }}>
+        <button
+          type="button"
+          onClick={() => onChangeProducts?.()}
+          style={{
+            flex: "1 1 180px",
+            padding: "11px 14px",
+            borderRadius: 999,
+            border: "1px solid #0f766e",
+            background: "#ecfdf5",
+            fontWeight: 800,
+            color: "#065f46",
+          }}
+        >
+          Change compared product
+        </button>
+        <button
+          type="button"
+          onClick={() => onReset?.()}
+          style={{
+            flex: "1 1 140px",
+            padding: "11px 14px",
+            borderRadius: 999,
+            border: "1px solid #cbd5e1",
+            background: "#f8fafc",
+            fontWeight: 800,
+            color: "#334155",
+          }}
+        >
+          Reset comparison
+        </button>
+      </div>
     </div>
   );
 }
