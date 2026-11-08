@@ -68,6 +68,34 @@ export default function TestSpecUpdaterPage() {
     return data.idToken;
   }
 
+  async function inspectTestCatalog() {
+    if (!email.trim() || (!token && !password)) {
+      setMessage("Enter your test Firebase email and password first.");
+      return;
+    }
+    setBusy(true);
+    setMessage("");
+    setResults([]);
+    try {
+      const idToken = token || await signIn();
+      setToken(idToken);
+      const response = await fetch("/api/admin/products/catalog-inspection", {
+        method: "GET",
+        headers: { Authorization: "Bearer " + idToken },
+        cache: "no-store",
+      });
+      const data = await response.json().catch(() => ({ error: "Response was not valid JSON." }));
+      setResults([{ operation: "read-only test catalogue inspection", httpStatus: response.status, ...data }]);
+      setMessage(response.ok ? "Read-only inventory complete. No records were changed." : "Could not inspect the test catalogue.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Inspection failed.");
+      setToken("");
+    } finally {
+      setPassword("");
+      setBusy(false);
+    }
+  }
+
   async function run(mode) {
     if (!email.trim() || (!token && !password)) {
       setMessage("Enter your test Firebase email and password.");
