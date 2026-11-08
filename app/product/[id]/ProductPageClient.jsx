@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 import ProductCard from "@/components/ProductCard";
+import CompareContainer from "@/components/compare/CompareContainer";
 import {
   excludeProductById,
   filterByPriceRange,
@@ -596,6 +597,9 @@ export default function ProductPage({ params }) {
             );
           })}
         </div>
+
+        {/* Phase 5: product-to-product comparison. Uses existing product data only. */}
+        <CompareContainer currentProduct={product} />
 
         {openOffer && (
           <>
