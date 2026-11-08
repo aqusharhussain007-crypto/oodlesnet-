@@ -224,7 +224,15 @@ export default function CompareTestPage() {
     [productBId]
   );
 
+  function clearOtherResults(active) {
+    if (active !== "smartphone") setResult(null);
+    if (active !== "powerbank") setPowerBankResult(null);
+    if (active !== "speaker") setSpeakerResult(null);
+    if (active !== "watch") setWatchResult(null);
+  }
+
   function runComparison() {
+    clearOtherResults("smartphone");
     if (!productA || !productB || productA.id === productB.id) {
       setResult(null);
       setError("Choose two different products.");
@@ -309,6 +317,7 @@ export default function CompareTestPage() {
           type="button"
           disabled={!powerBankB}
           onClick={() => {
+            clearOtherResults("powerbank");
             const comparison = compareProducts(POWER_BANK_DEMOS[0], powerBankB);
             if (comparison.error) {
               setPowerBankResult(null);
@@ -346,6 +355,7 @@ export default function CompareTestPage() {
           type="button"
           disabled={!speakerB}
           onClick={() => {
+            clearOtherResults("speaker");
             const comparison = compareProducts(BLUETOOTH_SPEAKER_DEMOS[0], speakerB);
             if (comparison.error) {
               setSpeakerResult(null);
@@ -383,6 +393,7 @@ export default function CompareTestPage() {
           type="button"
           disabled={!watchB}
           onClick={() => {
+            clearOtherResults("watch");
             const comparison = compareProducts(SMARTWATCH_DEMOS[0], watchB);
             if (comparison.error) {
               setWatchResult(null);
