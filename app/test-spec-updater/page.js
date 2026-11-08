@@ -213,28 +213,17 @@ export default function TestSpecUpdaterPage() {
 
   return (
     <main style={{ maxWidth: 760, margin: "24px auto", padding: 18, fontFamily: "Arial, sans-serif", lineHeight: 1.5, color: "#111" }}>
-      <h1 style={{ fontSize: 26, fontWeight: 800 }}>Restricted Test Specification Updater</h1>
+      <h1 style={{ fontSize: 26, fontWeight: 800 }}>OodlesNet TEST Catalogue Replacement + Specification Updater</h1>
       <p><strong>Database:</strong> oodlesnet-test only. Production is not connected to this updater.</p>
       <div style={{ border: "2px solid #b45309", borderRadius: 8, padding: 12, margin: "16px 0" }}>
         <strong>Strict limits</strong>
         <ul>
           <li>Only Motorola Edge 70 and Nothing Phone (2a) document IDs are accepted.</li>
-          <li>Only the comparison specifications map can be changed.</li>
+          <li>The 66-product catalogue replacement is a separate, TEST-only operation with full backup.</li>
           <li>Each update creates a transactional backup of the previous specs.</li>
           <li>Dry-run is available before the explicit write confirmation.</li>
         </ul>
       </div>
-
-      <h2 style={{ fontSize: 20, fontWeight: 700 }}>Review the two prepared specification sets</h2>
-      {PRODUCTS.map((product) => (
-        <section key={product.documentId} style={{ border: "1px solid #aaa", borderRadius: 8, padding: 12, marginTop: 12 }}>
-          <strong>{product.name}</strong>
-          <p style={{ fontSize: 12, overflowWrap: "anywhere" }}>Document ID: {product.documentId}</p>
-          <pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere", background: "#f3f4f6", padding: 10, borderRadius: 6, fontSize: 13 }}>
-            {JSON.stringify(product.specs, null, 2)}
-          </pre>
-        </section>
-      ))}
 
       <section style={{ border: "2px solid #0b7285", borderRadius: 10, padding: 14, marginTop: 24 }}>
         <h2 style={{ fontSize: 20, fontWeight: 800 }}>Replace TEST catalogue with 66 products</h2>
@@ -249,6 +238,17 @@ export default function TestSpecUpdaterPage() {
           {busy ? "Working…" : "Back up and replace TEST catalogue"}
         </button>
       </section>
+
+      <h2 style={{ fontSize: 20, fontWeight: 700 }}>Review the two prepared specification sets</h2>
+      {PRODUCTS.map((product) => (
+        <section key={product.documentId} style={{ border: "1px solid #aaa", borderRadius: 8, padding: 12, marginTop: 12 }}>
+          <strong>{product.name}</strong>
+          <p style={{ fontSize: 12, overflowWrap: "anywhere" }}>Document ID: {product.documentId}</p>
+          <pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere", background: "#f3f4f6", padding: 10, borderRadius: 6, fontSize: 13 }}>
+            {JSON.stringify(product.specs, null, 2)}
+          </pre>
+        </section>
+      ))}
 
       <h2 style={{ fontSize: 20, fontWeight: 700, marginTop: 24 }}>Test Firebase sign-in</h2>
       <label style={{ display: "block", marginTop: 12 }}>
