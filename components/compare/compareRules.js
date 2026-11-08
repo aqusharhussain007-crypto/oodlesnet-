@@ -62,6 +62,9 @@ function inferType(product) {
   }
 
   const category = normalizeCategory(product?.categorySlug);
+  // The export uses "smartphone" as its category even when the product name
+  // does not contain a phone keyword (for example, Motorola Edge models).
+  if (["smartphone", "smartphones"].includes(category)) return "smartphone";
   if (["power-banks", "bluetooth-speakers"].includes(category)) {
     return normalizeType(category);
   }
