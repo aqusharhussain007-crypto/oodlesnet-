@@ -333,9 +333,10 @@ export default function CompareResult({
       </p>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 16 }}>
+        {typeof onChangeProducts === "function" && (
         <button
           type="button"
-          onClick={() => onChangeProducts?.()}
+          onClick={onChangeProducts}
           style={{
             flex: "1 1 180px",
             padding: "11px 14px",
@@ -348,6 +349,7 @@ export default function CompareResult({
         >
           Change compared product
         </button>
+        )}
         <button
           type="button"
           onClick={() => onReset?.()}
