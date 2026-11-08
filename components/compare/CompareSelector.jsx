@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase-app";
 import { canCompare } from "./compareRules";
@@ -15,6 +15,9 @@ export default function CompareSelector({
   onSelect,
   demoProducts,
 }) {
+  const selectorId = useId();
+  const productSelectId = `${selectorId}-product`;
+  const helpTextId = `${selectorId}-help`;
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(Boolean(currentProduct?.id));
   const [loadError, setLoadError] = useState(false);
@@ -105,7 +108,7 @@ export default function CompareSelector({
   return (
     <div aria-busy={loading}>
       <label
-        htmlFor="compare-product-selector"
+        htmlFor={productSelectId}
         style={{
           display: "block",
           marginBottom: 7,
@@ -117,12 +120,12 @@ export default function CompareSelector({
         Choose a product
       </label>
       <select
-        id="compare-product-selector"
+        id={productSelectId}
         value={selectedId || ""}
         disabled={loading || options.length === 0}
         onChange={handleChange}
         aria-label="Choose a compatible product to compare"
-        aria-describedby="compare-selector-help"
+        aria-describedby={helpTextId}
         style={{
           width: "100%",
           minHeight: 48,
@@ -155,7 +158,7 @@ export default function CompareSelector({
       </select>
 
       <p
-        id="compare-selector-help"
+        id={helpTextId}
         role="status"
         aria-live="polite"
         style={{
