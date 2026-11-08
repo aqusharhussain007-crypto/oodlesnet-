@@ -125,6 +125,19 @@ export default function CompareResult({
   };
   const retailerA = safeCount(result.retailerCoverage?.A);
   const retailerB = safeCount(result.retailerCoverage?.B);
+  const scoreA = result.scores?.A && typeof result.scores.A === "object" ? result.scores.A : {};
+  const scoreB = result.scores?.B && typeof result.scores.B === "object" ? result.scores.B : {};
+  const priceA = result.priceComparison?.A;
+  const priceB = result.priceComparison?.B;
+  const hasBothPrices = Number.isFinite(priceA) && priceA > 0 && Number.isFinite(priceB) && priceB > 0;
+  const formatPrice = (value) =>
+    Number.isFinite(value) && value > 0
+      ? new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(value)
+      : "Not available";
+  const pricePointsA = safeCount(scoreA.price);
+  const pricePointsB = safeCount(scoreB.price);
+  const offerPointsA = safeCount(scoreA.offers);
+  const offerPointsB = safeCount(scoreB.offers);
 
   return (
     <div
@@ -197,6 +210,43 @@ export default function CompareResult({
           />
         </div>
       </div>
+
+      <section
+        aria-label="Listed-value score breakdown"
+        style={{ marginTop: 20, padding: 14, borderRadius: 14, background: "#f8fafc", border: "1px solid #e2e8f0" }}
+      >
+        <h4 style={{ margin: "0 0 10px", fontSize: 15, fontWeight: 900 }}>
+          Why these scores?
+        </h4>
+        <p style={{ margin: "0 0 12px", fontSize: 12, color: "#64748b", lineHeight: 1.5 }}>
+          The score uses listed price and offer availability only. It does not judge performance or product quality.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, fontSize: 12 }}>
+          <div style={{ minWidth: 0 }}>
+            <strong>{productAName}</strong>
+            <p style={{ margin: "6px 0 4px" }}>Price advantage: {pricePointsA}/2</p>
+            <p style={{ margin: "0 0 4px" }}>Offer availability: {offerPointsA}/1</p>
+            <p style={{ margin: 0, color: "#64748b" }}>Total: {totalA}/{maxScore}</p>
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <strong>{productBName}</strong>
+            <p style={{ margin: "6px 0 4px" }}>Price advantage: {pricePointsB}/2</p>
+            <p style={{ margin: "0 0 4px" }}>Offer availability: {offerPointsB}/1</p>
+            <p style={{ margin: 0, color: "#64748b" }}>Total: {totalB}/{maxScore}</p>
+          </div>
+        </div>
+        <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid #e2e8f0", fontSize: 12, color: "#475569", lineHeight: 1.55 }}>
+          <strong>Lowest listed prices:</strong> {productAName}: {formatPrice(priceA)} · {productBName}: {formatPrice(priceB)}
+          <p style={{ margin: "6px 0 0" }}>
+            Price points: 2 points when one price is at least 10% lower; 1 point when it is 2% to under 10% lower; otherwise 0. Offer availability adds 1 point only when just one product has an offer.
+          </p>
+          {!hasBothPrices && (
+            <p style={{ margin: "6px 0 0" }}>
+              A price advantage is not awarded unless both products have valid listed prices.
+            </p>
+          )}
+        </div>
+      </section>
 
       <h4 style={{ marginTop: 24, marginBottom: 10, fontSize: 16, fontWeight: 900 }}>
         Compare product specifications
