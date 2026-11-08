@@ -198,6 +198,10 @@ export default function TestSpecUpdaterPage() {
       <p style={{ fontSize: 13 }}>Credentials are sent directly to Firebase Authentication. The password is cleared after each attempt; the ID token stays only in this page's memory.</p>
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 16 }}>
+        <button type="button" disabled={busy || !email.trim() || (!token && !password)} onClick={inspectTestCatalog} style={{ padding: 12, borderRadius: 8, background: "#e5f3f8" }}>
+          {busy ? "Working…" : "Inspect existing TEST products"}
+        </button>
+
         <button type="button" disabled={busy || !email.trim() || (!token && !password)} onClick={() => run("dry-run")} style={{ padding: 12, borderRadius: 8 }}>
           {busy ? "Working…" : "Run both dry-runs"}
         </button>
