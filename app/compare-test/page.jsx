@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { compareProducts } from "@/components/compare/compareRules";
 import CompareResult from "@/components/compare/CompareResult";
 import CompareSelector from "@/components/compare/CompareSelector";
@@ -194,6 +194,27 @@ export default function CompareTestPage() {
   const [watchResult, setWatchResult] = useState(null);
   const [watchError, setWatchError] = useState("");
 
+  const smartphoneResultRef = useRef(null);
+  const powerBankResultRef = useRef(null);
+  const speakerResultRef = useRef(null);
+  const watchResultRef = useRef(null);
+
+  useEffect(() => {
+    const target = result
+      ? smartphoneResultRef.current
+      : powerBankResult
+      ? powerBankResultRef.current
+      : speakerResult
+      ? speakerResultRef.current
+      : watchResult
+      ? watchResultRef.current
+      : null;
+
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [result, powerBankResult, speakerResult, watchResult]);
+
   const productA = useMemo(
     () => DEMO_PRODUCTS.find((product) => product.id === productAId),
     [productAId]
@@ -267,6 +288,8 @@ export default function CompareTestPage() {
         {error && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{error}</p>}
       </section>
 
+      {result && <div ref={smartphoneResultRef} style={{ scrollMarginTop: 96 }}><CompareResult result={result} productA={productA} productB={productB} onReset={() => setResult(null)} /></div>}
+
       <section style={{ marginTop: 24, padding: 18, border: "1px solid #99f6e4", borderRadius: 18, background: "#f8fffd" }}>
         <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 900 }}>Power bank category test</h2>
         <p style={{ margin: "0 0 14px", color: "#64748b", fontSize: 13, lineHeight: 1.5 }}>
@@ -301,6 +324,8 @@ export default function CompareTestPage() {
         </button>
         {powerBankError && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{powerBankError}</p>}
       </section>
+
+      {powerBankResult && <div ref={powerBankResultRef} style={{ scrollMarginTop: 96 }}><CompareResult result={powerBankResult} productA={POWER_BANK_DEMOS[0]} productB={powerBankB} onReset={() => setPowerBankResult(null)} /></div>}
 
       <section style={{ marginTop: 24, padding: 18, border: "1px solid #99f6e4", borderRadius: 18, background: "#f8fffd" }}>
         <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 900 }}>Bluetooth speaker category test</h2>
@@ -337,6 +362,8 @@ export default function CompareTestPage() {
         {speakerError && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{speakerError}</p>}
       </section>
 
+      {speakerResult && <div ref={speakerResultRef} style={{ scrollMarginTop: 96 }}><CompareResult result={speakerResult} productA={BLUETOOTH_SPEAKER_DEMOS[0]} productB={speakerB} onReset={() => setSpeakerResult(null)} /></div>}
+
       <section style={{ marginTop: 24, padding: 18, border: "1px solid #99f6e4", borderRadius: 18, background: "#f8fffd" }}>
         <h2 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 900 }}>Smartwatch category test</h2>
         <p style={{ margin: "0 0 14px", color: "#64748b", fontSize: 13, lineHeight: 1.5 }}>
@@ -372,34 +399,7 @@ export default function CompareTestPage() {
         {watchError && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{watchError}</p>}
       </section>
 
-      {speakerResult && (
-        <CompareResult
-          result={speakerResult}
-          productA={BLUETOOTH_SPEAKER_DEMOS[0]}
-          productB={speakerB}
-          onReset={() => setSpeakerResult(null)}
-        />
-      )}
-
-      {watchResult && (
-        <CompareResult
-          result={watchResult}
-          productA={SMARTWATCH_DEMOS[0]}
-          productB={watchB}
-          onReset={() => setWatchResult(null)}
-        />
-      )}
-
-      {powerBankResult && (
-        <CompareResult
-          result={powerBankResult}
-          productA={POWER_BANK_DEMOS[0]}
-          productB={powerBankB}
-          onReset={() => setPowerBankResult(null)}
-        />
-      )}
-
-      {result && <CompareResult result={result} productA={productA} productB={productB} onReset={() => setResult(null)} />}
+      {watchResult && <div ref={watchResultRef} style={{ scrollMarginTop: 96 }}><CompareResult result={watchResult} productA={SMARTWATCH_DEMOS[0]} productB={watchB} onReset={() => setWatchResult(null)} /></div>}
 
       <p style={{ marginTop: 20, fontSize: 13, color: "#64748b", lineHeight: 1.5 }}>
         Demo prices and specifications are invented test values, not real product information. Any score shown is only a test of the current comparison rules.
