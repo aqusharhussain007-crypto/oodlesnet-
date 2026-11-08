@@ -206,9 +206,10 @@ export default function CompareResult({
       </p>
       <div style={{ overflowX: "auto", width: "100%", borderRadius: 10, overscrollBehaviorX: "contain" }}>
         <table
+          aria-label="Product specification comparison"
           style={{
-            width: 540,
-            minWidth: 540,
+            width: "100%",
+            minWidth: 480,
             tableLayout: "fixed",
             borderCollapse: "collapse",
             fontSize: 13,
@@ -216,13 +217,15 @@ export default function CompareResult({
         >
           <thead>
             <tr>
-              <th scope="col" style={{ position: "sticky", left: 0, zIndex: 3, minWidth: 120, width: 120, maxWidth: 120, textAlign: "left", padding: 12, background: "#eaf0f7", boxShadow: "2px 0 4px rgba(15, 23, 42, 0.06)" }}>
+              <th scope="col" style={{ position: "sticky", left: 0, zIndex: 3, minWidth: 112, width: 112, maxWidth: 112, textAlign: "left", verticalAlign: "top", padding: 10, lineHeight: 1.35, background: "#eaf0f7", boxShadow: "2px 0 4px rgba(15, 23, 42, 0.06)", overflowWrap: "anywhere" }}>
                 Specification
               </th>
-              <th scope="col" style={{ textAlign: "left", padding: 12, width: 210, minWidth: 210, background: "#f1f5f9" }}>
+              <th scope="col" style={{ textAlign: "left", verticalAlign: "top", padding: 10, width: 184, minWidth: 184, background: "#f1f5f9", lineHeight: 1.35, overflowWrap: "anywhere", wordBreak: "break-word" }}>
+                <span style={{ display: "block", fontSize: 10, color: "#64748b", marginBottom: 4 }}>PRODUCT A</span>
                 {productAName}
               </th>
-              <th scope="col" style={{ textAlign: "left", padding: 12, width: 210, minWidth: 210, background: "#f1f5f9" }}>
+              <th scope="col" style={{ textAlign: "left", verticalAlign: "top", padding: 10, width: 184, minWidth: 184, background: "#f1f5f9", lineHeight: 1.35, overflowWrap: "anywhere", wordBreak: "break-word" }}>
+                <span style={{ display: "block", fontSize: 10, color: "#64748b", marginBottom: 4 }}>PRODUCT B</span>
                 {productBName}
               </th>
             </tr>
