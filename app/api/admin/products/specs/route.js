@@ -10,7 +10,7 @@ const TEST_PROJECT_ID = "oodlesnet-test";
 const MAX_BODY_BYTES = 20_000;
 const ALLOWED_PRODUCTS = Object.freeze({
   "36MaFYdnIalGYYwZhZbq": { brand: "Motorola", nameIncludes: "Edge 70" },
-  "wYJ88jdBndp0VqtyE0Tu": { brand: "Nothing", nameIncludes: "Phone (2a)" },
+  "wYJ88jdBndp0VqtyE0Tu": { brand: "Nothing Phone", nameIncludes: "Phone (2a)" },
 });
 const ALLOWED_SPEC_KEYS = new Set([
   "display", "processor", "ram", "storage", "rearCamera", "frontCamera",
