@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { compareProducts } from "./compareRules";
 import CompareSelector from "./CompareSelector";
 import CompareResult from "./CompareResult";
@@ -18,6 +18,7 @@ export default function CompareContainer({ currentProduct }) {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(true);
+  const selectorSectionRef = useRef(null);
 
   useEffect(() => {
     setProductB(null);
@@ -129,11 +130,13 @@ export default function CompareContainer({ currentProduct }) {
         Compare <strong>{currentProductName}</strong> with
       </h3>
 
+      <div ref={selectorSectionRef} style={{ scrollMarginTop: 100 }}>
       <CompareSelector
         currentProduct={currentProduct}
         selectedId={productB?.id || ""}
         onSelect={handleSelect}
       />
+      </div>
 
       <button
         type="button"
@@ -179,6 +182,11 @@ export default function CompareContainer({ currentProduct }) {
           productA={currentProduct}
           productB={productB}
           onReset={reset}
+          onChangeProducts={() => {
+            setResult(null);
+            setError(null);
+            selectorSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }}
         />
       )}
     </section>
