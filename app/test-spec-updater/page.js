@@ -46,6 +46,9 @@ export default function TestSpecUpdaterPage() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [results, setResults] = useState([]);
+  const [catalogFile, setCatalogFile] = useState(null);
+  const [catalogConfirmed, setCatalogConfirmed] = useState(false);
+
 
   async function signIn() {
     if (!API_KEY) {
@@ -89,6 +92,53 @@ export default function TestSpecUpdaterPage() {
       setMessage(response.ok ? "Read-only inventory complete. No records were changed." : "Could not inspect the test catalogue.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Inspection failed.");
+      setToken("");
+    } finally {
+      setPassword("");
+      setBusy(false);
+    }
+  }
+
+  async function replaceTestCatalog() {
+    if (!email.trim() || (!token && !password)) {
+      setMessage("Enter your test Firebase email and password first.");
+      return;
+    }
+    if (!catalogFile) {
+      setMessage("Choose the prepared 66-product JSON file first.");
+      return;
+    }
+    if (!catalogConfirmed) {
+      setMessage("Confirm the test-only catalogue replacement first.");
+      return;
+    }
+    setBusy(true);
+    setMessage("");
+    setResults([]);
+    try {
+      const parsed = JSON.parse(await catalogFile.text());
+      if (!Array.isArray(parsed) || parsed.length !== 66) {
+        throw new Error("Selected file must contain exactly 66 product records.");
+      }
+      const idSet = new Set(parsed.map((item) => item?.id));
+      if (idSet.size !== 66 || parsed.some((item) => !item?.id || !item?.data)) {
+        throw new Error("The file has missing or duplicate IDs or invalid product data.");
+      }
+      const idToken = token || await signIn();
+      setToken(idToken);
+      const response = await fetch("/api/admin/products/catalog-replacement", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + idToken },
+        body: JSON.stringify({ products: parsed, confirmReplace: true }),
+        cache: "no-store",
+      });
+      const data = await response.json().catch(() => ({ error: "Response was not valid JSON." }));
+      setResults([{ operation: "66-product test catalogue replacement", httpStatus: response.status, ...data }]);
+      setMessage(response.ok && data.ok
+        ? "Catalogue replacement completed. Review the backup ID and counts below."
+        : "Replacement did not report success. Do not retry until we inspect the result.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Catalogue replacement failed.");
       setToken("");
     } finally {
       setPassword("");
@@ -185,6 +235,20 @@ export default function TestSpecUpdaterPage() {
           </pre>
         </section>
       ))}
+
+      <section style={{ border: "2px solid #0b7285", borderRadius: 10, padding: 14, marginTop: 24 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 800 }}>Replace TEST catalogue with 66 products</h2>
+        <p>First download the prepared JSON file, then select it here. This operation backs up every current test product, imports the 66 supplied IDs, and removes old test documents not in the new list. It is locked to oodlesnet-test.</p>
+        <input type="file" accept=".json,application/json" onChange={(event) => { setCatalogFile(event.target.files?.[0] || null); setCatalogConfirmed(false); }} style={{ display: "block", width: "100%", marginTop: 10 }} />
+        <p style={{ fontSize: 13 }}>{catalogFile ? "Selected: " + catalogFile.name + " (" + catalogFile.size + " bytes)" : "No JSON file selected."}</p>
+        <label style={{ display: "flex", gap: 10, alignItems: "flex-start", marginTop: 12 }}>
+          <input type="checkbox" checked={catalogConfirmed} onChange={(event) => setCatalogConfirmed(event.target.checked)} style={{ marginTop: 5, width: 20, height: 20 }} />
+          <span>I authorize replacing the entire <strong>oodlesnet-test/products</strong> catalogue with these 66 records. Back up all existing records first, then remove records outside the 66 IDs. Production must not be touched.</span>
+        </label>
+        <button type="button" disabled={busy || !email.trim() || (!token && !password) || !catalogFile || !catalogConfirmed} onClick={replaceTestCatalog} style={{ padding: 12, borderRadius: 8, marginTop: 14, background: "#063c5a", color: "#fff" }}>
+          {busy ? "Working…" : "Back up and replace TEST catalogue"}
+        </button>
+      </section>
 
       <h2 style={{ fontSize: 20, fontWeight: 700, marginTop: 24 }}>Test Firebase sign-in</h2>
       <label style={{ display: "block", marginTop: 12 }}>
