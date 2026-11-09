@@ -88,8 +88,8 @@ export default function CompareContainer({ currentProduct, demoProducts }) {
     <section
       aria-label="Compare products"
       style={{
-        marginTop: 28,
-        padding: 18,
+        marginTop: 0,
+        padding: 10,
         borderRadius: 20,
         background: "#f8fffd",
         border: "1px solid #99f6e4",
@@ -110,7 +110,7 @@ export default function CompareContainer({ currentProduct, demoProducts }) {
           borderRadius: "50%",
           border: "none",
           background: "#e5e7eb",
-          fontSize: 18,
+          fontSize: 16,
           fontWeight: 900,
           cursor: "pointer",
         }}
@@ -127,7 +127,7 @@ export default function CompareContainer({ currentProduct, demoProducts }) {
           paddingRight: 36,
         }}
       >
-        Compare <strong>{currentProductName}</strong> with
+        PRODUCT B · COMPATIBLE MATCH
       </h3>
 
       <div ref={selectorSectionRef} style={{ scrollMarginTop: 100 }}>
