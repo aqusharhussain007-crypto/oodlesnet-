@@ -52,11 +52,13 @@ export default function TestComparePage() {
       }
       if (!data.products.some((product) => product.id === MOTOROLA_ID)) throw new Error("Motorola test product was not found.");
       setProducts(data.products);
+      setSelectedProductAId((previous) => data.products.some((product) => product.id === previous) ? previous : MOTOROLA_ID);
       setMessage("Loaded 66 products directly from oodlesnet-test. Read-only mode; no database writes.");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not load the test catalogue.");
       setToken("");
       setProducts([]);
+      setSelectedProductAId("");
     } finally {
       setPassword("");
       setBusy(false);
@@ -81,11 +83,28 @@ export default function TestComparePage() {
         {message && <p role="status" style={{ color: "#166534", marginTop: 12 }}>{message}</p>}
         {error && <p role="alert" style={{ color: "#b91c1c", marginTop: 12 }}>{error}</p>}
       </section>
-      {currentProduct && (
+
+      {products.length > 0 && (
         <section style={{ marginTop: 20 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 900 }}>Comparison test: Motorola Edge 70</h2>
-          <p style={{ color: "#475569", lineHeight: 1.5 }}>Choose another compatible smartphone from the 66 TEST products, then compare specifications, lowest valid prices and retailer coverage.</p>
-          <CompareContainer currentProduct={currentProduct} demoProducts={products} />
+          <h2 style={{ fontSize: 20, fontWeight: 900 }}>Build a product comparison</h2>
+          <p style={{ color: "#475569", lineHeight: 1.5 }}>Search the entire TEST catalogue. Choose any starting product, then search for a compatible product to compare.</p>
+          <section style={{ marginTop: 14, padding: 16, border: "1px solid #99f6e4", borderRadius: 16, background: "#f0fdfa" }}>
+            <ProductSearchPicker
+              products={products}
+              selectedId={currentProduct?.id || ""}
+              onSelect={(product) => setSelectedProductAId(product?.id || "")}
+              label="Product A · Search the full catalogue"
+              placeholder="Search any product, brand or model…"
+              categoryFilter={true}
+              emptyMessage="No products match that search. Try another name or category."
+            />
+          </section>
+          {currentProduct ? (
+            <>
+              <h3 style={{ marginTop: 22, fontSize: 19, fontWeight: 900 }}>Compare {currentProduct.name}</h3>
+              <CompareContainer currentProduct={currentProduct} demoProducts={products} />
+            </>
+          ) : <p style={{ marginTop: 14, color: "#64748b" }}>Choose Product A to begin. You can compare products from any supported category.</p>}
         </section>
       )}
     </main>
