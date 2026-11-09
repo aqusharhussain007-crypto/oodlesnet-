@@ -59,9 +59,6 @@ export default function CompareContainer({ currentProduct, demoProducts }) {
 
   return (
     <div aria-label="Product B selection" style={{ minWidth: 0, marginTop: 0 }}>
-      <h3 style={{ fontSize: 15, fontWeight: 900, color: "#0f766e", margin: "0 0 8px", lineHeight: 1.25 }}>
-        PRODUCT B
-      </h3>
       <div ref={selectorSectionRef} style={{ scrollMarginTop: 100 }}>
         <CompareSelector
           currentProduct={currentProduct}
