@@ -87,15 +87,15 @@ export default function TestComparePage() {
       {products.length > 0 && (
         <section style={{ marginTop: 20 }}>
           <h2 style={{ fontSize: 20, fontWeight: 900 }}>Build a product comparison</h2>
-          <p style={{ color: "#475569", lineHeight: 1.5 }}>Search the entire TEST catalogue. Choose any starting product, then search for a compatible product to compare.</p>
-          <p style={{ color: "#475569", lineHeight: 1.5 }}>Choose two products side by side. Product B automatically shows only products compatible with Product A's category and type.</p>
+          <p style={{ color: "#475569", lineHeight: 1.5 }}>Choose two products side by side. Product B automatically filters to compatible products.</p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10, alignItems: "start", marginTop: 14 }}>
-            <section style={{ minWidth: 0, padding: 10, border: "1px solid #99f6e4", borderRadius: 16, background: "#f0fdfa" }}>
+            <section style={{ minWidth: 0, padding: 0, border: 0, borderRadius: 0, background: "transparent" }}>
+              <h3 style={{ fontSize: 15, fontWeight: 900, color: "#0f766e", margin: "0 0 8px" }}>PRODUCT A</h3>
               <ProductSearchPicker
                 products={products}
                 selectedId={currentProduct?.id || ""}
                 onSelect={(product) => setSelectedProductAId(product?.id || "")}
-                label="PRODUCT A"
+                label="Choose Product A"
                 placeholder="Search product…"
                 categoryFilter={true}
                 emptyMessage="No products match. Try another search."
@@ -105,10 +105,9 @@ export default function TestComparePage() {
               {currentProduct ? (
                 <CompareContainer currentProduct={currentProduct} demoProducts={products} />
               ) : (
-                <section style={{ padding: 12, border: "1px dashed #94a3b8", borderRadius: 16, background: "#f8fafc", color: "#64748b", fontSize: 14 }}>
-                  <strong style={{ display: "block", color: "#0f172a", marginBottom: 8 }}>PRODUCT B</strong>
+                <div style={{ padding: "8px 0", color: "#64748b", fontSize: 13 }}>
                   Select Product A first. Compatible products will appear here automatically.
-                </section>
+                </div>
               )}
             </div>
           </div>
