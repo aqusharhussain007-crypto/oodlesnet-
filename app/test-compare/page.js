@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import CompareContainer from "@/components/compare/CompareContainer";
+import ProductSearchPicker from "@/components/compare/ProductSearchPicker";
 
 const API_KEY = process.env.NEXT_PUBLIC_TEST_FIREBASE_API_KEY || "";
 const MOTOROLA_ID = "36MaFYdnIalGYYwZhZbq";
@@ -11,6 +12,7 @@ export default function TestComparePage() {
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
   const [products, setProducts] = useState([]);
+  const [selectedProductAId, setSelectedProductAId] = useState(MOTOROLA_ID);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -61,7 +63,7 @@ export default function TestComparePage() {
     }
   }
 
-  const currentProduct = products.find((product) => product.id === MOTOROLA_ID) || null;
+  const currentProduct = products.find((product) => product.id === selectedProductAId) || null;
 
   return (
     <main style={{ maxWidth: 900, margin: "0 auto", padding: 18, color: "#0f172a" }}>
