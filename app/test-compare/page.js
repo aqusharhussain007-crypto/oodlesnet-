@@ -88,23 +88,30 @@ export default function TestComparePage() {
         <section style={{ marginTop: 20 }}>
           <h2 style={{ fontSize: 20, fontWeight: 900 }}>Build a product comparison</h2>
           <p style={{ color: "#475569", lineHeight: 1.5 }}>Search the entire TEST catalogue. Choose any starting product, then search for a compatible product to compare.</p>
-          <section style={{ marginTop: 14, padding: 16, border: "1px solid #99f6e4", borderRadius: 16, background: "#f0fdfa" }}>
-            <ProductSearchPicker
-              products={products}
-              selectedId={currentProduct?.id || ""}
-              onSelect={(product) => setSelectedProductAId(product?.id || "")}
-              label="Product A · Search the full catalogue"
-              placeholder="Search any product, brand or model…"
-              categoryFilter={true}
-              emptyMessage="No products match that search. Try another name or category."
-            />
-          </section>
-          {currentProduct ? (
-            <>
-              <h3 style={{ marginTop: 22, fontSize: 19, fontWeight: 900 }}>Compare {currentProduct.name}</h3>
-              <CompareContainer currentProduct={currentProduct} demoProducts={products} />
-            </>
-          ) : <p style={{ marginTop: 14, color: "#64748b" }}>Choose Product A to begin. You can compare products from any supported category.</p>}
+          <p style={{ color: "#475569", lineHeight: 1.5 }}>Choose two products side by side. Product B automatically shows only products compatible with Product A's category and type.</p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10, alignItems: "start", marginTop: 14 }}>
+            <section style={{ minWidth: 0, padding: 10, border: "1px solid #99f6e4", borderRadius: 16, background: "#f0fdfa" }}>
+              <ProductSearchPicker
+                products={products}
+                selectedId={currentProduct?.id || ""}
+                onSelect={(product) => setSelectedProductAId(product?.id || "")}
+                label="PRODUCT A"
+                placeholder="Search product…"
+                categoryFilter={true}
+                emptyMessage="No products match. Try another search."
+              />
+            </section>
+            <div style={{ minWidth: 0 }}>
+              {currentProduct ? (
+                <CompareContainer currentProduct={currentProduct} demoProducts={products} />
+              ) : (
+                <section style={{ padding: 12, border: "1px dashed #94a3b8", borderRadius: 16, background: "#f8fafc", color: "#64748b", fontSize: 14 }}>
+                  <strong style={{ display: "block", color: "#0f172a", marginBottom: 8 }}>PRODUCT B</strong>
+                  Select Product A first. Compatible products will appear here automatically.
+                </section>
+              )}
+            </div>
+          </div>
         </section>
       )}
     </main>
