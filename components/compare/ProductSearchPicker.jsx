@@ -67,10 +67,15 @@ export default function ProductSearchPicker({
         style={{ width: "100%", minHeight: 48, boxSizing: "border-box", padding: "12px 14px", borderRadius: 12, border: "2px solid #10b981", fontSize: 16, background: "#fff", color: "#111827" }}
       />
       {categoryFilter && (
-        <select value={category} onChange={(event) => { setCategory(event.target.value); setShowResults(true); }} aria-label="Filter products by category" style={{ width: "100%", minHeight: 42, marginTop: 8, padding: "9px 12px", borderRadius: 10, border: "1px solid #cbd5e1", background: "#fff", color: "#334155" }}>
-          <option value="all">All categories ({products.length})</option>
-          {categories.map((item) => <option key={item} value={item}>{categoryLabel(item)} ({products.filter((p) => p?.categorySlug === item).length})</option>)}
-        </select>
+        <div style={{ marginTop: 10 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: "#475569", marginBottom: 7 }}>CATEGORY · SWIPE TO EXPLORE</div>
+          <div role="group" aria-label="Filter products by category" style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 7, WebkitOverflowScrolling: "touch" }}>
+            <button type="button" onClick={() => { setCategory("all"); setShowResults(true); }} aria-pressed={category === "all"} style={{ flex: "0 0 auto", border: "1px solid #0d9488", borderRadius: 999, padding: "9px 14px", background: category === "all" ? "#0f766e" : "#fff", color: category === "all" ? "#fff" : "#134e4a", fontWeight: 800 }}>All ({products.length})</button>
+            {categories.map((item) => (
+              <button key={item} type="button" onClick={() => { setCategory(item); setShowResults(true); }} aria-pressed={category === item} style={{ flex: "0 0 auto", border: "1px solid #0d9488", borderRadius: 999, padding: "9px 14px", background: category === item ? "#0f766e" : "#fff", color: category === item ? "#fff" : "#134e4a", fontWeight: 800, whiteSpace: "nowrap" }}>{categoryLabel(item)} ({products.filter((p) => p?.categorySlug === item).length})</button>
+            ))}
+          </div>
+        </div>
       )}
       {showResults && !selected && (
         <div role="listbox" aria-label="Matching products" style={{ marginTop: 8, maxHeight: 300, overflowY: "auto", border: "1px solid #cbd5e1", borderRadius: 12, background: "#fff" }}>
