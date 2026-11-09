@@ -58,43 +58,48 @@ export default function CompareContainer({ currentProduct, demoProducts }) {
   }
 
   return (
-    <div aria-label="Product B selection" style={{ minWidth: 0, marginTop: 0 }}>
-      <div ref={selectorSectionRef} style={{ scrollMarginTop: 100 }}>
-        <CompareSelector
-          currentProduct={currentProduct}
-          demoProducts={demoProducts}
-          selectedId={productB?.id || ""}
-          onSelect={handleSelect}
-        />
+    <>
+      <section style={{ minWidth: 0 }}>
+        <h3 style={{ fontSize: 16, fontWeight: 900, color: "#0f766e", margin: "0 0 10px" }}>PRODUCT B</h3>
+        <div ref={selectorSectionRef} style={{ scrollMarginTop: 100 }}>
+          <CompareSelector
+            currentProduct={currentProduct}
+            demoProducts={demoProducts}
+            selectedId={productB?.id || ""}
+            onSelect={handleSelect}
+          />
+        </div>
+      </section>
+      <div style={{ gridColumn: "1 / -1", display: "flex", justifyContent: "center", width: "100%", marginTop: 2 }}>
+        <button
+          type="button"
+          disabled={!productB}
+          onClick={handleCompare}
+          style={{
+            width: "min(62%, 320px)",
+            minWidth: 190,
+            minHeight: 48,
+            padding: "11px 18px",
+            borderRadius: 12,
+            border: "none",
+            fontWeight: 900,
+            fontSize: 15,
+            color: "#fff",
+            background: productB ? "linear-gradient(135deg,#0f4c81,#10b981)" : "#9ca3af",
+            boxShadow: productB ? "0 6px 14px rgba(16,185,129,0.25)" : "none",
+            cursor: productB ? "pointer" : "not-allowed",
+          }}
+        >
+          Compare now
+        </button>
       </div>
-      <button
-        type="button"
-        disabled={!productB}
-        onClick={handleCompare}
-        style={{
-          marginTop: 12,
-          width: "100%",
-          minHeight: 46,
-          padding: "11px 8px",
-          borderRadius: 12,
-          border: "none",
-          fontWeight: 900,
-          fontSize: 14,
-          color: "#fff",
-          background: productB ? "linear-gradient(135deg,#0f4c81,#10b981)" : "#9ca3af",
-          boxShadow: productB ? "0 6px 14px rgba(16,185,129,0.25)" : "none",
-          cursor: productB ? "pointer" : "not-allowed",
-        }}
-      >
-        Compare now
-      </button>
       {error && (
-        <p role="alert" style={{ color: error === "CATEGORY_MISMATCH" ? "#b45309" : "#b91c1c", marginTop: 10, fontWeight: 700, fontSize: 13 }}>
+        <p role="alert" style={{ gridColumn: "1 / -1", color: error === "CATEGORY_MISMATCH" ? "#b45309" : "#b91c1c", marginTop: 10, fontWeight: 700, fontSize: 13 }}>
           {ERROR_MESSAGES[error] || ERROR_MESSAGES.COMPARISON_FAILED}
         </p>
       )}
       {result && (
-        <div style={{ gridColumn: "1 / -1", width: "100%", marginTop: 22 }}>
+        <div style={{ gridColumn: "1 / -1", width: "100%", marginTop: 12 }}>
           <CompareResult
             result={result}
             productA={currentProduct}
@@ -108,6 +113,6 @@ export default function CompareContainer({ currentProduct, demoProducts }) {
           />
         </div>
       )}
-    </div>
+    </>
   );
 }
