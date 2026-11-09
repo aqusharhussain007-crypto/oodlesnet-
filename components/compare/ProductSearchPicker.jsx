@@ -69,11 +69,11 @@ export default function ProductSearchPicker({
       <input
         type="search"
         value={query}
-        onChange={(event) => { setQuery(event.target.value); setShowResults(true); }}
+        onChange={(event) => { if (selected) onSelect?.(null); setQuery(event.target.value); setShowResults(true); }}
         onFocus={() => setShowResults(true)}
         placeholder={placeholder}
         aria-label={label}
-        style={{ width: "100%", minHeight: 48, boxSizing: "border-box", padding: "12px 14px", borderRadius: 12, border: "2px solid #10b981", fontSize: 16, background: "#fff", color: "#111827" }}
+        style={{ width: "100%", minHeight: 40, height: 42, boxSizing: "border-box", padding: "8px 12px", borderRadius: 11, border: "2px solid #10b981", fontSize: 15, background: "#fff", color: "#111827" }}
       />
       {categoryFilter && (
         <div style={{ marginTop: 10 }}>
