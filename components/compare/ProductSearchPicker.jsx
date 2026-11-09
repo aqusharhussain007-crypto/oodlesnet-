@@ -49,15 +49,12 @@ export default function ProductSearchPicker({
     <div style={{ marginTop: 12 }}>
       <label style={{ display: "block", marginBottom: 7, fontWeight: 800 }}>{label}</label>
       {selected && (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 7, minWidth: 0, padding: 9, marginBottom: 9, border: "1px solid #99f6e4", borderRadius: 12, background: "#ecfdf5", textAlign: "center" }}>
-          <div style={{ width: "100%", height: 76, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", borderRadius: 9, background: "#fff" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, minWidth: 0, padding: "4px 0 10px", marginBottom: 8, textAlign: "center" }}>
+          <div style={{ width: "100%", height: 82, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", borderRadius: 10, background: "#fff" }}>
             {selected.imageUrl ? <img src={selected.imageUrl} alt={selected.name || "Selected product"} loading="lazy" style={{ display: "block", maxWidth: "100%", width: "100%", height: "100%", objectFit: "contain" }} /> : <span style={{ color: "#94a3b8", fontSize: 11 }}>Image unavailable</span>}
           </div>
-          <div style={{ width: "100%", minWidth: 0 }}>
-            <div style={{ fontWeight: 800, fontSize: 13, lineHeight: 1.3, overflowWrap: "anywhere" }}>{selected.name || "Unnamed product"}</div>
-            <div style={{ color: "#64748b", fontSize: 11, marginTop: 3 }}>{categoryLabel(selected.categorySlug)}{selected.brand ? " · " + selected.brand : ""}</div>
-          </div>
-          <button type="button" onClick={() => { onSelect?.(null); setQuery(""); setShowResults(true); }} style={{ width: "100%", border: 0, borderRadius: 9, padding: "7px 8px", background: "#d1fae5", color: "#065f46", fontWeight: 800, fontSize: 12 }}>Change product</button>
+          <div style={{ width: "100%", minWidth: 0, fontWeight: 800, fontSize: 13, lineHeight: 1.3, overflowWrap: "anywhere" }}>{selected.name || "Unnamed product"}</div>
+          <button type="button" onClick={() => { onSelect?.(null); setQuery(""); setShowResults(true); }} style={{ border: 0, borderRadius: 999, padding: "7px 14px", background: "#d1fae5", color: "#065f46", fontWeight: 800, fontSize: 12, cursor: "pointer" }}>Change product</button>
         </div>
       )}
       <input
