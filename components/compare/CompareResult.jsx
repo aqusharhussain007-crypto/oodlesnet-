@@ -295,10 +295,14 @@ export default function CompareResult({
       <style jsx>{`
         @media (max-width: 640px) {
           .comparison-result-card {
-            width: calc(100% + 32px);
+            box-sizing: border-box;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100vw - 16px);
             max-width: none;
-            margin-left: -16px;
-            margin-right: -16px;
+            margin-left: 0;
+            margin-right: 0;
             padding: 14px !important;
           }
         }
