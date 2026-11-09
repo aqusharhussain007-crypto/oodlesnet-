@@ -106,10 +106,12 @@ export default function TestComparePage() {
               <h3 style={{ fontSize: 16, fontWeight: 900, color: "#0f766e", margin: "0 0 10px" }}>PRODUCT A</h3>
               <ProductSearchPicker products={productAOptions} selectedId={currentProduct?.id || ""} onSelect={(product) => setSelectedProductAId(product?.id || "")} label="" placeholder="Search Product A…" categoryFilter={false} emptyMessage="No products match. Try another search." />
             </section>
-            <section style={{ minWidth: 0 }}>
-              <h3 style={{ fontSize: 16, fontWeight: 900, color: "#0f766e", margin: "0 0 10px" }}>PRODUCT B</h3>
-              {currentProduct ? <CompareContainer currentProduct={currentProduct} demoProducts={products} /> : <div style={{ color: "#64748b", fontSize: 13 }}>Select Product A.</div>}
-            </section>
+            {currentProduct ? <CompareContainer currentProduct={currentProduct} demoProducts={products} /> : (
+              <section style={{ minWidth: 0 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 900, color: "#0f766e", margin: "0 0 10px" }}>PRODUCT B</h3>
+                <div style={{ height: 176, borderRadius: 12, background: "rgba(15,118,110,0.045)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(15,118,110,0.22)", fontWeight: 900 }}>OodlesNet</div>
+              </section>
+            )}
           </div>
         </section>
       )}
