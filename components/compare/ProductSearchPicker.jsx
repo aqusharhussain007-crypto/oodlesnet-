@@ -46,19 +46,26 @@ export default function ProductSearchPicker({
   }, [products, query, category]);
 
   return (
-    <div style={{ marginTop: 12 }}>
+    <div style={{ marginTop: 0, minWidth: 0 }}>
       {label ? <label style={{ display: "block", marginBottom: 7, fontWeight: 800 }}>{label}</label> : null}
-      {selected && (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, minWidth: 0, padding: "4px 0 10px", marginBottom: 8, textAlign: "center" }}>
-          <button type="button" onClick={() => { onSelect?.(null); setQuery(""); setShowResults(true); }} aria-label={`Change ${label}`} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, width: "100%", padding: 0, border: 0, background: "transparent", color: "inherit", cursor: "pointer" }}>
-            <span style={{ width: "100%", height: 82, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", borderRadius: 10, background: "#fff" }}>
-              {selected.imageUrl ? <img src={selected.imageUrl} alt={selected.name || "Selected product"} loading="lazy" style={{ display: "block", maxWidth: "100%", width: "100%", height: "100%", objectFit: "contain" }} /> : <span style={{ color: "#94a3b8", fontSize: 11 }}>Image unavailable</span>}
-            </span>
-            <span style={{ display: "block", width: "100%", minWidth: 0, fontWeight: 800, fontSize: 13, lineHeight: 1.3, overflowWrap: "anywhere" }}>{selected.name || "Unnamed product"}</span>
-          </button>
-          <button type="button" onClick={() => { onSelect?.(null); setQuery(""); setShowResults(true); }} style={{ border: 0, borderRadius: 999, padding: "7px 14px", background: "#d1fae5", color: "#065f46", fontWeight: 800, fontSize: 12, cursor: "pointer" }}>Change product</button>
-        </div>
-      )}
+      <div style={{ minHeight: 176, height: 176, display: "flex", flexDirection: "column", justifyContent: selected ? "flex-start" : "center", alignItems: "center", minWidth: 0, padding: "4px 0 8px", marginBottom: 8, boxSizing: "border-box", textAlign: "center", overflow: "hidden" }}>
+        {selected ? (
+          <>
+            <button type="button" onClick={() => { onSelect?.(null); setQuery(""); setShowResults(true); }} aria-label="Change selected product" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, width: "100%", minWidth: 0, padding: 0, border: 0, background: "transparent", color: "inherit", cursor: "pointer" }}>
+              <span style={{ width: "100%", height: 82, flex: "0 0 82px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", borderRadius: 10, background: "#fff" }}>
+                {selected.imageUrl ? <img src={selected.imageUrl} alt={selected.name || "Selected product"} loading="lazy" style={{ display: "block", maxWidth: "100%", width: "100%", height: "100%", objectFit: "contain" }} /> : <span style={{ color: "#94a3b8", fontSize: 11 }}>Image unavailable</span>}
+              </span>
+              <span style={{ display: "-webkit-box", width: "100%", minWidth: 0, fontWeight: 800, fontSize: 13, lineHeight: 1.3, overflowWrap: "anywhere", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{selected.name || "Unnamed product"}</span>
+            </button>
+            <button type="button" onClick={() => { onSelect?.(null); setQuery(""); setShowResults(true); }} style={{ flex: "0 0 auto", marginTop: 6, border: 0, borderRadius: 999, padding: "6px 12px", background: "#d1fae5", color: "#065f46", fontWeight: 800, fontSize: 12, cursor: "pointer" }}>Change product</button>
+          </>
+        ) : (
+          <div aria-hidden="true" style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", borderRadius: 12, background: "linear-gradient(145deg,rgba(15,118,110,0.045),rgba(16,185,129,0.015))", color: "rgba(15,118,110,0.22)" }}>
+            <span style={{ fontSize: 29, fontWeight: 900, letterSpacing: -1 }}>OodlesNet</span>
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase" }}>Choose a product</span>
+          </div>
+        )}
+      </div>
       <input
         type="search"
         value={query}
@@ -92,7 +99,6 @@ export default function ProductSearchPicker({
           )) : <p style={{ padding: 13, color: "#64748b" }}>{emptyMessage}</p>}
         </div>
       )}
-      <p role="status" style={{ marginTop: 7, fontSize: 12, color: "#64748b" }}>{products.length} products available{category !== "all" ? " in this category" : ""}. Search by name or brand.</p>
     </div>
   );
 }
