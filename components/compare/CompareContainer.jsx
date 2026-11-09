@@ -1,19 +1,72 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { compareProducts } from "./compareRules";
 import CompareSelector from "./CompareSelector";
 import CompareResult from "./CompareResult";
 
-export default function CompareContainer({ currentProduct }) {
+const ERROR_MESSAGES = {
+  CATEGORY_MISMATCH: "These products belong to different categories and cannot be compared.",
+  TYPE_MISMATCH: "These products are not the same product type and cannot be compared.",
+  UNSUPPORTED_TYPE: "The product type is not identified well enough for a reliable comparison.",
+  INVALID_PRODUCT: "One of the selected products is missing required information. Please select again.",
+  COMPARISON_FAILED: "The comparison could not be completed. Please select the products again.",
+};
+
+export default function CompareContainer({ currentProduct, demoProducts }) {
   const [productB, setProductB] = useState(null);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(true);
+  const selectorSectionRef = useRef(null);
+
+  useEffect(() => {
+    setProductB(null);
+    setResult(null);
+    setError(null);
+    setOpen(true);
+  }, [currentProduct?.id]);
+
+  if (!currentProduct?.id) return null;
+
+  const currentProductName = currentProduct.name || "Selected product";
+
+  function handleSelect(product) {
+    setProductB(product);
+    setResult(null);
+    setError(null);
+  }
+
+  function handleCompare() {
+    if (!productB) return;
+
+    try {
+      const comparison = compareProducts(currentProduct, productB);
+      if (comparison.error) {
+        setError(comparison.error);
+        setResult(null);
+        return;
+      }
+
+      setError(null);
+      setResult(comparison);
+    } catch (comparisonError) {
+      console.error("Product comparison failed:", comparisonError);
+      setError("COMPARISON_FAILED");
+      setResult(null);
+    }
+  }
+
+  function reset() {
+    setProductB(null);
+    setResult(null);
+    setError(null);
+  }
 
   if (!open) {
     return (
       <button
+        type="button"
         onClick={() => setOpen(true)}
         style={{
           marginTop: 20,
@@ -31,26 +84,9 @@ export default function CompareContainer({ currentProduct }) {
     );
   }
 
-  function handleCompare() {
-    if (!productB) return;
-    const res = compareProducts(currentProduct, productB);
-    if (res.error) {
-      setError(res.error);
-      setResult(null);
-      return;
-    }
-    setError(null);
-    setResult(res);
-  }
-
-  function reset() {
-    setProductB(null);
-    setResult(null);
-    setError(null);
-  }
-
   return (
-    <div
+    <section
+      aria-label="Compare products"
       style={{
         marginTop: 28,
         padding: 18,
@@ -61,8 +97,8 @@ export default function CompareContainer({ currentProduct }) {
         position: "relative",
       }}
     >
-      {/* CLOSE BUTTON */}
       <button
+        type="button"
         onClick={() => setOpen(false)}
         aria-label="Close comparison"
         style={{
@@ -82,28 +118,29 @@ export default function CompareContainer({ currentProduct }) {
         ✕
       </button>
 
-      {/* TITLE */}
       <h3
         style={{
           fontSize: 18,
           fontWeight: 900,
           color: "#0f766e",
           marginBottom: 12,
+          paddingRight: 36,
         }}
       >
-        Compare <strong>{currentProduct.name}</strong> with
+        Compare <strong>{currentProductName}</strong> with
       </h3>
 
-      {/* SELECTOR */}
+      <div ref={selectorSectionRef} style={{ scrollMarginTop: 100 }}>
       <CompareSelector
-        selected={productB}
-        onSelect={setProductB}
-        excludeId={currentProduct.id}
-        category={currentProduct.categorySlug}
+        currentProduct={currentProduct}
+        demoProducts={demoProducts}
+        selectedId={productB?.id || ""}
+        onSelect={handleSelect}
       />
+      </div>
 
-      {/* COMPARE BUTTON */}
       <button
+        type="button"
         disabled={!productB}
         onClick={handleCompare}
         style={{
@@ -127,17 +164,18 @@ export default function CompareContainer({ currentProduct }) {
         Compare now
       </button>
 
-      {error === "CATEGORY_MISMATCH" && (
-  <p style={{ color: "#b45309", marginTop: 10, fontWeight: 700 }}>
-    Comparison works best within the same category.
-  </p>
-)}
-
-{error === "TYPE_MISMATCH" && (
-  <p style={{ color: "#b91c1c", marginTop: 10, fontWeight: 700 }}>
-    These products are not the same type and can’t be compared.
-  </p>
-)}
+      {error && (
+        <p
+          role="alert"
+          style={{
+            color: error === "CATEGORY_MISMATCH" ? "#b45309" : "#b91c1c",
+            marginTop: 10,
+            fontWeight: 700,
+          }}
+        >
+          {ERROR_MESSAGES[error] || ERROR_MESSAGES.COMPARISON_FAILED}
+        </p>
+      )}
 
       {result && (
         <CompareResult
@@ -145,9 +183,13 @@ export default function CompareContainer({ currentProduct }) {
           productA={currentProduct}
           productB={productB}
           onReset={reset}
+          onChangeProducts={() => {
+            setResult(null);
+            setError(null);
+            selectorSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }}
         />
       )}
-    </div>
+    </section>
   );
 }
-  
