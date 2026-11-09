@@ -47,7 +47,7 @@ export default function ProductSearchPicker({
 
   return (
     <div style={{ marginTop: 12 }}>
-      <label style={{ display: "block", marginBottom: 7, fontWeight: 800 }}>{label}</label>
+      {label ? <label style={{ display: "block", marginBottom: 7, fontWeight: 800 }}>{label}</label> : null}
       {selected && (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, minWidth: 0, padding: "4px 0 10px", marginBottom: 8, textAlign: "center" }}>
           <button type="button" onClick={() => { onSelect?.(null); setQuery(""); setShowResults(true); }} aria-label={`Change ${label}`} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, width: "100%", padding: 0, border: 0, background: "transparent", color: "inherit", cursor: "pointer" }}>
