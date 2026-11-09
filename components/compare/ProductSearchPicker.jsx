@@ -49,12 +49,15 @@ export default function ProductSearchPicker({
     <div style={{ marginTop: 12 }}>
       <label style={{ display: "block", marginBottom: 7, fontWeight: 800 }}>{label}</label>
       {selected && (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: 11, marginBottom: 9, border: "1px solid #99f6e4", borderRadius: 12, background: "#ecfdf5" }}>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontWeight: 800, overflowWrap: "anywhere" }}>{selected.name || "Unnamed product"}</div>
-            <div style={{ color: "#64748b", fontSize: 12 }}>{categoryLabel(selected.categorySlug)}{selected.brand ? " · " + selected.brand : ""}</div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 7, minWidth: 0, padding: 9, marginBottom: 9, border: "1px solid #99f6e4", borderRadius: 12, background: "#ecfdf5", textAlign: "center" }}>
+          <div style={{ width: "100%", height: 76, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", borderRadius: 9, background: "#fff" }}>
+            {selected.imageUrl ? <img src={selected.imageUrl} alt={selected.name || "Selected product"} loading="lazy" style={{ display: "block", maxWidth: "100%", width: "100%", height: "100%", objectFit: "contain" }} /> : <span style={{ color: "#94a3b8", fontSize: 11 }}>Image unavailable</span>}
           </div>
-          <button type="button" onClick={() => { onSelect?.(null); setQuery(""); setShowResults(true); }} style={{ flexShrink: 0, border: 0, borderRadius: 9, padding: "8px 10px", background: "#d1fae5", color: "#065f46", fontWeight: 800 }}>Change</button>
+          <div style={{ width: "100%", minWidth: 0 }}>
+            <div style={{ fontWeight: 800, fontSize: 13, lineHeight: 1.3, overflowWrap: "anywhere" }}>{selected.name || "Unnamed product"}</div>
+            <div style={{ color: "#64748b", fontSize: 11, marginTop: 3 }}>{categoryLabel(selected.categorySlug)}{selected.brand ? " · " + selected.brand : ""}</div>
+          </div>
+          <button type="button" onClick={() => { onSelect?.(null); setQuery(""); setShowResults(true); }} style={{ width: "100%", border: 0, borderRadius: 9, padding: "7px 8px", background: "#d1fae5", color: "#065f46", fontWeight: 800, fontSize: 12 }}>Change product</button>
         </div>
       )}
       <input
@@ -80,9 +83,12 @@ export default function ProductSearchPicker({
       {showResults && !selected && (
         <div role="listbox" aria-label="Matching products" style={{ marginTop: 8, maxHeight: 300, overflowY: "auto", border: "1px solid #cbd5e1", borderRadius: 12, background: "#fff" }}>
           {matches.length ? matches.map((product) => (
-            <button key={product.id} type="button" role="option" aria-selected={false} onClick={() => { onSelect?.(product); setQuery(""); setShowResults(false); }} style={{ display: "block", width: "100%", textAlign: "left", padding: "11px 13px", border: 0, borderBottom: "1px solid #e2e8f0", background: "#fff", color: "#0f172a", cursor: "pointer" }}>
-              <span style={{ display: "block", fontWeight: 800 }}>{product.name || "Unnamed product"}</span>
-              <span style={{ display: "block", marginTop: 3, color: "#64748b", fontSize: 12 }}>{categoryLabel(product.categorySlug)}{product.brand ? " · " + product.brand : ""}</span>
+            <button key={product.id} type="button" role="option" aria-selected={false} onClick={() => { onSelect?.(product); setQuery(""); setShowResults(false); }} style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", textAlign: "left", padding: "9px 11px", border: 0, borderBottom: "1px solid #e2e8f0", background: "#fff", color: "#0f172a", cursor: "pointer" }}>
+              {product.imageUrl ? <img src={product.imageUrl} alt="" loading="lazy" style={{ width: 48, height: 48, flex: "0 0 48px", objectFit: "contain", borderRadius: 7, background: "#f8fafc" }} /> : <span style={{ width: 48, height: 48, flex: "0 0 48px", borderRadius: 7, background: "#f1f5f9" }} />}
+              <span style={{ minWidth: 0 }}>
+                <span style={{ display: "block", fontWeight: 800, overflowWrap: "anywhere" }}>{product.name || "Unnamed product"}</span>
+                <span style={{ display: "block", marginTop: 3, color: "#64748b", fontSize: 12 }}>{categoryLabel(product.categorySlug)}{product.brand ? " · " + product.brand : ""}</span>
+              </span>
             </button>
           )) : <p style={{ padding: 13, color: "#64748b" }}>{emptyMessage}</p>}
         </div>
