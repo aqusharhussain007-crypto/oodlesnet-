@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import { canCompare } from "./compareRules";
+import ProductSearchPicker from "./ProductSearchPicker";
 
 export default function CompareSelector({ currentProduct, selectedId, onSelect, demoProducts }) {
-  const id = useId();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -29,21 +29,24 @@ export default function CompareSelector({ currentProduct, selectedId, onSelect, 
     return () => { active = false; };
   }, [currentProduct?.id, currentProduct?.categorySlug, demoProducts]);
 
-  const status = loading ? "Loading test products…" :
-    loadError ? "Test products could not be loaded." :
-    options.length ? options.length + " compatible test products available." :
-    "No compatible products available in this category.";
+  if (loading) return <p role="status">Preparing compatible products…</p>;
+  if (loadError) return <p role="alert" style={{ color: "#b91c1c" }}>Test products could not be loaded.</p>;
 
   return (
     <div aria-busy={loading}>
-      <label htmlFor={id + "-compare"} style={{ display: "block", marginBottom: 7, fontWeight: 800 }}>Choose a product from TEST catalogue</label>
-      <select id={id + "-compare"} value={selectedId || ""} disabled={loading || !options.length}
-        onChange={(event) => onSelect?.(options.find((p) => p.id === event.target.value) || null)}
-        style={{ width: "100%", minHeight: 48, padding: "12px 14px", borderRadius: 12, border: "2px solid #10b981", fontSize: 16, background: "#fff", color: "#111827" }}>
-        <option value="">{loading ? "Loading…" : "Select a compatible product"}</option>
-        {options.map((product) => <option key={product.id} value={product.id}>{product.name || "Unnamed product"}</option>)}
-      </select>
-      <p role="status" style={{ marginTop: 7, fontSize: 12, color: loadError ? "#b91c1c" : "#64748b" }}>{status}</p>
+      <ProductSearchPicker
+        products={options}
+        selectedId={selectedId || ""}
+        onSelect={onSelect}
+        label="Search for the second product"
+        placeholder="Type a product name or brand…"
+        categoryFilter={false}
+        emptyMessage="No compatible products match that search."
+      />
+      <p style={{ marginTop: 6, fontSize: 12, color: "#64748b" }}>
+        Showing only products compatible with {currentProduct?.name || "Product A"}.
+        {options.length ? " " + options.length + " compatible products found." : " No compatible products are currently available."}
+      </p>
     </div>
   );
 }
