@@ -17,19 +17,15 @@ export default function CompareContainer({ currentProduct, demoProducts }) {
   const [productB, setProductB] = useState(null);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [open, setOpen] = useState(true);
   const selectorSectionRef = useRef(null);
 
   useEffect(() => {
     setProductB(null);
     setResult(null);
     setError(null);
-    setOpen(true);
   }, [currentProduct?.id]);
 
   if (!currentProduct?.id) return null;
-
-  const currentProductName = currentProduct.name || "Selected product";
 
   function handleSelect(product) {
     setProductB(product);
@@ -39,7 +35,6 @@ export default function CompareContainer({ currentProduct, demoProducts }) {
 
   function handleCompare() {
     if (!productB) return;
-
     try {
       const comparison = compareProducts(currentProduct, productB);
       if (comparison.error) {
@@ -47,7 +42,6 @@ export default function CompareContainer({ currentProduct, demoProducts }) {
         setResult(null);
         return;
       }
-
       setError(null);
       setResult(comparison);
     } catch (comparisonError) {
@@ -63,133 +57,60 @@ export default function CompareContainer({ currentProduct, demoProducts }) {
     setError(null);
   }
 
-  if (!open) {
-    return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        style={{
-          marginTop: 20,
-          padding: "12px 18px",
-          borderRadius: 999,
-          border: "none",
-          fontWeight: 800,
-          color: "#fff",
-          background: "linear-gradient(135deg,#0f4c81,#10b981)",
-          boxShadow: "0 8px 18px rgba(16,185,129,0.45)",
-        }}
-      >
-        Compare with another product
-      </button>
-    );
-  }
-
   return (
-    <section
-      aria-label="Compare products"
-      style={{
-        marginTop: 0,
-        padding: 10,
-        borderRadius: 20,
-        background: "#f8fffd",
-        border: "1px solid #99f6e4",
-        boxShadow: "0 10px 24px rgba(0,0,0,0.12)",
-        position: "relative",
-      }}
-    >
-      <button
-        type="button"
-        onClick={() => setOpen(false)}
-        aria-label="Close comparison"
-        style={{
-          position: "absolute",
-          top: 12,
-          right: 12,
-          width: 32,
-          height: 32,
-          borderRadius: "50%",
-          border: "none",
-          background: "#e5e7eb",
-          fontSize: 16,
-          fontWeight: 900,
-          cursor: "pointer",
-        }}
-      >
-        ✕
-      </button>
-
-      <h3
-        style={{
-          fontSize: 18,
-          fontWeight: 900,
-          color: "#0f766e",
-          marginBottom: 12,
-          paddingRight: 36,
-        }}
-      >
-        PRODUCT B · COMPATIBLE MATCH
+    <div aria-label="Product B selection" style={{ minWidth: 0, marginTop: 0 }}>
+      <h3 style={{ fontSize: 15, fontWeight: 900, color: "#0f766e", margin: "0 0 8px", lineHeight: 1.25 }}>
+        PRODUCT B
       </h3>
-
       <div ref={selectorSectionRef} style={{ scrollMarginTop: 100 }}>
-      <CompareSelector
-        currentProduct={currentProduct}
-        demoProducts={demoProducts}
-        selectedId={productB?.id || ""}
-        onSelect={handleSelect}
-      />
+        <CompareSelector
+          currentProduct={currentProduct}
+          demoProducts={demoProducts}
+          selectedId={productB?.id || ""}
+          onSelect={handleSelect}
+        />
       </div>
-
       <button
         type="button"
         disabled={!productB}
         onClick={handleCompare}
         style={{
-          marginTop: 14,
+          marginTop: 12,
           width: "100%",
-          padding: "14px 0",
-          borderRadius: 14,
+          minHeight: 46,
+          padding: "11px 8px",
+          borderRadius: 12,
           border: "none",
           fontWeight: 900,
-          fontSize: 15,
+          fontSize: 14,
           color: "#fff",
-          background: productB
-            ? "linear-gradient(135deg,#0f4c81,#10b981)"
-            : "#9ca3af",
-          boxShadow: productB
-            ? "0 8px 18px rgba(16,185,129,0.45)"
-            : "none",
+          background: productB ? "linear-gradient(135deg,#0f4c81,#10b981)" : "#9ca3af",
+          boxShadow: productB ? "0 6px 14px rgba(16,185,129,0.25)" : "none",
           cursor: productB ? "pointer" : "not-allowed",
         }}
       >
         Compare now
       </button>
-
       {error && (
-        <p
-          role="alert"
-          style={{
-            color: error === "CATEGORY_MISMATCH" ? "#b45309" : "#b91c1c",
-            marginTop: 10,
-            fontWeight: 700,
-          }}
-        >
+        <p role="alert" style={{ color: error === "CATEGORY_MISMATCH" ? "#b45309" : "#b91c1c", marginTop: 10, fontWeight: 700, fontSize: 13 }}>
           {ERROR_MESSAGES[error] || ERROR_MESSAGES.COMPARISON_FAILED}
         </p>
       )}
-
       {result && (
-        <CompareResult
-          result={result}
-          productA={currentProduct}
-          productB={productB}
-          onReset={reset}
-          onChangeProducts={() => {
-            setResult(null);
-            setError(null);
-            selectorSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-          }}
-        />
+        <div style={{ gridColumn: "1 / -1", width: "100%", marginTop: 22 }}>
+          <CompareResult
+            result={result}
+            productA={currentProduct}
+            productB={productB}
+            onReset={reset}
+            onChangeProducts={() => {
+              setResult(null);
+              setError(null);
+              selectorSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+            }}
+          />
+        </div>
       )}
-    </section>
+    </div>
   );
 }
