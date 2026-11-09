@@ -142,6 +142,7 @@ export default function CompareResult({
 
   return (
     <div
+      className="comparison-result-card"
       style={{
         marginTop: 20,
         padding: 18,
@@ -252,20 +253,20 @@ export default function CompareResult({
         Compare product specifications
       </h4>
       <p style={{ margin: "0 0 8px", fontSize: 11, color: "#64748b" }}>
-        On mobile, each specification is shown as a readable product-by-product card. Highlighted values differ; this does not indicate which product is better.
+        Compare both products side by side. Highlighted values differ; this does not indicate which product is better.
       </p>
-      <div className="comparison-desktop-table" style={{ overflowX: "auto", width: "100%", borderRadius: 10, overscrollBehaviorX: "contain" }}>
+      <div className="comparison-desktop-table" style={{ overflowX: "auto", width: "100%", borderRadius: 10, overscrollBehaviorX: "contain", WebkitOverflowScrolling: "touch" }}>
         <table
           aria-label="Product specification comparison"
-          style={{ width: "100%", minWidth: 480, tableLayout: "fixed", borderCollapse: "collapse", fontSize: 13 }}
+          style={{ width: "100%", minWidth: 560, tableLayout: "fixed", borderCollapse: "collapse", fontSize: 13 }}
         >
           <thead>
             <tr>
-              <th scope="col" style={{ position: "sticky", left: 0, zIndex: 3, minWidth: 112, width: 112, maxWidth: 112, textAlign: "left", verticalAlign: "top", padding: 10, lineHeight: 1.35, background: "#eaf0f7", boxShadow: "2px 0 4px rgba(15, 23, 42, 0.06)", overflowWrap: "anywhere" }}>Specification</th>
-              <th scope="col" style={{ textAlign: "left", verticalAlign: "top", padding: 10, width: 184, minWidth: 184, background: "#f1f5f9", lineHeight: 1.35, overflowWrap: "anywhere", wordBreak: "break-word" }}>
+              <th scope="col" style={{ position: "sticky", left: 0, zIndex: 3, minWidth: 120, width: 120, maxWidth: 120, textAlign: "left", verticalAlign: "top", padding: 10, lineHeight: 1.35, background: "#eaf0f7", boxShadow: "2px 0 4px rgba(15, 23, 42, 0.06)", overflowWrap: "anywhere" }}>Specification</th>
+              <th scope="col" style={{ textAlign: "left", verticalAlign: "top", padding: 10, width: 220, minWidth: 220, background: "#f1f5f9", lineHeight: 1.35, overflowWrap: "anywhere", wordBreak: "break-word" }}>
                 <span style={{ display: "block", fontSize: 10, color: "#64748b", marginBottom: 4 }}>PRODUCT A</span>{productAName}
               </th>
-              <th scope="col" style={{ textAlign: "left", verticalAlign: "top", padding: 10, width: 184, minWidth: 184, background: "#f1f5f9", lineHeight: 1.35, overflowWrap: "anywhere", wordBreak: "break-word" }}>
+              <th scope="col" style={{ textAlign: "left", verticalAlign: "top", padding: 10, width: 220, minWidth: 220, background: "#f1f5f9", lineHeight: 1.35, overflowWrap: "anywhere", wordBreak: "break-word" }}>
                 <span style={{ display: "block", fontSize: 10, color: "#64748b", marginBottom: 4 }}>PRODUCT B</span>{productBName}
               </th>
             </tr>
@@ -291,42 +292,15 @@ export default function CompareResult({
           </tbody>
         </table>
       </div>
-      <div className="comparison-mobile-cards">
-        {[...variantRows.map((field) => ({ ...field, isVariant: true })), ...specRows].map((field) => {
-          const valueA = valueFor(rowsA, variantA, field.key);
-          const valueB = valueFor(rowsB, variantB, field.key);
-          return (
-            <section key={`mobile-${field.key}`} className="comparison-mobile-row">
-              <h5>{field.label}{field.isVariant ? " (variant)" : ""}</h5>
-              <div className="comparison-mobile-values">
-                <div className="comparison-mobile-value" style={comparisonCellStyle(valueA, valueB)}>
-                  <span>PRODUCT A · {productAName}</span>
-                  <p>{safeDisplayValue(valueA)}</p>
-                </div>
-                <div className="comparison-mobile-value" style={comparisonCellStyle(valueB, valueA)}>
-                  <span>PRODUCT B · {productBName}</span>
-                  <p>{safeDisplayValue(valueB)}</p>
-                </div>
-              </div>
-            </section>
-          );
-        })}
-        {!variantRows.length && !specRows.length && (
-          <p style={{ padding: 12, color: "#64748b" }}>No structured specifications are available for these products yet.</p>
-        )}
-      </div>
       <style jsx>{`
-        .comparison-mobile-cards { display: none; }
         @media (max-width: 640px) {
-          .comparison-desktop-table { display: none; }
-          .comparison-mobile-cards { display: grid; gap: 10px; }
-          .comparison-mobile-row { min-width: 0; overflow: hidden; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; }
-          .comparison-mobile-row h5 { margin: 0; padding: 11px 12px; background: #eaf0f7; color: #172033; font-size: 14px; font-weight: 800; overflow-wrap: anywhere; }
-          .comparison-mobile-values { display: grid; grid-template-columns: 1fr 1fr; }
-          .comparison-mobile-value { min-width: 0; padding: 10px !important; overflow-wrap: anywhere; word-break: break-word; font-size: 12px; }
-          .comparison-mobile-value + .comparison-mobile-value { border-left: 1px solid #e5e7eb; }
-          .comparison-mobile-value span { display: block; margin-bottom: 6px; color: #64748b; font-size: 10px; font-weight: 800; line-height: 1.35; }
-          .comparison-mobile-value p { margin: 0; line-height: 1.5; }
+          .comparison-result-card {
+            width: calc(100% + 32px);
+            max-width: none;
+            margin-left: -16px;
+            margin-right: -16px;
+            padding: 14px !important;
+          }
         }
       `}</style>
 
