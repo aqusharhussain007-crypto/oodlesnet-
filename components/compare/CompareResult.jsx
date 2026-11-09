@@ -152,17 +152,16 @@ export default function CompareResult({
       }}
     >
       <p style={{ fontSize: 12, color: "#64748b", marginBottom: 10 }}>
-        Listed-value indicator based on available prices and offers — not a
-        technical quality rating.
+        Price-and-offer score based only on listed prices and offer availability — not a product-quality rating.
       </p>
 
       {winner === "tie" ? (
         <p style={{ fontWeight: 900 }}>
-          🤝 Both products have a similar listed-value score.
+          🤝 Both products have the same price-and-offer score.
         </p>
       ) : (
         <p style={{ fontWeight: 900, fontSize: 16 }}>
-          🏆 Higher listed-value score:
+          🏆 Higher price-and-offer score:
           <br />
           <span style={{ color: "#16a34a" }}>
             {winnerProduct?.name || "Selected product"}
@@ -213,7 +212,7 @@ export default function CompareResult({
       </div>
 
       <section
-        aria-label="Listed-value score breakdown"
+        aria-label="Price and offer score breakdown"
         style={{ marginTop: 20, padding: 14, borderRadius: 14, background: "#f8fafc", border: "1px solid #e2e8f0" }}
       >
         <h4 style={{ margin: "0 0 10px", fontSize: 15, fontWeight: 900 }}>
