@@ -39,7 +39,7 @@ export default function CompareSelector({ currentProduct, selectedId, onSelect, 
         selectedId={selectedId || ""}
         onSelect={onSelect}
         label=""
-        placeholder="Type a product name or brand…"
+        placeholder="Search Product B…"
         categoryFilter={false}
         emptyMessage="No compatible products match that search."
       />
