@@ -50,10 +50,12 @@ export default function ProductSearchPicker({
       <label style={{ display: "block", marginBottom: 7, fontWeight: 800 }}>{label}</label>
       {selected && (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, minWidth: 0, padding: "4px 0 10px", marginBottom: 8, textAlign: "center" }}>
-          <div style={{ width: "100%", height: 82, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", borderRadius: 10, background: "#fff" }}>
-            {selected.imageUrl ? <img src={selected.imageUrl} alt={selected.name || "Selected product"} loading="lazy" style={{ display: "block", maxWidth: "100%", width: "100%", height: "100%", objectFit: "contain" }} /> : <span style={{ color: "#94a3b8", fontSize: 11 }}>Image unavailable</span>}
-          </div>
-          <div style={{ width: "100%", minWidth: 0, fontWeight: 800, fontSize: 13, lineHeight: 1.3, overflowWrap: "anywhere" }}>{selected.name || "Unnamed product"}</div>
+          <button type="button" onClick={() => { onSelect?.(null); setQuery(""); setShowResults(true); }} aria-label={`Change ${label}`} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, width: "100%", padding: 0, border: 0, background: "transparent", color: "inherit", cursor: "pointer" }}>
+            <span style={{ width: "100%", height: 82, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", borderRadius: 10, background: "#fff" }}>
+              {selected.imageUrl ? <img src={selected.imageUrl} alt={selected.name || "Selected product"} loading="lazy" style={{ display: "block", maxWidth: "100%", width: "100%", height: "100%", objectFit: "contain" }} /> : <span style={{ color: "#94a3b8", fontSize: 11 }}>Image unavailable</span>}
+            </span>
+            <span style={{ display: "block", width: "100%", minWidth: 0, fontWeight: 800, fontSize: 13, lineHeight: 1.3, overflowWrap: "anywhere" }}>{selected.name || "Unnamed product"}</span>
+          </button>
           <button type="button" onClick={() => { onSelect?.(null); setQuery(""); setShowResults(true); }} style={{ border: 0, borderRadius: 999, padding: "7px 14px", background: "#d1fae5", color: "#065f46", fontWeight: 800, fontSize: 12, cursor: "pointer" }}>Change product</button>
         </div>
       )}
