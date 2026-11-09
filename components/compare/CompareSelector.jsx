@@ -38,15 +38,11 @@ export default function CompareSelector({ currentProduct, selectedId, onSelect, 
         products={options}
         selectedId={selectedId || ""}
         onSelect={onSelect}
-        label="Search for the second product"
+        label=""
         placeholder="Type a product name or brand…"
         categoryFilter={false}
         emptyMessage="No compatible products match that search."
       />
-      <p style={{ marginTop: 6, fontSize: 12, color: "#64748b" }}>
-        Showing only products compatible with {currentProduct?.name || "Product A"}.
-        {options.length ? " " + options.length + " compatible products found." : " No compatible products are currently available."}
-      </p>
-    </div>
+   </div>
   );
 }
