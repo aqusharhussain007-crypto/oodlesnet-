@@ -13,6 +13,7 @@ export default function TestComparePage() {
   const [token, setToken] = useState("");
   const [products, setProducts] = useState([]);
   const [selectedProductAId, setSelectedProductAId] = useState(MOTOROLA_ID);
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -52,7 +53,9 @@ export default function TestComparePage() {
       }
       if (!data.products.some((product) => product.id === MOTOROLA_ID)) throw new Error("Motorola test product was not found.");
       setProducts(data.products);
-      setSelectedProductAId((previous) => data.products.some((product) => product.id === previous) ? previous : MOTOROLA_ID);
+      const initialProduct = data.products.find((product) => product.id === selectedProductAId) || data.products.find((product) => product.id === MOTOROLA_ID);
+      setSelectedProductAId(initialProduct?.id || "");
+      setSelectedCategory(initialProduct?.categorySlug || "all");
       setMessage("Loaded 66 products directly from oodlesnet-test. Read-only mode; no database writes.");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not load the test catalogue.");
@@ -66,6 +69,9 @@ export default function TestComparePage() {
   }
 
   const currentProduct = products.find((product) => product.id === selectedProductAId) || null;
+  const categories = [...new Set(products.map((product) => String(product?.categorySlug || "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  const categoryName = (value) => String(value || "All").replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+  const productAOptions = selectedCategory === "all" ? products : products.filter((product) => product.categorySlug === selectedCategory);
 
   return (
     <main style={{ maxWidth: 900, margin: "0 auto", padding: 18, color: "#0f172a" }}>
@@ -86,30 +92,24 @@ export default function TestComparePage() {
 
       {products.length > 0 && (
         <section style={{ marginTop: 20 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 900 }}>Build a product comparison</h2>
-          <p style={{ color: "#475569", lineHeight: 1.5 }}>Choose two products side by side. Product B automatically filters to compatible products.</p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10, alignItems: "start", marginTop: 14 }}>
-            <section style={{ minWidth: 0, padding: 0, border: 0, borderRadius: 0, background: "transparent" }}>
-              <h3 style={{ fontSize: 15, fontWeight: 900, color: "#0f766e", margin: "0 0 8px" }}>PRODUCT A</h3>
-              <ProductSearchPicker
-                products={products}
-                selectedId={currentProduct?.id || ""}
-                onSelect={(product) => setSelectedProductAId(product?.id || "")}
-                label="Choose Product A"
-                placeholder="Search product…"
-                categoryFilter={true}
-                emptyMessage="No products match. Try another search."
-              />
-            </section>
-            <div style={{ minWidth: 0 }}>
-              {currentProduct ? (
-                <CompareContainer currentProduct={currentProduct} demoProducts={products} />
-              ) : (
-                <div style={{ padding: "8px 0", color: "#64748b", fontSize: 13 }}>
-                  Select Product A first. Compatible products will appear here automatically.
-                </div>
-              )}
+          <div style={{ marginTop: 8, marginBottom: 18 }}>
+            <div style={{ fontSize: 14, fontWeight: 900, color: "#475569", marginBottom: 9 }}>CATEGORY</div>
+            <div role="group" aria-label="Choose product category" style={{ display: "flex", gap: 9, overflowX: "auto", paddingBottom: 8, WebkitOverflowScrolling: "touch" }}>
+              <button type="button" aria-pressed={selectedCategory === "all"} onClick={() => setSelectedCategory("all")} style={{ flex: "0 0 auto", border: "1px solid #0d9488", borderRadius: 999, padding: "10px 17px", background: selectedCategory === "all" ? "#0f766e" : "#fff", color: selectedCategory === "all" ? "#fff" : "#134e4a", fontWeight: 800, whiteSpace: "nowrap" }}>All ({products.length})</button>
+              {categories.map((category) => (
+                <button key={category} type="button" aria-pressed={selectedCategory === category} onClick={() => { setSelectedCategory(category); if (currentProduct?.categorySlug !== category) setSelectedProductAId(""); }} style={{ flex: "0 0 auto", border: "1px solid #0d9488", borderRadius: 999, padding: "10px 17px", background: selectedCategory === category ? "#0f766e" : "#fff", color: selectedCategory === category ? "#fff" : "#134e4a", fontWeight: 800, whiteSpace: "nowrap" }}>{categoryName(category)} ({products.filter((product) => product.categorySlug === category).length})</button>
+              ))}
             </div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 14, alignItems: "start", marginTop: 8 }}>
+            <section style={{ minWidth: 0 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 900, color: "#0f766e", margin: "0 0 10px" }}>PRODUCT A</h3>
+              <ProductSearchPicker products={productAOptions} selectedId={currentProduct?.id || ""} onSelect={(product) => setSelectedProductAId(product?.id || "")} label="" placeholder="Search Product A…" categoryFilter={false} emptyMessage="No products match. Try another search." />
+            </section>
+            <section style={{ minWidth: 0 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 900, color: "#0f766e", margin: "0 0 10px" }}>PRODUCT B</h3>
+              {currentProduct ? <CompareContainer currentProduct={currentProduct} demoProducts={products} /> : <div style={{ color: "#64748b", fontSize: 13 }}>Select Product A.</div>}
+            </section>
           </div>
         </section>
       )}
