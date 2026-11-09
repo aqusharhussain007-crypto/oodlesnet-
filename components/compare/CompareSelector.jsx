@@ -1,86 +1,49 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase-app";
-import { canCompare } from "@/components/compare/compareRules";
+import { useEffect, useId, useState } from "react";
+import { canCompare } from "./compareRules";
 
-/**
- * CompareSelector
- * - Shows ONLY products that can be compared with currentProduct
- * - Uses compareRules as single source of truth
- */
-export default function CompareSelector({
-  currentProduct,
-  onSelect,
-  selectedId,
-}) {
+export default function CompareSelector({ currentProduct, selectedId, onSelect, demoProducts }) {
+  const id = useId();
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
-    if (!currentProduct) return;
-
-    async function loadOptions() {
-      setLoading(true);
-
-      try {
-        const snap = await getDocs(collection(db, "products"));
-
-        const filtered = snap.docs
-          .map((d) => ({ id: d.id, ...d.data() }))
-          .filter((p) => {
-            // never compare with itself
-            if (p.id === currentProduct.id) return false;
-
-            // must pass compare rules
-            const res = canCompare(currentProduct, p);
-            return res.allowed;
-          });
-
-        setOptions(filtered);
-      } catch (e) {
-        console.error("CompareSelector load error:", e);
-        setOptions([]);
-      } finally {
-        setLoading(false);
-      }
+    let active = true;
+    setLoading(true);
+    setLoadError(false);
+    try {
+      if (!Array.isArray(demoProducts)) throw new Error("Test catalogue data is unavailable.");
+      const compatible = demoProducts
+        .filter((product) => product && product.id !== currentProduct?.id)
+        .filter((product) => canCompare(currentProduct, product).allowed)
+        .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
+      if (active) setOptions(compatible);
+    } catch (error) {
+      console.error("Test CompareSelector error:", error);
+      if (active) { setOptions([]); setLoadError(true); }
+    } finally {
+      if (active) setLoading(false);
     }
+    return () => { active = false; };
+  }, [currentProduct?.id, currentProduct?.categorySlug, demoProducts]);
 
-    loadOptions();
-  }, [currentProduct]);
+  const status = loading ? "Loading test products…" :
+    loadError ? "Test products could not be loaded." :
+    options.length ? options.length + " compatible test products available." :
+    "No compatible products available in this category.";
 
   return (
-    <select
-      value={selectedId || ""}
-      disabled={loading || options.length === 0}
-      onChange={(e) => onSelect(e.target.value)}
-      style={{
-        width: "100%",
-        padding: "12px 14px",
-        borderRadius: 14,
-        border: "2px solid #10b981",
-        fontSize: 16,
-        fontWeight: 700,
-        background: "#ffffff",
-        color: "#111827",
-        outline: "none",
-        cursor: loading ? "not-allowed" : "pointer",
-      }}
-    >
-      <option value="">
-        {loading
-          ? "Loading comparable products..."
-          : options.length === 0
-          ? "No comparable products available"
-          : "Select a product to compare"}
-      </option>
-
-      {options.map((p) => (
-        <option key={p.id} value={p.id}>
-          {p.name}
-        </option>
-      ))}
-    </select>
+    <div aria-busy={loading}>
+      <label htmlFor={id + "-compare"} style={{ display: "block", marginBottom: 7, fontWeight: 800 }}>Choose a product from TEST catalogue</label>
+      <select id={id + "-compare"} value={selectedId || ""} disabled={loading || !options.length}
+        onChange={(event) => onSelect?.(options.find((p) => p.id === event.target.value) || null)}
+        style={{ width: "100%", minHeight: 48, padding: "12px 14px", borderRadius: 12, border: "2px solid #10b981", fontSize: 16, background: "#fff", color: "#111827" }}>
+        <option value="">{loading ? "Loading…" : "Select a compatible product"}</option>
+        {options.map((product) => <option key={product.id} value={product.id}>{product.name || "Unnamed product"}</option>)}
+      </select>
+      <p role="status" style={{ marginTop: 7, fontSize: 12, color: loadError ? "#b91c1c" : "#64748b" }}>{status}</p>
+    </div>
   );
 }
