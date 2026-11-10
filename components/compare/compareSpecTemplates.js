@@ -177,19 +177,40 @@ function isPlainObject(value) {
   return Boolean(value && typeof value === "object" && !Array.isArray(value));
 }
 
-export function getComparisonSpecRows(product, productType) {
-  const template = COMPARISON_SPEC_TEMPLATES[productType] || [];
-  const specs = isPlainObject(product?.specs) ? product.specs : {};
+function specificationLabel(key) {
+  return String(key)
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/[_-]+/g, " ")
+    .replace(/\\s+/g, " ")
+    .trim()
+    .replace(/\\b\\w/g, (letter) => letter.toUpperCase());
+}
 
-  // Show only fields supplied by at least one product. The comparison UI
-  // can then show "Not available" for the other product without listing
-  // every empty template field for both products.
-  return template
-    .map((field) => ({
-      ...field,
-      value: displayableValue(specs[field.key]),
-    }))
-    .filter((field) => field.value !== null);
+export function getComparisonSpecRows(product) {
+  // Read actual product data instead of requiring a category-specific
+  // template. New categories and newly added spec keys work automatically.
+  const sources = [
+    product?.specs,
+    product?.specifications,
+    product?.attributes,
+  ].filter(isPlainObject);
+
+  const fields = new Map();
+  for (const source of sources) {
+    for (const [key, rawValue] of Object.entries(source)) {
+      const value = displayableValue(rawValue);
+      if (value === null) continue;
+      const normalizedKey = String(key).trim();
+      if (!normalizedKey) continue;
+      fields.set(normalizedKey, {
+        key: normalizedKey,
+        label: specificationLabel(normalizedKey),
+        value,
+      });
+    }
+  }
+
+  return [...fields.values()];
 }
 
 export function getProductVariant(product) {
