@@ -210,6 +210,18 @@ export function getComparisonSpecRows(product) {
     }
   }
 
+  // Product descriptions are useful source information even when no
+  // structured specification map has been supplied. Keep them clearly
+  // labelled as descriptions rather than treating prose as verified fields.
+  const description = displayableValue(product?.description);
+  if (description !== null) {
+    fields.set("productDetails", {
+      key: "productDetails",
+      label: "Product details (description)",
+      value: description,
+    });
+  }
+
   return [...fields.values()];
 }
 
