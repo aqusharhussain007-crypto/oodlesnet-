@@ -2,8 +2,8 @@ import {
   getLowestPrice,
   getStoreCount,
   hasOffers,
-} from "./compareUtils";
-import { COMPARISON_SPEC_TEMPLATES, getComparisonSpecRows, getProductVariant } from "./compareSpecTemplates";
+} from "./compareUtils.js";
+import { COMPARISON_SPEC_TEMPLATES, getComparisonSpecRows, getProductVariant } from "./compareSpecTemplates.js";
 
 const TYPE_KEYWORDS = {
   earbuds: ["earbuds", "ear bud", "tws", "in-ear", "in ear"],
