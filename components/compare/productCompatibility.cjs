@@ -9,7 +9,7 @@ function normalize(value) {
     .trim()
     .toLowerCase()
     .replace(/&/g, "and")
-    .replace(/[_\\s]+/g, "-")
+    .replace(/[_\s]+/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
 }
