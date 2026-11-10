@@ -111,7 +111,8 @@ export function canCompare(a, b) {
   return { allowed: true, type: typeA };
 }
 
-const { getPriceAdvantagePoints } = require("./priceAdvantage.cjs");
+import priceAdvantage from "./priceAdvantage.cjs";
+const { getPriceAdvantagePoints } = priceAdvantage;
 export { getPriceAdvantagePoints };
 
 export function compareProducts(a, b) {
