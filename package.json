@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "test:compare": "node --experimental-default-type=module --test components/compare/compareRules.test.js",
+    "build": "npm run test:compare && next build",
     "start": "next start",
     "lint": "next lint"
   },
