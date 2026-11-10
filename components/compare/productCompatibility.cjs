@@ -34,7 +34,7 @@ function normalizeCategory(value) {
     .trim()
     .toLowerCase()
     .replace(/&/g, "and")
-    .replace(/[_\\s]+/g, "-")
+    .replace(/[_\s]+/g, "-")
     .replace(/-+/g, "-");
 }
 
