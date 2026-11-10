@@ -6,29 +6,37 @@ function product(id, extra = {}) {
   return { id, categorySlug: "smartphones", productType: "smartphone", name: id, ...extra };
 }
 
-test("smartphone singular and plural category slugs are compatible", () => {
+test("same explicit product type compares across category reorganizations", () => {
   assert.deepEqual(
-    canCompare(product("A", { categorySlug: "smartphone" }), product("B", { categorySlug: "smartphones" })),
+    canCompare(product("A", { categorySlug: "mobile" }), product("B", { categorySlug: "electronics" })),
     { allowed: true, type: "smartphone" }
   );
 });
 
-test("different categories are rejected before product-type matching", () => {
-  assert.equal(canCompare(product("A"), product("B", { categorySlug: "laptops", productType: "laptop" })).error, "CATEGORY_MISMATCH");
-});
-
-test("different supported types within one broad category are rejected", () => {
+test("different explicit product types are rejected even inside one broad category", () => {
   assert.equal(
     canCompare(product("A", { categorySlug: "audio", productType: "earbuds" }), product("B", { categorySlug: "audio", productType: "headphones" })).error,
     "TYPE_MISMATCH"
   );
 });
 
-test("unsupported explicit product types cannot compare even when labels match", () => {
-  const a = product("A", { categorySlug: "electronics", productType: "unrecognized" });
-  const b = product("B", { categorySlug: "electronics", productType: "unrecognized" });
-  assert.equal(inferType(a), "unknown");
-  assert.equal(canCompare(a, b).error, "UNSUPPORTED_TYPE");
+test("new product types are accepted without editing an allowlist", () => {
+  const a = product("A", { categorySlug: "home", productType: "robot-vacuum" });
+  const b = product("B", { categorySlug: "cleaning", productType: "robot vacuum" });
+  assert.equal(inferType(a), "robot-vacuum");
+  assert.deepEqual(canCompare(a, b), { allowed: true, type: "robot-vacuum" });
+});
+
+test("products without explicit types compare within the same new category", () => {
+  const a = product("A", { categorySlug: "garden-tools", productType: undefined });
+  const b = product("B", { categorySlug: "garden_tools", productType: undefined });
+  assert.deepEqual(canCompare(a, b), { allowed: true, type: "garden-tools" });
+});
+
+test("different categories without explicit types are rejected", () => {
+  const a = product("A", { categorySlug: "garden-tools", productType: undefined });
+  const b = product("B", { categorySlug: "kitchen", productType: undefined });
+  assert.equal(canCompare(a, b).error, "CATEGORY_MISMATCH");
 });
 
 test("duplicate and incomplete product identities are rejected", () => {
@@ -36,7 +44,10 @@ test("duplicate and incomplete product identities are rejected", () => {
   assert.equal(canCompare(product("A"), { categorySlug: "smartphones", productType: "smartphone" }).error, "INVALID_PRODUCT");
 });
 
-test("known type aliases normalize to supported comparison types", () => {
-  assert.equal(inferType(product("A", { productType: "smartphones" })), "smartphone");
-  assert.equal(inferType(product("B", { categorySlug: "power-banks", productType: undefined })), "power_bank");
+test("type aliases normalize consistently", () => {
+  assert.deepEqual(
+    canCompare(product("A", { productType: "smartphones" }), product("B", { productType: "smartphone" })),
+    { allowed: true, type: "smartphone" }
+  );
+  assert.equal(inferType(product("C", { categorySlug: "power-banks", productType: undefined })), "power-bank");
 });
