@@ -5,14 +5,13 @@ import CompareContainer from "@/components/compare/CompareContainer";
 import ProductSearchPicker from "@/components/compare/ProductSearchPicker";
 
 const API_KEY = process.env.NEXT_PUBLIC_TEST_FIREBASE_API_KEY || "";
-const MOTOROLA_ID = "36MaFYdnIalGYYwZhZbq";
 
 export default function TestComparePage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
   const [products, setProducts] = useState([]);
-  const [selectedProductAId, setSelectedProductAId] = useState(MOTOROLA_ID);
+  const [selectedProductAId, setSelectedProductAId] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -48,15 +47,15 @@ export default function TestComparePage() {
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.ok) throw new Error(data.error || "Could not load TEST catalogue.");
-      if (data.project !== "oodlesnet-test" || data.count !== 66 || !Array.isArray(data.products) || data.products.length !== 66) {
-        throw new Error("Safety check failed: expected exactly 66 products from oodlesnet-test.");
+      if (data.project !== "oodlesnet-test" || !Array.isArray(data.products) || data.count !== data.products.length) {
+        throw new Error("Safety check failed: expected a valid product catalogue from oodlesnet-test.");
       }
-      if (!data.products.some((product) => product.id === MOTOROLA_ID)) throw new Error("Motorola test product was not found.");
+      if (!data.products.length) throw new Error("The TEST catalogue contains no products.");
       setProducts(data.products);
-      const initialProduct = data.products.find((product) => product.id === selectedProductAId) || data.products.find((product) => product.id === MOTOROLA_ID);
+      const initialProduct = data.products.find((product) => product.id === selectedProductAId) || data.products[0];
       setSelectedProductAId(initialProduct?.id || "");
       setSelectedCategory(initialProduct?.categorySlug || "all");
-      setMessage("Loaded 66 products directly from oodlesnet-test. Read-only mode; no database writes.");
+       setMessage(`Loaded ${data.products.length} products dynamically from oodlesnet-test. Read-only mode; no database writes.`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not load the test catalogue.");
       setToken("");
@@ -84,7 +83,7 @@ export default function TestComparePage() {
         <label style={{ display: "block", marginTop: 12 }}>Password</label>
         <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" autoComplete="current-password" style={{ width: "100%", padding: 12, border: "1px solid #94a3b8", borderRadius: 8, marginTop: 5 }} />
         <button type="button" disabled={busy} onClick={loadTestProducts} style={{ marginTop: 14, padding: "12px 18px", border: 0, borderRadius: 10, background: "#064e3b", color: "#fff", fontWeight: 800 }}>
-          {busy ? "Loading TEST catalogue…" : "Load 66 TEST products"}
+          {busy ? "Loading TEST catalogue…" : "Load all TEST products"}
         </button>
         {message && <p role="status" style={{ color: "#166534", marginTop: 12 }}>{message}</p>}
         {error && <p role="alert" style={{ color: "#b91c1c", marginTop: 12 }}>{error}</p>}
