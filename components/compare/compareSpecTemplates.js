@@ -181,10 +181,15 @@ export function getComparisonSpecRows(product, productType) {
   const template = COMPARISON_SPEC_TEMPLATES[productType] || [];
   const specs = isPlainObject(product?.specs) ? product.specs : {};
 
-  return template.map((field) => ({
-    ...field,
-    value: displayableValue(specs[field.key]),
-  }));
+  // Show only fields supplied by at least one product. The comparison UI
+  // can then show "Not available" for the other product without listing
+  // every empty template field for both products.
+  return template
+    .map((field) => ({
+      ...field,
+      value: displayableValue(specs[field.key]),
+    }))
+    .filter((field) => field.value !== null);
 }
 
 export function getProductVariant(product) {
