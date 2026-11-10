@@ -186,6 +186,9 @@ function specificationLabel(key) {
     .replace(/\\b\\w/g, (letter) => letter.toUpperCase());
 }
 
+import descriptionSpecParser from "./descriptionSpecs.cjs";
+const { extractDescriptionSpecs } = descriptionSpecParser;
+
 export function getComparisonSpecRows(product) {
   // Read actual product data instead of requiring a category-specific
   // template. New categories and newly added spec keys work automatically.
@@ -220,6 +223,12 @@ export function getComparisonSpecRows(product) {
       label: "Product details (description)",
       value: description,
     });
+  }
+
+  // Extract only explicitly labelled facts (for example "Battery life: 48 hours")
+  // from prose descriptions. Unlabelled text remains available in its own row.
+  for (const item of extractDescriptionSpecs(product?.description)) {
+    if (!fields.has(item.key)) fields.set(item.key, item);
   }
 
   return [...fields.values()];
