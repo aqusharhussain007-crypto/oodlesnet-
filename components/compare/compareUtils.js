@@ -1,4 +1,4 @@
-import { getPriceConfidence } from "../../lib/priceConfidence";
+import { getPriceConfidence } from "../../lib/priceConfidence.js";
 
 function isNonEmptyOffer(value) {
   if (typeof value === "string") return value.trim().length > 0;
