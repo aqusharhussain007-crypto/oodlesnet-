@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "test:compare": "node --experimental-default-type=module --test components/compare/compareRules.test.js",
+    "test:compare": "node --test components/compare/priceAdvantage.test.cjs",
     "build": "npm run test:compare && next build",
     "start": "next start",
     "lint": "next lint"
