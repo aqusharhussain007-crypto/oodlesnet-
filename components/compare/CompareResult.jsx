@@ -323,8 +323,8 @@ export default function CompareResult({
       <style jsx>{`
         .comparison-mobile-specs { display: none !important; }
         @media (max-width: 640px) {
-          .comparison-desktop-table { display: none !important; }
-          .comparison-mobile-specs { display: grid !important; }
+          .comparison-desktop-table { display: block !important; }
+          .comparison-mobile-specs { display: none !important; }
           .comparison-result-card {
             box-sizing: border-box;
             position: relative;
