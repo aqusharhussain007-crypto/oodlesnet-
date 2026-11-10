@@ -124,6 +124,14 @@ export default function CompareResult({
     }
     return variantItems.find((item) => item && item.key === key)?.value ?? null;
   };
+  const mobileSpecRows = [
+    ...variantRows.map((field) => ({ ...field, label: `${field.label} (variant)`, kind: "variant" })),
+    ...specRows.map((field) => ({ ...field, kind: "spec" })),
+  ].map((field) => {
+    const valueA = valueFor(rowsA, variantA, field.key);
+    const valueB = valueFor(rowsB, variantB, field.key);
+    return { ...field, valueA, valueB, displayA: safeDisplayValue(valueA), displayB: safeDisplayValue(valueB) };
+  });
   const retailerA = safeCount(result.retailerCoverage?.A);
   const retailerB = safeCount(result.retailerCoverage?.B);
   const scoreA = result.scores?.A && typeof result.scores.A === "object" ? result.scores.A : {};
@@ -255,6 +263,26 @@ export default function CompareResult({
       <p style={{ margin: "0 0 8px", fontSize: 11, color: "#64748b" }}>
         Compare both products side by side. Highlighted values differ; this does not indicate which product is better.
       </p>
+      <div className="comparison-mobile-specs" aria-label="Mobile product specification comparison" style={{ display: "none", gap: 10 }}>
+        {mobileSpecRows.length ? mobileSpecRows.map((field) => {
+          const differs = field.displayA !== field.displayB && (field.displayA !== "Not available" || field.displayB !== "Not available");
+          return (
+            <section key={`mobile-${field.kind}-${field.key}`} style={{ border: "1px solid #e2e8f0", borderRadius: 12, overflow: "hidden", background: "#fff" }}>
+              <h5 style={{ margin: 0, padding: "9px 11px", fontSize: 13, fontWeight: 900, color: "#334155", background: "#f1f5f9" }}>{field.label}</h5>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, background: "#e2e8f0" }}>
+                <div style={{ minWidth: 0, padding: 10, background: differs ? "#fff7ed" : "#fff" }}>
+                  <div style={{ fontSize: 10, fontWeight: 900, color: "#64748b", marginBottom: 5 }}>PRODUCT A</div>
+                  <div style={{ fontSize: 12, lineHeight: 1.45, color: "#0f172a", overflowWrap: "anywhere" }}>{field.displayA}</div>
+                </div>
+                <div style={{ minWidth: 0, padding: 10, background: differs ? "#fff7ed" : "#fff" }}>
+                  <div style={{ fontSize: 10, fontWeight: 900, color: "#64748b", marginBottom: 5 }}>PRODUCT B</div>
+                  <div style={{ fontSize: 12, lineHeight: 1.45, color: "#0f172a", overflowWrap: "anywhere" }}>{field.displayB}</div>
+                </div>
+              </div>
+            </section>
+          );
+        }) : <p style={{ padding: 12, color: "#64748b" }}>No structured specifications are available for these products yet.</p>}
+      </div>
       <div className="comparison-desktop-table" style={{ overflowX: "auto", width: "100%", borderRadius: 10, overscrollBehaviorX: "contain", WebkitOverflowScrolling: "touch" }}>
         <table
           aria-label="Product specification comparison"
@@ -293,7 +321,10 @@ export default function CompareResult({
         </table>
       </div>
       <style jsx>{`
+        .comparison-mobile-specs { display: none !important; }
         @media (max-width: 640px) {
+          .comparison-desktop-table { display: none !important; }
+          .comparison-mobile-specs { display: grid !important; }
           .comparison-result-card {
             box-sizing: border-box;
             position: relative;
