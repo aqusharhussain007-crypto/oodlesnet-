@@ -3,7 +3,7 @@ import {
   getStoreCount,
   hasOffers,
 } from "./compareUtils";
-import { getComparisonSpecRows, getProductVariant } from "./compareSpecTemplates";
+import { COMPARISON_SPEC_TEMPLATES, getComparisonSpecRows, getProductVariant } from "./compareSpecTemplates";
 
 const TYPE_KEYWORDS = {
   earbuds: ["earbuds", "ear bud", "tws", "in-ear", "in ear"],
@@ -45,7 +45,12 @@ function normalizeType(value) {
 
 function inferType(product) {
   const explicit = product?.productType || product?.type || product?.subcategory;
-  if (explicit) return normalizeType(explicit);
+  if (explicit) {
+    const normalizedExplicit = normalizeType(explicit);
+    return Object.prototype.hasOwnProperty.call(COMPARISON_SPEC_TEMPLATES, normalizedExplicit)
+      ? normalizedExplicit
+      : "unknown";
+  }
 
   const text = [
     product?.name,
