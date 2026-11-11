@@ -25,12 +25,12 @@ function extractDescriptionSpecs(description, definitions = []) {
   if (!labels.length) return [];
 
   const alternatives = labels.map(escapeRegex).join("|");
-  const marker = new RegExp("(^|[;,|.]\\s*|\\s)(" + alternatives + ")\\s*:\\s*", "gi");
+  const marker = new RegExp("(?<![A-Za-z0-9])(" + alternatives + ")\\s*:\\s*", "gi");
   const matches = [...text.matchAll(marker)];
   const rows = [];
   for (let i = 0; i < matches.length; i += 1) {
     const match = matches[i];
-    const label = match[2].trim();
+    const label = match[1].trim();
     const start = match.index + match[0].length;
     const end = i + 1 < matches.length ? matches[i + 1].index : text.length;
     const value = text.slice(start, end).replace(/^[\s,.;|:-]+|[\s,.;|:-]+$/g, "").trim();
