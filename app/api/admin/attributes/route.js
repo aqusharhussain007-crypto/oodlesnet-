@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 function getTestApp() {
   const projectId = process.env.FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  const privateKey = String(process.env.FIREBASE_PRIVATE_KEY || "").trim().replace(/\\\\n/g, "\\n");
+  const privateKey = String(process.env.FIREBASE_PRIVATE_KEY || "").trim().replace(/\\n/g, "\n");
   if (projectId !== "oodlesnet-test") {
     throw new Error("Attribute registry is locked to oodlesnet-test.");
   }
