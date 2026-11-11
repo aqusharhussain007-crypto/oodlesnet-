@@ -188,7 +188,10 @@ function specificationLabel(key) {
 
 import descriptionSpecParser from "./descriptionSpecs.cjs";
 const { extractDescriptionSpecs } = descriptionSpecParser;
-iexport function getComparisonSpecRows(product, definitions = []) {
+import attributeRegistry from "./attributeRegistry.cjs";
+const { buildAttributeIndex, resolveAttribute, normalizeAttributeValue } = attributeRegistry;
+
+export function getComparisonSpecRows(product, definitions = []) {
   const registryIndex = buildAttributeIndex(definitions);
   const sources = [
     product?.specs,
