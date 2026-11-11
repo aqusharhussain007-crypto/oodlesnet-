@@ -11,12 +11,12 @@ const DEFAULT_LABELS = [
 ];
 
 function escapeRegex(value) {
-  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return String(value).replace(/[.*+?^\${}()|[\]\\]/g, "\\$&");
 }
 
 function extractDescriptionSpecs(description, definitions = []) {
   if (typeof description !== "string" || !description.trim()) return [];
-  const text = description.replace(/\\s+/g, " ").trim();
+  const text = description.replace(/\s+/g, " ").trim();
   const labels = [...new Set([
     ...DEFAULT_LABELS,
     ...definitions.flatMap((item) => [item?.label, ...(Array.isArray(item?.aliases) ? item.aliases : [])]),
@@ -25,7 +25,7 @@ function extractDescriptionSpecs(description, definitions = []) {
   if (!labels.length) return [];
 
   const alternatives = labels.map(escapeRegex).join("|");
-  const marker = new RegExp("(^|[;,|.]\\\\s*|\\\\s)(" + alternatives + ")\\\\s*:\\\\s*", "gi");
+  const marker = new RegExp("(^|[;,|.]\\s*|\\s)(" + alternatives + ")\\s*:\\s*", "gi");
   const matches = [...text.matchAll(marker)];
   const rows = [];
   for (let i = 0; i < matches.length; i += 1) {
@@ -33,7 +33,7 @@ function extractDescriptionSpecs(description, definitions = []) {
     const label = match[2].trim();
     const start = match.index + match[0].length;
     const end = i + 1 < matches.length ? matches[i + 1].index : text.length;
-    const value = text.slice(start, end).replace(/^[\\s,.;|:-]+|[\\s,.;|:-]+$/g, "").trim();
+    const value = text.slice(start, end).replace(/^[\s,.;|:-]+|[\s,.;|:-]+$/g, "").trim();
     if (!value) continue;
     const key = label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
     rows.push({ key, label, value });
