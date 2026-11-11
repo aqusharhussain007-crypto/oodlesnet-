@@ -65,6 +65,14 @@ Existing fields remain unchanged. Add optional fields:
 
 For compatibility, the comparison reader must continue accepting legacy `specs`, `specifications`, flat `attributes`, and current product fields. New structured attribute values use the {value, unit, raw} envelope; plain values remain valid.
 
+## Product type taxonomy (required for comparison)
+
+- `categorySlug` is a broad browse group such as `fashion`, `beauty`, or `electronics`.
+- `productType` is the specific comparable product class such as `shoes`, `jeans`, `face_wash`, `smartphone`, or `earbuds`.
+- A comparison is allowed only when both products have an explicit, normalized matching `productType`.
+- Missing product types are not inferred from broad categories or guessed from product names; those records remain unavailable for comparison until verified.
+- Aliases (for example, `running shoes` and `sneakers`) should resolve through a maintained product-type registry, not scattered hard-coded conditions.
+
 ## Comparison rules
 1. Build candidate rows from the union of keys present on either product.
 2. Resolve labels and aliases through the registry.
