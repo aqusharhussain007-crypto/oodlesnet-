@@ -51,3 +51,21 @@ test("type aliases normalize consistently", () => {
   );
   assert.equal(inferType(product("C", { categorySlug: "power-banks", productType: undefined })), "power-bank");
 });
+
+test("broad category cannot make different declared product types comparable", () => {
+  const shoes = product("Shoes", { categorySlug: "fashion", productType: "shoes" });
+  const shirt = product("Shirt", { categorySlug: "fashion", productType: "t-shirt" });
+  assert.equal(canCompare(shoes, shirt).error, "TYPE_MISMATCH");
+});
+
+test("explicit type is not weakened by missing type on the other product", () => {
+  const shoes = product("Shoes", { categorySlug: "fashion", productType: "shoes" });
+  const unknown = product("Unknown", { categorySlug: "fashion", productType: undefined });
+  assert.equal(canCompare(shoes, unknown).error, "TYPE_MISMATCH");
+});
+
+test("same explicit type remains comparable across different categories", () => {
+  const a = product("A", { categorySlug: "fashion", productType: "shoes" });
+  const b = product("B", { categorySlug: "footwear", productType: "shoes" });
+  assert.deepEqual(canCompare(a, b), { allowed: true, type: "shoes" });
+});
