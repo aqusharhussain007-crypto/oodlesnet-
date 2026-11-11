@@ -13,7 +13,7 @@ const ERROR_MESSAGES = {
   COMPARISON_FAILED: "The comparison could not be completed. Please select the products again.",
 };
 
-export default function CompareContainer({ currentProduct, demoProducts }) {
+export default function CompareContainer({ currentProduct, demoProducts, attributeDefinitions = [] }) {
   const [productB, setProductB] = useState(null);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -36,7 +36,7 @@ export default function CompareContainer({ currentProduct, demoProducts }) {
   function handleCompare() {
     if (!productB) return;
     try {
-      const comparison = compareProducts(currentProduct, productB);
+      const comparison = compareProducts(currentProduct, productB, attributeDefinitions);
       if (comparison.error) {
         setError(comparison.error);
         setResult(null);
