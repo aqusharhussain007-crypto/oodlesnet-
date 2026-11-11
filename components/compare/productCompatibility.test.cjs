@@ -27,16 +27,16 @@ test("new product types are accepted without editing an allowlist", () => {
   assert.deepEqual(canCompare(a, b), { allowed: true, type: "robot-vacuum" });
 });
 
-test("products without explicit types compare within the same new category", () => {
+test("products without explicit types are not comparable even in the same category", () => {
   const a = product("A", { categorySlug: "garden-tools", productType: undefined });
   const b = product("B", { categorySlug: "garden_tools", productType: undefined });
-  assert.deepEqual(canCompare(a, b), { allowed: true, type: "garden-tools" });
+  assert.equal(canCompare(a, b).error, "PRODUCT_TYPE_REQUIRED");
 });
 
 test("different categories without explicit types are rejected", () => {
   const a = product("A", { categorySlug: "garden-tools", productType: undefined });
   const b = product("B", { categorySlug: "kitchen", productType: undefined });
-  assert.equal(canCompare(a, b).error, "CATEGORY_MISMATCH");
+  assert.equal(canCompare(a, b).error, "PRODUCT_TYPE_REQUIRED");
 });
 
 test("duplicate and incomplete product identities are rejected", () => {
@@ -68,4 +68,10 @@ test("same explicit type remains comparable across different categories", () => 
   const a = product("A", { categorySlug: "fashion", productType: "shoes" });
   const b = product("B", { categorySlug: "footwear", productType: "shoes" });
   assert.deepEqual(canCompare(a, b), { allowed: true, type: "shoes" });
+});
+
+test("same broad category without product types is never enough", () => {
+  const shoes = product("Shoes", { categorySlug: "fashion", productType: undefined });
+  const jeans = product("Jeans", { categorySlug: "fashion", productType: undefined });
+  assert.equal(canCompare(shoes, jeans).error, "PRODUCT_TYPE_REQUIRED");
 });
