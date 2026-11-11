@@ -1,0 +1,37 @@
+const test = require("node:test");
+const assert = require("node:assert/strict");
+
+test("uses Firestore registry aliases and canonical labels for structured specs", async () => {
+  const { getComparisonSpecRows } = await import("./compareSpecTemplates.js");
+  const definitions = [
+    { key: "battery_life", label: "Battery life", aliases: ["runtime"], dataType: "measurement", unit: "hours" },
+    { key: "material", label: "Material", aliases: ["fabric composition"], dataType: "text" },
+  ];
+  const rows = getComparisonSpecRows({
+    specs: { runtime: "48 hours", "fabric composition": "Cotton" },
+  }, definitions);
+  assert.equal(rows.find((row) => row.key === "battery_life").label, "Battery life");
+  assert.deepEqual(rows.find((row) => row.key === "battery_life").normalizedValue, {
+    value: 48, unit: "hours", raw: "48 hours",
+  });
+  assert.equal(rows.find((row) => row.key === "material").value, "Cotton");
+});
+
+test("uses registry aliases for explicitly labelled description facts", async () => {
+  const { getComparisonSpecRows } = await import("./compareSpecTemplates.js");
+  const definitions = [
+    { key: "battery_life", label: "Battery life", aliases: ["runtime"], dataType: "measurement", unit: "hours" },
+  ];
+  const rows = getComparisonSpecRows({ description: "Runtime: 36 hours" }, definitions);
+  const battery = rows.find((row) => row.key === "battery_life");
+  assert.ok(battery);
+  assert.equal(battery.label, "Battery life");
+  assert.equal(battery.value, "36 hours");
+});
+
+test("keeps unknown attributes available without inventing values", async () => {
+  const { getComparisonSpecRows } = await import("./compareSpecTemplates.js");
+  const rows = getComparisonSpecRows({ specs: { "custom feature": "Verified value" } }, []);
+  assert.equal(rows[0].key, "custom_feature");
+  assert.equal(rows[0].value, "Verified value");
+});
