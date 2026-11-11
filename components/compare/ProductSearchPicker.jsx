@@ -56,6 +56,7 @@ export default function ProductSearchPicker({
                 {selected.imageUrl ? <img src={selected.imageUrl} alt={selected.name || "Selected product"} loading="lazy" style={{ display: "block", maxWidth: "100%", width: "100%", height: "100%", objectFit: "contain" }} /> : <span style={{ color: "#94a3b8", fontSize: 11 }}>Image unavailable</span>}
               </span>
               <span style={{ display: "-webkit-box", width: "100%", maxWidth: "100%", minWidth: 0, boxSizing: "border-box", padding: "0 3px", fontWeight: 800, fontSize: 13, lineHeight: 1.3, textAlign: "center", overflowWrap: "anywhere", wordBreak: "normal", WebkitLineClamp: 4, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{selected.name || "Unnamed product"}</span>
+              <span style={{ color: "#0f766e", fontSize: 11, fontWeight: 800 }}>{categoryLabel(selected.categorySlug)} · {productTypeLabel(selected)}</span>
             </button>
             <button type="button" onClick={() => { onSelect?.(null); setQuery(""); setShowResults(true); }} style={{ flex: "0 0 auto", marginTop: 6, border: 0, borderRadius: 999, padding: "6px 12px", background: "#d1fae5", color: "#065f46", fontWeight: 800, fontSize: 12, cursor: "pointer" }}>Change product</button>
           </>
@@ -93,7 +94,7 @@ export default function ProductSearchPicker({
               {product.imageUrl ? <img src={product.imageUrl} alt="" loading="lazy" style={{ width: 48, height: 48, flex: "0 0 48px", objectFit: "contain", borderRadius: 7, background: "#f8fafc" }} /> : <span style={{ width: 48, height: 48, flex: "0 0 48px", borderRadius: 7, background: "#f1f5f9" }} />}
               <span style={{ minWidth: 0 }}>
                 <span style={{ display: "block", fontWeight: 800, overflowWrap: "anywhere" }}>{product.name || "Unnamed product"}</span>
-                <span style={{ display: "block", marginTop: 3, color: "#64748b", fontSize: 12 }}>{categoryLabel(product.categorySlug)}{product.brand ? " · " + product.brand : ""}</span>
+                <span style={{ display: "block", marginTop: 3, color: "#64748b", fontSize: 12 }}>{categoryLabel(product.categorySlug)} · {productTypeLabel(product)}{product.brand ? " · " + product.brand : ""}</span>
               </span>
             </button>
           )) : <p style={{ padding: 13, color: "#64748b" }}>{emptyMessage}</p>}
