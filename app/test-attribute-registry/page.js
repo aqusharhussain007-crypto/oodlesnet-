@@ -53,6 +53,17 @@ export default function TestAttributeRegistryPage() {
     }
   }
 
+  async function seedDefinitions() {
+    if (!token || !window.confirm("Create only the 20 missing definitions in oodlesnet-test? Existing records will not be overwritten.")) return;
+    setBusy(true); setMessage(""); setResult("");
+    try {
+      const response = await fetch("/api/admin/attributes", { method: "POST", headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" }, body: JSON.stringify({ confirm: "CREATE_MISSING_ATTRIBUTE_DEFINITIONS" }), cache: "no-store" });
+      const data = await response.json().catch(() => ({}));
+      setResult(JSON.stringify({ httpStatus: response.status, ...data }, null, 2));
+      setMessage(response.ok && data.ok ? "Seed completed and verified." : "Seed did not fully verify. Review the result.");
+    } catch (error) { setMessage(error.message || "Could not complete the TEST seed."); }
+    finally { setBusy(false); }
+  }
   async function runDryRun() {
     if (!token) return;
     setBusy(true);
@@ -94,6 +105,7 @@ export default function TestAttributeRegistryPage() {
         <strong>Authentication succeeded.</strong>
         <p>Run the attribute seed comparison. This is strictly read-only.</p>
         <button disabled={busy} type="button" onClick={runDryRun} style={{ padding: 12, fontWeight: 700 }}>{busy ? "Auditing…" : "Run read-only registry audit"}</button>
+        <button disabled={busy} type="button" onClick={seedDefinitions} style={{ marginTop: 10, padding: 12, fontWeight: 700 }}>Create missing 20 definitions in TEST</button>
       </section>}
       {message && <p role="status" style={{ marginTop: 16, overflowWrap: "anywhere" }}>{message}</p>}
       {result && <pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere", padding: 12, background: "#eee", color: "#111", borderRadius: 8 }}>{result}</pre>}
