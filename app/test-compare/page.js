@@ -11,6 +11,7 @@ export default function TestComparePage() {
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
   const [products, setProducts] = useState([]);
+  const [attributeDefinitions, setAttributeDefinitions] = useState([]);
   const [selectedProductAId, setSelectedProductAId] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [busy, setBusy] = useState(false);
@@ -51,6 +52,20 @@ export default function TestComparePage() {
         throw new Error("Safety check failed: expected a valid product catalogue from oodlesnet-test.");
       }
       if (!data.products.length) throw new Error("The TEST catalogue contains no products.");
+      const registryResponse = await fetch("/api/admin/attributes?mode=registry", {
+        method: "GET",
+        headers: { Authorization: "Bearer " + idToken },
+        cache: "no-store",
+      });
+      const registryData = await registryResponse.json().catch(() => ({}));
+      if (!registryResponse.ok || !registryData.ok ||
+          registryData.project !== "oodlesnet-test" ||
+          !Array.isArray(registryData.definitions) ||
+          registryData.count !== registryData.definitions.length ||
+          registryData.definitions.length < 1) {
+        throw new Error(registryData.error || "Could not load the verified TEST attribute registry.");
+      }
+      setAttributeDefinitions(registryData.definitions);
       setProducts(data.products);
       const initialProduct = data.products.find((product) => product.id === selectedProductAId) || data.products[0];
       setSelectedProductAId(initialProduct?.id || "");
@@ -60,6 +75,7 @@ export default function TestComparePage() {
       setError(e instanceof Error ? e.message : "Could not load the test catalogue.");
       setToken("");
       setProducts([]);
+      setAttributeDefinitions([]);
       setSelectedProductAId("");
     } finally {
       setPassword("");
@@ -75,7 +91,7 @@ export default function TestComparePage() {
   return (
     <main style={{ maxWidth: 900, margin: "0 auto", padding: 18, color: "#0f172a" }}>
       <h1 style={{ fontSize: 26, fontWeight: 900 }}>OodlesNet TEST Comparison Lab</h1>
-      <p style={{ marginTop: 8, lineHeight: 1.6 }}>Read-only comparison testing against the isolated <strong>oodlesnet-test</strong> catalogue. This page does not use the production Firebase client.</p>
+      <p style={{ marginTop: 8, lineHeight: 1.6 }}>Read-only comparison testing against the isolated <strong>oodlesnet-test</strong> catalogue and Firestore attribute registry. This page does not use the production Firebase client.</p>
       <section style={{ marginTop: 18, padding: 16, border: "1px solid #0e7490", borderRadius: 14, background: "#f0fdfa" }}>
         <h2 style={{ fontSize: 18, fontWeight: 800 }}>TEST Firebase sign-in</h2>
         <label style={{ display: "block", marginTop: 12 }}>Test account email</label>
@@ -105,7 +121,7 @@ export default function TestComparePage() {
               <h3 style={{ fontSize: 16, fontWeight: 900, color: "#0f766e", margin: "0 0 10px" }}>PRODUCT A</h3>
               <ProductSearchPicker products={productAOptions} selectedId={currentProduct?.id || ""} onSelect={(product) => setSelectedProductAId(product?.id || "")} label="" placeholder="Search Product A…" categoryFilter={false} emptyMessage="No products match. Try another search." />
             </section>
-            {currentProduct ? <CompareContainer currentProduct={currentProduct} demoProducts={products} /> : (
+            {currentProduct ? <CompareContainer currentProduct={currentProduct} demoProducts={products} attributeDefinitions={attributeDefinitions} /> : (
               <section style={{ minWidth: 0 }}>
                 <h3 style={{ fontSize: 16, fontWeight: 900, color: "#0f766e", margin: "0 0 10px" }}>PRODUCT B</h3>
                 <div style={{ height: 176, borderRadius: 12, background: "rgba(15,118,110,0.045)", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(15,118,110,0.22)", fontWeight: 900 }}>OodlesNet</div>
