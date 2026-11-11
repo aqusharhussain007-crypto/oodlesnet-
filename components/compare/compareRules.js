@@ -12,7 +12,7 @@ export { canCompare };
 import comparisonScoring from "./comparisonScoring.cjs";
 const { getComparisonScore } = comparisonScoring;
 
-export function compareProducts(a, b) {
+export function compareProducts(a, b, attributeDefinitions = []) {
   const compatibility = canCompare(a, b);
   if (!compatibility.allowed) return { error: compatibility.error };
 
@@ -26,8 +26,8 @@ export function compareProducts(a, b) {
     priceComparison: { A: priceA, B: priceB },
     retailerCoverage: { A: getStoreCount(a), B: getStoreCount(b) },
     specifications: {
-      A: getComparisonSpecRows(a, compatibility.type),
-      B: getComparisonSpecRows(b, compatibility.type),
+      A: getComparisonSpecRows(a, attributeDefinitions),
+      B: getComparisonSpecRows(b, attributeDefinitions),
     },
     variants: { A: getProductVariant(a), B: getProductVariant(b) },
   };
