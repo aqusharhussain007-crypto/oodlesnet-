@@ -71,6 +71,27 @@ export async function GET(request) {
     return NextResponse.json({ ok: false, error: "Firebase ID token is invalid or expired." }, { status: 401, headers: { "Cache-Control": "no-store" } });
   }
 
+  if (new URL(request.url).searchParams.get("mode") === "registry") {
+    try {
+      const snapshot = await getFirestore(app).collection("attribute_definitions").get();
+      const definitions = snapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter((definition) => definition.active !== false);
+      return NextResponse.json({
+        ok: true,
+        mode: "registry",
+        project: "oodlesnet-test",
+        collection: "attribute_definitions",
+        count: definitions.length,
+        definitions,
+        readOnly: true,
+        writesPerformed: 0,
+      }, { headers: { "Cache-Control": "no-store" } });
+    } catch {
+      return NextResponse.json({ ok: false, error: "Could not load TEST attribute registry." }, { status: 500, headers: { "Cache-Control": "no-store" } });
+    }
+  }
+
   try {
     if (seed.collection !== "attribute_definitions" || !Array.isArray(seed.definitions)) {
       throw new Error("Invalid bundled attribute seed.");
