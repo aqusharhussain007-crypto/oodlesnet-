@@ -244,12 +244,6 @@ export function getComparisonSpecRows(product, definitions = []) {
 
   return [...fields.values()];
 }
-m of extractDescriptionSpecs(product?.description)) {
-    if (!fields.has(item.key)) fields.set(item.key, item);
-  }
-
-  return [...fields.values()];
-}
 
 export function getProductVariant(product) {
   const explicit = product?.variantDetails;
