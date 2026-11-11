@@ -40,3 +40,15 @@ test("measurement definitions require a unit", () => {
   assert.equal(result.ok, false);
   assert.ok(result.errors.some((error) => error.includes("measurement requires a unit")));
 });
+
+const fs = require("node:fs");
+const path = require("node:path");
+
+test("the committed 20-definition starter seed passes the dry-run audit", () => {
+  const seedPath = path.join(__dirname, "..", "data", "attribute-definitions.seed.json");
+  const seed = JSON.parse(fs.readFileSync(seedPath, "utf8"));
+  const result = validateSeed(seed);
+  assert.equal(seed.definitions.length, 20);
+  assert.equal(result.ok, true, result.errors.join("; "));
+  assert.equal(result.actions.length, 20);
+});
