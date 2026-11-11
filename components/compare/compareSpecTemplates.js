@@ -188,10 +188,8 @@ function specificationLabel(key) {
 
 import descriptionSpecParser from "./descriptionSpecs.cjs";
 const { extractDescriptionSpecs } = descriptionSpecParser;
-
-export function getComparisonSpecRows(product) {
-  // Read actual product data instead of requiring a category-specific
-  // template. New categories and newly added spec keys work automatically.
+iexport function getComparisonSpecRows(product, definitions = []) {
+  const registryIndex = buildAttributeIndex(definitions);
   const sources = [
     product?.specs,
     product?.specifications,
@@ -200,34 +198,50 @@ export function getComparisonSpecRows(product) {
 
   const fields = new Map();
   for (const source of sources) {
-    for (const [key, rawValue] of Object.entries(source)) {
+    for (const [rawKey, rawValue] of Object.entries(source)) {
       const value = displayableValue(rawValue);
       if (value === null) continue;
-      const normalizedKey = String(key).trim();
-      if (!normalizedKey) continue;
-      fields.set(normalizedKey, {
-        key: normalizedKey,
-        label: specificationLabel(normalizedKey),
+      const definition = resolveAttribute(rawKey, registryIndex);
+      if (!definition.key) continue;
+      const normalizedValue = normalizeAttributeValue(rawValue, definition);
+      fields.set(definition.key, {
+        key: definition.key,
+        label: definition.label || specificationLabel(definition.key),
         value,
+        normalizedValue,
+        dataType: definition.dataType || "text",
+        unit: definition.unit || null,
       });
     }
   }
 
-  // Product descriptions are useful source information even when no
-  // structured specification map has been supplied. Keep them clearly
-  // labelled as descriptions rather than treating prose as verified fields.
   const description = displayableValue(product?.description);
   if (description !== null) {
-    fields.set("productDetails", {
-      key: "productDetails",
+    fields.set("product_details", {
+      key: "product_details",
       label: "Product details (description)",
       value: description,
+      source: "description",
     });
   }
 
-  // Extract only explicitly labelled facts (for example "Battery life: 48 hours")
-  // from prose descriptions. Unlabelled text remains available in its own row.
-  for (const item of extractDescriptionSpecs(product?.description)) {
+  for (const item of extractDescriptionSpecs(product?.description, definitions)) {
+    const definition = resolveAttribute(item.key, registryIndex);
+    if (!fields.has(definition.key)) {
+      fields.set(definition.key, {
+        ...item,
+        key: definition.key,
+        label: definition.label || item.label,
+        normalizedValue: normalizeAttributeValue(item.value, definition),
+        dataType: definition.dataType || "text",
+        unit: definition.unit || null,
+      });
+    }
+  }
+
+  return [...fields.values()];
+}
+m of extractDescriptionSpecs(product?.description)) {
     if (!fields.has(item.key)) fields.set(item.key, item);
   }
 
