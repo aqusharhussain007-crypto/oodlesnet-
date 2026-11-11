@@ -61,7 +61,7 @@ test("broad category cannot make different declared product types comparable", (
 test("explicit type is not weakened by missing type on the other product", () => {
   const shoes = product("Shoes", { categorySlug: "fashion", productType: "shoes" });
   const unknown = product("Unknown", { categorySlug: "fashion", productType: undefined });
-  assert.equal(canCompare(shoes, unknown).error, "TYPE_MISMATCH");
+  assert.equal(canCompare(shoes, unknown).error, "PRODUCT_TYPE_REQUIRED");
 });
 
 test("same explicit type remains comparable across different categories", () => {
