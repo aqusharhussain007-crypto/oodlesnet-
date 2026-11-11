@@ -1,0 +1,352 @@
+{
+  "schemaVersion": 1,
+  "collection": "attribute_definitions",
+  "definitions": [
+    {
+      "key": "brand",
+      "label": "Brand",
+      "aliases": [
+        "manufacturer"
+      ],
+      "dataType": "text",
+      "appliesTo": [
+        "*"
+      ],
+      "comparison": "exact",
+      "filterable": true,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "aliases": [
+        "color"
+      ],
+      "dataType": "enum",
+      "appliesTo": [
+        "*"
+      ],
+      "comparison": "set",
+      "filterable": true,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "size",
+      "label": "Size",
+      "aliases": [
+        "clothing size",
+        "shoe size"
+      ],
+      "dataType": "list",
+      "appliesTo": [
+        "*"
+      ],
+      "comparison": "set",
+      "filterable": true,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "material",
+      "label": "Material",
+      "aliases": [
+        "fabric",
+        "fabric composition"
+      ],
+      "dataType": "text",
+      "appliesTo": [
+        "*"
+      ],
+      "comparison": "exact",
+      "filterable": true,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "battery_life",
+      "label": "Battery life",
+      "aliases": [
+        "playback time",
+        "runtime"
+      ],
+      "dataType": "measurement",
+      "unit": "hours",
+      "appliesTo": [
+        "earbuds",
+        "headphones",
+        "smartwatch",
+        "fitness_band"
+      ],
+      "comparison": "numeric",
+      "filterable": false,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "bluetooth_version",
+      "label": "Bluetooth version",
+      "aliases": [
+        "bluetooth"
+      ],
+      "dataType": "text",
+      "appliesTo": [
+        "earbuds",
+        "headphones",
+        "smartwatch",
+        "smartphone"
+      ],
+      "comparison": "exact",
+      "filterable": false,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "charging",
+      "label": "Charging",
+      "aliases": [
+        "charging type",
+        "charging port"
+      ],
+      "dataType": "text",
+      "appliesTo": [
+        "*"
+      ],
+      "comparison": "exact",
+      "filterable": false,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "noise_cancellation",
+      "label": "Noise cancellation",
+      "aliases": [
+        "anc",
+        "active noise cancellation"
+      ],
+      "dataType": "text",
+      "appliesTo": [
+        "earbuds",
+        "headphones"
+      ],
+      "comparison": "exact",
+      "filterable": true,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "ram",
+      "label": "RAM",
+      "aliases": [
+        "memory"
+      ],
+      "dataType": "measurement",
+      "unit": "GB",
+      "appliesTo": [
+        "smartphone",
+        "tablet",
+        "laptop"
+      ],
+      "comparison": "numeric",
+      "filterable": true,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "storage",
+      "label": "Storage",
+      "aliases": [
+        "internal storage"
+      ],
+      "dataType": "measurement",
+      "unit": "GB",
+      "appliesTo": [
+        "smartphone",
+        "tablet",
+        "laptop"
+      ],
+      "comparison": "numeric",
+      "filterable": true,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "processor",
+      "label": "Processor",
+      "aliases": [
+        "chipset",
+        "cpu"
+      ],
+      "dataType": "text",
+      "appliesTo": [
+        "smartphone",
+        "tablet",
+        "laptop"
+      ],
+      "comparison": "exact",
+      "filterable": true,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "skin_type",
+      "label": "Suitable skin type",
+      "aliases": [
+        "skin compatibility"
+      ],
+      "dataType": "list",
+      "appliesTo": [
+        "skincare",
+        "cleanser",
+        "moisturizer",
+        "serum"
+      ],
+      "comparison": "set",
+      "filterable": true,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "ingredients",
+      "label": "Ingredients",
+      "aliases": [
+        "key ingredients",
+        "active ingredients"
+      ],
+      "dataType": "list",
+      "appliesTo": [
+        "beauty",
+        "skincare",
+        "cleanser",
+        "moisturizer",
+        "serum"
+      ],
+      "comparison": "set",
+      "filterable": true,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "volume",
+      "label": "Pack size",
+      "aliases": [
+        "net quantity",
+        "quantity"
+      ],
+      "dataType": "measurement",
+      "unit": "ml",
+      "appliesTo": [
+        "beauty",
+        "skincare",
+        "cleanser",
+        "serum"
+      ],
+      "comparison": "numeric",
+      "filterable": true,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "spf",
+      "label": "SPF",
+      "aliases": [
+        "sun protection factor"
+      ],
+      "dataType": "number",
+      "appliesTo": [
+        "sunscreen"
+      ],
+      "comparison": "numeric",
+      "filterable": true,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "capacity",
+      "label": "Capacity",
+      "aliases": [
+        "load capacity"
+      ],
+      "dataType": "measurement",
+      "unit": "L",
+      "appliesTo": [
+        "refrigerator",
+        "washing_machine",
+        "water_purifier"
+      ],
+      "comparison": "numeric",
+      "filterable": true,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "energy_rating",
+      "label": "Energy rating",
+      "aliases": [
+        "star rating"
+      ],
+      "dataType": "enum",
+      "appliesTo": [
+        "refrigerator",
+        "washing_machine",
+        "air_conditioner"
+      ],
+      "comparison": "exact",
+      "filterable": true,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "warranty",
+      "label": "Warranty",
+      "aliases": [
+        "warranty period"
+      ],
+      "dataType": "measurement",
+      "unit": "years",
+      "appliesTo": [
+        "*"
+      ],
+      "comparison": "numeric",
+      "filterable": false,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "fit",
+      "label": "Fit",
+      "aliases": [
+        "clothing fit"
+      ],
+      "dataType": "enum",
+      "appliesTo": [
+        "clothing",
+        "tshirt",
+        "trousers",
+        "jeans"
+      ],
+      "comparison": "exact",
+      "filterable": true,
+      "comparable": true,
+      "active": true
+    },
+    {
+      "key": "pattern",
+      "label": "Pattern",
+      "aliases": [
+        "print"
+      ],
+      "dataType": "text",
+      "appliesTo": [
+        "clothing",
+        "tshirt",
+        "dress"
+      ],
+      "comparison": "exact",
+      "filterable": true,
+      "comparable": true,
+      "active": true
+    }
+  ]
+}
