@@ -44,14 +44,16 @@ function canCompare(a, b) {
   const categoryA = normalize(a.categorySlug ?? a.category_slug ?? a.category);
   const categoryB = normalize(b.categorySlug ?? b.category_slug ?? b.category);
 
-  // When both records have explicit types, compare those types. This allows
-  // taxonomy/category reorganizations without code changes.
-  if (typeA && typeB) {
-    if (typeA !== typeB) return { allowed: false, error: "TYPE_MISMATCH" };
+  // Explicit type metadata is authoritative. Never fall back to a broad
+  // category when only one product has a known type.
+  if (typeA || typeB) {
+    if (!typeA || !typeB || typeA !== typeB) {
+      return { allowed: false, error: "TYPE_MISMATCH" };
+    }
     return { allowed: true, type: typeA };
   }
 
-  // Without explicit type metadata, require the same known category.
+  // When neither record has an explicit type, require the same known category.
   if (!categoryA || !categoryB) {
     return { allowed: false, error: "UNSUPPORTED_TYPE" };
   }
