@@ -1,8 +1,7 @@
 /**
  * Data-driven product compatibility.
- * Explicit product-type metadata is authoritative. If it is absent, products
- * can compare only when their normalized category slugs match.
- * No category or product-type allowlist is required for new catalogue entries.
+ * Explicit product-type metadata is required. Broad category slugs are never
+ * sufficient to establish product equivalence. New types need no code allowlist.
  */
 function normalize(value) {
   return String(value || "")
@@ -44,25 +43,15 @@ function canCompare(a, b) {
   const categoryA = normalize(a.categorySlug ?? a.category_slug ?? a.category);
   const categoryB = normalize(b.categorySlug ?? b.category_slug ?? b.category);
 
-  // Explicit type metadata is authoritative. Never fall back to a broad
-  // category when only one product has a known type.
-  if (typeA || typeB) {
-    if (!typeA || !typeB || typeA !== typeB) {
-      return { allowed: false, error: "TYPE_MISMATCH" };
-    }
-    return { allowed: true, type: typeA };
+  // Require an explicit product type on both products. Category is only
+  // a navigation grouping (e.g. Fashion), never proof of comparability.
+  if (!typeA || !typeB) {
+    return { allowed: false, error: "PRODUCT_TYPE_REQUIRED" };
   }
-
-  // When neither record has an explicit type, require the same known category.
-  if (!categoryA || !categoryB) {
-    return { allowed: false, error: "UNSUPPORTED_TYPE" };
+  if (typeA !== typeB) {
+    return { allowed: false, error: "TYPE_MISMATCH" };
   }
-  if (categoryA !== categoryB) {
-    return { allowed: false, error: "CATEGORY_MISMATCH" };
-  }
-
-  const inferred = TYPE_ALIASES[categoryA] || categoryA;
-  return { allowed: true, type: inferred };
+  return { allowed: true, type: typeA };
 }
 
 module.exports = { canCompare, inferType };
