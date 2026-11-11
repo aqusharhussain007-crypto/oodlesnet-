@@ -7,7 +7,8 @@ import CompareResult from "./CompareResult";
 
 const ERROR_MESSAGES = {
   CATEGORY_MISMATCH: "These products belong to different categories and cannot be compared.",
-  TYPE_MISMATCH: "These products are not the same product type and cannot be compared.",
+  TYPE_MISMATCH: "These products are different product types and cannot be compared.",
+  PRODUCT_TYPE_REQUIRED: "A specific product type is missing. Add or select a verified type for both products before comparing.",
   UNSUPPORTED_TYPE: "The product type is not identified well enough for a reliable comparison.",
   INVALID_PRODUCT: "One of the selected products is missing required information. Please select again.",
   COMPARISON_FAILED: "The comparison could not be completed. Please select the products again.",
