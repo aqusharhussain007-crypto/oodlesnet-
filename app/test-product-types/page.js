@@ -108,6 +108,27 @@ export default function TestProductTypesPage() {
     setMessage("Suggested types filled where product names provide a clear match. Review every suggestion; uncertain products remain blank. Nothing has been saved.");
   }
 
+  async function repairMalformedTypes() {
+    if (!token || !window.confirm("Repair only known malformed productType slugs in oodlesnet-test? Production will not be touched.")) return;
+    setBusy(true); setError(""); setResult(""); setMessage("");
+    try {
+      const response = await fetch("/api/admin/products/product-types", {
+        method: "POST",
+        headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: "repair-known-malformed-slugs", confirm: "REPAIR_KNOWN_MALFORMED_TEST_PRODUCT_TYPES" }),
+        cache: "no-store",
+      });
+      const data = await response.json().catch(() => ({}));
+      setResult(JSON.stringify({ httpStatus: response.status, ...data }, null, 2));
+      if (!response.ok || !data.ok || data.project !== "oodlesnet-test") throw new Error(data.error || "TEST repair did not verify.");
+      const repaired = new Map((data.assignments || []).map((item) => [item.id, item.productType]));
+      setProducts((current) => current.map((p) => repaired.has(p.id) ? { ...p, productType: repaired.get(p.id) } : p));
+      setDrafts((current) => Object.fromEntries(Object.entries(current).map(([id, value]) => [id, repaired.get(id) || value])));
+      setMessage("Repaired " + data.updatedCount + " known malformed TEST product types. Other fields were unchanged.");
+    } catch (e) { setError(e.message || "Could not repair TEST product types."); }
+    finally { setBusy(false); }
+  }
+
   async function saveAssignments() {
     if (!token || !pending.length) return;
     const assignments = pending.map((p) => ({ id: p.id, productType: drafts[p.id] }));
@@ -164,6 +185,7 @@ export default function TestProductTypesPage() {
       {products.length > 0 && <>
         <section style={{ margin: "16px 0", padding: 12, borderRadius: 10, background: "#f1f5f9" }}>
           <strong>{products.length} products</strong> · <strong>{unassigned} unassigned</strong> · <strong>{pending.length} changes ready</strong>
+          <button type="button" disabled={busy || !token} onClick={repairMalformedTypes} style={{ width: "100%", marginTop: 10, padding: 12, border: "1px solid #b45309", borderRadius: 8, background: "#fffbeb", color: "#92400e", fontWeight: 800 }}>Repair known malformed TEST product types</button>
           <button type="button" disabled={busy} onClick={applySuggestions} style={{ width: "100%", marginTop: 10, padding: 12, border: 0, borderRadius: 8, background: "#0e7490", color: "white", fontWeight: 800 }}>Suggest types automatically for clear product names</button>
           <p style={{ fontSize: 12, color: "#475569", margin: "6px 0" }}>Suggestions are not saved. Review them before using the TEST save button. Unclear products remain unassigned.</p>
           <input type="search" placeholder="Search product, brand, category…" value={query} onChange={(e) => setQuery(e.target.value)} style={{ width: "100%", boxSizing: "border-box", padding: 11, marginTop: 10, border: "1px solid #94a3b8", borderRadius: 8 }} />
