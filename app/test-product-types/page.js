@@ -56,6 +56,7 @@ export default function TestProductTypesPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [result, setResult] = useState("");
+  const [reviewOpen, setReviewOpen] = useState(false);
 
   async function signInAndLoad(event) {
     event.preventDefault();
@@ -110,11 +111,12 @@ export default function TestProductTypesPage() {
   async function saveAssignments() {
     if (!token || !pending.length) return;
     const assignments = pending.map((p) => ({ id: p.id, productType: drafts[p.id] }));
-    const preview = assignments.map((a) => {
-      const product = products.find((p) => p.id === a.id);
-      return (product?.name || a.id) + " → " + a.productType;
-    }).join("\\n");
-    if (!window.confirm("Update only productType in oodlesnet-test for " + assignments.length + " products?\\n\\n" + preview + "\\n\\nNo other fields will be changed.")) return;
+    setReviewOpen(true);
+  }
+
+  async function confirmAssignments() {
+    if (!token || !pending.length) return;
+    const assignments = pending.map((p) => ({ id: p.id, productType: drafts[p.id] }));
     setBusy(true); setError(""); setResult(""); setMessage("");
     try {
       const response = await fetch("/api/admin/products/product-types", {
@@ -127,6 +129,7 @@ export default function TestProductTypesPage() {
       if (!response.ok || !data.ok || data.project !== "oodlesnet-test") throw new Error(data.error || "Update did not verify.");
       setProducts((current) => current.map((p) => ({ ...p, productType: drafts[p.id] || p.productType })));
       setMessage("Updated " + data.updatedCount + " TEST product types. Other product fields were not changed.");
+      setReviewOpen(false);
     } catch (e) { setError(e.message || "Could not save product types."); }
     finally { setBusy(false); }
   }
@@ -140,6 +143,24 @@ export default function TestProductTypesPage() {
         <label>TEST admin password<input required type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ display: "block", width: "100%", boxSizing: "border-box", padding: 11, marginTop: 4 }} /></label>
         <button disabled={busy} type="submit" style={{ padding: 12, border: 0, borderRadius: 9, background: "#065f46", color: "white", fontWeight: 800 }}>{busy ? "Loading…" : "Sign in and load TEST products"}</button>
       </form>
+      {reviewOpen && <div role="dialog" aria-modal="true" aria-labelledby="review-title" style={{ position: "fixed", inset: 0, zIndex: 10000, background: "rgba(15,23,42,.82)", overflowY: "auto", padding: 12 }}>
+        <section style={{ maxWidth: 760, margin: "16px auto", background: "white", color: "#0f172a", borderRadius: 14, padding: 16 }}>
+          <h2 id="review-title" style={{ fontSize: 22, margin: "0 0 8px" }}>Review product type assignments</h2>
+          <p><strong>{pending.length} proposed updates</strong> · TEST database only. Review the complete list. Nothing is saved until you press Confirm.</p>
+          <div style={{ display: "grid", gap: 8, maxHeight: "58vh", overflowY: "auto" }}>
+            {pending.map((p) => <article key={p.id} style={{ padding: 10, border: "1px solid #cbd5e1", borderRadius: 8 }}>
+              <strong>{p.name || p.id}</strong>
+              <div style={{ color: "#64748b", fontSize: 12 }}>Category: {p.categorySlug || "unknown"} · Brand: {p.brand || "unknown"}</div>
+              <div style={{ color: "#0f766e", fontWeight: 800, marginTop: 4 }}>→ {drafts[p.id]}</div>
+            </article>)}
+          </div>
+          <p style={{ fontSize: 12, color: "#475569" }}>Only the productType field will be updated. All other product fields remain unchanged.</p>
+          <div style={{ display: "flex", gap: 10, position: "sticky", bottom: 0, background: "white", paddingTop: 10 }}>
+            <button type="button" disabled={busy} onClick={() => setReviewOpen(false)} style={{ flex: 1, padding: 13, border: "1px solid #64748b", borderRadius: 9, background: "white", fontWeight: 800 }}>Cancel</button>
+            <button type="button" disabled={busy} onClick={confirmAssignments} style={{ flex: 1, padding: 13, border: 0, borderRadius: 9, background: "#0f766e", color: "white", fontWeight: 800 }}>{busy ? "Saving…" : "Confirm TEST updates"}</button>
+          </div>
+        </section>
+      </div>}
       {products.length > 0 && <>
         <section style={{ margin: "16px 0", padding: 12, borderRadius: 10, background: "#f1f5f9" }}>
           <strong>{products.length} products</strong> · <strong>{unassigned} unassigned</strong> · <strong>{pending.length} changes ready</strong>
