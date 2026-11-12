@@ -67,13 +67,43 @@ export async function POST(request) {
   if (auth.error) return NextResponse.json({ ok: false, error: auth.error }, { status: auth.status });
   try {
     const body = await request.json().catch(() => ({}));
+    if (body.mode === "repair-known-malformed-slugs") {
+      if (body.confirm !== "REPAIR_KNOWN_MALFORMED_TEST_PRODUCT_TYPES") {
+        return NextResponse.json({ ok: false, error: "Explicit repair confirmation is required." }, { status: 400 });
+      }
+      const repairs = {
+        "neaker": "sneakers",
+        "wirele-earbud": "wireless-earbuds",
+        "martphone": "smartphone",
+        "fitne-band": "fitness-band",
+        "face-erum": "face-serum",
+        "face-wa-h": "face-wash",
+        "un-creen": "sunscreen",
+        "moi-turizer": "moisturizer",
+        "running-hoe": "running-shoes",
+        "peaker": "speaker",
+        "t-hirt": "t-shirts",
+        "hampoo": "shampoo",
+        "jean": "jeans",
+      };
+      const snapshot = await getFirestore(auth.app).collection("products").get();
+      const targets = snapshot.docs.filter((doc) => Object.hasOwn(repairs, String(doc.data().productType || "")));
+      if (!targets.length) {
+        return NextResponse.json({ ok: true, mode: "repair-known-malformed-slugs", project: "oodlesnet-test", updatedCount: 0, assignments: [], writesPerformed: 0, readOnly: true });
+      }
+      const batch = getFirestore(auth.app).batch();
+      const assignments = targets.map((doc) => ({ id: doc.id, previous: doc.data().productType, productType: repairs[doc.data().productType] }));
+      assignments.forEach((item) => batch.update(getFirestore(auth.app).collection("products").doc(item.id), { productType: item.productType }));
+      await batch.commit();
+      return NextResponse.json({ ok: true, mode: "repair-known-malformed-slugs", project: "oodlesnet-test", updatedCount: assignments.length, assignments, writesPerformed: assignments.length, readOnly: false }, { headers: { "Cache-Control": "no-store" } });
+    }
     const assignments = body.assignments;
     if (body.confirm !== "UPDATE_TEST_PRODUCT_TYPES" || !Array.isArray(assignments) || assignments.length < 1 || assignments.length > 100) {
       return NextResponse.json({ ok: false, error: "Explicit confirmation and 1–100 assignments are required." }, { status: 400 });
     }
     const normalized = assignments.map((item) => ({
       id: String(item?.id || "").trim(),
-      productType: String(item?.productType || "").trim().toLowerCase().replace(/&/g, "and").replace(/[\\s_]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, ""),
+      productType: String(item?.productType || "").trim().toLowerCase().replace(/&/g, "and").replace(/[\s_]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, ""),
     }));
     if (normalized.some((x) => !x.id || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(x.productType)) ||
         new Set(normalized.map((x) => x.id)).size !== normalized.length) {
