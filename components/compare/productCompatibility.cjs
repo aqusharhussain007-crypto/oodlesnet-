@@ -59,10 +59,17 @@ function canCompare(a, b) {
   if (!typeA || !typeB) {
     return { allowed: false, error: "PRODUCT_TYPE_REQUIRED" };
   }
-  if (typeA !== typeB) {
-    return { allowed: false, error: "TYPE_MISMATCH" };
+  if (typeA === typeB) {
+    return { allowed: true, type: typeA };
   }
-  return { allowed: true, type: typeA };
+
+  const groupA = relatedGroup(typeA);
+  const groupB = relatedGroup(typeB);
+  if (groupA && groupA === groupB) {
+    return { allowed: true, type: groupA, match: "related" };
+  }
+
+  return { allowed: false, error: "TYPE_MISMATCH" };
 }
 
 module.exports = { canCompare, inferType, relatedGroup };
