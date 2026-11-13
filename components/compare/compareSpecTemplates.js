@@ -227,7 +227,7 @@ export function getComparisonProfile(product) {
   const rawType = String(product?.productType ?? product?.product_type ?? product?.type ?? product?.subcategory ?? "").trim().toLowerCase().replace(/[_\s]+/g, "-");
   const profile = PROFILE_BY_TYPE[rawType] || rawType.replace(/-/g, "_");
   if (COMPARISON_SPEC_TEMPLATES[profile]) return profile;
-  const category = String(product?.categorySlug ?? product?.category_slug ?? product?.category ?? "").trim().toLowerCase().replace(/[_\\s]+/g, "-");
+  const category = String(product?.categorySlug ?? product?.category_slug ?? product?.category ?? "").trim().toLowerCase().replace(/[_\s]+/g, "-");
   const categoryProfiles = { fashion: "clothing", footwear: "footwear", beauty: "beauty", skincare: "beauty", groceries: "grocery", grocery: "grocery", furniture: "furniture", sports: "sports", automotive: "automotive", books: "books" };
   return categoryProfiles[category] || "generic";
 }
@@ -287,12 +287,12 @@ export function getComparisonSpecRows(product, definitions = []) {
   const profile = getComparisonProfile(product);
   const profileFields = COMPARISON_SPEC_TEMPLATES[profile] || [];
   const templateIndex = new Map(profileFields.map((field, index) => [field.key.replace(/([a-z0-9])([A-Z])/g, "$1_$2").replace(/-/g, "_").toLowerCase(), { ...field, index }]));
-  const productType = String(product?.productType ?? product?.product_type ?? product?.type ?? product?.subcategory ?? "").trim().toLowerCase().replace(/[_\\s]+/g, "-");
-  const category = String(product?.categorySlug ?? product?.category_slug ?? product?.category ?? "").trim().toLowerCase().replace(/[_\\s]+/g, "-");
+  const productType = String(product?.productType ?? product?.product_type ?? product?.type ?? product?.subcategory ?? "").trim().toLowerCase().replace(/[_\s]+/g, "-");
+  const category = String(product?.categorySlug ?? product?.category_slug ?? product?.category ?? "").trim().toLowerCase().replace(/[_\s]+/g, "-");
   const appliesToProduct = (definition) => {
     if (definition?.comparable === false) return false;
     if (!Array.isArray(definition?.appliesTo) || !definition.appliesTo.length || definition.appliesTo.includes("*")) return true;
-    const allowed = definition.appliesTo.map((item) => String(item).trim().toLowerCase().replace(/[_\\s]+/g, "-"));
+    const allowed = definition.appliesTo.map((item) => String(item).trim().toLowerCase().replace(/[_\s]+/g, "-"));
     return allowed.includes(productType) || allowed.includes(category) || allowed.includes(profile);
   };
   const sources = [
