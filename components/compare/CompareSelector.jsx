@@ -35,7 +35,7 @@ export default function CompareSelector({ currentProduct, selectedId, onSelect, 
   return (
     <div aria-busy={loading}>
       <p style={{ margin: "0 0 8px", color: "#64748b", fontSize: 12, lineHeight: 1.4 }}>
-        Only products with the same assigned product type are listed. Broad categories alone are not enough.
+        {options.length} compatible products found. Exact product types and approved related footwear types are listed; unrelated categories are excluded.
       </p>
       <ProductSearchPicker
         products={options}
