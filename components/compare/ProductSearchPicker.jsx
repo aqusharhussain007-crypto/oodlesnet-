@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 function categoryLabel(value) {
   return String(value || "uncategorized")
     .replace(/[-_]+/g, " ")
-    .replace(/\\b\\w/g, (letter) => letter.toUpperCase());
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 function productTypeLabel(product) {
