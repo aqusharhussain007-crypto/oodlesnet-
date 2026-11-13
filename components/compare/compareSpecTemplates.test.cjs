@@ -35,3 +35,23 @@ test("keeps unknown attributes available without inventing values", async () => 
   assert.equal(rows[0].key, "custom_feature");
   assert.equal(rows[0].value, "Verified value");
 });
+
+test("comparison profiles cover common categories and future types fall back safely", async () => {
+  const { getComparisonProfile } = await import("./compareSpecTemplates.js");
+  assert.equal(getComparisonProfile({ productType: "running shoes" }), "footwear");
+  assert.equal(getComparisonProfile({ productType: "facewash" }), "beauty");
+  assert.equal(getComparisonProfile({ categorySlug: "fashion" }), "clothing");
+  assert.equal(getComparisonProfile({ productType: "robot-vacuum" }), "generic");
+});
+
+test("size and colour are excluded from comparison attributes and variants", async () => {
+  const { getComparisonSpecRows, getProductVariant } = await import("./compareSpecTemplates.js");
+  const product = {
+    specs: { size: "UK 9", colour: "Black", material: "Mesh", cushioning: "Foam" },
+    variantDetails: { size: "UK 9", colour: "Black", modelNumber: "X100" },
+  };
+  const specs = getComparisonSpecRows(product, []);
+  const variants = getProductVariant(product);
+  assert.deepEqual(specs.map((row) => row.key).sort(), ["cushioning", "material"]);
+  assert.deepEqual(variants.map((row) => row.key), ["modelNumber"]);
+});
