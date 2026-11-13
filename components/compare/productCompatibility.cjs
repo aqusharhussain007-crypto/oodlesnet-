@@ -33,7 +33,7 @@ function inferType(product) {
   return category ? (TYPE_ALIASES[category] || category) : "unknown";
 }
 
-function canCompare(a, b) {
+const RELATED_TYPE_GROUPS = {\n  footwear: new Set(["shoe", "shoes", "sneaker", "sneakers", "running-shoe", "sports-shoe", "casual-shoe", "boot", "boots", "sandal", "sandals"]),\n};\n\nfunction relatedGroup(type) {\n  for (const [group, types] of Object.entries(RELATED_TYPE_GROUPS)) {\n    if (types.has(type)) return group;\n  }\n  return "";\n}\n\nfunction canCompare(a, b) {
   if (!a || !b || !a.id || !b.id || a.id === b.id) {
     return { allowed: false, error: "INVALID_PRODUCT" };
   }
@@ -54,4 +54,4 @@ function canCompare(a, b) {
   return { allowed: true, type: typeA };
 }
 
-module.exports = { canCompare, inferType };
+module.exports = { canCompare, inferType, relatedGroup };
