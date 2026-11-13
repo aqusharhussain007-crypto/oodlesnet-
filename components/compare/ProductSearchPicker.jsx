@@ -5,7 +5,14 @@ import { useMemo, useState } from "react";
 function categoryLabel(value) {
   return String(value || "uncategorized")
     .replace(/[-_]+/g, " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+    .replace(/\\b\\w/g, (letter) => letter.toUpperCase());
+}
+
+function productTypeLabel(product) {
+  const value = String(product?.productType || "").trim();
+  return value
+    ? value.replace(/[-_]+/g, " ")
+    : "Type not assigned";
 }
 
 export default function ProductSearchPicker({
