@@ -34,7 +34,7 @@ function inferType(product) {
 }
 
 const RELATED_TYPE_GROUPS = {
-  footwear: new Set(["shoe", "shoes", "sneaker", "sneakers", "running-shoe", "sports-shoe", "casual-shoe", "boot", "boots", "sandal", "sandals"]),
+  footwear: new Set(["shoe", "shoes", "sneaker", "sneakers", "running-shoe", "running-shoes", "sports-shoe", "sports-shoes", "casual-shoe", "casual-shoes", "boot", "boots", "sandal", "sandals"]),
 };
 
 function relatedGroup(type) {
