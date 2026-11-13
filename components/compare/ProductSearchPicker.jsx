@@ -49,7 +49,7 @@ export default function ProductSearchPicker({
         ...(Array.isArray(product.tags) ? product.tags : []),
       ].filter(Boolean).join(" ").toLowerCase();
       return searchable.includes(term);
-    }).slice(0, 12);
+    }).slice(0, 30);
   }, [products, query, category]);
 
   return (
