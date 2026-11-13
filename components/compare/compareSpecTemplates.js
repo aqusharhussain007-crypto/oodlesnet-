@@ -138,7 +138,99 @@ export const COMPARISON_SPEC_TEMPLATES = {
     { key: "fragrance", label: "Fragrance" },
     { key: "usage", label: "Usage" },
   ],
+  footwear: [
+    { key: "material", label: "Material" },
+    { key: "soleMaterial", label: "Sole material" },
+    { key: "closure", label: "Closure" },
+    { key: "shoeType", label: "Footwear type" },
+    { key: "cushioning", label: "Cushioning" },
+    { key: "waterResistance", label: "Water resistance" },
+    { key: "weight", label: "Weight" },
+  ],
+  clothing: [
+    { key: "material", label: "Material" },
+    { key: "fabricComposition", label: "Fabric composition" },
+    { key: "fit", label: "Fit" },
+    { key: "fabricCare", label: "Care instructions" },
+    { key: "occasion", label: "Occasion" },
+  ],
+  beauty: [
+    { key: "keyIngredients", label: "Key ingredients" },
+    { key: "skinType", label: "Suitable skin type" },
+    { key: "formulation", label: "Formulation" },
+    { key: "volume", label: "Pack size" },
+    { key: "spf", label: "SPF" },
+    { key: "benefits", label: "Benefits" },
+  ],
+  grocery: [
+    { key: "netQuantity", label: "Net quantity" },
+    { key: "ingredients", label: "Ingredients" },
+    { key: "nutrition", label: "Nutrition" },
+    { key: "shelfLife", label: "Shelf life" },
+    { key: "dietaryType", label: "Dietary information" },
+  ],
+  furniture: [
+    { key: "material", label: "Material" },
+    { key: "dimensions", label: "Dimensions" },
+    { key: "weightCapacity", label: "Weight capacity" },
+    { key: "construction", label: "Construction" },
+    { key: "warranty", label: "Warranty" },
+  ],
+  sports: [
+    { key: "material", label: "Material" },
+    { key: "dimensions", label: "Dimensions" },
+    { key: "weight", label: "Weight" },
+    { key: "intendedUse", label: "Intended use" },
+    { key: "includedComponents", label: "Included components" },
+  ],
+  automotive: [
+    { key: "compatibility", label: "Vehicle compatibility" },
+    { key: "material", label: "Material" },
+    { key: "dimensions", label: "Dimensions" },
+    { key: "warranty", label: "Warranty" },
+  ],
+  books: [
+    { key: "author", label: "Author" },
+    { key: "publisher", label: "Publisher" },
+    { key: "edition", label: "Edition" },
+    { key: "language", label: "Language" },
+    { key: "format", label: "Format" },
+    { key: "pages", label: "Pages" },
+  ],
+  generic: [],
 };
+
+const PROFILE_BY_TYPE = {
+  sneakers: "footwear",
+  "running-shoes": "footwear",
+  "sports-shoes": "footwear",
+  "casual-shoes": "footwear",
+  boots: "footwear",
+  sandals: "footwear",
+  shoes: "footwear",
+  tshirt: "clothing",
+  "t-shirt": "clothing",
+  shirt: "clothing",
+  jeans: "clothing",
+  trousers: "clothing",
+  dress: "clothing",
+  cleanser: "beauty",
+  facewash: "beauty",
+  moisturizer: "beauty",
+  serum: "beauty",
+  sunscreen: "beauty",
+  shampoo: "beauty",
+  conditioner: "beauty",
+};
+
+export function getComparisonProfile(product) {
+  const rawType = String(product?.productType ?? product?.product_type ?? product?.type ?? product?.subcategory ?? "").trim().toLowerCase().replace(/[_\\s]+/g, "-");
+  const profile = PROFILE_BY_TYPE[rawType] || rawType.replace(/-/g, "_");
+  if (COMPARISON_SPEC_TEMPLATES[profile]) return profile;
+  const category = String(product?.categorySlug ?? product?.category_slug ?? product?.category ?? "").trim().toLowerCase().replace(/[_\\s]+/g, "-");
+  const categoryProfiles = { fashion: "clothing", footwear: "footwear", beauty: "beauty", skincare: "beauty", groceries: "grocery", grocery: "grocery", furniture: "furniture", sports: "sports", automotive: "automotive", books: "books" };
+  return categoryProfiles[category] || "generic";
+}
 
 const VARIANT_FIELDS = [
   { key: "modelNumber", label: "Model number" },
@@ -146,7 +238,6 @@ const VARIANT_FIELDS = [
   { key: "ram", label: "RAM" },
   { key: "storage", label: "Storage" },
   { key: "capacity", label: "Capacity" },
-  { key: "size", label: "Size" },
 ];
 
 function hasValue(value) {
@@ -205,7 +296,7 @@ export function getComparisonSpecRows(product, definitions = []) {
       const value = displayableValue(rawValue);
       if (value === null) continue;
       const definition = resolveAttribute(rawKey, registryIndex);
-      if (!definition.key) continue;
+      if (!definition.key || ["size", "colour", "color"].includes(definition.key)) continue;
       const normalizedValue = normalizeAttributeValue(rawValue, definition);
       fields.set(definition.key, {
         key: definition.key,
@@ -250,18 +341,9 @@ export function getProductVariant(product) {
   if (isPlainObject(explicit)) {
     const entries = Object.entries(explicit).filter(([, value]) => hasValue(value));
     if (entries.length) {
-      const colourEntry =
-        entries.find(([key]) => key.toLowerCase() === "colour") ||
-        entries.find(([key]) => key.toLowerCase() === "color");
-      const otherEntries = entries.filter(
-        ([key]) => !["colour", "color"].includes(key.toLowerCase())
-      );
-      const normalized = [
-        ...otherEntries.map(([key, value]) => ({ key, label: key, value: displayableValue(value) })),
-        ...(colourEntry
-          ? [{ key: "colour", label: "Colour", value: displayableValue(colourEntry[1]) }]
-          : []),
-      ];
+      const normalized = entries
+        .filter(([key]) => !["colour", "color", "size"].includes(key.toLowerCase()))
+        .map(([key, value]) => ({ key, label: key, value: displayableValue(value) }));
       return normalized.filter((item) => item.value !== null);
     }
   }
@@ -273,16 +355,7 @@ export function getProductVariant(product) {
       value: displayableValue(product[field.key]),
     }));
 
-  const colour = hasValue(product?.colour)
-    ? product.colour
-    : product?.color;
-  if (hasValue(colour)) {
-    variants.push({
-      key: "colour",
-      label: "Colour",
-      value: displayableValue(colour),
-    });
-  }
+
 
   return variants;
 }
