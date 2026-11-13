@@ -70,7 +70,7 @@ export default function TestComparePage() {
       const initialProduct = data.products.find((product) => product.id === selectedProductAId) || data.products[0];
       setSelectedProductAId(initialProduct?.id || "");
       setSelectedCategory(initialProduct?.categorySlug || "all");
-      setMessage(`Loaded ${data.products.length} products dynamically from oodlesnet-test. Read-only mode; no database writes.`);
+      setMessage(`Loaded ${data.products.length} products and ${registryData.count} active attribute definitions from oodlesnet-test. Read-only comparison mode; no database writes.`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not load the test catalogue.");
       setToken("");
