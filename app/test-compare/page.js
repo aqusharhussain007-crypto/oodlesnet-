@@ -85,7 +85,7 @@ export default function TestComparePage() {
 
   const currentProduct = products.find((product) => product.id === selectedProductAId) || null;
   const categories = [...new Set(products.map((product) => String(product?.categorySlug || "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
-  const categoryName = (value) => String(value || "All").replace(/[-_]+/g, " ").replace(/\\b\\w/g, (letter) => letter.toUpperCase());
+  const categoryName = (value) => String(value || "All").replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
   const productAOptions = selectedCategory === "all" ? products : products.filter((product) => product.categorySlug === selectedCategory);
 
   return (
