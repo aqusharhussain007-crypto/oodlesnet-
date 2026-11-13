@@ -83,3 +83,17 @@ test("related footwear types can be compared without opening unrelated categorie
   assert.deepEqual(canCompare(sneakers, running), { allowed: true, type: "footwear", match: "related" });
   assert.equal(canCompare(sneakers, shirt).error, "TYPE_MISMATCH");
 });
+
+test("related footwear aliases include plural running and sports shoe labels", () => {
+  const sneaker = product("A", { productType: "sneakers" });
+  const running = product("B", { productType: "running shoes" });
+  const sports = product("C", { productType: "sports shoes" });
+  assert.deepEqual(canCompare(sneaker, running), { allowed: true, type: "footwear", match: "related" });
+  assert.deepEqual(canCompare(running, sports), { allowed: true, type: "footwear", match: "related" });
+});
+
+test("related footwear compatibility does not allow footwear to compare with clothing", () => {
+  const boot = product("A", { productType: "boots" });
+  const shirt = product("B", { productType: "shirt" });
+  assert.equal(canCompare(boot, shirt).error, "TYPE_MISMATCH");
+});
