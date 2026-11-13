@@ -1,10 +1,10 @@
 "use client";
 
-import { compareProducts } from "./compareRules";
+import { compareProducts, canCompare } from "./compareRules";
 import { getComparisonSpecRows, getProductVariant } from "./compareSpecTemplates";
 import { getLowestPrice, getStoreCount } from "./compareUtils";
 
-const unavailable = "Not available";
+const unavailable = "Not available";\nconst requireCompatibility = canCompare;
 function display(value) {
   if (value === undefined || value === null || value === "") return unavailable;
   if (Array.isArray(value)) return value.map(display).filter((v) => v !== unavailable).join(", ") || unavailable;
@@ -28,6 +28,13 @@ export default function MultiCompareResult({ products, attributeDefinitions = []
     score: 0,
   }));
   const pairErrors = [];
+  const relatedPairs = [];
+  for (let i = 0; i < products.length; i += 1) {
+    for (let j = i + 1; j < products.length; j += 1) {
+      const check = requireCompatibility(products[i], products[j]);
+      if (check?.match === "related") relatedPairs.push([products[i].name, products[j].name]);
+    }
+  }
   for (let i = 0; i < products.length; i += 1) {
     for (let j = i + 1; j < products.length; j += 1) {
       const pair = compareProducts(products[i], products[j], attributeDefinitions);
@@ -52,7 +59,7 @@ export default function MultiCompareResult({ products, attributeDefinitions = []
     <section style={{ marginTop: 18, padding: 14, borderRadius: 16, background: "#fff", border: "1px solid #dbe3ec", boxShadow: "0 8px 22px rgba(0,0,0,.08)", minWidth: 0 }}>
       <h3 style={{ margin: "0 0 8px", fontSize: 19, fontWeight: 900, color: "#0f766e" }}>Side-by-side product comparison</h3>
       <p style={{ margin: "0 0 12px", color: "#64748b", fontSize: 12, lineHeight: 1.5 }}>Compare {products.length} products. Swipe horizontally on mobile to view every product column. Missing specifications are not estimated.</p>
-      {pairErrors.length > 0 && <p role="alert" style={{ color: "#b91c1c" }}>One or more product pairs could not be scored. Check that all selected products share the same assigned product type.</p>}
+      {relatedPairs.length > 0 && <p style={{ margin: "0 0 10px", padding: 9, borderRadius: 8, background: "#eff6ff", color: "#1e40af", fontSize: 12 }}>Related footwear types are being compared. Check the product type labels when interpreting differences.</p>}\n      {pairErrors.length > 0 && <p role="alert" style={{ color: "#b91c1c" }}>One or more product pairs could not be scored. Check that all selected products share the same assigned product type.</p>}
       <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 10, WebkitOverflowScrolling: "touch" }}>
         {rows.map((row, index) => (
           <article key={row.product.id} style={{ flex: "0 0 190px", width: 190, minWidth: 190, border: "1px solid #dbe3ec", borderRadius: 12, padding: 10, background: "#f8fafc" }}>
