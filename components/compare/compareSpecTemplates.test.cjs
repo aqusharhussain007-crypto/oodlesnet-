@@ -55,3 +55,13 @@ test("size and colour are excluded from comparison attributes and variants", asy
   assert.deepEqual(specs.map((row) => row.key).sort(), ["cushioning", "material"]);
   assert.deepEqual(variants.map((row) => row.key), ["modelNumber"]);
 });
+
+test("excludes compound size and colour fields from specs and variants", async () => {
+  const { getComparisonSpecRows, getProductVariant } = await import("./compareSpecTemplates.js");
+  const product = {
+    specs: { shoe_size: "UK 9", productColor: "Black", material: "Mesh" },
+    variantDetails: { clothing_size: "M", colour_name: "Blue", modelNumber: "M2" },
+  };
+  assert.deepEqual(getComparisonSpecRows(product, []).map((row) => row.key), ["material"]);
+  assert.deepEqual(getProductVariant(product).map((row) => row.key), ["modelNumber"]);
+});
