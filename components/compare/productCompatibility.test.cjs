@@ -75,3 +75,11 @@ test("same broad category without product types is never enough", () => {
   const jeans = product("Jeans", { categorySlug: "fashion", productType: undefined });
   assert.equal(canCompare(shoes, jeans).error, "PRODUCT_TYPE_REQUIRED");
 });
+
+test("related footwear types can be compared without opening unrelated categories", () => {
+  const sneakers = product("A", { categorySlug: "fashion", productType: "sneakers" });
+  const running = product("B", { categorySlug: "sports", productType: "running shoes" });
+  const shirt = product("C", { categorySlug: "fashion", productType: "t-shirt" });
+  assert.deepEqual(canCompare(sneakers, running), { allowed: true, type: "footwear", match: "related" });
+  assert.equal(canCompare(sneakers, shirt).error, "TYPE_MISMATCH");
+});
