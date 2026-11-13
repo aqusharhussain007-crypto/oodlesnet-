@@ -224,7 +224,7 @@ const PROFILE_BY_TYPE = {
 };
 
 export function getComparisonProfile(product) {
-  const rawType = String(product?.productType ?? product?.product_type ?? product?.type ?? product?.subcategory ?? "").trim().toLowerCase().replace(/[_\\s]+/g, "-");
+  const rawType = String(product?.productType ?? product?.product_type ?? product?.type ?? product?.subcategory ?? "").trim().toLowerCase().replace(/[_\s]+/g, "-");
   const profile = PROFILE_BY_TYPE[rawType] || rawType.replace(/-/g, "_");
   if (COMPARISON_SPEC_TEMPLATES[profile]) return profile;
   const category = String(product?.categorySlug ?? product?.category_slug ?? product?.category ?? "").trim().toLowerCase().replace(/[_\\s]+/g, "-");
@@ -272,9 +272,9 @@ function specificationLabel(key) {
   return String(key)
     .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
     .replace(/[_-]+/g, " ")
-    .replace(/\\s+/g, " ")
+    .replace(/\s+/g, " ")
     .trim()
-    .replace(/\\b\\w/g, (letter) => letter.toUpperCase());
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 import descriptionSpecParser from "./descriptionSpecs.cjs";
