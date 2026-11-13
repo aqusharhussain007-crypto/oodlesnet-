@@ -277,6 +277,15 @@ function specificationLabel(key) {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
+function isVariantOnlyAttribute(key) {
+  const normalized = String(key || "")
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  return /(^|_)(size|colour|color)(_|$)/.test(normalized);
+}
+
 import descriptionSpecParser from "./descriptionSpecs.cjs";
 const { extractDescriptionSpecs } = descriptionSpecParser;
 import attributeRegistry from "./attributeRegistry.cjs";
@@ -307,7 +316,7 @@ export function getComparisonSpecRows(product, definitions = []) {
       const value = displayableValue(rawValue);
       if (value === null) continue;
       const definition = resolveAttribute(rawKey, registryIndex);
-      if (!definition.key || ["size", "colour", "color"].includes(definition.key) || !appliesToProduct(definition)) continue;
+      if (!definition.key || isVariantOnlyAttribute(definition.key) || !appliesToProduct(definition)) continue;
       const normalizedValue = normalizeAttributeValue(rawValue, definition);
       fields.set(definition.key, {
         key: definition.key,
@@ -332,7 +341,7 @@ export function getComparisonSpecRows(product, definitions = []) {
 
   for (const item of extractDescriptionSpecs(product?.description, definitions)) {
     const definition = resolveAttribute(item.key, registryIndex);
-    if (!fields.has(definition.key) && appliesToProduct(definition) && !["size", "colour", "color"].includes(definition.key)) {
+    if (!fields.has(definition.key) && appliesToProduct(definition) && !isVariantOnlyAttribute(definition.key)) {
       fields.set(definition.key, {
         ...item,
         key: definition.key,
@@ -353,7 +362,7 @@ export function getProductVariant(product) {
     const entries = Object.entries(explicit).filter(([, value]) => hasValue(value));
     if (entries.length) {
       const normalized = entries
-        .filter(([key]) => !["colour", "color", "size"].includes(key.toLowerCase()))
+        .filter(([key]) => !isVariantOnlyAttribute(key))
         .map(([key, value]) => ({ key, label: key, value: displayableValue(value) }));
       return normalized.filter((item) => item.value !== null);
     }
