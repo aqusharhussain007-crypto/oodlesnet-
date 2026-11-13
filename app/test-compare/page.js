@@ -116,7 +116,7 @@ export default function TestComparePage() {
               ))}
             </div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: 18, alignItems: "start", marginTop: 8, minWidth: 0 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(280px, 1fr))", gap: 14, alignItems: "start", marginTop: 8, minWidth: 0, overflowX: "auto", paddingBottom: 8, WebkitOverflowScrolling: "touch" }}>
             <section style={{ minWidth: 0 }}>
               <h3 style={{ fontSize: 16, fontWeight: 900, color: "#0f766e", margin: "0 0 10px" }}>PRODUCT A</h3>
               <ProductSearchPicker products={productAOptions} selectedId={currentProduct?.id || ""} onSelect={(product) => setSelectedProductAId(product?.id || "")} label="" placeholder="Search Product A…" categoryFilter={false} emptyMessage="No products match. Try another search." />
