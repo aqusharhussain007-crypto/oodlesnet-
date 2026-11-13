@@ -284,6 +284,17 @@ const { buildAttributeIndex, resolveAttribute, normalizeAttributeValue } = attri
 
 export function getComparisonSpecRows(product, definitions = []) {
   const registryIndex = buildAttributeIndex(definitions);
+  const profile = getComparisonProfile(product);
+  const profileFields = COMPARISON_SPEC_TEMPLATES[profile] || [];
+  const templateIndex = new Map(profileFields.map((field, index) => [field.key, { ...field, index }]));
+  const productType = String(product?.productType ?? product?.product_type ?? product?.type ?? product?.subcategory ?? "").trim().toLowerCase().replace(/[_\\s]+/g, "-");
+  const category = String(product?.categorySlug ?? product?.category_slug ?? product?.category ?? "").trim().toLowerCase().replace(/[_\\s]+/g, "-");
+  const appliesToProduct = (definition) => {
+    if (definition?.comparable === false) return false;
+    if (!Array.isArray(definition?.appliesTo) || !definition.appliesTo.length || definition.appliesTo.includes("*")) return true;
+    const allowed = definition.appliesTo.map((item) => String(item).trim().toLowerCase().replace(/[_\\s]+/g, "-"));
+    return allowed.includes(productType) || allowed.includes(category) || allowed.includes(profile);
+  };
   const sources = [
     product?.specs,
     product?.specifications,
@@ -296,11 +307,11 @@ export function getComparisonSpecRows(product, definitions = []) {
       const value = displayableValue(rawValue);
       if (value === null) continue;
       const definition = resolveAttribute(rawKey, registryIndex);
-      if (!definition.key || ["size", "colour", "color"].includes(definition.key)) continue;
+      if (!definition.key || ["size", "colour", "color"].includes(definition.key) || !appliesToProduct(definition)) continue;
       const normalizedValue = normalizeAttributeValue(rawValue, definition);
       fields.set(definition.key, {
         key: definition.key,
-        label: definition.label || specificationLabel(definition.key),
+        label: definition.label || templateIndex.get(definition.key)?.label || specificationLabel(definition.key),
         value,
         normalizedValue,
         dataType: definition.dataType || "text",
@@ -321,11 +332,11 @@ export function getComparisonSpecRows(product, definitions = []) {
 
   for (const item of extractDescriptionSpecs(product?.description, definitions)) {
     const definition = resolveAttribute(item.key, registryIndex);
-    if (!fields.has(definition.key)) {
+    if (!fields.has(definition.key) && appliesToProduct(definition) && !["size", "colour", "color"].includes(definition.key)) {
       fields.set(definition.key, {
         ...item,
         key: definition.key,
-        label: definition.label || item.label,
+        label: definition.label || templateIndex.get(definition.key)?.label || item.label,
         normalizedValue: normalizeAttributeValue(item.value, definition),
         dataType: definition.dataType || "text",
         unit: definition.unit || null,
@@ -333,7 +344,7 @@ export function getComparisonSpecRows(product, definitions = []) {
     }
   }
 
-  return [...fields.values()];
+  return [...fields.values()].sort((a, b) => (templateIndex.get(a.key)?.index ?? 9999) - (templateIndex.get(b.key)?.index ?? 9999));
 }
 
 export function getProductVariant(product) {
