@@ -295,7 +295,17 @@ export function getComparisonSpecRows(product, definitions = []) {
   const registryIndex = buildAttributeIndex(definitions);
   const profile = getComparisonProfile(product);
   const profileFields = COMPARISON_SPEC_TEMPLATES[profile] || [];
-  const templateIndex = new Map(profileFields.map((field, index) => [field.key.replace(/([a-z0-9])([A-Z])/g, "$1_$2").replace(/-/g, "_").toLowerCase(), { ...field, index }]));
+  const templateIndex = new Map();
+  profileFields.forEach((field, index) => {
+    const record = { ...field, index };
+    const normalizeTemplateKey = (value) => String(value)
+      .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+      .replace(/-/g, "_")
+      .replace(/[^a-zA-Z0-9_]+/g, "_")
+      .toLowerCase();
+    templateIndex.set(normalizeTemplateKey(field.key), record);
+    templateIndex.set(normalizeTemplateKey(field.label), record);
+  });
   const productType = String(product?.productType ?? product?.product_type ?? product?.type ?? product?.subcategory ?? "").trim().toLowerCase().replace(/[_\s]+/g, "-");
   const category = String(product?.categorySlug ?? product?.category_slug ?? product?.category ?? "").trim().toLowerCase().replace(/[_\s]+/g, "-");
   const appliesToProduct = (definition) => {
