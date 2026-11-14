@@ -53,9 +53,8 @@ export default function CompareContainer({ currentProduct, demoProducts, attribu
   return (
     <>
       <section style={{ minWidth: 0 }}>
-        <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", alignItems: "center", justifyContent: "space-between", gap: 4, width: "100%", minWidth: 0, marginBottom: 10, whiteSpace: "nowrap" }}>
-          <h3 style={{ flex: "0 1 auto", minWidth: 0, fontSize: 14, lineHeight: 1.2, fontWeight: 900, color: "#0f766e", margin: 0, whiteSpace: "nowrap" }}>PRODUCT B{slotCount > 1 ? "–D" : ""}</h3>
-          <span style={{ flex: "0 0 auto", fontSize: 11, lineHeight: 1.2, color: "#64748b", fontWeight: 700, whiteSpace: "nowrap" }}>Up to {MAX_PRODUCTS} products</span>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", width: "100%", minWidth: 0, marginBottom: 10 }}>
+          <h3 style={{ fontSize: 16, lineHeight: 1.25, fontWeight: 900, color: "#0f766e", margin: 0 }}>PRODUCT B{slotCount > 1 ? "–D" : ""}</h3>
         </div>
         <div aria-label="More comparison products" style={{ display: "flex", gap: 10, minWidth: 0, maxWidth: "100%", overflowX: "auto", alignItems: "flex-start", paddingBottom: 8, WebkitOverflowScrolling: "touch", scrollSnapType: "x mandatory" }}>
           {Array.from({ length: slotCount }, (_, index) => {
@@ -73,7 +72,7 @@ export default function CompareContainer({ currentProduct, demoProducts, attribu
               </section>
             );
           })}
-          {slotCount < MAX_PRODUCTS && (
+          {slotCount < MAX_PRODUCTS - 1 && uniqueSelected.length < MAX_PRODUCTS && (
             <button type="button" onClick={() => { setSlotCount((count) => Math.min(MAX_PRODUCTS - 1, count + 1)); setResultReady(false); }} style={{ flex: "0 0 100%", minWidth: 0, height: 150, minHeight: 150, alignSelf: "flex-start", boxSizing: "border-box", scrollSnapAlign: "start", padding: 18, borderRadius: 12, border: "1px dashed #0d9488", background: "#ecfdf5", color: "#065f46", fontWeight: 800, fontSize: 17 }}>
               + Add another product
             </button>
