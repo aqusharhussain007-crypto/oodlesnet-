@@ -8,6 +8,9 @@ const DEFAULT_LABELS = [
   "Material", "Fabric", "Colour", "Color", "Size", "Fit", "Skin Type",
   "Ingredients", "Volume", "SPF", "Fragrance", "Power Consumption",
   "Energy Rating", "Warranty", "Connectivity", "Water Resistance",
+  "Sole Material", "Sole", "Closure", "Cushioning", "Footwear Type",
+  "Shoe Type", "Upper Material", "Outsole Material", "Midsole Material",
+  "Heel Type", "Arch Support", "Weight",
 ];
 
 function escapeRegex(value) {
