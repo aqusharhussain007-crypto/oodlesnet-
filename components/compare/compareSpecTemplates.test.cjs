@@ -65,3 +65,20 @@ test("excludes compound size and colour fields from specs and variants", async (
   assert.deepEqual(getComparisonSpecRows(product, []).map((row) => row.key), ["material"]);
   assert.deepEqual(getProductVariant(product).map((row) => row.key), ["modelNumber"]);
 });
+
+test("shows missing footwear template attributes as unavailable comparison rows", async () => {
+  const { getComparisonSpecRows } = await import("./compareSpecTemplates.js");
+  const rows = getComparisonSpecRows({
+    productType: "sneakers",
+    description: "Everyday court-style sneakers.",
+  }, []);
+  const material = rows.find((row) => row.key === "material");
+  const sole = rows.find((row) => row.key === "soleMaterial");
+  const shoeType = rows.find((row) => row.key === "shoeType");
+  assert.ok(material);
+  assert.equal(material.value, null);
+  assert.ok(sole);
+  assert.equal(sole.value, null);
+  assert.ok(shoeType);
+  assert.equal(shoeType.value, null);
+});
