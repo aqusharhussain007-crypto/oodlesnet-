@@ -34,9 +34,6 @@ export default function CompareSelector({ currentProduct, selectedId, onSelect, 
 
   return (
     <div aria-busy={loading}>
-      <p style={{ margin: "0 0 8px", color: "#64748b", fontSize: 12, lineHeight: 1.4 }}>
-        {options.length} compatible products found. Exact product types and approved related footwear types are listed; unrelated categories are excluded.
-      </p>
       <ProductSearchPicker
         products={options}
         selectedId={selectedId || ""}
