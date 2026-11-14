@@ -53,9 +53,9 @@ export default function CompareContainer({ currentProduct, demoProducts, attribu
   return (
     <>
       <section style={{ minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 10 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 900, color: "#0f766e", margin: 0 }}>PRODUCT B{slotCount > 1 ? "–D" : ""}</h3>
-          <span style={{ fontSize: 11, color: "#64748b", fontWeight: 700 }}>Up to {MAX_PRODUCTS} products</span>
+        <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", alignItems: "center", justifyContent: "space-between", gap: 4, width: "100%", minWidth: 0, marginBottom: 10, whiteSpace: "nowrap" }}>
+          <h3 style={{ flex: "0 1 auto", minWidth: 0, fontSize: 14, lineHeight: 1.2, fontWeight: 900, color: "#0f766e", margin: 0, whiteSpace: "nowrap" }}>PRODUCT B{slotCount > 1 ? "–D" : ""}</h3>
+          <span style={{ flex: "0 0 auto", fontSize: 11, lineHeight: 1.2, color: "#64748b", fontWeight: 700, whiteSpace: "nowrap" }}>Up to {MAX_PRODUCTS} products</span>
         </div>
         <div aria-label="More comparison products" style={{ display: "flex", gap: 10, minWidth: 0, maxWidth: "100%", overflowX: "auto", alignItems: "flex-start", paddingBottom: 8, WebkitOverflowScrolling: "touch", scrollSnapType: "x mandatory" }}>
           {Array.from({ length: slotCount }, (_, index) => {
