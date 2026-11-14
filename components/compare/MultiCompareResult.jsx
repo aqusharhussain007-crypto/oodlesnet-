@@ -68,7 +68,7 @@ export default function MultiCompareResult({ products, attributeDefinitions = []
         <div style={{ display: "flex", alignItems: "stretch", gap: 0, width: 150 + rows.length * 190, minWidth: 150 + rows.length * 190, padding: "10px 0 12px", boxSizing: "border-box", background: "#fff" }}>
           <div aria-hidden="true" style={{ flex: "0 0 150px", width: 150 }} />
           {rows.map((row, index) => (
-            <article key={row.product.id} style={{ flex: "0 0 190px", width: 190, minWidth: 190, boxSizing: "border-box", margin: "0 5px", border: "1px solid #dbe3ec", borderRadius: 12, padding: 10, background: "#f8fafc" }}>
+            <article key={row.product.id} style={{ flex: "0 0 190px", width: 190, minWidth: 190, boxSizing: "border-box", margin: 0, border: "1px solid #dbe3ec", borderRadius: 12, padding: 10, background: "#f8fafc" }}>
               <div style={{ fontSize: 11, color: "#0f766e", fontWeight: 900 }}>PRODUCT {String.fromCharCode(65 + index)}</div>
               <div style={{ height: 100, margin: "7px 0", background: "#fff", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
                 {row.product.imageUrl ? <img src={row.product.imageUrl} alt={row.product.name || "Product"} style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : <span style={{ color: "#94a3b8", fontSize: 12 }}>No image</span>}
