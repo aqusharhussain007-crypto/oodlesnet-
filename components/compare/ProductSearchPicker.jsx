@@ -68,9 +68,9 @@ export default function ProductSearchPicker({
             <button type="button" onClick={() => { onSelect?.(null); setQuery(""); setShowResults(true); }} style={{ flex: "0 0 auto", marginTop: 5, border: 0, borderRadius: 999, padding: "6px 10px", background: "#d1fae5", color: "#065f46", fontWeight: 800, fontSize: 12, cursor: "pointer" }}>Change product</button>
           </>
         ) : (
-          <div aria-hidden="true" style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", borderRadius: 12, background: "linear-gradient(145deg,rgba(15,118,110,0.045),rgba(16,185,129,0.015))", color: "rgba(15,118,110,0.22)" }}>
-            <span style={{ fontSize: 29, fontWeight: 900, letterSpacing: -1 }}>OodlesNet</span>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase" }}>Choose a product</span>
+          <div aria-hidden="true" style={{ width: "100%", height: 104, flex: "0 0 104px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", boxSizing: "border-box", padding: 7, border: "1px solid #e2e8f0", borderRadius: 10, background: "#fff", color: "rgba(15,118,110,0.28)" }}>
+            <span style={{ fontSize: 23, fontWeight: 900, letterSpacing: -1 }}>OodlesNet</span>
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase" }}>Choose a product</span>
           </div>
         )}
       </div>
