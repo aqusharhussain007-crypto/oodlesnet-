@@ -62,9 +62,9 @@ export default function MultiCompareResult({ products, attributeDefinitions = []
       <p style={{ margin: "0 0 12px", color: "#64748b", fontSize: 12, lineHeight: 1.5 }}>Compare {products.length} products. Swipe horizontally on mobile to view every product column. Missing specifications are not estimated.</p>
       {relatedPairs.length > 0 && <p style={{ margin: "0 0 10px", padding: 9, borderRadius: 8, background: "#eff6ff", color: "#1e40af", fontSize: 12 }}>Related footwear types are being compared. Check the product type labels when interpreting differences.</p>}
       {pairErrors.length > 0 && <p role="alert" style={{ color: "#b91c1c" }}>One or more product pairs could not be scored. Check that all selected products share the same assigned product type.</p>}
-      <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 10, WebkitOverflowScrolling: "touch" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10, minWidth: 0, paddingBottom: 6 }}>
         {rows.map((row, index) => (
-          <article key={row.product.id} style={{ flex: "0 0 190px", width: 190, minWidth: 190, border: "1px solid #dbe3ec", borderRadius: 12, padding: 10, background: "#f8fafc" }}>
+          <article key={row.product.id} style={{ minWidth: 0, width: "100%", border: "1px solid #dbe3ec", borderRadius: 12, padding: 10, background: "#f8fafc" }}>
             <div style={{ fontSize: 11, color: "#0f766e", fontWeight: 900 }}>PRODUCT {String.fromCharCode(65 + index)}</div>
             <div style={{ height: 100, margin: "7px 0", background: "#fff", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
               {row.product.imageUrl ? <img src={row.product.imageUrl} alt={row.product.name || "Product"} style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : <span style={{ color: "#94a3b8", fontSize: 12 }}>No image</span>}
