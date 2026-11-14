@@ -73,7 +73,6 @@ export default function CompareContainer({ currentProduct, demoProducts, attribu
               </section>
             );
           })}
-        </div>
           {slotCount < MAX_PRODUCTS && (
             <button type="button" onClick={() => { setSlotCount((count) => Math.min(MAX_PRODUCTS - 1, count + 1)); setResultReady(false); }} style={{ flex: "0 0 100%", minWidth: 0, minHeight: 150, boxSizing: "border-box", scrollSnapAlign: "start", padding: 18, borderRadius: 12, border: "1px dashed #0d9488", background: "#ecfdf5", color: "#065f46", fontWeight: 800, fontSize: 17 }}>
               + Add another product
