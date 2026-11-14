@@ -55,11 +55,11 @@ export default function ProductSearchPicker({
   return (
     <div style={{ marginTop: 0, minWidth: 0 }}>
       {label ? <label style={{ display: "block", marginBottom: 7, fontWeight: 800 }}>{label}</label> : null}
-      <div style={{ minHeight: 158, height: 158, display: "flex", flexDirection: "column", justifyContent: selected ? "flex-start" : "center", alignItems: "center", minWidth: 0, padding: "2px 0 5px", marginBottom: 5, boxSizing: "border-box", textAlign: "center", overflow: "hidden" }}>
+      <div style={{ minHeight: 184, height: "auto", display: "flex", flexDirection: "column", justifyContent: selected ? "flex-start" : "center", alignItems: "center", minWidth: 0, padding: "2px 0 5px", marginBottom: 5, boxSizing: "border-box", textAlign: "center", overflow: "visible" }}>
         {selected ? (
           <>
             <button type="button" onClick={() => { onSelect?.(null); setQuery(""); setShowResults(true); }} aria-label="Change selected product" title={selected.name || "Selected product"} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, width: "100%", maxWidth: "100%", minWidth: 0, boxSizing: "border-box", padding: 0, border: 0, background: "transparent", color: "inherit", cursor: "pointer", overflow: "hidden" }}>
-              <span style={{ width: "100%", height: 78, flex: "0 0 78px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", borderRadius: 10, background: "#fff" }}>
+              <span style={{ width: "100%", height: 104, flex: "0 0 104px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", boxSizing: "border-box", padding: 7, border: "1px solid #e2e8f0", borderRadius: 10, background: "#fff" }}>
                 {selected.imageUrl ? <img src={selected.imageUrl} alt={selected.name || "Selected product"} loading="lazy" style={{ display: "block", maxWidth: "100%", width: "100%", height: "100%", objectFit: "contain" }} /> : <span style={{ color: "#94a3b8", fontSize: 11 }}>Image unavailable</span>}
               </span>
               <span style={{ display: "-webkit-box", width: "100%", maxWidth: "100%", minWidth: 0, boxSizing: "border-box", padding: "0 3px", fontWeight: 800, fontSize: 13, lineHeight: 1.3, textAlign: "center", overflowWrap: "anywhere", wordBreak: "normal", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{selected.name || "Unnamed product"}</span>
