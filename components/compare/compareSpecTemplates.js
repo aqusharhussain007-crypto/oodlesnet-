@@ -316,11 +316,13 @@ export function getComparisonSpecRows(product, definitions = []) {
       const value = displayableValue(rawValue);
       if (value === null) continue;
       const definition = resolveAttribute(rawKey, registryIndex);
-      if (!definition.key || isVariantOnlyAttribute(definition.key) || !appliesToProduct(definition)) continue;
+      const templateField = templateIndex.get(String(rawKey).replace(/([a-z0-9])([A-Z])/g, "$1_$2").replace(/-/g, "_").toLowerCase());
+      const canonicalKey = templateField?.key || definition.key;
+      if (!canonicalKey || isVariantOnlyAttribute(canonicalKey) || !appliesToProduct(definition)) continue;
       const normalizedValue = normalizeAttributeValue(rawValue, definition);
-      fields.set(definition.key, {
-        key: definition.key,
-        label: definition.label || templateIndex.get(definition.key)?.label || specificationLabel(definition.key),
+      fields.set(canonicalKey, {
+        key: canonicalKey,
+        label: templateField?.label || definition.label || specificationLabel(canonicalKey),
         value,
         normalizedValue,
         dataType: definition.dataType || "text",
@@ -346,11 +348,13 @@ export function getComparisonSpecRows(product, definitions = []) {
 
   for (const item of extractDescriptionSpecs(product?.description, definitions)) {
     const definition = resolveAttribute(item.key, registryIndex);
-    if (!fields.has(definition.key) && appliesToProduct(definition) && !isVariantOnlyAttribute(definition.key)) {
-      fields.set(definition.key, {
+    const templateField = templateIndex.get(item.key);
+    const canonicalKey = templateField?.key || definition.key;
+    if (!fields.has(canonicalKey) && appliesToProduct(definition) && !isVariantOnlyAttribute(canonicalKey)) {
+      fields.set(canonicalKey, {
         ...item,
-        key: definition.key,
-        label: definition.label || templateIndex.get(definition.key)?.label || item.label,
+        key: canonicalKey,
+        label: templateField?.label || definition.label || item.label,
         normalizedValue: normalizeAttributeValue(item.value, definition),
         dataType: definition.dataType || "text",
         unit: definition.unit || null,
