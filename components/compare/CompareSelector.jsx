@@ -1,86 +1,48 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase-app";
-import { canCompare } from "@/components/compare/compareRules";
+import { canCompare } from "./compareRules";
+import ProductSearchPicker from "./ProductSearchPicker";
 
-/**
- * CompareSelector
- * - Shows ONLY products that can be compared with currentProduct
- * - Uses compareRules as single source of truth
- */
-export default function CompareSelector({
-  currentProduct,
-  onSelect,
-  selectedId,
-}) {
+export default function CompareSelector({ currentProduct, selectedId, onSelect, demoProducts }) {
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
-    if (!currentProduct) return;
-
-    async function loadOptions() {
-      setLoading(true);
-
-      try {
-        const snap = await getDocs(collection(db, "products"));
-
-        const filtered = snap.docs
-          .map((d) => ({ id: d.id, ...d.data() }))
-          .filter((p) => {
-            // never compare with itself
-            if (p.id === currentProduct.id) return false;
-
-            // must pass compare rules
-            const res = canCompare(currentProduct, p);
-            return res.allowed;
-          });
-
-        setOptions(filtered);
-      } catch (e) {
-        console.error("CompareSelector load error:", e);
-        setOptions([]);
-      } finally {
-        setLoading(false);
-      }
+    let active = true;
+    setLoading(true);
+    setLoadError(false);
+    try {
+      if (!Array.isArray(demoProducts)) throw new Error("Test catalogue data is unavailable.");
+      const compatible = demoProducts
+        .filter((product) => product && product.id !== currentProduct?.id)
+        .filter((product) => canCompare(currentProduct, product).allowed)
+        .sort((a, b) => String(a.name || "").localeCompare(String(b.name || "")));
+      if (active) setOptions(compatible);
+    } catch (error) {
+      console.error("Test CompareSelector error:", error);
+      if (active) { setOptions([]); setLoadError(true); }
+    } finally {
+      if (active) setLoading(false);
     }
+    return () => { active = false; };
+  }, [currentProduct?.id, currentProduct?.categorySlug, demoProducts]);
 
-    loadOptions();
-  }, [currentProduct]);
+  if (loading) return <p role="status">Preparing compatible products…</p>;
+  if (loadError) return <p role="alert" style={{ color: "#b91c1c" }}>Test products could not be loaded.</p>;
 
   return (
-    <select
-      value={selectedId || ""}
-      disabled={loading || options.length === 0}
-      onChange={(e) => onSelect(e.target.value)}
-      style={{
-        width: "100%",
-        padding: "12px 14px",
-        borderRadius: 14,
-        border: "2px solid #10b981",
-        fontSize: 16,
-        fontWeight: 700,
-        background: "#ffffff",
-        color: "#111827",
-        outline: "none",
-        cursor: loading ? "not-allowed" : "pointer",
-      }}
-    >
-      <option value="">
-        {loading
-          ? "Loading comparable products..."
-          : options.length === 0
-          ? "No comparable products available"
-          : "Select a product to compare"}
-      </option>
-
-      {options.map((p) => (
-        <option key={p.id} value={p.id}>
-          {p.name}
-        </option>
-      ))}
-    </select>
+    <div aria-busy={loading}>
+      <ProductSearchPicker
+        products={options}
+        selectedId={selectedId || ""}
+        onSelect={onSelect}
+        label=""
+        placeholder="Search Product B…"
+        categoryFilter={false}
+        emptyMessage="No compatible products match that search."
+      />
+   </div>
   );
 }
