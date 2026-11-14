@@ -1,6 +1,6 @@
 /**
- * Extract values only for labels explicitly known to the attribute registry.
- * Unknown prose is never reinterpreted as a field name.
+ * Extract explicit labels and a conservative whitelist of footwear construction facts.
+ * General marketing prose is never treated as a specification.
  */
 const DEFAULT_LABELS = [
   "Battery Life", "Fast Charging", "Noise Cancellation", "Coverage Area",
@@ -12,11 +12,13 @@ const DEFAULT_LABELS = [
   "Shoe Type", "Upper Material", "Outsole Material", "Midsole Material",
   "Heel Type", "Arch Support", "Weight",
 ];
-
+const FOOTWEAR_MATERIALS = [
+  "synthetic leather", "genuine leather", "synthetic", "mesh", "leather",
+  "textile", "knit", "canvas", "suede", "rubber", "EVA", "foam",
+];
 function escapeRegex(value) {
   return String(value).replace(/[.*+?^\${}()|[\]\\]/g, "\\$&");
 }
-
 function extractDescriptionSpecs(description, definitions = []) {
   if (typeof description !== "string" || !description.trim()) return [];
   const text = description.replace(/\s+/g, " ").trim();
@@ -25,8 +27,6 @@ function extractDescriptionSpecs(description, definitions = []) {
     ...definitions.flatMap((item) => [item?.label, ...(Array.isArray(item?.aliases) ? item.aliases : [])]),
   ].filter((item) => typeof item === "string" && item.trim()))]
     .sort((a, b) => b.length - a.length);
-  if (!labels.length) return [];
-
   const alternatives = labels.map(escapeRegex).join("|");
   const marker = new RegExp("(?<![A-Za-z0-9])(" + alternatives + ")\\s*:\\s*", "gi");
   const matches = [...text.matchAll(marker)];
@@ -41,7 +41,15 @@ function extractDescriptionSpecs(description, definitions = []) {
     const key = label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
     rows.push({ key, label, value });
   }
+  const materialPattern = FOOTWEAR_MATERIALS.sort((a, b) => b.length - a.length).map(escapeRegex).join("|");
+  const upperMatch = text.match(new RegExp("\\b(" + materialPattern + "(?:\\s+and\\s+(?:" + materialPattern + "))?)\\s+upper\\b", "i"));
+  if (upperMatch && !rows.some((row) => row.key === "material")) {
+    rows.push({ key: "material", label: "Material", value: upperMatch[1] });
+  }
+  const outsoleMatch = text.match(new RegExp("\\b(" + materialPattern + ")\\s+outsole\\b", "i"));
+  if (outsoleMatch && !rows.some((row) => row.key === "sole_material")) {
+    rows.push({ key: "sole_material", label: "Sole Material", value: outsoleMatch[1] });
+  }
   return rows;
 }
-
 module.exports = { extractDescriptionSpecs };
