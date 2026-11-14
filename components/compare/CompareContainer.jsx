@@ -61,8 +61,7 @@ export default function CompareContainer({ currentProduct, demoProducts, attribu
             const excludedIds = new Set([currentProduct.id, ...selectedProducts.filter((p) => p && p.id !== selectedProducts[index]?.id).map((p) => p.id)]);
             const availableProducts = (demoProducts || []).filter((product) => !excludedIds.has(product.id));
             return (
-              <section key={index} ref={(node) => { selectorRefs.current[index] = node; }} style={{ flex: "0 0 100%", minWidth: 0, boxSizing: "border-box", scrollSnapAlign: "start", border: "1px solid #dbe3ec", borderRadius: 12, padding: 10, background: "#ffffff" }}>
-                <div style={{ fontSize: 12, fontWeight: 900, color: "#0f766e", marginBottom: 6 }}>PRODUCT {String.fromCharCode(66 + index)}</div>
+              <section key={index} ref={(node) => { selectorRefs.current[index] = node; }} style={{ flex: "0 0 100%", minWidth: 0, boxSizing: "border-box", scrollSnapAlign: "start" }}>
                 <CompareSelector
                   currentProduct={currentProduct}
                   demoProducts={availableProducts}
