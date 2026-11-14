@@ -77,8 +77,8 @@ export default function MultiCompareResult({ products, attributeDefinitions = []
         ))}
       </div>
       <h4 style={{ margin: "18px 0 8px", fontSize: 15, fontWeight: 900 }}>Specification comparison</h4>
-      <div style={{ width: "100%", overflowX: "auto", border: "1px solid #e2e8f0", borderRadius: 10, WebkitOverflowScrolling: "touch" }}>
-        <table style={{ borderCollapse: "collapse", tableLayout: "fixed", minWidth: 150 + rows.length * 190, width: "100%", fontSize: 12 }}>
+      <div aria-label="Swipe horizontally to compare product specifications" style={{ display: "block", width: "100%", maxWidth: "100%", overflowX: "auto", overflowY: "hidden", border: "1px solid #e2e8f0", borderRadius: 10, WebkitOverflowScrolling: "touch", overscrollBehaviorX: "contain", touchAction: "pan-x" }}>
+        <table style={{ borderCollapse: "collapse", tableLayout: "fixed", minWidth: 150 + rows.length * 190, width: 150 + rows.length * 190, fontSize: 12 }}>
           <thead><tr>
             <th style={{ position: "sticky", left: 0, zIndex: 2, width: 150, minWidth: 150, padding: 10, textAlign: "left", background: "#eaf0f7" }}>Specification</th>
             {rows.map((row, index) => <th key={row.product.id} style={{ width: 190, minWidth: 190, padding: 10, textAlign: "left", verticalAlign: "top", background: "#f1f5f9" }}>PRODUCT {String.fromCharCode(65 + index)}<br />{row.product.name}</th>)}
