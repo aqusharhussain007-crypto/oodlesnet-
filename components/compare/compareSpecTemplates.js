@@ -353,6 +353,20 @@ export function getComparisonSpecRows(product, definitions = []) {
     }
   }
 
+  // Keep the profile's standard comparison rows visible even when a product
+  // has no supplied value. The UI can then show "Not available" instead of
+  // silently hiding important fields or implying that the products are alike.
+  for (const field of profileFields) {
+    if (!fields.has(field.key) && !isVariantOnlyAttribute(field.key)) {
+      fields.set(field.key, {
+        key: field.key,
+        label: field.label,
+        value: null,
+        source: "template",
+      });
+    }
+  }
+
   return [...fields.values()].sort((a, b) => (templateIndex.get(a.key)?.index ?? 9999) - (templateIndex.get(b.key)?.index ?? 9999));
 }
 
