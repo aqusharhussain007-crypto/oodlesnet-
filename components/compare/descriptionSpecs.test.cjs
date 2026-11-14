@@ -54,3 +54,24 @@ test("does not infer footwear specifications from marketing prose", () => {
     []
   );
 });
+
+
+test("extracts only grounded material phrases from Puma-style footwear descriptions", () => {
+  assert.deepEqual(
+    extractDescriptionSpecs("Synthetic and mesh upper allows for easy cleaning. Durable rubber outsole offers excellent traction."),
+    [
+      { key: "material", label: "Material", value: "Synthetic and mesh" },
+      { key: "sole_material", label: "Sole Material", value: "rubber" },
+    ]
+  );
+});
+
+test("does not infer cushioning or closure from generic comfort and activity prose", () => {
+  assert.deepEqual(
+    extractDescriptionSpecs("Breathable mesh upper keeps feet cool. Durable rubber outsole offers stability during activities."),
+    [
+      { key: "material", label: "Material", value: "mesh" },
+      { key: "sole_material", label: "Sole Material", value: "rubber" },
+    ]
+  );
+});
