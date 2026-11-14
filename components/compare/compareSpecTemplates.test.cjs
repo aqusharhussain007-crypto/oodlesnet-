@@ -106,3 +106,17 @@ test("does not show generic seller fallback as a product description", async () 
   }, []);
   assert.equal(rows.some((row) => row.key === "product_details"), false);
 });
+
+
+test("compares grounded footwear materials without displaying the full marketing description", async () => {
+  const { getComparisonSpecRows } = await import("./compareSpecTemplates.js");
+  const rows = getComparisonSpecRows({
+    productType: "running shoes",
+    description: "Synthetic and mesh upper allows for easy cleaning. Durable rubber outsole offers excellent traction and stability. Breathable mesh keeps feet cool.",
+  }, []);
+  assert.equal(rows.find((row) => row.key === "material").value, "Synthetic and mesh");
+  assert.equal(rows.find((row) => row.key === "soleMaterial").value, "rubber");
+  assert.equal(rows.some((row) => row.key === "product_details"), false);
+  assert.equal(rows.find((row) => row.key === "closure").value, null);
+  assert.equal(rows.find((row) => row.key === "cushioning").value, null);
+});
