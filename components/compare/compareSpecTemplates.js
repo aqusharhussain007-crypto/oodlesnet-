@@ -330,7 +330,12 @@ export function getComparisonSpecRows(product, definitions = []) {
   }
 
   const description = displayableValue(product?.description);
-  if (description !== null) {
+  const normalizedDescription = String(description || "").toLowerCase().replace(/\\s+/g, " ").trim();
+  const isGenericFallbackDescription =
+    normalizedDescription.startsWith("prices and product details vary by store") ||
+    normalizedDescription.startsWith("product details vary by store") ||
+    normalizedDescription === "product details will be provided by the seller.";
+  if (description !== null && !isGenericFallbackDescription) {
     fields.set("product_details", {
       key: "product_details",
       label: "Product details (description)",
