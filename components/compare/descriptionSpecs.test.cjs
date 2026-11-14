@@ -32,3 +32,25 @@ test("ignores empty labels and safely handles missing descriptions", () => {
   ]);
   assert.deepEqual(extractDescriptionSpecs(null), []);
 });
+
+
+test("extracts explicitly labelled footwear specifications", () => {
+  assert.deepEqual(
+    extractDescriptionSpecs("Material: Mesh; Sole Material: Rubber; Closure: Lace-up; Cushioning: Foam; Footwear Type: Running; Weight: 280 g"),
+    [
+      { key: "material", label: "Material", value: "Mesh" },
+      { key: "sole_material", label: "Sole Material", value: "Rubber" },
+      { key: "closure", label: "Closure", value: "Lace-up" },
+      { key: "cushioning", label: "Cushioning", value: "Foam" },
+      { key: "footwear_type", label: "Footwear Type", value: "Running" },
+      { key: "weight", label: "Weight", value: "280 g" },
+    ]
+  );
+});
+
+test("does not infer footwear specifications from marketing prose", () => {
+  assert.deepEqual(
+    extractDescriptionSpecs("Breathable mesh upper with soft cushioning for everyday comfort."),
+    []
+  );
+});
