@@ -82,3 +82,27 @@ test("shows missing footwear template attributes as unavailable comparison rows"
   assert.ok(shoeType);
   assert.equal(shoeType.value, null);
 });
+
+
+test("extracts footwear labels into canonical template rows", async () => {
+  const { getComparisonSpecRows } = await import("./compareSpecTemplates.js");
+  const rows = getComparisonSpecRows({
+    productType: "running shoes",
+    description: "Material: Mesh; Sole Material: Rubber; Closure: Lace-up; Cushioning: Foam; Footwear Type: Running; Weight: 280 g",
+  }, []);
+  assert.equal(rows.find((row) => row.key === "material").value, "Mesh");
+  assert.equal(rows.find((row) => row.key === "soleMaterial").value, "Rubber");
+  assert.equal(rows.find((row) => row.key === "closure").value, "Lace-up");
+  assert.equal(rows.find((row) => row.key === "cushioning").value, "Foam");
+  assert.equal(rows.find((row) => row.key === "shoeType").value, "Running");
+  assert.equal(rows.find((row) => row.key === "weight").value, "280 g");
+});
+
+test("does not show generic seller fallback as a product description", async () => {
+  const { getComparisonSpecRows } = await import("./compareSpecTemplates.js");
+  const rows = getComparisonSpecRows({
+    productType: "sneakers",
+    description: "Prices and product details vary by store. You’ll be redirected to the seller for final selection.",
+  }, []);
+  assert.equal(rows.some((row) => row.key === "product_details"), false);
+});
