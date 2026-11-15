@@ -42,7 +42,7 @@ function extractDescriptionSpecs(description, definitions = []) {
     rows.push({ key, label, value });
   }
   const materialPattern = FOOTWEAR_MATERIALS.sort((a, b) => b.length - a.length).map(escapeRegex).join("|");
-  const upperMatch = text.match(/\b((?:synthetic|mesh)(?:\s+and\s+(?:synthetic|mesh))|(?:synthetic leather|genuine leather|leather|textile|knit|canvas|suede|rubber|EVA|foam))\s+upper\b/i);
+  const upperMatch = text.match(/\b((?:synthetic|mesh)(?:\s+and\s+(?:synthetic|mesh))?|(?:synthetic leather|genuine leather|leather|textile|knit|canvas|suede|rubber|EVA|foam))\s+upper\b/i);
   if (upperMatch && !rows.some((row) => row.key === "material")) {
     rows.push({ key: "material", label: "Material", value: upperMatch[1] });
   }
