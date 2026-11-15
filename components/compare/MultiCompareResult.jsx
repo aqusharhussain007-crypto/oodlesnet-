@@ -59,12 +59,12 @@ export default function MultiCompareResult({ products, attributeDefinitions = []
   return (
     <section style={{ marginTop: 18, padding: 14, borderRadius: 16, background: "#fff", border: "1px solid #dbe3ec", boxShadow: "0 8px 22px rgba(0,0,0,.08)", minWidth: 0 }}>
       <h3 style={{ margin: "0 0 8px", fontSize: 19, fontWeight: 900, color: "#0f766e" }}>Side-by-side product comparison</h3>
-      <p style={{ margin: "0 0 12px", color: "#64748b", fontSize: 12, lineHeight: 1.5 }}>Compare {products.length} products. Swipe horizontally on mobile to view every product column. Missing specifications are not estimated.</p>
+      <p style={{ margin: "0 0 12px", color: "#64748b", fontSize: 12, lineHeight: 1.5 }}>Compare {products.length} products. On mobile, each product is shown in its own readable card. Missing specifications are not estimated.</p>
       {relatedPairs.length > 0 && <p style={{ margin: "0 0 10px", padding: 9, borderRadius: 8, background: "#eff6ff", color: "#1e40af", fontSize: 12 }}>Related footwear types are being compared. Check the product type labels when interpreting differences.</p>}
       {pairErrors.length > 0 && <p role="alert" style={{ color: "#b91c1c" }}>One or more product pairs could not be scored. Check that all selected products share the same assigned product type.</p>}
       <h4 style={{ margin: "18px 0 8px", fontSize: 15, fontWeight: 900 }}>Product and specification comparison</h4>
-      <p style={{ margin: "0 0 8px", color: "#64748b", fontSize: 11 }}>Swipe this shared area sideways. Each product card stays aligned with its specification column.</p>
-      <div aria-label="Swipe horizontally to compare product summaries and specifications" style={{ display: "block", width: "100%", maxWidth: "100%", overflowX: "auto", overflowY: "visible", border: "1px solid #e2e8f0", borderRadius: 10, WebkitOverflowScrolling: "touch", overscrollBehaviorX: "contain", touchAction: "auto" }}>
+      <p className="multi-compare-desktop-hint" style={{ margin: "0 0 8px", color: "#64748b", fontSize: 11 }}>Swipe this shared area sideways to view every product column.</p>
+      <div className="multi-compare-desktop" aria-label="Side-by-side product comparison" style={{ display: "block", width: "100%", maxWidth: "100%", overflowX: "auto", overflowY: "visible", border: "1px solid #e2e8f0", borderRadius: 10, WebkitOverflowScrolling: "touch", overscrollBehaviorX: "contain", touchAction: "auto" }}>
         <div style={{ display: "flex", alignItems: "stretch", gap: 0, width: 150 + rows.length * 190, minWidth: 150 + rows.length * 190, padding: "10px 0 12px", boxSizing: "border-box", background: "#fff" }}>
           <div aria-hidden="true" style={{ flex: "0 0 150px", width: 150 }} />
           {rows.map((row, index) => (
@@ -98,6 +98,39 @@ export default function MultiCompareResult({ products, attributeDefinitions = []
           </tbody>
         </table>
       </div>
+      <div className="multi-compare-mobile" aria-label="Mobile product comparison cards">
+        {rows.map((row, index) => (
+          <article key={row.product.id} style={{ minWidth: 0, padding: 12, border: "1px solid #dbe3ec", borderRadius: 14, background: "#f8fafc" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+              <div style={{ flex: "0 0 84px", width: 84, height: 84, padding: 5, boxSizing: "border-box", display: "flex", alignItems: "center", justifyContent: "center", background: "#fff", border: "1px solid #e2e8f0", borderRadius: 10, overflow: "hidden" }}>
+                {row.product.imageUrl ? <img src={row.product.imageUrl} alt={row.product.name || "Product"} style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : <span style={{ color: "#94a3b8", fontSize: 10 }}>No image</span>}
+              </div>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: 10, color: "#0f766e", fontWeight: 900 }}>PRODUCT {String.fromCharCode(65 + index)}</div>
+                <div style={{ marginTop: 3, fontSize: 14, fontWeight: 800, lineHeight: 1.35, overflowWrap: "anywhere" }}>{row.product.name || "Unnamed product"}</div>
+                <div style={{ marginTop: 5, color: "#0f766e", fontSize: 14, fontWeight: 900 }}>{money(row.price)}</div>
+                <div style={{ marginTop: 2, color: "#64748b", fontSize: 11 }}>{row.stores} listed stores · {row.score}/{maxScore} points</div>
+              </div>
+            </div>
+            <div style={{ marginTop: 12, borderTop: "1px solid #e2e8f0" }}>
+              {allFields.length ? allFields.map((field) => (
+                <div key={field.key} style={{ display: "grid", gridTemplateColumns: "minmax(0, 0.85fr) minmax(0, 1.15fr)", gap: 8, padding: "9px 2px", borderBottom: "1px solid #e2e8f0" }}>
+                  <div style={{ minWidth: 0, color: "#475569", fontSize: 12, fontWeight: 800, overflowWrap: "anywhere" }}>{field.label}</div>
+                  <div style={{ minWidth: 0, color: "#0f172a", fontSize: 12, lineHeight: 1.45, overflowWrap: "anywhere" }}>{display(valueFor(row, field.key))}</div>
+                </div>
+              )) : <p style={{ margin: 0, padding: 10, color: "#64748b", fontSize: 12 }}>No structured specifications are available yet.</p>}
+            </div>
+          </article>
+        ))}
+      </div>
+      <style jsx>{`
+        .multi-compare-mobile { display: none; }
+        @media (max-width: 640px) {
+          .multi-compare-desktop { display: none !important; }
+          .multi-compare-desktop-hint { display: none !important; }
+          .multi-compare-mobile { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; width: 100%; min-width: 0; }
+        }
+      `}</style>
       <h4 style={{ margin: "16px 0 6px", fontSize: 15, fontWeight: 900 }}>Price-and-offer score leader</h4>
       <p style={{ margin: 0, color: "#475569", fontSize: 13, lineHeight: 1.5 }}>
         {leaders.length === rows.length ? "All selected products are tied." : leaders.map((row) => row.product.name).join(", ") + " lead(s) with " + bestScore + "/" + maxScore + " points."}
