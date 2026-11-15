@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "test:compare": "node --test components/compare/priceAdvantage.test.cjs components/compare/productCompatibility.test.cjs components/compare/comparisonScoring.test.cjs components/compare/descriptionSpecs.test.cjs components/compare/attributeRegistry.test.cjs components/compare/compareSpecTemplates.test.cjs scripts/validate-attribute-seed.test.cjs lib/productTypeSuggestions.test.cjs",
+    "build": "npm run test:compare && next build",
     "start": "next start",
     "lint": "next lint"
   },
