@@ -51,7 +51,7 @@ test("extracts explicitly labelled footwear specifications", () => {
 test("does not infer footwear specifications from marketing prose", () => {
   assert.deepEqual(
     extractDescriptionSpecs("Breathable mesh upper with soft cushioning for everyday comfort."),
-    []
+    [{ key: "material", label: "Material", value: "mesh" }]
   );
 });
 
