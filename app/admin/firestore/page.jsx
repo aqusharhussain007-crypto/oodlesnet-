@@ -67,6 +67,36 @@ export default function FirestoreAdminPage() {
     }
   }
 
+  async function downloadProductsBackup() {
+    if (!idToken) return;
+    setBusy(true);
+    setStatus("Creating read-only LIVE products backup…");
+    try {
+      const response = await fetch("/api/admin/firestore-backup", {
+        headers: { Authorization: "Bearer " + idToken },
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        throw new Error(result.error || "Backup export failed.");
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "oodlesnet-live-products-backup.json";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setStatus("Backup downloaded. Firestore was read only; no records were changed.");
+    } catch (error) {
+      setStatus(error?.message || "Backup download failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   function changeCollection(value) {
     setCollection(value);
     setDocuments([]);
@@ -179,6 +209,7 @@ export default function FirestoreAdminPage() {
           </select>
           <div style={rowStyle}>
             <button disabled={busy} onClick={() => requestRecords(collection)} style={buttonStyle}>Load / refresh</button>
+            <button disabled={busy} onClick={downloadProductsBackup} style={secondaryButtonStyle}>Download LIVE products backup</button>
             <button disabled={busy} onClick={logout} style={secondaryButtonStyle}>Sign out</button>
           </div>
           <p style={{ color: "#aab4c5" }}>Read view: displays live records. Write tools below require a dry-run and a separate confirmation.</p>
